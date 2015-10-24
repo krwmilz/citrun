@@ -26,64 +26,68 @@ using namespace std;
 class MyASTVisitor : public RecursiveASTVisitor<MyASTVisitor>
 {
 public:
-    MyASTVisitor(Rewriter &R)
-        : TheRewriter(R)
-    {}
+	MyASTVisitor(Rewriter &R)
+		: TheRewriter(R)
+	{}
 
-    bool VisitStmt(Stmt *s) {
-        // Only care about If statements.
-        if (isa<IfStmt>(s)) {
-            IfStmt *IfStatement = cast<IfStmt>(s);
-            Stmt *Then = IfStatement->getThen();
+	bool VisitStmt(Stmt *s) {
 
-            TheRewriter.InsertText(Then->getLocStart(),
-                                   "// the 'if' part\n",
-                                   true, true);
+		TheRewriter.InsertTextAfter(s->getLocEnd(),
+		                       "// <- statement here");
 
-            Stmt *Else = IfStatement->getElse();
-            if (Else)
-                TheRewriter.InsertText(Else->getLocStart(),
-                                       "// the 'else' part\n",
-                                       true, true);
-        }
+		// Only care about If statements.
+		if (isa<IfStmt>(s)) {
+			IfStmt *IfStatement = cast<IfStmt>(s);
+			Stmt *Then = IfStatement->getThen();
 
-        return true;
-    }
+			TheRewriter.InsertText(Then->getLocStart(),
+					"// the 'if' part\n",
+					true, true);
 
-    bool VisitFunctionDecl(FunctionDecl *f) {
-        // Only function definitions (with bodies), not declarations.
-        if (f->hasBody()) {
-            Stmt *FuncBody = f->getBody();
+			Stmt *Else = IfStatement->getElse();
+			if (Else)
+				TheRewriter.InsertText(Else->getLocStart(),
+						"// the 'else' part\n",
+						true, true);
+		}
 
-            // Type name as string
-            QualType QT = f->getReturnType();
-            string TypeStr = QT.getAsString();
+		return true;
+	}
 
-            // Function name
-            DeclarationName DeclName = f->getNameInfo().getName();
-            string FuncName = DeclName.getAsString();
+	bool VisitFunctionDecl(FunctionDecl *f) {
+		// Only function definitions (with bodies), not declarations.
+		if (f->hasBody()) {
+			Stmt *FuncBody = f->getBody();
 
-            // Add comment before
-            stringstream SSBefore;
-            SSBefore << "// Begin function " << FuncName << " returning "
-                     << TypeStr << "\n";
-            SourceLocation ST = f->getSourceRange().getBegin();
-            TheRewriter.InsertText(ST, SSBefore.str(), true, true);
+			// Type name as string
+			QualType QT = f->getReturnType();
+			string TypeStr = QT.getAsString();
 
-            // And after
-            stringstream SSAfter;
-            SSAfter << "\n// End function " << FuncName << "\n";
-            ST = FuncBody->getLocEnd().getLocWithOffset(1);
-            TheRewriter.InsertText(ST, SSAfter.str(), true, true);
-        }
+			// Function name
+			DeclarationName DeclName = f->getNameInfo().getName();
+			string FuncName = DeclName.getAsString();
 
-        return true;
-    }
+			// Add comment before
+			stringstream SSBefore;
+			SSBefore << "// Begin function " << FuncName << " returning "
+				<< TypeStr << "\n";
+			SourceLocation ST = f->getSourceRange().getBegin();
+			TheRewriter.InsertText(ST, SSBefore.str(), true, true);
+
+			// And after
+			stringstream SSAfter;
+			SSAfter << "\n// End function " << FuncName << "\n";
+			ST = FuncBody->getLocEnd().getLocWithOffset(1);
+			TheRewriter.InsertText(ST, SSAfter.str(), true, true);
+		}
+
+		return true;
+	}
 
 private:
-    void AddBraces(Stmt *s);
+	void AddBraces(Stmt *s);
 
-    Rewriter &TheRewriter;
+	Rewriter &TheRewriter;
 };
 
 
@@ -91,77 +95,78 @@ private:
 // by the Clang parser.
 class MyASTConsumer : public ASTConsumer
 {
-public:
-    MyASTConsumer(Rewriter &R)
-        : Visitor(R)
-    {}
+	public:
+		MyASTConsumer(Rewriter &R)
+			: Visitor(R)
+		{}
 
-    // Override the method that gets called for each parsed top-level
-    // declaration.
-    virtual bool HandleTopLevelDecl(DeclGroupRef DR) {
-        for (DeclGroupRef::iterator b = DR.begin(), e = DR.end();
-             b != e; ++b)
-            // Traverse the declaration using our AST visitor.
-            Visitor.TraverseDecl(*b);
-        return true;
-    }
+		// Override the method that gets called for each parsed
+		// top-level declaration.
+		virtual bool HandleTopLevelDecl(DeclGroupRef DR) {
+			for (DeclGroupRef::iterator b = DR.begin(), e = DR.end();
+					b != e; ++b)
+				// Traverse the declaration using our AST
+				// visitor.
+				Visitor.TraverseDecl(*b);
+			return true;
+		}
 
-private:
-    MyASTVisitor Visitor;
+	private:
+		MyASTVisitor Visitor;
 };
 
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2) {
-        llvm::errs() << "Usage: rewritersample <filename>\n";
-        return 1;
-    }
+	if (argc != 2) {
+		llvm::errs() << "Usage: rewritersample <filename>\n";
+		return 1;
+	}
 
-    // CompilerInstance will hold the instance of the Clang compiler for us,
-    // managing the various objects needed to run the compiler.
-    CompilerInstance TheCompInst;
-    TheCompInst.createDiagnostics(NULL, false);
+	// CompilerInstance will hold the instance of the Clang compiler for us,
+	// managing the various objects needed to run the compiler.
+	CompilerInstance TheCompInst;
+	TheCompInst.createDiagnostics(NULL, false);
 
-    // Initialize target info with the default triple for our platform.
-    TargetOptions TO;
-    TO.Triple = llvm::sys::getDefaultTargetTriple();
-    std::shared_ptr<TargetOptions> TO_shared (&TO);
-    TargetInfo *TI = TargetInfo::CreateTargetInfo(
-        TheCompInst.getDiagnostics(), &TO);
-    TheCompInst.setTarget(TI);
+	// Initialize target info with the default triple for our platform.
+	TargetOptions TO;
+	TO.Triple = llvm::sys::getDefaultTargetTriple();
+	// std::shared_ptr<TargetOptions> TO_shared (&TO);
+	TargetInfo *TI = TargetInfo::CreateTargetInfo(
+			TheCompInst.getDiagnostics(), &TO);
+	TheCompInst.setTarget(TI);
 
-    TheCompInst.createFileManager();
-    FileManager &FileMgr = TheCompInst.getFileManager();
-    TheCompInst.createSourceManager(FileMgr);
-    SourceManager &SourceMgr = TheCompInst.getSourceManager();
-    TheCompInst.createPreprocessor();
-    TheCompInst.createASTContext();
+	TheCompInst.createFileManager();
+	FileManager &FileMgr = TheCompInst.getFileManager();
+	TheCompInst.createSourceManager(FileMgr);
+	SourceManager &SourceMgr = TheCompInst.getSourceManager();
+	TheCompInst.createPreprocessor();
+	TheCompInst.createASTContext();
 
-    // A Rewriter helps us manage the code rewriting task.
-    Rewriter TheRewriter;
-    TheRewriter.setSourceMgr(SourceMgr, TheCompInst.getLangOpts());
+	// A Rewriter helps us manage the code rewriting task.
+	Rewriter TheRewriter;
+	TheRewriter.setSourceMgr(SourceMgr, TheCompInst.getLangOpts());
 
-    // Set the main file handled by the source manager to the input file.
-    const FileEntry *FileIn = FileMgr.getFile(argv[1]);
-    SourceMgr.createMainFileID(FileIn);
-    TheCompInst.getDiagnosticClient().BeginSourceFile(
-        TheCompInst.getLangOpts(),
-        &TheCompInst.getPreprocessor());
+	// Set the main file handled by the source manager to the input file.
+	const FileEntry *FileIn = FileMgr.getFile(argv[1]);
+	SourceMgr.createMainFileID(FileIn);
+	TheCompInst.getDiagnosticClient().BeginSourceFile(
+			TheCompInst.getLangOpts(),
+			&TheCompInst.getPreprocessor());
 
-    // Create an AST consumer instance which is going to get called by
-    // ParseAST.
-    MyASTConsumer TheConsumer(TheRewriter);
+	// Create an AST consumer instance which is going to get called by
+	// ParseAST.
+	MyASTConsumer TheConsumer(TheRewriter);
 
-    // Parse the file to AST, registering our consumer as the AST consumer.
-    ParseAST(TheCompInst.getPreprocessor(), &TheConsumer,
-             TheCompInst.getASTContext());
+	// Parse the file to AST, registering our consumer as the AST consumer.
+	ParseAST(TheCompInst.getPreprocessor(), &TheConsumer,
+			TheCompInst.getASTContext());
 
-    // At this point the rewriter's buffer should be full with the rewritten
-    // file contents.
-    const RewriteBuffer *RewriteBuf =
-        TheRewriter.getRewriteBufferFor(SourceMgr.getMainFileID());
-    llvm::outs() << string(RewriteBuf->begin(), RewriteBuf->end());
+	// At this point the rewriter's buffer should be full with the rewritten
+	// file contents.
+	const RewriteBuffer *RewriteBuf =
+		TheRewriter.getRewriteBufferFor(SourceMgr.getMainFileID());
+	llvm::outs() << string(RewriteBuf->begin(), RewriteBuf->end());
 
-    return 0;
+	return 0;
 }
