@@ -4,13 +4,11 @@ CXXFLAGS += -std=c++1y -fno-rtti -g
 CXX = eg++
 
 LDLIBS += \
-  -lclangFrontendTool -lclangFrontend -lclangDriver \
-  -lclangSerialization -lclangCodeGen -lclangParse \
-  -lclangSema -lclangStaticAnalyzerFrontend \
-  -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore \
-  -lclangAnalysis -lclangARCMigrate -lclangRewriteCore -lclangRewriteFrontend \
+  -lclangFrontend -lclangDriver -lclangSerialization -lclangParse \
+  -lclangSema -lclangAnalysis -lclangRewriteCore -lclangRewriteFrontend \
   -lclangEdit -lclangAST -lclangLex -lclangBasic -lclangTooling \
-  -lLLVMOption -lLLVMMCParser -lLLVMTransformUtils -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMSupport \
+  -lLLVMOption -lLLVMMCParser -lLLVMTransformUtils -lLLVMMC -lLLVMBitReader \
+  -lLLVMCore -lLLVMSupport \
   -lpthread -lz
 
 instrument: instrument.cpp
