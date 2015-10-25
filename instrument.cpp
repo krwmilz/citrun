@@ -52,38 +52,38 @@ public:
 		return true;
 	}
 
-  bool VisitFunctionDecl(FunctionDecl *f) {
-    // Only function definitions (with bodies), not declarations.
-    if (f->hasBody()) {
-      Stmt *FuncBody = f->getBody();
+	bool VisitFunctionDecl(FunctionDecl *f) {
+		// Only function definitions (with bodies), not declarations.
+		if (f->hasBody()) {
+			Stmt *FuncBody = f->getBody();
 
-      // Type name as string
-      QualType QT = f->getReturnType();
-      std::string TypeStr = QT.getAsString();
+			// Type name as string
+			QualType QT = f->getReturnType();
+			std::string TypeStr = QT.getAsString();
 
-      // Function name
-      DeclarationName DeclName = f->getNameInfo().getName();
-      std::string FuncName = DeclName.getAsString();
+			// Function name
+			DeclarationName DeclName = f->getNameInfo().getName();
+			std::string FuncName = DeclName.getAsString();
 
-      // Add comment before
-      std::stringstream SSBefore;
-      SSBefore << "// Begin function " << FuncName << " returning " << TypeStr
-               << "\n";
-      SourceLocation ST = f->getSourceRange().getBegin();
-      TheRewriter.InsertText(ST, SSBefore.str(), true, true);
+			// Add comment before
+			std::stringstream SSBefore;
+			SSBefore << "// Begin function " << FuncName << " returning " << TypeStr
+				<< "\n";
+			SourceLocation ST = f->getSourceRange().getBegin();
+			TheRewriter.InsertText(ST, SSBefore.str(), true, true);
 
-      // And after
-      std::stringstream SSAfter;
-      SSAfter << "\n// End function " << FuncName;
-      ST = FuncBody->getLocEnd().getLocWithOffset(1);
-      TheRewriter.InsertText(ST, SSAfter.str(), true, true);
-    }
+			// And after
+			std::stringstream SSAfter;
+			SSAfter << "\n// End function " << FuncName;
+			ST = FuncBody->getLocEnd().getLocWithOffset(1);
+			TheRewriter.InsertText(ST, SSAfter.str(), true, true);
+		}
 
-    return true;
-  }
+		return true;
+	}
 
 private:
-  Rewriter &TheRewriter;
+	Rewriter &TheRewriter;
 };
 
 // Implementation of the ASTConsumer interface for reading an AST produced
@@ -131,14 +131,16 @@ private:
 	Rewriter TheRewriter;
 };
 
-int main(int argc, const char **argv) {
-  CommonOptionsParser op(argc, argv, ToolingSampleCategory);
-  ClangTool Tool(op.getCompilations(), op.getSourcePathList());
+int
+main(int argc, const char *argv[])
+{
+	CommonOptionsParser op(argc, argv, ToolingSampleCategory);
+	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
-  // ClangTool::run accepts a FrontendActionFactory, which is then used to
-  // create new objects implementing the FrontendAction interface. Here we use
-  // the helper newFrontendActionFactory to create a default factory that will
-  // return a new MyFrontendAction object every time.
-  // To further customize this, we could create our own factory class.
-  return Tool.run(newFrontendActionFactory<MyFrontendAction>());
+	// ClangTool::run accepts a FrontendActionFactory, which is then used to
+	// create new objects implementing the FrontendAction interface. Here we
+	// use the helper newFrontendActionFactory to create a default factory
+	// that will return a new MyFrontendAction object every time.  To
+	// further customize this, we could create our own factory class.
+	return Tool.run(newFrontendActionFactory<MyFrontendAction>());
 }
