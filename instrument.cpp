@@ -1,172 +1,144 @@
-#include <cstdio>
-#include <string>
+//------------------------------------------------------------------------------
+// Tooling sample. Demonstrates:
+//
+// * How to write a simple source tool using libTooling.
+// * How to use RecursiveASTVisitor to find interesting AST nodes.
+// * How to use the Rewriter API to rewrite the source code.
+//
+// Eli Bendersky (eliben@gmail.com)
+// This code is in the public domain
+//------------------------------------------------------------------------------
 #include <sstream>
+#include <string>
 
+#include "clang/AST/AST.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/FileManager.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TargetOptions.h"
-#include "clang/Basic/TargetInfo.h"
+#include "clang/Frontend/ASTConsumers.h"
+#include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Parse/ParseAST.h"
+#include "clang/Tooling/CommonOptionsParser.h"
+#include "clang/Tooling/Tooling.h"
 #include "clang/Rewrite/Core/Rewriter.h"
-#include "clang/Rewrite/Frontend/Rewriters.h"
-#include "llvm/Support/Host.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
-using namespace std;
+using namespace clang::driver;
+using namespace clang::tooling;
 
+static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
 
 // By implementing RecursiveASTVisitor, we can specify which AST nodes
 // we're interested in by overriding relevant methods.
-class MyASTVisitor : public RecursiveASTVisitor<MyASTVisitor>
-{
+class MyASTVisitor : public RecursiveASTVisitor<MyASTVisitor> {
 public:
-	MyASTVisitor(Rewriter &R)
-		: TheRewriter(R)
-	{}
+	MyASTVisitor(Rewriter &R) : TheRewriter(R) {}
 
 	bool VisitStmt(Stmt *s) {
-
-		TheRewriter.InsertTextAfter(s->getLocEnd(),
-		                       "// <- statement here");
-
 		// Only care about If statements.
 		if (isa<IfStmt>(s)) {
 			IfStmt *IfStatement = cast<IfStmt>(s);
 			Stmt *Then = IfStatement->getThen();
 
-			TheRewriter.InsertText(Then->getLocStart(),
-					"// the 'if' part\n",
-					true, true);
+			TheRewriter.InsertText(Then->getLocStart(), "// the 'if' part\n", true,
+					true);
 
 			Stmt *Else = IfStatement->getElse();
 			if (Else)
-				TheRewriter.InsertText(Else->getLocStart(),
-						"// the 'else' part\n",
+				TheRewriter.InsertText(Else->getLocStart(), "// the 'else' part\n",
 						true, true);
 		}
 
 		return true;
 	}
 
-	bool VisitFunctionDecl(FunctionDecl *f) {
-		// Only function definitions (with bodies), not declarations.
-		if (f->hasBody()) {
-			Stmt *FuncBody = f->getBody();
+  bool VisitFunctionDecl(FunctionDecl *f) {
+    // Only function definitions (with bodies), not declarations.
+    if (f->hasBody()) {
+      Stmt *FuncBody = f->getBody();
 
-			// Type name as string
-			QualType QT = f->getReturnType();
-			string TypeStr = QT.getAsString();
+      // Type name as string
+      QualType QT = f->getReturnType();
+      std::string TypeStr = QT.getAsString();
 
-			// Function name
-			DeclarationName DeclName = f->getNameInfo().getName();
-			string FuncName = DeclName.getAsString();
+      // Function name
+      DeclarationName DeclName = f->getNameInfo().getName();
+      std::string FuncName = DeclName.getAsString();
 
-			// Add comment before
-			stringstream SSBefore;
-			SSBefore << "// Begin function " << FuncName << " returning "
-				<< TypeStr << "\n";
-			SourceLocation ST = f->getSourceRange().getBegin();
-			TheRewriter.InsertText(ST, SSBefore.str(), true, true);
+      // Add comment before
+      std::stringstream SSBefore;
+      SSBefore << "// Begin function " << FuncName << " returning " << TypeStr
+               << "\n";
+      SourceLocation ST = f->getSourceRange().getBegin();
+      TheRewriter.InsertText(ST, SSBefore.str(), true, true);
 
-			// And after
-			stringstream SSAfter;
-			SSAfter << "\n// End function " << FuncName << "\n";
-			ST = FuncBody->getLocEnd().getLocWithOffset(1);
-			TheRewriter.InsertText(ST, SSAfter.str(), true, true);
+      // And after
+      std::stringstream SSAfter;
+      SSAfter << "\n// End function " << FuncName;
+      ST = FuncBody->getLocEnd().getLocWithOffset(1);
+      TheRewriter.InsertText(ST, SSAfter.str(), true, true);
+    }
+
+    return true;
+  }
+
+private:
+  Rewriter &TheRewriter;
+};
+
+// Implementation of the ASTConsumer interface for reading an AST produced
+// by the Clang parser.
+class MyASTConsumer : public ASTConsumer {
+public:
+	MyASTConsumer(Rewriter &R) : Visitor(R) {}
+
+	// Override the method that gets called for each parsed top-level
+	// declaration.
+	bool HandleTopLevelDecl(DeclGroupRef DR) override {
+		for (DeclGroupRef::iterator b = DR.begin(), e = DR.end(); b != e; ++b) {
+			// Traverse the declaration using our AST visitor.
+			Visitor.TraverseDecl(*b);
+			(*b)->dump();
 		}
-
 		return true;
 	}
 
 private:
-	void AddBraces(Stmt *s);
-
-	Rewriter &TheRewriter;
+	MyASTVisitor Visitor;
 };
 
+// For each source file provided to the tool, a new FrontendAction is created.
+class MyFrontendAction : public ASTFrontendAction {
+public:
+	MyFrontendAction() {}
+	void EndSourceFileAction() override {
+		SourceManager &SM = TheRewriter.getSourceMgr();
+		llvm::errs() << "** EndSourceFileAction for: "
+			<< SM.getFileEntryForID(SM.getMainFileID())->getName() << "\n";
 
-// Implementation of the ASTConsumer interface for reading an AST produced
-// by the Clang parser.
-class MyASTConsumer : public ASTConsumer
-{
-	public:
-		MyASTConsumer(Rewriter &R)
-			: Visitor(R)
-		{}
-
-		// Override the method that gets called for each parsed
-		// top-level declaration.
-		virtual bool HandleTopLevelDecl(DeclGroupRef DR) {
-			for (DeclGroupRef::iterator b = DR.begin(), e = DR.end();
-					b != e; ++b)
-				// Traverse the declaration using our AST
-				// visitor.
-				Visitor.TraverseDecl(*b);
-			return true;
-		}
-
-	private:
-		MyASTVisitor Visitor;
-};
-
-
-int main(int argc, char *argv[])
-{
-	if (argc != 2) {
-		llvm::errs() << "Usage: rewritersample <filename>\n";
-		return 1;
+		// Now emit the rewritten buffer.
+		TheRewriter.getEditBuffer(SM.getMainFileID()).write(llvm::outs());
 	}
 
-	// CompilerInstance will hold the instance of the Clang compiler for us,
-	// managing the various objects needed to run the compiler.
-	CompilerInstance TheCompInst;
-	TheCompInst.createDiagnostics(NULL, false);
+	ASTConsumer *CreateASTConsumer(CompilerInstance &CI,
+			StringRef file) override {
+		llvm::errs() << "** Creating AST consumer for: " << file << "\n";
+		TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
+		return new MyASTConsumer(TheRewriter);
+	}
 
-	// Initialize target info with the default triple for our platform.
-	TargetOptions TO;
-	TO.Triple = llvm::sys::getDefaultTargetTriple();
-	// std::shared_ptr<TargetOptions> TO_shared (&TO);
-	TargetInfo *TI = TargetInfo::CreateTargetInfo(
-			TheCompInst.getDiagnostics(), &TO);
-	TheCompInst.setTarget(TI);
-
-	TheCompInst.createFileManager();
-	FileManager &FileMgr = TheCompInst.getFileManager();
-	TheCompInst.createSourceManager(FileMgr);
-	SourceManager &SourceMgr = TheCompInst.getSourceManager();
-	TheCompInst.createPreprocessor();
-	TheCompInst.createASTContext();
-
-	// A Rewriter helps us manage the code rewriting task.
+private:
 	Rewriter TheRewriter;
-	TheRewriter.setSourceMgr(SourceMgr, TheCompInst.getLangOpts());
+};
 
-	// Set the main file handled by the source manager to the input file.
-	const FileEntry *FileIn = FileMgr.getFile(argv[1]);
-	SourceMgr.createMainFileID(FileIn);
-	TheCompInst.getDiagnosticClient().BeginSourceFile(
-			TheCompInst.getLangOpts(),
-			&TheCompInst.getPreprocessor());
+int main(int argc, const char **argv) {
+  CommonOptionsParser op(argc, argv, ToolingSampleCategory);
+  ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
-	// Create an AST consumer instance which is going to get called by
-	// ParseAST.
-	MyASTConsumer TheConsumer(TheRewriter);
-
-	// Parse the file to AST, registering our consumer as the AST consumer.
-	ParseAST(TheCompInst.getPreprocessor(), &TheConsumer,
-			TheCompInst.getASTContext());
-
-	// At this point the rewriter's buffer should be full with the rewritten
-	// file contents.
-	const RewriteBuffer *RewriteBuf =
-		TheRewriter.getRewriteBufferFor(SourceMgr.getMainFileID());
-	llvm::outs() << string(RewriteBuf->begin(), RewriteBuf->end());
-
-	return 0;
+  // ClangTool::run accepts a FrontendActionFactory, which is then used to
+  // create new objects implementing the FrontendAction interface. Here we use
+  // the helper newFrontendActionFactory to create a default factory that will
+  // return a new MyFrontendAction object every time.
+  // To further customize this, we could create our own factory class.
+  return Tool.run(newFrontendActionFactory<MyFrontendAction>());
 }
