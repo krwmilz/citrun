@@ -35,23 +35,49 @@ public:
 	MyASTVisitor(Rewriter &R) : TheRewriter(R) {}
 
 	bool VisitStmt(Stmt *s) {
-		// Only care about If statements.
+		std::stringstream ss;
+		SourceManager &SM = TheRewriter.getSourceMgr();
+		unsigned line = SM.getPresumedLineNumber(s->getLocStart());
+
+		ss << "lines[" << line << "] = 1";
+
 		if (isa<IfStmt>(s)) {
 			IfStmt *IfStatement = cast<IfStmt>(s);
-			Stmt *Then = IfStatement->getThen();
-
-			TheRewriter.InsertText(Then->getLocStart(), "// the 'if' part\n", true,
-					true);
-
-			Stmt *Else = IfStatement->getElse();
-			if (Else)
-				TheRewriter.InsertText(Else->getLocStart(), "// the 'else' part\n",
-						true, true);
+			Stmt *Cond = IfStatement->getCond();
+			ss << ", ";
+			TheRewriter.InsertTextBefore(Cond->getLocStart(),
+					ss.str());
+		}
+		else if (isa<ForStmt>(s)) {
+			ForStmt *ForStatement = cast<ForStmt>(s);
+			Stmt *Cond = ForStatement->getCond();
+			ss << ", ";
+			TheRewriter.InsertTextAfter(Cond->getLocStart(),
+					ss.str());
+		}
+		else if (isa<ReturnStmt>(s)) {
+			ReturnStmt *ReturnStatement = cast<ReturnStmt>(s);
+			Expr *RetValue = ReturnStatement->getRetValue();
+			ss << ", ";
+			TheRewriter.InsertTextBefore(RetValue->getLocStart(),
+					ss.str());
+		}
+		else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
+		    isa<DeclStmt>(s) || isa<SwitchStmt>(s) ||
+		    isa<SwitchCase>(s)) {
+			ss << "; ";
+			TheRewriter.InsertTextBefore(s->getLocStart(),
+					ss.str());
+		}
+		else if (isa<Expr>(s)) {
+			// TheRewriter.InsertTextBefore(s->getLocStart(),
+			//		"lines[xx] = 1; ");
 		}
 
 		return true;
 	}
 
+#if 0
 	bool VisitFunctionDecl(FunctionDecl *f) {
 		// Only function definitions (with bodies), not declarations.
 		if (f->hasBody()) {
@@ -81,6 +107,7 @@ public:
 
 		return true;
 	}
+#endif
 
 private:
 	Rewriter &TheRewriter;
