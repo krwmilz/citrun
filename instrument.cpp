@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTConsumer.h"
@@ -33,6 +34,11 @@ static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
 class MyASTVisitor : public RecursiveASTVisitor<MyASTVisitor> {
 public:
 	MyASTVisitor(Rewriter &R) : TheRewriter(R) {}
+
+	bool VisitVarDecl(VarDecl *d) {
+		// std::cout << "HERE" << std::endl;
+		return true;
+	}
 
 	bool VisitStmt(Stmt *s) {
 		std::stringstream ss;
@@ -69,20 +75,23 @@ public:
 			TheRewriter.InsertTextBefore(s->getLocStart(),
 					ss.str());
 		}
-		else if (isa<Expr>(s)) {
-			// TheRewriter.InsertTextBefore(s->getLocStart(),
-			//		"lines[xx] = 1; ");
+		else if (isa<CallExpr>(s)) {
+			/* still has problems with f(x) + g(y) style code
+			ss << ", ";
+			TheRewriter.InsertTextBefore(s->getLocStart(),
+					ss.str());
+			*/
 		}
 
 		return true;
 	}
 
-#if 0
 	bool VisitFunctionDecl(FunctionDecl *f) {
 		// Only function definitions (with bodies), not declarations.
 		if (f->hasBody()) {
 			Stmt *FuncBody = f->getBody();
 
+#if 0
 			// Type name as string
 			QualType QT = f->getReturnType();
 			std::string TypeStr = QT.getAsString();
@@ -103,11 +112,11 @@ public:
 			SSAfter << "\n// End function " << FuncName;
 			ST = FuncBody->getLocEnd().getLocWithOffset(1);
 			TheRewriter.InsertText(ST, SSAfter.str(), true, true);
+#endif
 		}
 
 		return true;
 	}
-#endif
 
 private:
 	Rewriter &TheRewriter;
@@ -125,7 +134,7 @@ public:
 		for (DeclGroupRef::iterator b = DR.begin(), e = DR.end(); b != e; ++b) {
 			// Traverse the declaration using our AST visitor.
 			Visitor.TraverseDecl(*b);
-			(*b)->dump();
+			// (*b)->dump();
 		}
 		return true;
 	}
@@ -139,18 +148,30 @@ class MyFrontendAction : public ASTFrontendAction {
 public:
 	MyFrontendAction() {}
 	void EndSourceFileAction() override {
-		SourceManager &SM = TheRewriter.getSourceMgr();
+		SourceManager &sm = TheRewriter.getSourceMgr();
+		const FileID main_fid = sm.getMainFileID();
 		llvm::errs() << "** EndSourceFileAction for: "
-			<< SM.getFileEntryForID(SM.getMainFileID())->getName() << "\n";
+			<< sm.getFileEntryForID(main_fid)->getName()
+			<< "\n";
+
+		SourceLocation start = sm.getLocForStartOfFile(main_fid);
+
+		std::stringstream ss;
+		// This isn't the correct size but will always be sufficient
+		ss << "static unsigned int lines[" << sm.getFileIDSize(main_fid)
+			<< "];\n";
+		TheRewriter.InsertTextAfter(start, ss.str());
 
 		// Now emit the rewritten buffer.
-		TheRewriter.getEditBuffer(SM.getMainFileID()).write(llvm::outs());
+		TheRewriter.getEditBuffer(main_fid).write(llvm::outs());
 	}
 
 	ASTConsumer *CreateASTConsumer(CompilerInstance &CI,
 			StringRef file) override {
 		llvm::errs() << "** Creating AST consumer for: " << file << "\n";
-		TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
+		SourceManager &sm = CI.getSourceManager();
+		TheRewriter.setSourceMgr(sm, CI.getLangOpts());
+
 		return new MyASTConsumer(TheRewriter);
 	}
 
