@@ -157,9 +157,9 @@ public:
 	void EndSourceFileAction() override {
 		SourceManager &sm = TheRewriter.getSourceMgr();
 		const FileID main_fid = sm.getMainFileID();
-		llvm::errs() << "** EndSourceFileAction for: "
-			<< sm.getFileEntryForID(main_fid)->getName()
-			<< "\n";
+		// llvm::errs() << "** EndSourceFileAction for: "
+		// 	<< sm.getFileEntryForID(main_fid)->getName()
+		// 	<< "\n";
 
 		SourceLocation start = sm.getLocForStartOfFile(main_fid);
 
@@ -175,7 +175,7 @@ public:
 
 	ASTConsumer *CreateASTConsumer(CompilerInstance &CI,
 			StringRef file) override {
-		llvm::errs() << "** Creating AST consumer for: " << file << "\n";
+		// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
 		SourceManager &sm = CI.getSourceManager();
 		TheRewriter.setSourceMgr(sm, CI.getLangOpts());
 
