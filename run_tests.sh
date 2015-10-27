@@ -24,8 +24,8 @@ for t in `ls tests/*.c`; do
 		continue
 	fi
 
-	if ! sh ${t}.sh /tmp/bin; then
-		echo "$t:$RED tests failed!"
+	if ! sh ${t}.sh /tmp/bin "${t}"; then
+		echo "$t:$RED tests failed!$RESET"
 		rm /tmp/bin
 		continue
 	fi
