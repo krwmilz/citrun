@@ -68,6 +68,13 @@ public:
 			TheRewriter.InsertTextBefore(RetValue->getLocStart(),
 					ss.str());
 		}
+		else if (isa<WhileStmt>(s)) {
+			WhileStmt *WhileStatement = cast<WhileStmt>(s);
+			Stmt *Cond = WhileStatement->getCond();
+			ss << ", ";
+			TheRewriter.InsertTextBefore(Cond->getLocStart(),
+					ss.str());
+		}
 		else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
 		    isa<DeclStmt>(s) || isa<SwitchStmt>(s) ||
 		    isa<SwitchCase>(s)) {
