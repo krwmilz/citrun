@@ -13,5 +13,8 @@ LDLIBS += \
 
 instrument: instrument.cpp
 
+test: instrument
+	sh run_tests.sh
+
 clean:
 	rm instrument

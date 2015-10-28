@@ -1,6 +1,5 @@
 #!/bin/sh
 
-make || exit 1
 # make sure we have a .c extension
 temp_file=$(mktemp).c
 
@@ -21,7 +20,7 @@ for t in `ls tests/*/prog.c`; do
 		failed=1
 	fi
 
-	# compile the instrumented file
+	# try to compile the instrumented file
 	if ! gcc -o /tmp/bin $temp_file; then
 		# /tmp/bin won't be created here
 		echo "$dirname/instrumented.c:$RED gcc compilation failed$RESET"
