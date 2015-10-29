@@ -14,7 +14,7 @@ $(BIN): $(OBJS)
 	$(CXX) -o $(BIN) $(LDLIBS) $(OBJS)
 
 clean:
-	rm $(OBJS) $(BIN)
+	rm -f $(OBJS) $(BIN)
 
 depend:
 	mkdep $(CXXFLAGS) $(SRCS)
