@@ -9,6 +9,7 @@ if which tput > /dev/null; then
 	RESET=`tput sgr0`
 fi
 
+export LD_LIBRARY_PATH="runtime"
 for t in `ls tests/*/prog.c`; do
 	./instrument $t -- > $temp_file
 	dirname=`dirname ${t}`
@@ -21,11 +22,10 @@ for t in `ls tests/*/prog.c`; do
 	fi
 
 	# try to compile the instrumented file
-	if ! gcc -o /tmp/bin $temp_file; then
-		# /tmp/bin won't be created here
+	if ! gcc -o /tmp/bin -pthread -Lruntime/ $temp_file -lruntime ; then
 		echo "$dirname/instrumented.c:$RED gcc compilation failed$RESET"
 
-		rm /tmp/bin
+		# /tmp/bin won't be created here
 		continue
 	fi
 
