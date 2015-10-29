@@ -1,4 +1,5 @@
-static unsigned int lines[199];
+unsigned int lines[199];
+int size = 199;
 #include <stdlib.h>
 
 int

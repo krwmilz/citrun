@@ -164,9 +164,11 @@ public:
 		SourceLocation start = sm.getLocForStartOfFile(main_fid);
 
 		std::stringstream ss;
-		// This isn't the correct size but will always be sufficient
-		ss << "static unsigned int lines[" << sm.getFileIDSize(main_fid)
-			<< "];\n";
+		// This isn't the number of lines but rather bytes
+		int file_bytes = sm.getFileIDSize(main_fid);
+		ss << "unsigned int lines[" << file_bytes << "];"
+			<< std::endl;
+		ss << "int size = " << file_bytes << ";" << std::endl;
 		TheRewriter.InsertTextAfter(start, ss.str());
 
 		// Now emit the rewritten buffer.

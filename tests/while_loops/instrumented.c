@@ -1,4 +1,5 @@
-static unsigned int lines[76];
+unsigned int lines[76];
+int size = 76;
 int
 main(void)
 {

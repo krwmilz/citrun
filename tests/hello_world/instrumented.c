@@ -1,4 +1,5 @@
-static unsigned int lines[77];
+unsigned int lines[77];
+int size = 77;
 #include <stdio.h>
 
 int

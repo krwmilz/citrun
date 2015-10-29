@@ -1,4 +1,5 @@
-static unsigned int lines[512];
+unsigned int lines[512];
+int size = 512;
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
