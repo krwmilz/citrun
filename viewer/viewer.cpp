@@ -13,12 +13,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "shader_utils.h"
+#include <iostream>
+#include <vector>
 
-GLuint program;
-GLint attribute_coord;
-GLint uniform_tex;
-GLint uniform_color;
+#include "shader_utils.h"
 
 struct point {
 	GLfloat x;
@@ -27,41 +25,88 @@ struct point {
 	GLfloat t;
 };
 
-GLuint vbo;
+class drawable {
+public:
+	virtual void draw() = 0;
+};
 
-FT_Library ft;
-FT_Face face;
+class idleable {
+public:
+	virtual void idle() = 0;
+};
 
-const char *fontfilename;
+class shader {
+public:
+	shader();
+	void use();
+	~shader();
 
-int init_resources() {
-	/* Initialize the FreeType2 library */
-	if (FT_Init_FreeType(&ft)) {
-		fprintf(stderr, "Could not init freetype library\n");
-		return 0;
-	}
+	GLint attribute_coord;
+	GLint uniform_tex;
+	GLint uniform_color;
+private:
+	GLuint program;
+};
 
-	/* Load a font */
-	if (FT_New_Face(ft, fontfilename, 0, &face)) {
-		fprintf(stderr, "Could not open font %s\n", fontfilename);
-		return 0;
-	}
-
+shader::shader()
+{
 	program = create_program("text.v.glsl", "text.f.glsl");
 	if(program == 0)
-		return 0;
+		exit(1);
 
 	attribute_coord = get_attrib(program, "coord");
 	uniform_tex = get_uniform(program, "tex");
 	uniform_color = get_uniform(program, "color");
 
 	if(attribute_coord == -1 || uniform_tex == -1 || uniform_color == -1)
-		return 0;
+		exit(1);
+}
 
-	// Create the vertex buffer object
+void
+shader::use()
+{
+	glUseProgram(program);
+}
+
+shader::~shader()
+{
+	glDeleteProgram(program);
+}
+
+
+class text : public drawable {
+public:
+	text();
+	void draw();
+private:
+	std::string font_file_name;
+	FT_Library ft;
+	FT_Face face;
+	FT_GlyphSlot g;
+	GLuint vbo;
+	shader text_shader;
+
+	void render_text(const char *, float x, float y, float sx, float sy);
+};
+
+text::text()
+{
+	font_file_name = "DejaVuSansMono.ttf";
+
+	/* Initialize the FreeType2 library */
+	if (FT_Init_FreeType(&ft)) {
+		std::cerr << "Could not init freetype library" << std::endl;
+		exit(1);
+	}
+
+	/* Load a font */
+	if (FT_New_Face(ft, font_file_name.c_str(), 0, &face)) {
+		std::cerr << "Could not open font " << font_file_name << std::endl;
+		exit(1);
+	}
+
+	g = face->glyph;
 	glGenBuffers(1, &vbo);
-
-	return 1;
 }
 
 /**
@@ -69,9 +114,10 @@ int init_resources() {
  * Rendering starts at coordinates (x, y), z is always 0.
  * The pixel coordinates that the FreeType2 library uses are scaled by (sx, sy).
  */
-void render_text(const char *text, float x, float y, float sx, float sy) {
+void
+text::render_text(const char *text, float x, float y, float sx, float sy)
+{
 	const char *p;
-	FT_GlyphSlot g = face->glyph;
 
 	/* Create a texture that will be used to hold one "glyph" */
 	GLuint tex;
@@ -79,7 +125,7 @@ void render_text(const char *text, float x, float y, float sx, float sy) {
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glUniform1i(uniform_tex, 0);
+	glUniform1i(text_shader.uniform_tex, 0);
 
 	/* We require 1 byte alignment when uploading texture data */
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -93,9 +139,9 @@ void render_text(const char *text, float x, float y, float sx, float sy) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	/* Set up the VBO for our vertex data */
-	glEnableVertexAttribArray(attribute_coord);
+	glEnableVertexAttribArray(text_shader.attribute_coord);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(attribute_coord, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(text_shader.attribute_coord, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	/* Loop through all characters */
 	for (p = text; *p; p++) {
@@ -128,23 +174,18 @@ void render_text(const char *text, float x, float y, float sx, float sy) {
 		y += (g->advance.y >> 6) * sy;
 	}
 
-	glDisableVertexAttribArray(attribute_coord);
+	glDisableVertexAttribArray(text_shader.attribute_coord);
 	glDeleteTextures(1, &tex);
 }
 
-void display() {
+void
+text::draw()
+{
 	float sx = 2.0 / glutGet(GLUT_WINDOW_WIDTH);
 	float sy = 2.0 / glutGet(GLUT_WINDOW_HEIGHT);
 
-	glUseProgram(program);
-
-	/* White background */
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	/* Enable blending, necessary for our alpha texture */
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glUseProgram(program);
+	text_shader.use();
 
 	GLfloat black[4] = { 0, 0, 0, 1 };
 	GLfloat red[4] = { 1, 0, 0, 1 };
@@ -152,7 +193,7 @@ void display() {
 
 	/* Set font size to 48 pixels, color to black */
 	FT_Set_Pixel_Sizes(face, 0, 48);
-	glUniform4fv(uniform_color, 1, black);
+	glUniform4fv(text_shader.uniform_color, 1, black);
 
 	/* Effects of alignment */
 	render_text("The Quick Brown Fox Jumps Over The Lazy Dog", -1 + 8 * sx, 1 - 50 * sy, sx, sy);
@@ -171,50 +212,98 @@ void display() {
 	/* Colors and transparency */
 	render_text("The Solid Black Fox Jumps Over The Lazy Dog", -1 + 8 * sx, 1 - 430 * sy, sx, sy);
 
-	glUniform4fv(uniform_color, 1, red);
+	glUniform4fv(text_shader.uniform_color, 1, red);
 	render_text("The Solid Red Fox Jumps Over The Lazy Dog", -1 + 8 * sx, 1 - 330 * sy, sx, sy);
 	render_text("The Solid Red Fox Jumps Over The Lazy Dog", -1 + 28 * sx, 1 - 450 * sy, sx, sy);
 
-	glUniform4fv(uniform_color, 1, transparent_green);
+	glUniform4fv(text_shader.uniform_color, 1, transparent_green);
 	render_text("The Transparent Green Fox Jumps Over The Lazy Dog", -1 + 8 * sx, 1 - 380 * sy, sx, sy);
 	render_text("The Transparent Green Fox Jumps Over The Lazy Dog", -1 + 18 * sx, 1 - 440 * sy, sx, sy);
-
-	glutSwapBuffers();
 }
 
-void free_resources() {
-	glDeleteProgram(program);
-}
+class window {
+public:
+	window(int argc, char *argv[]);
+	void start();
+	void add(drawable &);
 
-int main(int argc, char *argv[]) {
+private:
+	static std::vector<drawable*> drawables;
+	static std::vector<idleable*> idleables;
+	static void display();
+	static void idle();
+};
+
+// fuckin c++
+std::vector<drawable*> window::drawables;
+std::vector<idleable*> window::idleables;
+
+window::window(int argc, char *argv[])
+{
 	glutInit(&argc, argv);
 	glutInitContextVersion(2,0);
 	glutInitDisplayMode(GLUT_RGB);
 	glutInitWindowSize(1600, 1200);
 	glutCreateWindow("Basic Text");
 
-	if (argc > 1)
-		fontfilename = argv[1];
-	else
-		fontfilename = "DejaVuSansMono.ttf";
-
 	GLenum glew_status = glewInit();
 
 	if (GLEW_OK != glew_status) {
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status));
-		return 1;
+		std::cerr << "Error: " << glewGetErrorString(glew_status) << std::endl;
+		exit(1);
 	}
 
 	if (!GLEW_VERSION_2_0) {
-		fprintf(stderr, "No support for OpenGL 2.0 found\n");
-		return 1;
+		std::cerr << "No support for OpenGL 2.0 found" << std::endl;
+		exit(1);
 	}
 
-	if (init_resources()) {
-		glutDisplayFunc(display);
-		glutMainLoop();
-	}
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
+}
 
-	free_resources();
+void
+window::start()
+{
+	glutMainLoop();
+}
+
+void
+window::add(drawable &d)
+{
+	drawables.push_back(&d);
+}
+
+void
+window::display(void)
+{
+	/* White background */
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	/* Enable blending, necessary for our alpha texture */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	for(auto  &d : drawables)
+		d->draw();
+
+	glutSwapBuffers();
+}
+
+void
+window::idle(void)
+{
+	// printf("idling!\n");
+}
+
+int main(int argc, char *argv[]) {
+
+	window gl_window(argc, argv);
+	text gl_text;
+
+	gl_window.add(gl_text);
+	gl_window.start();
+
 	return 0;
 }
