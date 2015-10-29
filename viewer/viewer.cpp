@@ -52,6 +52,9 @@ window::window(int argc, char *argv[])
 
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
+
+	// set socket to listening mode
+	socket.set_listen();
 }
 
 void
@@ -86,8 +89,12 @@ window::display(void)
 void
 window::idle(void)
 {
-	socket.accept_one();
-	socket.read();
+	af_unix_nonblock *temp_socket;
+
+	temp_socket = socket.accept();
+	if (temp_socket)
+		drawables.push_back(new text(temp_socket));
+	// socket.read();
 
 	for (auto &i : drawables)
 		i->idle();
@@ -97,9 +104,6 @@ int
 main(int argc, char *argv[])
 {
 	window gl_window(argc, argv);
-	text gl_text;
-
-	gl_window.add(gl_text);
 	gl_window.start();
 
 	return 0;

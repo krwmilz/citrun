@@ -3,7 +3,8 @@
 
 #include "text.h"
 
-text::text()
+text::text(af_unix_nonblock *sock) :
+	socket(sock)
 {
 	font_file_name = "DejaVuSansMono.ttf";
 

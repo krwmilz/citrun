@@ -7,12 +7,13 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include "af_unix.h"
 #include "shader_utils.h"
 #include "draw.h"
 
 class text : public drawable {
 public:
-	text();
+	text(af_unix_nonblock *);
 	void draw();
 	void idle();
 private:
@@ -22,6 +23,7 @@ private:
 	FT_GlyphSlot g;
 	GLuint vbo;
 	shader text_shader;
+	af_unix_nonblock *socket;
 
 	void render_text(const char *, float x, float y, float sx, float sy);
 };

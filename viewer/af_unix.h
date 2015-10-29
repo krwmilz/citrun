@@ -6,12 +6,15 @@
 class af_unix_nonblock {
 public:
 	af_unix_nonblock();
+	af_unix_nonblock(int);
 	~af_unix_nonblock();
-	void accept_one();
+
+	af_unix_nonblock *accept();
+	void set_listen();
 	void read();
 private:
-	int listen_fd;
-	std::vector<int> connected_fds;
+	int fd;
+	char buffer[4096];
 };
 
 #endif
