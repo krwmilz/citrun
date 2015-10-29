@@ -13,10 +13,6 @@ struct point {
 class drawable {
 public:
 	virtual void draw() = 0;
-};
-
-class idleable {
-public:
 	virtual void idle() = 0;
 };
 

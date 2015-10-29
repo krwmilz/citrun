@@ -21,7 +21,6 @@ public:
 
 private:
 	static std::vector<drawable*> drawables;
-	static std::vector<idleable*> idleables;
 	static af_unix_nonblock socket;
 	static void display();
 	static void idle();
@@ -29,7 +28,6 @@ private:
 
 // fuckin c++
 std::vector<drawable*> window::drawables;
-std::vector<idleable*> window::idleables;
 af_unix_nonblock window::socket;
 
 window::window(int argc, char *argv[])
@@ -91,7 +89,7 @@ window::idle(void)
 	socket.accept_one();
 	socket.read();
 
-	for (auto &i : idleables)
+	for (auto &i : drawables)
 		i->idle();
 }
 

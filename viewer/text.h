@@ -14,6 +14,7 @@ class text : public drawable {
 public:
 	text();
 	void draw();
+	void idle();
 private:
 	std::string font_file_name;
 	FT_Library ft;
