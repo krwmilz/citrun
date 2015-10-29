@@ -11,7 +11,7 @@ fi
 
 export LD_LIBRARY_PATH="runtime"
 for t in `ls tests/*/prog.c`; do
-	./instrument $t -- > $temp_file
+	./instrument/instrument $t -- > $temp_file
 	dirname=`dirname ${t}`
 	failed=0
 
