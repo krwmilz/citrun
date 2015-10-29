@@ -7,7 +7,7 @@ LDLIBS += -lfreetype -lz -lglut
 CXX = eg++ -std=c++1y
 
 BIN = viewer
-SRCS = viewer.cpp shader_utils.cpp
+SRCS = viewer.cpp shader_utils.cpp text.cpp
 OBJS = $(SRCS:cpp=o)
 
 $(BIN): $(OBJS)

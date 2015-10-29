@@ -8,6 +8,41 @@
 #include <stdlib.h>
 #include <GL/glew.h>
 
+#include "shader_utils.h"
+
+char* file_read(const char* filename);
+void print_log(GLuint object);
+GLuint create_shader(const char* filename, GLenum type);
+GLuint create_program(const char* vertexfile, const char *fragmentfile);
+GLuint create_gs_program(const char* vertexfile, const char *geometryfile, const char *fragmentfile, GLint input, GLint output, GLint vertices);
+GLint get_attrib(GLuint program, const char *name);
+GLint get_uniform(GLuint program, const char *name);
+
+shader::shader()
+{
+	program = create_program("text.v.glsl", "text.f.glsl");
+	if(program == 0)
+		exit(1);
+
+	attribute_coord = get_attrib(program, "coord");
+	uniform_tex = get_uniform(program, "tex");
+	uniform_color = get_uniform(program, "color");
+
+	if(attribute_coord == -1 || uniform_tex == -1 || uniform_color == -1)
+		exit(1);
+}
+
+void
+shader::use()
+{
+	glUseProgram(program);
+}
+
+shader::~shader()
+{
+	glDeleteProgram(program);
+}
+
 /**
  * Store all the file's contents in memory, useful to pass shaders
  * source code to OpenGL
