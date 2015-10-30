@@ -2,7 +2,7 @@
 
 result="`/tmp/bin 10`"
 if [ "$result" != "result: 55" ]; then
-	echo "${0}: $result != \"result: 55\""
+	echo "${0}: '$result' != 'result: 55'"
 	exit 1
 fi
 
