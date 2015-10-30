@@ -18,6 +18,7 @@
 #include "clang/Frontend/ASTConsumers.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Lex/Lexer.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
 #include "clang/Rewrite/Core/Rewriter.h"
@@ -29,105 +30,116 @@ using namespace clang::tooling;
 
 static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
 
+
 // By implementing RecursiveASTVisitor, we can specify which AST nodes
 // we're interested in by overriding relevant methods.
-class MyASTVisitor : public RecursiveASTVisitor<MyASTVisitor> {
+class instrumenter : public RecursiveASTVisitor<instrumenter> {
 public:
-	MyASTVisitor(Rewriter &R) : TheRewriter(R) {}
+	instrumenter(Rewriter &R) : TheRewriter(R), SM(R.getSourceMgr()) {}
 
-	bool VisitVarDecl(VarDecl *d) {
-		// std::cout << "HERE" << std::endl;
-		return true;
-	}
 
-	bool VisitStmt(Stmt *s) {
-		std::stringstream ss;
-		SourceManager &SM = TheRewriter.getSourceMgr();
-		unsigned line = SM.getPresumedLineNumber(s->getLocStart());
-
-		ss << "lines[" << line << "] = 1";
-
-		if (isa<IfStmt>(s)) {
-			IfStmt *IfStatement = cast<IfStmt>(s);
-			Stmt *Cond = IfStatement->getCond();
-			ss << ", ";
-			TheRewriter.InsertTextBefore(Cond->getLocStart(),
-					ss.str());
-		}
-		else if (isa<ForStmt>(s)) {
-			ForStmt *ForStatement = cast<ForStmt>(s);
-			Stmt *Cond = ForStatement->getCond();
-			ss << ", ";
-			TheRewriter.InsertTextAfter(Cond->getLocStart(),
-					ss.str());
-		}
-		else if (isa<ReturnStmt>(s)) {
-			ReturnStmt *ReturnStatement = cast<ReturnStmt>(s);
-			Expr *RetValue = ReturnStatement->getRetValue();
-			ss << ", ";
-			TheRewriter.InsertTextBefore(RetValue->getLocStart(),
-					ss.str());
-		}
-		else if (isa<WhileStmt>(s)) {
-			WhileStmt *WhileStatement = cast<WhileStmt>(s);
-			Stmt *Cond = WhileStatement->getCond();
-			ss << ", ";
-			TheRewriter.InsertTextBefore(Cond->getLocStart(),
-					ss.str());
-		}
-		else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
-		    isa<DeclStmt>(s) || isa<SwitchStmt>(s) ||
-		    isa<SwitchCase>(s)) {
-			ss << "; ";
-			TheRewriter.InsertTextBefore(s->getLocStart(),
-					ss.str());
-		}
-		else if (isa<CallExpr>(s)) {
-			/* still has problems with f(x) + g(y) style code
-			ss << ", ";
-			TheRewriter.InsertTextBefore(s->getLocStart(),
-					ss.str());
-			*/
-		}
-
-		return true;
-	}
-
-	bool VisitFunctionDecl(FunctionDecl *f) {
-		// Only function definitions (with bodies), not declarations.
-		if (f->hasBody()) {
-			Stmt *FuncBody = f->getBody();
-
-#if 0
-			// Type name as string
-			QualType QT = f->getReturnType();
-			std::string TypeStr = QT.getAsString();
-
-			// Function name
-			DeclarationName DeclName = f->getNameInfo().getName();
-			std::string FuncName = DeclName.getAsString();
-
-			// Add comment before
-			std::stringstream SSBefore;
-			SSBefore << "// Begin function " << FuncName << " returning " << TypeStr
-				<< "\n";
-			SourceLocation ST = f->getSourceRange().getBegin();
-			TheRewriter.InsertText(ST, SSBefore.str(), true, true);
-
-			// And after
-			std::stringstream SSAfter;
-			SSAfter << "\n// End function " << FuncName;
-			ST = FuncBody->getLocEnd().getLocWithOffset(1);
-			TheRewriter.InsertText(ST, SSAfter.str(), true, true);
-#endif
-		}
-
-		return true;
-	}
+	bool VisitVarDecl(VarDecl *d);
+	bool VisitStmt(Stmt *s);
+	bool VisitFunctionDecl(FunctionDecl *f);
 
 private:
 	Rewriter &TheRewriter;
+	SourceManager &SM;
+	LangOptions lopt;
+
+	SourceLocation real_loc_end(Stmt *s);
 };
+
+bool
+instrumenter::VisitVarDecl(VarDecl *d)
+{
+	// std::cout << "HERE" << std::endl;
+	return true;
+}
+
+bool
+instrumenter::VisitStmt(Stmt *s)
+{
+	std::stringstream ss;
+	unsigned line = SM.getPresumedLineNumber(s->getLocStart());
+	Stmt *stmt_to_inst;
+
+	if (isa<IfStmt>(s)) {
+		IfStmt *IfStatement = cast<IfStmt>(s);
+		stmt_to_inst = IfStatement->getCond();
+	}
+	else if (isa<ForStmt>(s)) {
+		ForStmt *ForStatement = cast<ForStmt>(s);
+		stmt_to_inst = ForStatement->getCond();
+	}
+	else if (isa<WhileStmt>(s)) {
+		WhileStmt *WhileStatement = cast<WhileStmt>(s);
+		stmt_to_inst = WhileStatement->getCond();
+	}
+	else if (isa<ReturnStmt>(s)) {
+		ReturnStmt *ReturnStatement = cast<ReturnStmt>(s);
+		stmt_to_inst = ReturnStatement->getRetValue();
+	}
+	/*
+	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
+		|| isa<SwitchStmt>(s) || isa<SwitchCase>(s)) {
+	}
+	*/
+	else if (isa<DeclStmt>(s)) {
+	}
+	else if (isa<CallExpr>(s)) {
+		stmt_to_inst = s;
+	}
+	else
+		return true;
+
+	ss << "(lines[" << line << "] = 1, ";
+	TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str());
+	TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
+
+	return true;
+}
+
+bool
+instrumenter::VisitFunctionDecl(FunctionDecl *f)
+{
+	// Only function definitions (with bodies), not declarations.
+	if (f->hasBody()) {
+		Stmt *FuncBody = f->getBody();
+#if 0
+		// Type name as string
+		QualType QT = f->getReturnType();
+		std::string TypeStr = QT.getAsString();
+
+		// Function name
+		DeclarationName DeclName = f->getNameInfo().getName();
+		std::string FuncName = DeclName.getAsString();
+
+		// Add comment before
+		std::stringstream SSBefore;
+		SSBefore << "// Begin function " << FuncName << " returning " << TypeStr
+			<< "\n";
+		SourceLocation ST = f->getSourceRange().getBegin();
+		TheRewriter.InsertText(ST, SSBefore.str(), true, true);
+
+		// And after
+		std::stringstream SSAfter;
+		SSAfter << "\n// End function " << FuncName;
+		ST = FuncBody->getLocEnd().getLocWithOffset(1);
+		TheRewriter.InsertText(ST, SSAfter.str(), true, true);
+#endif
+	}
+
+	return true;
+}
+
+SourceLocation
+instrumenter::real_loc_end(Stmt *d)
+{
+	SourceLocation _e(d->getLocEnd());
+	return SourceLocation(Lexer::getLocForEndOfToken(_e, 0, SM, lopt));
+}
+
 
 // Implementation of the ASTConsumer interface for reading an AST produced
 // by the Clang parser.
@@ -147,7 +159,7 @@ public:
 	}
 
 private:
-	MyASTVisitor Visitor;
+	instrumenter Visitor;
 };
 
 // For each source file provided to the tool, a new FrontendAction is created.

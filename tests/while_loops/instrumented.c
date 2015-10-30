@@ -3,12 +3,12 @@ int size = 76;
 int
 main(void)
 {
-	lines[4] = 1; int i;
+	int i;
 
 	i = 0;
-	while (lines[7] = 1, i < 10) {
+	while ((lines[7] = 1, i < 10)) {
 		i++;
 	}
 
-	return lines[11] = 1, i;
+	return (lines[11] = 1, i);
 }

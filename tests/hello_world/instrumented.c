@@ -5,6 +5,6 @@ int size = 77;
 int
 main(void)
 {
-	printf("hello, world\n");
-	return lines[7] = 1, 0;
+	(lines[6] = 1, printf("hello, world\n"));
+	return (lines[7] = 1, 0);
 }

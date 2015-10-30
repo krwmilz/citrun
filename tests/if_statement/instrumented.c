@@ -5,18 +5,18 @@ int size = 199;
 int
 main(int argc, char *argv[])
 {
-	if (lines[6] = 1, argc == 1)
-		return lines[7] = 1, 1;
+	if ((lines[6] = 1, argc == 1))
+		return (lines[7] = 1, 1);
 	else
-		exit(14);
+		(lines[9] = 1, exit(14));
 	
-	if (lines[11] = 1, argc == 2) {
-		return lines[12] = 1, 5;
+	if ((lines[11] = 1, argc == 2)) {
+		return (lines[12] = 1, 5);
 	}
-	else if (lines[14] = 1, argc == 3) {
-		return lines[15] = 1, 0;
+	else if ((lines[14] = 1, argc == 3)) {
+		return (lines[15] = 1, 0);
 	}
 	else {
-		exit(0);
+		(lines[18] = 1, exit(0));
 	}
 }
