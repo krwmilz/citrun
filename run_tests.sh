@@ -6,29 +6,32 @@ if which tput > /dev/null; then
 	RESET=`tput sgr0`
 fi
 
-export LD_LIBRARY_PATH="runtime"
 export SCV_PATH="$HOME/src/scv/instrument"
 export PATH="$SCV_PATH:$PATH"
-which cc
+
+export CFLAGS="-pthread"
+export LDFLAGS="-L$HOME/src/scv/runtime -pthread"
+
+export LD_LIBRARY_PATH="$HOME/src/scv/runtime"
+export LDLIBS="-lruntime"
 for t in `ls tests/*/prog.c`; do
 	dirname=`dirname ${t}`
+	make -C $dirname clean
+
 	if ! make -C $dirname prog; then
-		echo "$dirname: make failed!"
-		make -C $dirname clean
+		echo "$dirname:$RED make prog failed!$RESET"
 		continue
 	fi
 
 	# diff against the last known good instrumented source
 	if ! diff -u $dirname/instrumented.c $dirname/prog_inst.c; then
 		echo "$dirname:$RED source compare failed$RESET"
-		make -C $dirname clean
 		continue
 	fi
 
 	# test that the instrumented binary works properly
 	if ! make -C $dirname "test"; then
 		echo "$dirname:$RED test failed!$RESET"
-		make -C $dirname clean
 		continue
 	fi
 
