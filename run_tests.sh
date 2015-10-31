@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# make sure we have a .c extension
-temp_file=$(mktemp).c
-
 if which tput > /dev/null; then
 	RED=`tput setaf 1 0 0`
 	GREEN=`tput setaf 2 0 0`
@@ -10,36 +7,31 @@ if which tput > /dev/null; then
 fi
 
 export LD_LIBRARY_PATH="runtime"
+export SCV_PATH="$HOME/src/scv/instrument"
+export PATH="$SCV_PATH:$PATH"
+which cc
 for t in `ls tests/*/prog.c`; do
-	./instrument/instrument $t -- > $temp_file
 	dirname=`dirname ${t}`
-	failed=0
-
-	# diff against the last known good instrumented source
-	if ! diff -u "$dirname/instrumented.c" $temp_file; then
-		echo "$dirname/instrumented.c:$RED source compare failed$RESET"
-		failed=1
+	if ! make -C $dirname prog; then
+		echo "$dirname: make failed!"
+		make -C $dirname clean > /dev/null
+		continue
 	fi
 
-	# try to compile the instrumented file
-	if ! gcc -o /tmp/bin -pthread -Lruntime/ $temp_file -lruntime ; then
-		echo "$dirname/instrumented.c:$RED gcc compilation failed$RESET"
-
-		# /tmp/bin won't be created here
+	# diff against the last known good instrumented source
+	if ! diff -u $dirname/instrumented.c $dirname/prog_inst.c; then
+		echo "$dirname:$RED source compare failed$RESET"
+		make -C $dirname clean > /dev/null
 		continue
 	fi
 
 	# test that the instrumented binary works properly
-	if ! sh "$dirname/test.sh" /tmp/bin; then
-		echo "$dirname/test.sh:$RED failed!$RESET"
-		failed=1
+	if ! make -C $dirname "test" > /dev/null; then
+		echo "$dirname:$RED test failed!$RESET"
+		make -C $dirname clean > /dev/null
+		continue
 	fi
 
-	rm /tmp/bin
-
-	if [ $failed -eq 0 ]; then
-		echo "$dirname:$GREEN ok$RESET"
-	fi
+	make -C $dirname clean > /dev/null
+	echo "$dirname:$GREEN ok$RESET"
 done
-
-rm $temp_file
