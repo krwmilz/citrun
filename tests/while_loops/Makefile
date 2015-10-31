@@ -1,5 +1,5 @@
 test:
-	sh test.sh
+	@sh test.sh
 
 clean:
-	rm -f prog prog_inst.c
+	@rm -f prog prog_inst.c
