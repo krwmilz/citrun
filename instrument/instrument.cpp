@@ -8,6 +8,9 @@
 // Eli Bendersky (eliben@gmail.com)
 // This code is in the public domain
 //------------------------------------------------------------------------------
+#include <err.h>
+#include <unistd.h>
+
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -28,7 +31,7 @@ using namespace clang;
 using namespace clang::driver;
 using namespace clang::tooling;
 
-static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
+static llvm::cl::OptionCategory ToolingCategory("instrument options");
 
 
 // By implementing RecursiveASTVisitor, we can specify which AST nodes
@@ -62,7 +65,7 @@ instrumenter::VisitStmt(Stmt *s)
 {
 	std::stringstream ss;
 	unsigned line = SM.getPresumedLineNumber(s->getLocStart());
-	Stmt *stmt_to_inst;
+	Stmt *stmt_to_inst = NULL;
 
 	if (isa<IfStmt>(s)) {
 		IfStmt *IfStatement = cast<IfStmt>(s);
@@ -90,7 +93,8 @@ instrumenter::VisitStmt(Stmt *s)
 	else if (isa<CallExpr>(s)) {
 		stmt_to_inst = s;
 	}
-	else
+
+	if (stmt_to_inst == NULL)
 		return true;
 
 	ss << "(lines[" << line << "] = 1, ";
@@ -176,7 +180,7 @@ public:
 		SourceLocation start = sm.getLocForStartOfFile(main_fid);
 
 		std::stringstream ss;
-		// This isn't the number of lines but rather bytes
+		// Add declarations for coverage buffers
 		int file_bytes = sm.getFileIDSize(main_fid);
 		ss << "unsigned int lines[" << file_bytes << "];"
 			<< std::endl;
@@ -200,10 +204,101 @@ private:
 	Rewriter TheRewriter;
 };
 
-int
-main(int argc, const char *argv[])
+void
+clean_path()
 {
-	CommonOptionsParser op(argc, argv, ToolingSampleCategory);
+	// remove SCV_PATH from PATH
+
+	char *scv_path = getenv("SCV_PATH");
+	char *path = getenv("PATH");
+	if (scv_path == NULL)
+		errx(1, "SCV_PATH not found in environment, not running "
+			"native compiler");
+	else if (path == NULL)
+		errx(1, "PATH not set, your build system needs to use "
+			"the PATH for this tool to be useful.");
+#ifdef DEBUG
+	std::cout << "SCV_PATH=" << scv_path << std::endl;
+	std::cout << "old PATH=" << path << std::endl;
+#endif
+
+	int new_path_pos = 0;
+	char *new_path = (char *)calloc(strlen(path), 1);
+
+	char *tok = strtok(path, ":");
+	bool wrote_first_token = false;
+	while (tok != NULL) {
+		if (strncmp(scv_path, tok, 1024) != 0) {
+			if (wrote_first_token == true) {
+				strcat(new_path + new_path_pos, ":");
+				new_path_pos++;
+			}
+			strcat(new_path + new_path_pos, tok);
+			new_path_pos += strlen(tok);
+			wrote_first_token = true;
+		}
+		tok = strtok(NULL, ":");
+	}
+
+	setenv("PATH", new_path, 1);
+#ifdef DEBUG
+	std::cout << "new " << new_path << std::endl;
+	system("env");
+#endif
+}
+
+int
+main(int argc, char *argv[])
+{
+	std::vector<const char *> source_files;
+	char *exec_argv[argc + 1];
+
+	for (int i = 0; i < argc; i++) {
+		exec_argv[i] = strdup(argv[i]);
+
+		int arg_len = strlen(argv[i]);
+		if (arg_len < 4)
+			continue;
+
+		// compare last four bytes of argument
+		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
+		    strcmp(argv[i] + arg_len - 2, ".c") == 0)
+			source_files.push_back(argv[i]);
+	}
+	// very important that argv passed to execvp is NULL terminated
+	exec_argv[argc] = NULL;
+
+	// run native command if there's no source files to instrument
+	if (source_files.size() == 0) {
+		warnx("no source files found on command line");
+		clean_path();
+
+		if (execvp(exec_argv[0], exec_argv))
+			err(1, "execvp");
+	}
+
+	const char *clang_argv[source_files.size() + 1 + argc];
+	int clang_argc = 0;
+
+	clang_argv[clang_argc++] = argv[0];
+	for (auto s : source_files)
+		clang_argv[clang_argc++] = s;
+
+	clang_argv[clang_argc++] = "--";
+
+	// append original command line verbatim
+	for (int i = 0; i < argc; i++)
+		clang_argv[clang_argc++] = argv[i];
+
+	// print out
+#ifdef DEBUG
+	for (int i = 0; i < clang_argc; i++)
+		std::cout << clang_argv[i] << " ";
+	std::cout << std::endl;
+#endif
+
+	// give clang it's <source files> -- <native command line> arg style
+	CommonOptionsParser op(clang_argc, clang_argv, ToolingCategory);
 	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
 	// ClangTool::run accepts a FrontendActionFactory, which is then used to
@@ -211,5 +306,18 @@ main(int argc, const char *argv[])
 	// use the helper newFrontendActionFactory to create a default factory
 	// that will return a new MyFrontendAction object every time.  To
 	// further customize this, we could create our own factory class.
-	return Tool.run(newFrontendActionFactory<MyFrontendAction>());
+	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
+	if (ret) {
+		std::cout << "Instrumentation failed" << std::endl;
+		return ret;
+	}
+
+	clean_path();
+#if DEBUG
+	std::cout << "Calling real compiler " << exec_argv[0] << std::endl;
+#endif
+
+	if (execvp(exec_argv[0], exec_argv))
+		err(1, "execvp");
+	std::cout << "here" << std::endl;
 }

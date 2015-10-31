@@ -1,7 +1,8 @@
 CXXFLAGS += -I/usr/local/include
 CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
-CXXFLAGS += -fno-rtti -g
-CXX = eg++ -std=c++1y
+CXXFLAGS += -fno-rtti
+# CXXFLAGS += -ggdb -DDEBUG
+CXX = eg++ -std=c++11
 
 # clang has a circular dependencies here, use "linker group options" to avoid
 LDLIBS += \
