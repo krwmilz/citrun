@@ -1,3 +1,10 @@
+#include <sstream>
+#include <string>
+#include <iostream>
+
+#include <clang/AST/AST.h>
+#include <clang/Lex/Lexer.h>
+
 #include "instrumenter.h"
 
 bool

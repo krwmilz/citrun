@@ -4,21 +4,16 @@
 #include <unistd.h>
 #include <sys/stat.h>	// mode flags
 
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <iostream>
 
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Frontend/ASTConsumers.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-#include "llvm/Support/raw_ostream.h"
+#include <clang/Frontend/FrontendActions.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Tooling/CommonOptionsParser.h>
+#include <clang/Tooling/Tooling.h>
+#include <clang/Rewrite/Core/Rewriter.h>
+#include <llvm/Support/raw_ostream.h>
 
 #include "instrumenter.h"
 
@@ -50,8 +45,8 @@ public:
 		TheRewriter.InsertTextAfter(start, ss.str());
 
 		// Now emit the rewritten buffer.
-		// std::ofstream output(inst_files[0]);
-		int fd = open(inst_files[0], O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+		int fd = open(inst_files[0], O_WRONLY | O_CREAT,
+				S_IRUSR | S_IWUSR);
 		if (fd < 0)
 			err(1, "open");
 		llvm::raw_fd_ostream output(fd, /* close */ 1);

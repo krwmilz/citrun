@@ -1,21 +1,8 @@
-#include <sstream>
-#include <string>
-#include <iostream>
-
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Frontend/ASTConsumers.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/Rewrite/Core/Rewriter.h"
+#include <clang/AST/ASTConsumer.h>
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/Rewrite/Core/Rewriter.h>
 
 using namespace clang;
-using namespace clang::driver;
-using namespace clang::tooling;
 
 
 // By implementing RecursiveASTVisitor, we can specify which AST nodes
