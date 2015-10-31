@@ -3,7 +3,7 @@ SUBDIRS = instrument runtime viewer
 all: make_subdirs
 
 test: make_subdirs
-	sh run_tests.sh
+	@sh run_tests.sh
 
 clean:
 	make -C instrument clean
@@ -11,6 +11,6 @@ clean:
 	make -C viewer clean
 
 make_subdirs:
-	make -C instrument
-	make -C runtime
-	make -C viewer
+	@make -C instrument
+	@make -C runtime
+	@make -C viewer
