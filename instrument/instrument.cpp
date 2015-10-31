@@ -1,15 +1,8 @@
-//------------------------------------------------------------------------------
-// Tooling sample. Demonstrates:
-//
-// * How to write a simple source tool using libTooling.
-// * How to use RecursiveASTVisitor to find interesting AST nodes.
-// * How to use the Rewriter API to rewrite the source code.
-//
-// Eli Bendersky (eliben@gmail.com)
-// This code is in the public domain
-//------------------------------------------------------------------------------
-#include <err.h>
+#include <err.h>	// err, errx
+#include <fcntl.h>	// open
+#include <stdlib.h>	// mktemp
 #include <unistd.h>
+#include <sys/stat.h>	// mode flags
 
 #include <sstream>
 #include <string>
@@ -169,7 +162,7 @@ private:
 // For each source file provided to the tool, a new FrontendAction is created.
 class MyFrontendAction : public ASTFrontendAction {
 public:
-	MyFrontendAction() {}
+	MyFrontendAction(std::vector<const char *> &);
 	void EndSourceFileAction() override {
 		SourceManager &sm = TheRewriter.getSourceMgr();
 		const FileID main_fid = sm.getMainFileID();
@@ -188,7 +181,13 @@ public:
 		TheRewriter.InsertTextAfter(start, ss.str());
 
 		// Now emit the rewritten buffer.
-		TheRewriter.getEditBuffer(main_fid).write(llvm::outs());
+		// std::ofstream output(inst_files[0]);
+		int fd = open(inst_files[0], O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+		if (fd < 0)
+			err(1, "open");
+		llvm::raw_fd_ostream output(fd, /* close */ 1);
+		TheRewriter.getEditBuffer(main_fid).write(output);
+		// TheRewriter.getEditBuffer(main_fid).write(llvm::outs());
 	}
 
 	ASTConsumer *CreateASTConsumer(CompilerInstance &CI,
@@ -202,6 +201,25 @@ public:
 
 private:
 	Rewriter TheRewriter;
+
+	std::vector<const char *> inst_files;
+};
+
+MyFrontendAction::MyFrontendAction(std::vector<const char *> &i) :
+	inst_files(i)
+{
+}
+
+class MFAF : public FrontendActionFactory {
+public:
+	MFAF(std::vector<const char *> &i) : inst_files(i) {}
+
+	FrontendAction *create() {
+		return new MyFrontendAction(inst_files);
+	}
+
+private:
+	std::vector<const char *> inst_files;
 };
 
 void
@@ -229,6 +247,7 @@ clean_path()
 	bool wrote_first_token = false;
 	while (tok != NULL) {
 		if (strncmp(scv_path, tok, 1024) != 0) {
+			// didn't find SCV_PATH in PATH
 			if (wrote_first_token == true) {
 				strcat(new_path + new_path_pos, ":");
 				new_path_pos++;
@@ -247,36 +266,10 @@ clean_path()
 #endif
 }
 
-int
-main(int argc, char *argv[])
+void
+instrument(int argc, char *argv[], std::vector<const char *> &source_files,
+		std::vector<const char *> &inst_files)
 {
-	std::vector<const char *> source_files;
-	char *exec_argv[argc + 1];
-
-	for (int i = 0; i < argc; i++) {
-		exec_argv[i] = strdup(argv[i]);
-
-		int arg_len = strlen(argv[i]);
-		if (arg_len < 4)
-			continue;
-
-		// compare last four bytes of argument
-		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
-		    strcmp(argv[i] + arg_len - 2, ".c") == 0)
-			source_files.push_back(argv[i]);
-	}
-	// very important that argv passed to execvp is NULL terminated
-	exec_argv[argc] = NULL;
-
-	// run native command if there's no source files to instrument
-	if (source_files.size() == 0) {
-		warnx("no source files found on command line");
-		clean_path();
-
-		if (execvp(exec_argv[0], exec_argv))
-			err(1, "execvp");
-	}
-
 	const char *clang_argv[source_files.size() + 1 + argc];
 	int clang_argc = 0;
 
@@ -286,12 +279,12 @@ main(int argc, char *argv[])
 
 	clang_argv[clang_argc++] = "--";
 
-	// append original command line verbatim
+	// append original command line verbatim after --
 	for (int i = 0; i < argc; i++)
 		clang_argv[clang_argc++] = argv[i];
 
-	// print out
 #ifdef DEBUG
+	// print out
 	for (int i = 0; i < clang_argc; i++)
 		std::cout << clang_argv[i] << " ";
 	std::cout << std::endl;
@@ -306,18 +299,66 @@ main(int argc, char *argv[])
 	// use the helper newFrontendActionFactory to create a default factory
 	// that will return a new MyFrontendAction object every time.  To
 	// further customize this, we could create our own factory class.
-	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
-	if (ret) {
-		std::cout << "Instrumentation failed" << std::endl;
-		return ret;
+	int ret = Tool.run(new MFAF(inst_files));
+	// int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
+	if (ret)
+		errx(1, "Instrumentation failed");
+}
+
+int
+main(int argc, char *argv[])
+{
+	std::vector<const char *> source_files;
+	std::vector<const char *> inst_files;
+	char *exec_argv[argc + 1];
+
+	for (int i = 0; i < argc; i++) {
+		exec_argv[i] = strdup(argv[i]);
+
+		int arg_len = strlen(argv[i]);
+		if (arg_len < 4)
+			continue;
+
+		// compare last four bytes of argument
+		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
+		    strcmp(argv[i] + arg_len - 2, ".c") == 0) {
+			// keep track of original source file names
+			source_files.push_back(argv[i]);
+
+			char *inst_filename = (char *)calloc(PATH_MAX, 1);
+			if (inst_filename == NULL)
+				err(1, "calloc");
+
+			strncpy(inst_filename, argv[i], arg_len - 2);
+			strcat(inst_filename, "_inst.c");
+
+			// source code rewriter needs to know this file
+			inst_files.push_back(inst_filename);
+			// native compiler uses this source file instead
+			exec_argv[i] = inst_filename;
+		}
+	}
+	// very important that argv passed to execvp is NULL terminated
+	exec_argv[argc] = NULL;
+
+	// run native command if there's no source files to instrument
+	if (source_files.size() == 0) {
+		warnx("no source files found on command line");
+
+		clean_path();
+		if (execvp(exec_argv[0], exec_argv))
+			err(1, "execvp");
 	}
 
-	clean_path();
+	// run instrumentation on detected source files
+	instrument(argc, argv, source_files, inst_files);
+
 #if DEBUG
 	std::cout << "Calling real compiler " << exec_argv[0] << std::endl;
 #endif
 
+	// exec native compiler with instrumented source files
+	clean_path();
 	if (execvp(exec_argv[0], exec_argv))
 		err(1, "execvp");
-	std::cout << "here" << std::endl;
 }
