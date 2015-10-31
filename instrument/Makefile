@@ -32,7 +32,7 @@ LDLIBS += \
 	-lpthread -lz
 
 BIN = instrument
-SRCS = instrument.cpp
+SRCS = main.cpp instrumenter.cpp
 OBJS = $(SRCS:cpp=o)
 
 $(BIN): $(OBJS)
