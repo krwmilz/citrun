@@ -1,0 +1,5 @@
+test:
+	sh test.sh
+
+clean:
+	rm -f $(OBJS) $(BIN) *.{backup,inst}
