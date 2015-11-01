@@ -57,7 +57,10 @@ instrumenter::VisitStmt(Stmt *s)
 		return true;
 
 	ss << "(lines[" << line << "] = 1, ";
-	TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str());
+	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
+		// writing failed, don't attempt to add ")"
+		return true;
+
 	TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
 
 	return true;
