@@ -1,5 +1,6 @@
 unsigned int lines[512];
 int size = 512;
+char file_name[] = "/home/kyle/src/scv/tests/fibonacci/fib.c";
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>

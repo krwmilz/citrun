@@ -60,19 +60,19 @@ clean_path()
 	setenv("PATH", new_path, 1);
 #ifdef DEBUG
 	std::cout << "new " << new_path << std::endl;
-	system("env");
+	system("env | grep PATH");
 #endif
 }
 
 void
-instrument(int argc, char *argv[], std::vector<const char *> &source_files)
+instrument(int argc, char *argv[], std::vector<std::string> &source_files)
 {
 	const char *clang_argv[source_files.size() + 1 + argc];
 	int clang_argc = 0;
 
 	clang_argv[clang_argc++] = argv[0];
 	for (auto s : source_files)
-		clang_argv[clang_argc++] = s;
+		clang_argv[clang_argc++] = s.c_str();
 
 	clang_argv[clang_argc++] = "--";
 
@@ -105,7 +105,7 @@ instrument(int argc, char *argv[], std::vector<const char *> &source_files)
 int
 main(int argc, char *argv[])
 {
-	std::vector<const char *> source_files;
+	std::vector<std::string> source_files;
 
 	for (int i = 0; i < argc; i++) {
 		int arg_len = strlen(argv[i]);
@@ -116,7 +116,7 @@ main(int argc, char *argv[])
 		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
 		    strcmp(argv[i] + arg_len - 2, ".c") == 0)
 			// keep track of original source file names
-			source_files.push_back(argv[i]);
+			source_files.push_back(std::string(argv[i]));
 	}
 	// very important that argv passed to execvp is NULL terminated
 	argv[argc] = NULL;
@@ -134,8 +134,7 @@ main(int argc, char *argv[])
 	// backup original source files
 	for (auto s : source_files) {
 		std::ifstream src(s, std::ios::binary);
-		std::string dst_fn(s);
-		std::ofstream dst(dst_fn.append(".backup"), std::ios::binary);
+		std::ofstream dst(s + ".backup", std::ios::binary);
 
 		dst << src.rdbuf();
 
@@ -145,6 +144,17 @@ main(int argc, char *argv[])
 
 	// run instrumentation on detected source files
 	instrument(argc, argv, source_files);
+
+	// copy instrumented files ontop of original
+	for (auto s : source_files) {
+		std::ofstream dst(s, std::ios::binary);
+		std::ifstream src(s + ".inst", std::ios::binary);
+
+		dst << src.rdbuf();
+
+		src.close();
+		dst.close();
+	}
 
 #if DEBUG
 	std::cout << "Calling real compiler" << std::endl;
@@ -175,8 +185,7 @@ main(int argc, char *argv[])
 		// restore original source files
 		for (auto s : source_files) {
 			std::ofstream dst(s, std::ios::binary);
-			std::string src_fn(s);
-			std::ifstream src(src_fn.append(".backup"), std::ios::binary);
+			std::ifstream src(s + ".backup", std::ios::binary);
 
 			dst << src.rdbuf();
 

@@ -6,10 +6,10 @@ $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LDLIBS)
 
 test:
-	@sh test.sh
+	sh test.sh
 
 diff:
-	@diff -u fib.c.inst fib.c.inst_good
+	diff -u fib.c.inst fib.c.inst_good
 
 clean:
-	rm -f $(OBJS) $(BIN) *.backup
+	rm -f $(OBJS) $(BIN) *.{backup,inst}

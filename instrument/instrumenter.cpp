@@ -137,7 +137,8 @@ MyFrontendAction::EndSourceFileAction()
 	TheRewriter.InsertTextAfter(start, ss.str());
 
 	// rewrite the original source file
-	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT);
+	int fd = open(file_name.append(".inst").c_str(), O_WRONLY | O_CREAT,
+			S_IRUSR | S_IWUSR);
 	if (fd < 0)
 		err(1, "open");
 	llvm::raw_fd_ostream output(fd, /* close */ 1);

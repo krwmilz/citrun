@@ -6,35 +6,32 @@ if which tput > /dev/null; then
 	RESET=`tput sgr0`
 fi
 
-export SCV_PATH="$HOME/src/scv/instrument"
+export SCV_PATH="$HOME/src/scv/compilers"
 export PATH="$SCV_PATH:$PATH"
 
-export CFLAGS="-pthread"
-export LDFLAGS="-L$HOME/src/scv/runtime -pthread"
-
-export LD_LIBRARY_PATH="$HOME/src/scv/runtime"
-export LDLIBS="-lruntime"
-for t in `ls tests/*/prog.c`; do
+export CFLAGS="-pthread -fPIC"
+export LDLIBS="-L../../runtime -lruntime -pthread"
+for t in `ls tests/fibonacci/Makefile`; do
 	dirname=`dirname ${t}`
-	make -C $dirname clean
+	make -s -C $dirname clean
 
-	if ! make -C $dirname prog; then
+	if ! make -s -C $dirname; then
 		echo "$dirname:$RED make prog failed!$RESET"
 		continue
 	fi
 
 	# diff against the last known good instrumented source
-	if ! diff -u $dirname/instrumented.c $dirname/prog_inst.c; then
+	if ! make -s -C $dirname "diff"; then
 		echo "$dirname:$RED source compare failed$RESET"
 		continue
 	fi
 
 	# test that the instrumented binary works properly
-	if ! make -C $dirname "test"; then
+	if ! make -s -C $dirname "test"; then
 		echo "$dirname:$RED test failed!$RESET"
 		continue
 	fi
 
-	make -C $dirname clean
+	make -s -C $dirname clean
 	echo "$dirname:$GREEN ok$RESET"
 done
