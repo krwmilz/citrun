@@ -1,3 +1,9 @@
+.ifdef SCV_PATH
+error_SCV_PATH
+.endif
+
+# execvis
+
 SUBDIRS = instrument runtime viewer
 
 all: make_subdirs

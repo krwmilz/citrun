@@ -1,3 +1,7 @@
+.ifdef SCV_PATH
+error_SCV_PATH
+.endif
+
 CXXFLAGS += -I/usr/X11R6/include
 CXXFLAGS += -I/usr/X11R6/include/freetype2
 CXXFLAGS += -I/usr/X11R6/include/libdrm
