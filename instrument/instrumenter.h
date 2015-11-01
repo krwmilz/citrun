@@ -1,5 +1,6 @@
 #include <clang/AST/ASTConsumer.h>
 #include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/Frontend/FrontendActions.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
 using namespace clang;
@@ -44,3 +45,30 @@ public:
 private:
 	instrumenter Visitor;
 };
+
+// For each source file provided to the tool, a new FrontendAction is created.
+class MyFrontendAction : public ASTFrontendAction {
+public:
+	MyFrontendAction() {};
+
+	void EndSourceFileAction() override;
+	ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef file);
+
+private:
+	Rewriter TheRewriter;
+};
+
+
+#if 0
+class MFAF : public FrontendActionFactory {
+public:
+	MFAF(std::vector<const char *> &i) : inst_files(i) {}
+
+	FrontendAction *create() {
+		return new MyFrontendAction();
+	}
+
+private:
+	std::vector<const char *> inst_files;
+};
+#endif

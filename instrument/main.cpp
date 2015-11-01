@@ -1,8 +1,6 @@
 #include <err.h>	// err, errx
-#include <fcntl.h>	// open
 #include <stdlib.h>	// mktemp
 #include <unistd.h>
-#include <sys/stat.h>	// mode flags
 #include <sys/wait.h>	// wait
 
 #include <fstream>
@@ -10,8 +8,6 @@
 #include <sstream>
 #include <string>
 
-#include <clang/Frontend/FrontendActions.h>
-#include <clang/Frontend/CompilerInstance.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <clang/Rewrite/Core/Rewriter.h>
@@ -20,68 +16,9 @@
 #include "instrumenter.h"
 
 using namespace clang;
-using namespace clang::driver;
 using namespace clang::tooling;
 
 static llvm::cl::OptionCategory ToolingCategory("instrument options");
-
-// For each source file provided to the tool, a new FrontendAction is created.
-class MyFrontendAction : public ASTFrontendAction {
-public:
-	MyFrontendAction() {};
-
-	void EndSourceFileAction() override {
-		SourceManager &sm = TheRewriter.getSourceMgr();
-		const FileID main_fid = sm.getMainFileID();
-		// llvm::errs() << "** EndSourceFileAction for: "
-		// 	<< sm.getFileEntryForID(main_fid)->getName()
-		// 	<< "\n";
-
-		SourceLocation start = sm.getLocForStartOfFile(main_fid);
-		std::string file_name = getCurrentFile();
-
-		std::stringstream ss;
-		// Add declarations for coverage buffers
-		int file_bytes = sm.getFileIDSize(main_fid);
-		ss << "unsigned int lines[" << file_bytes << "];"
-			<< std::endl;
-		ss << "int size = " << file_bytes << ";" << std::endl;
-		ss << "char file_name[] = \"" << file_name << "\";" << std::endl;
-		TheRewriter.InsertTextAfter(start, ss.str());
-
-		// rewrite the original source file
-		int fd = open(file_name.c_str(), O_WRONLY | O_CREAT);
-		if (fd < 0)
-			err(1, "open");
-		llvm::raw_fd_ostream output(fd, /* close */ 1);
-		TheRewriter.getEditBuffer(main_fid).write(output);
-		// TheRewriter.getEditBuffer(main_fid).write(llvm::outs());
-	}
-
-	ASTConsumer *CreateASTConsumer(CompilerInstance &CI,
-			StringRef file) override {
-		// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
-		SourceManager &sm = CI.getSourceManager();
-		TheRewriter.setSourceMgr(sm, CI.getLangOpts());
-
-		return new MyASTConsumer(TheRewriter);
-	}
-
-private:
-	Rewriter TheRewriter;
-};
-
-class MFAF : public FrontendActionFactory {
-public:
-	MFAF(std::vector<const char *> &i) : inst_files(i) {}
-
-	FrontendAction *create() {
-		return new MyFrontendAction();
-	}
-
-private:
-	std::vector<const char *> inst_files;
-};
 
 void
 clean_path()

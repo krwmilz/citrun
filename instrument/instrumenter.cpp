@@ -1,9 +1,14 @@
+#include <err.h>
+#include <fcntl.h>	// open
+#include <sys/stat.h>	// mode flags
+
 #include <sstream>
 #include <string>
 #include <iostream>
 
 #include <clang/AST/AST.h>
 #include <clang/Lex/Lexer.h>
+#include <clang/Frontend/CompilerInstance.h>
 
 #include "instrumenter.h"
 
@@ -96,4 +101,46 @@ instrumenter::real_loc_end(Stmt *d)
 {
 	SourceLocation _e(d->getLocEnd());
 	return SourceLocation(Lexer::getLocForEndOfToken(_e, 0, SM, lopt));
+}
+
+// MyFrontendAction ---
+
+ASTConsumer *
+MyFrontendAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
+{
+	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
+	SourceManager &sm = CI.getSourceManager();
+	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
+
+	return new MyASTConsumer(TheRewriter);
+}
+
+void
+MyFrontendAction::EndSourceFileAction()
+{
+	SourceManager &sm = TheRewriter.getSourceMgr();
+	const FileID main_fid = sm.getMainFileID();
+	// llvm::errs() << "** EndSourceFileAction for: "
+	// 	<< sm.getFileEntryForID(main_fid)->getName()
+	// 	<< "\n";
+
+	SourceLocation start = sm.getLocForStartOfFile(main_fid);
+	std::string file_name = getCurrentFile();
+
+	std::stringstream ss;
+	// Add declarations for coverage buffers
+	int file_bytes = sm.getFileIDSize(main_fid);
+	ss << "unsigned int lines[" << file_bytes << "];"
+		<< std::endl;
+	ss << "int size = " << file_bytes << ";" << std::endl;
+	ss << "char file_name[] = \"" << file_name << "\";" << std::endl;
+	TheRewriter.InsertTextAfter(start, ss.str());
+
+	// rewrite the original source file
+	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT);
+	if (fd < 0)
+		err(1, "open");
+	llvm::raw_fd_ostream output(fd, /* close */ 1);
+	TheRewriter.getEditBuffer(main_fid).write(output);
+	// TheRewriter.getEditBuffer(main_fid).write(llvm::outs());
 }
