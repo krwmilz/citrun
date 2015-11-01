@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 
-/* these symbols are guaranteed to exist because of instrumentation */
+/* guaranteed to exist at link time because of instrumentation */
 extern unsigned int lines[];
 extern int size;
 
