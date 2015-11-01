@@ -1,5 +1,6 @@
 unsigned int lines[77];
 int size = 77;
+char file_name[] = "/home/kyle/src/scv/tests/hello_world/hello.c";
 #include <stdio.h>
 
 int
