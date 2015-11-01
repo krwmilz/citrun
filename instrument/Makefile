@@ -1,3 +1,7 @@
+.ifdef SCV_PATH
+error_SCV_PATH
+.endif
+
 CXXFLAGS += -I/usr/local/include
 CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 CXXFLAGS += -fno-rtti

@@ -3,7 +3,9 @@
 #include <stdlib.h>	// mktemp
 #include <unistd.h>
 #include <sys/stat.h>	// mode flags
+#include <sys/wait.h>	// wait
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -26,7 +28,8 @@ static llvm::cl::OptionCategory ToolingCategory("instrument options");
 // For each source file provided to the tool, a new FrontendAction is created.
 class MyFrontendAction : public ASTFrontendAction {
 public:
-	MyFrontendAction(std::vector<const char *> &);
+	MyFrontendAction() {};
+
 	void EndSourceFileAction() override {
 		SourceManager &sm = TheRewriter.getSourceMgr();
 		const FileID main_fid = sm.getMainFileID();
@@ -35,6 +38,7 @@ public:
 		// 	<< "\n";
 
 		SourceLocation start = sm.getLocForStartOfFile(main_fid);
+		std::string file_name = getCurrentFile();
 
 		std::stringstream ss;
 		// Add declarations for coverage buffers
@@ -42,11 +46,11 @@ public:
 		ss << "unsigned int lines[" << file_bytes << "];"
 			<< std::endl;
 		ss << "int size = " << file_bytes << ";" << std::endl;
+		ss << "char file_name[] = \"" << file_name << "\";" << std::endl;
 		TheRewriter.InsertTextAfter(start, ss.str());
 
-		// Now emit the rewritten buffer.
-		int fd = open(inst_files[0], O_WRONLY | O_CREAT,
-				S_IRUSR | S_IWUSR);
+		// rewrite the original source file
+		int fd = open(file_name.c_str(), O_WRONLY | O_CREAT);
 		if (fd < 0)
 			err(1, "open");
 		llvm::raw_fd_ostream output(fd, /* close */ 1);
@@ -65,21 +69,14 @@ public:
 
 private:
 	Rewriter TheRewriter;
-
-	std::vector<const char *> inst_files;
 };
-
-MyFrontendAction::MyFrontendAction(std::vector<const char *> &i) :
-	inst_files(i)
-{
-}
 
 class MFAF : public FrontendActionFactory {
 public:
 	MFAF(std::vector<const char *> &i) : inst_files(i) {}
 
 	FrontendAction *create() {
-		return new MyFrontendAction(inst_files);
+		return new MyFrontendAction();
 	}
 
 private:
@@ -131,8 +128,7 @@ clean_path()
 }
 
 void
-instrument(int argc, char *argv[], std::vector<const char *> &source_files,
-		std::vector<const char *> &inst_files)
+instrument(int argc, char *argv[], std::vector<const char *> &source_files)
 {
 	const char *clang_argv[source_files.size() + 1 + argc];
 	int clang_argc = 0;
@@ -163,8 +159,8 @@ instrument(int argc, char *argv[], std::vector<const char *> &source_files,
 	// use the helper newFrontendActionFactory to create a default factory
 	// that will return a new MyFrontendAction object every time.  To
 	// further customize this, we could create our own factory class.
-	int ret = Tool.run(new MFAF(inst_files));
-	// int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
+	// int ret = Tool.run(new MFAF(inst_files));
+	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
 	if (ret)
 		errx(1, "Instrumentation failed");
 }
@@ -173,56 +169,84 @@ int
 main(int argc, char *argv[])
 {
 	std::vector<const char *> source_files;
-	std::vector<const char *> inst_files;
-	char *exec_argv[argc + 1];
 
 	for (int i = 0; i < argc; i++) {
-		exec_argv[i] = strdup(argv[i]);
-
 		int arg_len = strlen(argv[i]);
 		if (arg_len < 4)
 			continue;
 
 		// compare last four bytes of argument
 		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
-		    strcmp(argv[i] + arg_len - 2, ".c") == 0) {
+		    strcmp(argv[i] + arg_len - 2, ".c") == 0)
 			// keep track of original source file names
 			source_files.push_back(argv[i]);
-
-			char *inst_filename = (char *)calloc(PATH_MAX, 1);
-			if (inst_filename == NULL)
-				err(1, "calloc");
-
-			strncpy(inst_filename, argv[i], arg_len - 2);
-			strcat(inst_filename, "_inst.c");
-
-			// source code rewriter needs to know this file
-			inst_files.push_back(inst_filename);
-			// native compiler uses this source file instead
-			exec_argv[i] = inst_filename;
-		}
 	}
 	// very important that argv passed to execvp is NULL terminated
-	exec_argv[argc] = NULL;
+	argv[argc] = NULL;
 
 	// run native command if there's no source files to instrument
 	if (source_files.size() == 0) {
+#if DEBUG
 		warnx("no source files found on command line");
-
+#endif
 		clean_path();
-		if (execvp(exec_argv[0], exec_argv))
+		if (execvp(argv[0], argv))
 			err(1, "execvp");
 	}
 
+	// backup original source files
+	for (auto s : source_files) {
+		std::ifstream src(s, std::ios::binary);
+		std::string dst_fn(s);
+		std::ofstream dst(dst_fn.append(".backup"), std::ios::binary);
+
+		dst << src.rdbuf();
+
+		src.close();
+		dst.close();
+	}
+
 	// run instrumentation on detected source files
-	instrument(argc, argv, source_files, inst_files);
+	instrument(argc, argv, source_files);
 
 #if DEBUG
-	std::cout << "Calling real compiler " << exec_argv[0] << std::endl;
+	std::cout << "Calling real compiler" << std::endl;
 #endif
-
-	// exec native compiler with instrumented source files
 	clean_path();
-	if (execvp(exec_argv[0], exec_argv))
-		err(1, "execvp");
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		// child, exec native compiler with instrumented source files
+		if (execvp(argv[0], argv))
+			err(1, "execvp");
+	}
+	else if (pid > 0) {
+		// parent
+		int status = 1;
+		int ret;
+		while (ret = wait(&status)) {
+			if (ret != -1)
+				break;
+			if (errno == EINTR)
+				continue;
+			// something bad happened
+			err(1, "wait");
+		}
+#ifdef DEBUG
+		std::cout << "parent: restoring files" << std::endl;
+#endif
+		// restore original source files
+		for (auto s : source_files) {
+			std::ofstream dst(s, std::ios::binary);
+			std::string src_fn(s);
+			std::ifstream src(src_fn.append(".backup"), std::ios::binary);
+
+			dst << src.rdbuf();
+
+			src.close();
+			dst.close();
+		}
+	}
+	else
+		err(1, "fork");
 }
