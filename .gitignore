@@ -1,4 +1,4 @@
 .depend
 *.o
-*.so
+*.a
 *.swp
