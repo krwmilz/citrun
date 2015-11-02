@@ -38,13 +38,17 @@ instrumenter::VisitStmt(Stmt *s)
 		WhileStmt *WhileStatement = cast<WhileStmt>(s);
 		stmt_to_inst = WhileStatement->getCond();
 	}
+	else if (isa<SwitchStmt>(s)) {
+		SwitchStmt *SwitchStatement = cast<SwitchStmt>(s);
+		stmt_to_inst = SwitchStatement->getCond();
+	}
 	else if (isa<ReturnStmt>(s)) {
 		ReturnStmt *ReturnStatement = cast<ReturnStmt>(s);
 		stmt_to_inst = ReturnStatement->getRetValue();
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
-		|| isa<SwitchStmt>(s) || isa<SwitchCase>(s)) {
+		|| isa<SwitchCase>(s)) {
 	}
 	*/
 	else if (isa<DeclStmt>(s)) {
