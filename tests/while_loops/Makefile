@@ -1,5 +1,11 @@
-test:
-	@sh test.sh
+BIN = prog
+SRCS = while.c
+OBJS = $(SRCS:c=o)
 
-clean:
-	@rm -f prog prog_inst.c
+$(BIN): $(OBJS)
+	$(CC) -o $(BIN) $(OBJS) $(LDLIBS)
+
+diff:
+	diff -u while.c.inst_good while.c.inst
+
+.include "../Makefile.test"
