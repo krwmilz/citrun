@@ -1,6 +1,6 @@
 unsigned int lines[198];
 int size = 198;
-char file_name[] = "/home/kyle/src/scv/tests/if_statement/if.c";
+char file_name[] = "/home/kyle/src/scv/tests/if/if.c";
 #include <stdlib.h>
 
 int

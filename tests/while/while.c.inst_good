@@ -1,6 +1,6 @@
 unsigned int lines[76];
 int size = 76;
-char file_name[] = "/home/kyle/src/scv/tests/while_loops/while.c";
+char file_name[] = "/home/kyle/src/scv/tests/while/while.c";
 int
 main(void)
 {
