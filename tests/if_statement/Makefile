@@ -1,5 +1,11 @@
-test:
-	@echo "test suite empty"
+BIN = prog
+SRCS = if.c
+OBJS = $(SRCS:c=o)
 
-clean:
-	@rm -f prog prog_inst.c
+$(BIN): $(OBJS)
+	$(CC) -o $(BIN) $(OBJS) $(LDLIBS)
+
+diff:
+	diff -u if.c.inst_good if.c.inst
+
+.include "../Makefile.test"

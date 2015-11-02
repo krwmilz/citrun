@@ -7,7 +7,7 @@ main(int argc, char *argv[])
 		return 1;
 	else
 		exit(14);
-	
+
 	if (argc == 2) {
 		return 5;
 	}
