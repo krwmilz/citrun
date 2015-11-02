@@ -1,0 +1,14 @@
+unsigned int lines[78];
+int size = 78;
+char file_name[] = "/home/kyle/src/scv/tests/for/for.c";
+int
+main(void)
+{
+	int i;
+
+	for (i = 0; (lines[6] = 1, i < 10); i++) {
+		i++;
+	}
+
+	return (lines[10] = 1, i);
+}
