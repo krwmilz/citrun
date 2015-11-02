@@ -9,26 +9,26 @@ fi
 export SCV_PATH="$HOME/src/scv/compilers"
 export PATH="$SCV_PATH:$PATH"
 
-export CFLAGS="-pthread -fPIC"
+export CFLAGS="-pthread"
 export LDLIBS="-L../../runtime -lruntime -pthread"
-for t in `ls tests/fibonacci/Makefile`; do
+for t in `ls tests/*/Makefile`; do
 	dirname=`dirname ${t}`
 	make -s -C $dirname clean
 
 	if ! make -s -C $dirname; then
-		echo "$dirname:$RED make prog failed!$RESET"
+		echo "$dirname:$RED make failed!$RESET"
 		continue
 	fi
 
 	# diff against the last known good instrumented source
 	if ! make -s -C $dirname "diff"; then
-		echo "$dirname:$RED source compare failed$RESET"
+		echo "$dirname:$RED make diff failed$RESET"
 		continue
 	fi
 
 	# test that the instrumented binary works properly
 	if ! make -s -C $dirname "test"; then
-		echo "$dirname:$RED test failed!$RESET"
+		echo "$dirname:$RED make test failed!$RESET"
 		continue
 	fi
 
