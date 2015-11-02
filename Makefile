@@ -17,6 +17,6 @@ clean:
 	make -C viewer clean
 
 make_subdirs:
-	@make -C instrument
-	@make -C runtime
-	@make -C viewer
+	make -C instrument
+	make -C runtime
+	make -C viewer
