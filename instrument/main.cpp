@@ -1,6 +1,6 @@
 #include <err.h>
 #include <libgen.h>
-#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <fstream>
@@ -105,7 +105,7 @@ int
 main(int argc, char *argv[])
 {
 	std::vector<std::string> source_files;
-	const char *real_compiler_argv[argc + 1];
+	char *real_compiler_argv[argc + 1];
 
 	for (int i = 0; i < argc; i++) {
 		std::string arg(argv[i]);
@@ -119,19 +119,18 @@ main(int argc, char *argv[])
 			source_files.push_back(arg);
 			std::string inst_src_path;
 
-			// Append original directory or "." if relative path
+			// Find original directory or "." if relative path
 			char *src_dir = dirname(arg.c_str());
 			if (src_dir == NULL)
 				err(1, "dirname");
-			inst_src_path.append(src_dir);
 
-			// Append instrumentation directory
-			inst_src_path.append("/inst/");
-
-			// Append original file name
+			// Find original file name
 			char *src_name = basename(arg.c_str());
 			if (src_name == NULL)
 				err(1, "basename");
+
+			inst_src_path.append(src_dir);
+			inst_src_path.append("/inst/");
 			inst_src_path.append(src_name);
 
 			// Compilation file will be instrumented source
@@ -159,6 +158,6 @@ main(int argc, char *argv[])
 	std::cout << "Calling real compiler" << std::endl;
 #endif
 	clean_path();
-	if (execvp(real_compiler_argv[0], (char *const *)real_compiler_argv))
+	if (execvp(real_compiler_argv[0], real_compiler_argv))
 		err(1, "execvp");
 }

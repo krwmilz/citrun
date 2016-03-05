@@ -4,7 +4,7 @@ error_SCV_PATH
 
 CXXFLAGS += -I/usr/local/include
 CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
-CXXFLAGS += -fno-rtti
+CXXFLAGS += -fno-rtti -Wall
 # CXXFLAGS += -ggdb -DDEBUG
 CXX = eg++ -std=c++11
 
