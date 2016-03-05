@@ -92,6 +92,15 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
 		errx(1, "Instrumentation failed");
 }
 
+bool
+ends_with(std::string const &value, std::string const &suffix)
+{
+	if (suffix.length() > value.length())
+		return false;
+
+	return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -99,25 +108,19 @@ main(int argc, char *argv[])
 	const char *real_compiler_argv[argc + 1];
 
 	for (int i = 0; i < argc; i++) {
-		int arg_len = strlen(argv[i]);
+		std::string arg(argv[i]);
 
 		// copy argument verbatim for now, we'll replace later if needed
 		real_compiler_argv[i] = argv[i];
 
-		// assume all source files are 4 characters or more
-		if (arg_len < 4)
-			continue;
-
 		// Dirty hack to find source files
-		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
-		    strcmp(argv[i] + arg_len - 2, ".c") == 0) {
+		if (ends_with(arg, ".cpp") || ends_with(arg, ".c")) {
 			// Keep track of original source file names
-			source_files.push_back(std::string(argv[i]));
-
+			source_files.push_back(arg);
 			std::string inst_src_path;
 
 			// Append original directory or "." if relative path
-			char *src_dir = dirname(argv[i]);
+			char *src_dir = dirname(arg.c_str());
 			if (src_dir == NULL)
 				err(1, "dirname");
 			inst_src_path.append(src_dir);
@@ -126,7 +129,7 @@ main(int argc, char *argv[])
 			inst_src_path.append("/inst/");
 
 			// Append original file name
-			char *src_name = basename(argv[i]);
+			char *src_name = basename(arg.c_str());
 			if (src_name == NULL)
 				err(1, "basename");
 			inst_src_path.append(src_name);
