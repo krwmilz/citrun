@@ -3,12 +3,12 @@ error_SCV_PATH
 .endif
 
 CFLAGS += -fPIC -pthread
-LIB = libruntime.a
+LIB = libruntime.so
 SRCS = runtime.c
 OBJS = $(SRCS:c=o)
 
 $(LIB): $(OBJS)
-	$(AR) cr $(LIB) $(OBJS)
+	$(CC) $(CFLAGS) -shared -o $(LIB) $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(LIB)
