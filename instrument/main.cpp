@@ -1,7 +1,7 @@
-#include <err.h>	// err, errx
-#include <stdlib.h>	// mktemp
+#include <err.h>
+#include <libgen.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <sys/wait.h>	// wait
 
 #include <fstream>
 #include <iostream>
@@ -23,7 +23,7 @@ static llvm::cl::OptionCategory ToolingCategory("instrument options");
 void
 clean_path()
 {
-	// remove SCV_PATH from PATH
+	// Remove SCV_PATH from PATH
 
 	char *scv_path = getenv("SCV_PATH");
 	char *path = getenv("PATH");
@@ -106,24 +106,52 @@ int
 main(int argc, char *argv[])
 {
 	std::vector<std::string> source_files;
+	const char *real_compiler_argv[argc + 1];
 
 	for (int i = 0; i < argc; i++) {
 		int arg_len = strlen(argv[i]);
+
+		// copy argument verbatim for now, we'll replace later if needed
+		real_compiler_argv[i] = argv[i];
+
+		// assume all source files are 4 characters or more
 		if (arg_len < 4)
 			continue;
 
-		// compare last four bytes of argument
+		// Dirty hack to find source files
 		if (strcmp(argv[i] + arg_len - 4, ".cpp") == 0 ||
-		    strcmp(argv[i] + arg_len - 2, ".c") == 0)
-			// keep track of original source file names
+		    strcmp(argv[i] + arg_len - 2, ".c") == 0) {
+			// Keep track of original source file names
 			source_files.push_back(std::string(argv[i]));
+
+			std::string inst_src_path;
+
+			// Append original directory or "." if relative path
+			char *src_dir = dirname(argv[i]);
+			if (src_dir == NULL)
+				err(1, "dirname");
+			inst_src_path.append(src_dir);
+
+			// Append instrumentation directory
+			inst_src_path.append("/inst/");
+
+			// Append original file name
+			char *src_name = basename(argv[i]);
+			if (src_name == NULL)
+				err(1, "basename");
+			inst_src_path.append(src_name);
+
+			// Compilation file will be instrumented source
+			real_compiler_argv[i] = strdup(inst_src_path.c_str());
+		}
 	}
-	// very important that argv passed to execvp is NULL terminated
+	// Very important that argv passed to execvp is NULL terminated
+	real_compiler_argv[argc] = NULL;
 	argv[argc] = NULL;
 
 	// run native command if there's no source files to instrument
 	if (source_files.size() == 0) {
-#if DEBUG
+#ifdef DEBUG
 		warnx("no source files found on command line");
 #endif
 		clean_path();
@@ -131,68 +159,13 @@ main(int argc, char *argv[])
 			err(1, "execvp");
 	}
 
-	// backup original source files
-	for (auto s : source_files) {
-		std::ifstream src(s, std::ios::binary);
-		std::ofstream dst(s + ".backup", std::ios::binary);
-
-		dst << src.rdbuf();
-
-		src.close();
-		dst.close();
-	}
-
 	// run instrumentation on detected source files
 	instrument(argc, argv, source_files);
 
-	// copy instrumented files ontop of original
-	for (auto s : source_files) {
-		std::ofstream dst(s, std::ios::binary);
-		std::ifstream src(s + ".inst", std::ios::binary);
-
-		dst << src.rdbuf();
-
-		src.close();
-		dst.close();
-	}
-
-#if DEBUG
+#ifdef DEBUG
 	std::cout << "Calling real compiler" << std::endl;
 #endif
 	clean_path();
-
-	pid_t pid = fork();
-	if (pid == 0) {
-		// child, exec native compiler with instrumented source files
-		if (execvp(argv[0], argv))
-			err(1, "execvp");
-	}
-	else if (pid > 0) {
-		// parent
-		int status = 1;
-		int ret;
-		while (ret = wait(&status)) {
-			if (ret != -1)
-				break;
-			if (errno == EINTR)
-				continue;
-			// something bad happened
-			err(1, "wait");
-		}
-#ifdef DEBUG
-		std::cout << "parent: restoring files" << std::endl;
-#endif
-		// restore original source files
-		for (auto s : source_files) {
-			std::ofstream dst(s, std::ios::binary);
-			std::ifstream src(s + ".backup", std::ios::binary);
-
-			dst << src.rdbuf();
-
-			src.close();
-			dst.close();
-		}
-	}
-	else
-		err(1, "fork");
+	if (execvp(real_compiler_argv[0], (char *const *)real_compiler_argv))
+		err(1, "execvp");
 }

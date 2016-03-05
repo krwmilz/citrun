@@ -143,8 +143,15 @@ MyFrontendAction::EndSourceFileAction()
 	ss << "char file_name[] = \"" << file_name << "\";" << std::endl;
 	TheRewriter.InsertTextAfter(start, ss.str());
 
-	// rewrite the original source file
-	int fd = open(file_name.append(".inst").c_str(), O_WRONLY | O_CREAT,
+	// write the instrumented source file to another directory
+	if (mkdir("inst", S_IWUSR | S_IRUSR | S_IXUSR))
+		// already existing directory is ok
+		if (errno != EEXIST)
+			err(1, "mkdir");
+
+	size_t last_slash = file_name.find_last_of('/');
+	file_name.insert(last_slash + 1, "inst/");
+	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT,
 			S_IRUSR | S_IWUSR);
 	if (fd < 0)
 		err(1, "open");
