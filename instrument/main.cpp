@@ -23,8 +23,6 @@ static llvm::cl::OptionCategory ToolingCategory("instrument options");
 void
 clean_path()
 {
-	// Remove SCV_PATH from PATH
-
 	char *scv_path = getenv("SCV_PATH");
 	char *path = getenv("PATH");
 	if (scv_path == NULL)
@@ -33,35 +31,27 @@ clean_path()
 	else if (path == NULL)
 		errx(1, "PATH not set, your build system needs to use "
 			"the PATH for this tool to be useful.");
-#ifdef DEBUG
-	std::cout << "SCV_PATH=" << scv_path << std::endl;
-	std::cout << "old PATH=" << path << std::endl;
-#endif
 
-	int new_path_pos = 0;
-	char *new_path = (char *)calloc(strlen(path), 1);
+	// Filter SCV_PATH out of PATH
+	std::stringstream path_ss(path);
+	std::ostringstream new_path;
+	std::string component;
+	bool first_component = 1;
 
-	char *tok = strtok(path, ":");
-	bool wrote_first_token = false;
-	while (tok != NULL) {
-		if (strncmp(scv_path, tok, 1024) != 0) {
-			// didn't find SCV_PATH in PATH
-			if (wrote_first_token == true) {
-				strcat(new_path + new_path_pos, ":");
-				new_path_pos++;
-			}
-			strcat(new_path + new_path_pos, tok);
-			new_path_pos += strlen(tok);
-			wrote_first_token = true;
-		}
-		tok = strtok(NULL, ":");
+	while (std::getline(path_ss, component, ':')) {
+		if (component.compare(scv_path) == 0)
+			continue;
+
+		if (first_component == 0)
+			new_path << ":";
+
+		// It wasn't $SCV_PATH, keep it
+		new_path << component;
+		first_component = 0;
 	}
 
-	setenv("PATH", new_path, 1);
-#ifdef DEBUG
-	std::cout << "new " << new_path << std::endl;
-	system("env | grep PATH");
-#endif
+	// Set new $PATH
+	setenv("PATH", new_path.str().c_str(), 1);
 }
 
 void
