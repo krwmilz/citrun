@@ -9,7 +9,7 @@ SUBDIRS = instrument runtime viewer
 all: make_subdirs
 
 test: make_subdirs
-	@sh run_tests.sh
+	prove
 
 clean:
 	make -C instrument clean
