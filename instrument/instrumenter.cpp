@@ -1,10 +1,13 @@
 #include <err.h>
 #include <fcntl.h>	// open
+#include <limits.h>
 #include <sys/stat.h>	// mode flags
+#include <unistd.h>	// getcwd, access
 
+#include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 #include <clang/AST/AST.h>
 #include <clang/Lex/Lexer.h>
@@ -75,8 +78,8 @@ instrumenter::VisitFunctionDecl(FunctionDecl *f)
 {
 	// Only function definitions (with bodies), not declarations.
 	if (f->hasBody()) {
-		Stmt *FuncBody = f->getBody();
 #if 0
+		Stmt *FuncBody = f->getBody();
 		// Type name as string
 		QualType QT = f->getReturnType();
 		std::string TypeStr = QT.getAsString();
@@ -122,6 +125,49 @@ MyFrontendAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
 	return new MyASTConsumer(TheRewriter);
 }
 
+unsigned int
+get_src_number()
+{
+	char *cwd = getcwd(NULL, PATH_MAX);
+	if (cwd == NULL)
+		errx(1, "getcwd");
+	std::string src_number_filename(cwd);
+	src_number_filename.append("/SRC_NUMBER");
+
+	std::cerr << "src num file is " << src_number_filename << std::endl;
+
+	std::fstream src_number_file;
+
+	if (access(src_number_filename.c_str(), F_OK) == -1) {
+		// SRC_NUMBER does not exist
+		std::cerr << "SRC_NUMBER does not exist" << std::endl;
+		std::cerr << "creating with contents '0'" << std::endl;
+
+		// Create SRC_NUMBER
+		src_number_file.open(src_number_filename, std::fstream::out);
+		src_number_file << 0;
+		src_number_file.close();
+
+		// First source file is zero
+		return 0;
+	}
+
+	// SRC_NUMBER existed, read its contents and write incremented value
+	src_number_file.open(src_number_filename, std::fstream::in | std::fstream::out);
+
+	unsigned int src_num = 0;
+	src_number_file >> src_num;
+
+	++src_num;
+	std::cerr << "src num is " << src_num << std::endl;
+
+	// Write the new source number
+	src_number_file.seekg(0);
+	src_number_file << src_num;
+
+	return src_num;
+}
+
 void
 MyFrontendAction::EndSourceFileAction()
 {
@@ -134,13 +180,32 @@ MyFrontendAction::EndSourceFileAction()
 	SourceLocation start = sm.getLocForStartOfFile(main_fid);
 	std::string file_name = getCurrentFile();
 
+	unsigned int src_number = get_src_number();
+
 	std::stringstream ss;
 	// Add declarations for coverage buffers
 	int file_bytes = sm.getFileIDSize(main_fid);
-	ss << "unsigned int lines[" << file_bytes << "];"
-		<< std::endl;
-	ss << "int size = " << file_bytes << ";" << std::endl;
-	ss << "char file_name[] = \"" << file_name << "\";" << std::endl;
+
+	ss << "#include <scv_global.h>" << std::endl;
+	ss << "static unsigned int lines[" << file_bytes << "];" << std::endl;
+
+	if (src_number != 0) {
+		unsigned int prev_src_number = src_number - 1;
+		ss << "extern struct scv_node node" << prev_src_number << ";" << std::endl;
+	}
+
+	ss << "struct scv_node node" << src_number << " = {" << std::endl
+		<< "	.lines_ptr = lines," << std::endl
+		<< "	.size = " << file_bytes << "," << std::endl
+		<< "	.file_name = \"" << file_name << "\"," << std::endl;
+	if (src_number != 0) {
+		unsigned int prev_src_number = src_number - 1;
+		ss << "	.next = &node" << prev_src_number << "," << std::endl;
+	} else {
+		ss << "	.next = 0," << std::endl;
+	}
+	ss << "};" << std::endl;
+
 	TheRewriter.InsertTextAfter(start, ss.str());
 
 	// write the instrumented source file to another directory
