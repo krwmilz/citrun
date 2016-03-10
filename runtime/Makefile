@@ -2,7 +2,7 @@
 error_SCV_PATH
 .endif
 
-CFLAGS += -fPIC -pthread
+CFLAGS += -fPIC -pthread -I../include
 LIB = libruntime.so
 SRCS = runtime.c
 OBJS = $(SRCS:c=o)

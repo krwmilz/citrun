@@ -134,16 +134,9 @@ get_src_number()
 	std::string src_number_filename(cwd);
 	src_number_filename.append("/SRC_NUMBER");
 
-	std::cerr << "src num file is " << src_number_filename << std::endl;
-
 	std::fstream src_number_file;
-
 	if (access(src_number_filename.c_str(), F_OK) == -1) {
-		// SRC_NUMBER does not exist
-		std::cerr << "SRC_NUMBER does not exist" << std::endl;
-		std::cerr << "creating with contents '0'" << std::endl;
-
-		// Create SRC_NUMBER
+		// SRC_NUMBER does not exist, create it
 		src_number_file.open(src_number_filename, std::fstream::out);
 		src_number_file << 0;
 		src_number_file.close();
@@ -157,9 +150,7 @@ get_src_number()
 
 	unsigned int src_num = 0;
 	src_number_file >> src_num;
-
 	++src_num;
-	std::cerr << "src num is " << src_num << std::endl;
 
 	// Write the new source number
 	src_number_file.seekg(0);
@@ -180,30 +171,26 @@ MyFrontendAction::EndSourceFileAction()
 	SourceLocation start = sm.getLocForStartOfFile(main_fid);
 	std::string file_name = getCurrentFile();
 
-	unsigned int src_number = get_src_number();
+	unsigned int tu_number = get_src_number();
 
 	std::stringstream ss;
 	// Add declarations for coverage buffers
 	int file_bytes = sm.getFileIDSize(main_fid);
 
 	ss << "#include <scv_global.h>" << std::endl;
+	// Define storage for coverage data
 	ss << "static unsigned int lines[" << file_bytes << "];" << std::endl;
 
-	if (src_number != 0) {
-		unsigned int prev_src_number = src_number - 1;
-		ss << "extern struct scv_node node" << prev_src_number << ";" << std::endl;
-	}
+	// Always declare this. The next TU will overwrite this or there won't
+	// be a next TU.
+	ss << "struct scv_node node" << tu_number + 1 << ";" << std::endl;
 
-	ss << "struct scv_node node" << src_number << " = {" << std::endl
+	// Define this translation units main book keeping data structure
+	ss << "struct scv_node node" << tu_number << " = {" << std::endl
 		<< "	.lines_ptr = lines," << std::endl
 		<< "	.size = " << file_bytes << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl;
-	if (src_number != 0) {
-		unsigned int prev_src_number = src_number - 1;
-		ss << "	.next = &node" << prev_src_number << "," << std::endl;
-	} else {
-		ss << "	.next = 0," << std::endl;
-	}
+		ss << "	.next = &node" << tu_number + 1 << "," << std::endl;
 	ss << "};" << std::endl;
 
 	TheRewriter.InsertTextAfter(start, ss.str());

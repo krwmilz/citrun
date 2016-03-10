@@ -12,25 +12,33 @@ sub new {
 
 	# Make new temporary directory, clean it up at exit
 	$self->{tmp_dir} = tempdir( CLEANUP => 1 );
+	$self->{src_files} = [];
 	return $self;
 }
 
 sub add_src {
 	my ($self, $source) = @_;
+	my $num_src_files = scalar(@{ $self->{src_files} });
+
+	# Create temporary file name
+	my $src_name = "source_$num_src_files.c";
 
 	# Write source code to temp directory
-	open( my $src_fh, ">", "$self->{tmp_dir}/source.c" );
+	open( my $src_fh, ">", "$self->{tmp_dir}/$src_name" );
 	syswrite( $src_fh, $source );
 	close( $src_fh );
+
+	push @{ $self->{src_files} }, $src_name;
 }
 
 sub compile {
 	my ($self) = @_;
 	my $tmp_dir = $self->{tmp_dir};
+	my $src_files = join(" ", @{ $self->{src_files} });
 
 	my $makefile = <<EOF;
 BIN = program
-SRCS = source.c
+SRCS = $src_files
 OBJS = \$(SRCS:c=o)
 
 \$(BIN): \$(OBJS)
@@ -46,9 +54,9 @@ EOF
 	$ENV{PATH} = "$ENV{SCV_PATH}:$ENV{PATH}";
 
 	# Link in the runtime
-	$ENV{CFLAGS} = "-pthread";
-	# $ENV{LDLIBS} = "-Lruntime -lruntime -pthread";
-	# $ENV{LD_LIBRARY_PATH} = "runtime";
+	$ENV{CFLAGS} = "-pthread -I/home/kyle/src/scv/include";
+	$ENV{LDLIBS} = "-L/home/kyle/src/scv/runtime -lruntime -pthread";
+	$ENV{LD_LIBRARY_PATH} = "runtime";
 
 	my $ret = system( "make -C $tmp_dir" );
 	die "make failed: $ret\n" if ($ret);
@@ -57,7 +65,7 @@ EOF
 sub instrumented_src {
 	my ($self) = @_;
 
-	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source.c" );
+	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
 	my $inst_src;
 	while (my $line = <$inst_fh>) {
 		$inst_src .= $line;
