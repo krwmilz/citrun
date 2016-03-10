@@ -31,11 +31,11 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_global.h>
-static unsigned int lines[93];
+static unsigned int lines[15];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
-	.size = 93,
+	.size = 15,
 	.file_name = "$tmp_dir/source_0.c",
 	.next = &node1,
 };
@@ -44,14 +44,14 @@ main(void)
 {
 	int i;
 
-	switch ((lines[6] = 1, i)) {
+	switch ((++lines[6], i)) {
 	case 0:
 		break;
 	case 1:
 		break;
 	}
 
-	return (lines[13] = 1, 0);
+	return (++lines[13], 0);
 }
 EOF
 

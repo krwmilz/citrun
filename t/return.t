@@ -28,24 +28,24 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_global.h>
-static unsigned int lines[91];
+static unsigned int lines[12];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
-	.size = 91,
+	.size = 12,
 	.file_name = "$tmp_dir/source_0.c",
 	.next = &node1,
 };
 int foo() {
-	return (lines[2] = 1, 0);
+	return (++lines[2], 0);
 }
 
 int main(void) {
-	return (lines[6] = 1, 10);
+	return (++lines[6], 10);
 
-	return (lines[8] = 1, 10 + 10);
+	return (++lines[8], 10 + 10);
 
-	return (lines[10] = 1, (lines[10] = 1, foo()));
+	return (++lines[10], (++lines[10], foo()));
 }
 EOF
 

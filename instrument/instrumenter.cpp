@@ -63,7 +63,7 @@ instrumenter::VisitStmt(Stmt *s)
 	if (stmt_to_inst == NULL)
 		return true;
 
-	ss << "(lines[" << line << "] = 1, ";
+	ss << "(++lines[" << line << "], ";
 	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
 		return true;
@@ -169,17 +169,18 @@ MyFrontendAction::EndSourceFileAction()
 	// 	<< "\n";
 
 	SourceLocation start = sm.getLocForStartOfFile(main_fid);
-	std::string file_name = getCurrentFile();
 
+	SourceLocation end = sm.getLocForEndOfFile(main_fid);
+	unsigned int num_lines = sm.getPresumedLineNumber(end);
+
+	std::string file_name = getCurrentFile();
 	unsigned int tu_number = get_src_number();
 
 	std::stringstream ss;
-	// Add declarations for coverage buffers
-	int file_bytes = sm.getFileIDSize(main_fid);
 
 	ss << "#include <scv_global.h>" << std::endl;
 	// Define storage for coverage data
-	ss << "static unsigned int lines[" << file_bytes << "];" << std::endl;
+	ss << "static unsigned int lines[" << num_lines << "];" << std::endl;
 
 	// Always declare this. The next TU will overwrite this or there won't
 	// be a next TU.
@@ -188,7 +189,7 @@ MyFrontendAction::EndSourceFileAction()
 	// Define this translation units main book keeping data structure
 	ss << "struct scv_node node" << tu_number << " = {" << std::endl
 		<< "	.lines_ptr = lines," << std::endl
-		<< "	.size = " << file_bytes << "," << std::endl
+		<< "	.size = " << num_lines << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl;
 		ss << "	.next = &node" << tu_number + 1 << "," << std::endl;
 	ss << "};" << std::endl;

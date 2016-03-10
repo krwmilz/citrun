@@ -1,5 +1,6 @@
 use strict;
 use SCV::Project;
+use SCV::Viewer;
 use Test::More tests => 7;
 use Test::Differences;
 
@@ -52,11 +53,11 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_global.h>
-static unsigned int lines[530];
+static unsigned int lines[36];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
-	.size = 530,
+	.size = 36,
 	.file_name = "$tmp_dir/source_0.c",
 	.next = &node1,
 };
@@ -68,12 +69,12 @@ struct scv_node node0 = {
 long long
 fibonacci(long long n)
 {
-	if ((lines[9] = 1, n == 0))
-		return (lines[10] = 1, 0);
-	else if ((lines[11] = 1, n == 1))
-		return (lines[12] = 1, 1);
+	if ((++lines[9], n == 0))
+		return (++lines[10], 0);
+	else if ((++lines[11], n == 1))
+		return (++lines[12], 1);
 
-	return (lines[14] = 1, (lines[14] = 1, fibonacci(n - 1)) + (lines[14] = 1, fibonacci(n - 2)));
+	return (++lines[14], (++lines[14], fibonacci(n - 1)) + (++lines[14], fibonacci(n - 2)));
 }
 
 int
@@ -82,18 +83,18 @@ main(int argc, char *argv[])
 	long long n;
 	const char *errstr = NULL;
 
-	if ((lines[23] = 1, argc != 2)) {
-		(lines[24] = 1, fprintf(stderr, "usage: %s <N>\\n", argv[0]));
-		return (lines[25] = 1, 1);
+	if ((++lines[23], argc != 2)) {
+		(++lines[24], fprintf(stderr, "usage: %s <N>\\n", argv[0]));
+		return (++lines[25], 1);
 	}
 
-	n = (lines[28] = 1, strtonum(argv[1], LONG_MIN, LONG_MAX, &errstr));
-	if ((lines[29] = 1, errstr))
-		(lines[30] = 1, err(1, "%s", errstr));
+	n = (++lines[28], strtonum(argv[1], LONG_MIN, LONG_MAX, &errstr));
+	if ((++lines[29], errstr))
+		(++lines[30], err(1, "%s", errstr));
 
-	(lines[32] = 1, fprintf(stderr, "result: %lli\\n", (lines[32] = 1, fibonacci(n))));
+	(++lines[32], fprintf(stderr, "result: %lli\\n", (++lines[32], fibonacci(n))));
 
-	return (lines[34] = 1, 0);
+	return (++lines[34], 0);
 }
 EOF
 
