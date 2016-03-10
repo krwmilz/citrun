@@ -27,9 +27,15 @@ $project->compile();
 my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
-unsigned int lines[78];
-int size = 78;
-char file_name[] = "$tmp_dir/source.c";
+#include <scv_global.h>
+static unsigned int lines[78];
+struct scv_node node1;
+struct scv_node node0 = {
+	.lines_ptr = lines,
+	.size = 78,
+	.file_name = "$tmp_dir/source_0.c",
+	.next = &node1,
+};
 int
 main(void)
 {
