@@ -4,7 +4,7 @@ use SCV::Viewer;
 use Test::More tests => 1;
 use Test::Differences;
 
-my $project = SCV::Viewer->new();
+my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 unified_diff;
 
@@ -42,7 +42,7 @@ EOF
 );
 
 $project->compile();
-
 $project->run();
+
 my ($ret, $err) = $project->wait();
 is($ret, 0, "instrumented program check return code");
