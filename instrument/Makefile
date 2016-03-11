@@ -1,6 +1,5 @@
-.ifdef SCV_PATH
-error_SCV_PATH
-.endif
+PROG = scv_instrument
+SRCS = main.cpp instrumenter.cpp
 
 CXXFLAGS += -I/usr/local/include
 CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
@@ -8,9 +7,11 @@ CXXFLAGS += -fno-rtti -Wall
 # CXXFLAGS += -ggdb -DDEBUG
 CXX = eg++ -std=c++11
 
-# clang has a circular dependencies here, use "linker group options" to avoid
-LDLIBS += \
-	-Wl,--start-group \
+# OpenBSD has it's third part libraries here
+LDFLAGS += -L/usr/local/lib
+
+# Clang has a circular dependencies here, use "linker group options" to avoid
+LDADD += -Wl,--start-group \
 	-lclangAST \
 	-lclangAnalysis \
 	-lclangBasic \
@@ -35,15 +36,4 @@ LDLIBS += \
 	-lLLVMSupport \
 	-lpthread -lz
 
-BIN = instrument
-SRCS = main.cpp instrumenter.cpp
-OBJS = $(SRCS:cpp=o)
-
-$(BIN): $(OBJS)
-	$(CXX) -o $(BIN) -L/usr/local/lib $(OBJS) $(LDLIBS)
-
-clean:
-	rm -f $(BIN) $(OBJS)
-
-depend:
-	mkdep $(CXXFLAGS) $(SRCS)
+.include <bsd.prog.mk>

@@ -55,8 +55,8 @@ EOF
 
 	# Link in the runtime
 	$ENV{CFLAGS} = "-pthread -I/home/kyle/src/scv/include";
-	$ENV{LDLIBS} = "-L/home/kyle/src/scv/runtime -lruntime -pthread";
-	$ENV{LD_LIBRARY_PATH} = "runtime";
+	$ENV{LDLIBS} = "-L/home/kyle/src/scv/lib -lscv -pthread";
+	$ENV{LD_LIBRARY_PATH} = "lib";
 
 	my $ret = system( "make -C $tmp_dir" );
 	die "make failed: $ret\n" if ($ret);
