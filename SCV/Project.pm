@@ -76,11 +76,15 @@ sub instrumented_src {
 
 sub run {
 	my ($self, @args) = @_;
+
 	my $tmp_dir = $self->{tmp_dir};
+	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/program", @args);
+}
 
-	my $pid = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/program", @args);
+sub wait {
+	my ($self) = @_;
 
-	waitpid( $pid, 0 );
+	waitpid( $self->{pid}, 0 );
 	my $real_ret = $? >> 8;
 
 	my $stderr;

@@ -180,7 +180,7 @@ MyFrontendAction::EndSourceFileAction()
 
 	ss << "#include <scv_global.h>" << std::endl;
 	// Define storage for coverage data
-	ss << "static unsigned int lines[" << num_lines << "];" << std::endl;
+	ss << "static uint64_t lines[" << num_lines << "];" << std::endl;
 
 	// Always declare this. The next TU will overwrite this or there won't
 	// be a next TU.
