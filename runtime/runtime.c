@@ -30,7 +30,6 @@ control_thread(void *arg)
 
 	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
 		err(1, "connect");
-		return 0;
 	}
 
 	while (1) {
