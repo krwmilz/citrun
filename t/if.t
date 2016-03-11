@@ -37,7 +37,7 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_global.h>
-static unsigned int lines[21];
+static uint64_t lines[21];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
@@ -72,5 +72,6 @@ ok( $inst_src );
 
 eq_or_diff $inst_src, $inst_src_good, "instrumented source comparison";
 
-my ($ret) = $project->run();
+$project->run();
+my ($ret) = $project->wait();
 is($ret, 1, "instrumented program check");

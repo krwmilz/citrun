@@ -4,6 +4,7 @@ use SCV::Viewer;
 use Test::More tests => 7;
 use Test::Differences;
 
+my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 unified_diff;
 
@@ -32,7 +33,7 @@ main(int argc, char *argv[])
 	const char *errstr = NULL;
 
 	if (argc != 2) {
-		fprintf(stderr, "usage: %s <N>\\n", argv[0]);
+		fprintf(stderr, "usage: %s <N>", argv[0]);
 		return 1;
 	}
 
@@ -40,7 +41,7 @@ main(int argc, char *argv[])
 	if (errstr)
 		err(1, "%s", errstr);
 
-	fprintf(stderr, "result: %lli\\n", fibonacci(n));
+	fprintf(stderr, "result: %lli", fibonacci(n));
 
 	return 0;
 }
@@ -53,7 +54,7 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_global.h>
-static unsigned int lines[36];
+static uint64_t lines[36];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
@@ -84,7 +85,7 @@ main(int argc, char *argv[])
 	const char *errstr = NULL;
 
 	if ((++lines[23], argc != 2)) {
-		(++lines[24], fprintf(stderr, "usage: %s <N>\\n", argv[0]));
+		(++lines[24], fprintf(stderr, "usage: %s <N>", argv[0]));
 		return (++lines[25], 1);
 	}
 
@@ -92,7 +93,7 @@ main(int argc, char *argv[])
 	if ((++lines[29], errstr))
 		(++lines[30], err(1, "%s", errstr));
 
-	(++lines[32], fprintf(stderr, "result: %lli\\n", (++lines[32], fibonacci(n))));
+	(++lines[32], fprintf(stderr, "result: %lli", (++lines[32], fibonacci(n))));
 
 	return (++lines[34], 0);
 }
@@ -103,13 +104,16 @@ ok( $inst_src );
 
 eq_or_diff $inst_src, $inst_src_good, "instrumented source comparison";
 
-my ($ret, $err) = $project->run();
+$project->run();
+my ($ret, $err) = $project->wait();
 is($ret, 1, "instrumented program check return code");
 
-my ($ret, $err) = $project->run(10);
+$project->run(10);
+my ($ret, $err) = $project->wait();
 is($ret, 0, "instrumented program check correctness 1");
-is($err, "result: 55\n", "instrumented program check correctness 1");
+is($err, "result: 55", "instrumented program check correctness 1");
 
-my ($ret, $err) = $project->run(20);
+$project->run(20);
+my ($ret, $err) = $project->wait(20);
 is($ret, 0, "instrumented program check correctness 2");
-is($err, "result: 6765\n", "instrumented program check correctness 2");
+is($err, "result: 6765", "instrumented program check correctness 2");

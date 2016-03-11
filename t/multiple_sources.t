@@ -1,8 +1,10 @@
 use strict;
 use SCV::Project;
-use Test::More tests => 2;
+use SCV::Viewer;
+use Test::More tests => 1;
 use Test::Differences;
 
+my $project = SCV::Viewer->new();
 my $project = SCV::Project->new();
 unified_diff;
 
@@ -41,15 +43,6 @@ EOF
 
 $project->compile();
 
-my $tmp_dir = $project->get_tmpdir();
-
-my $inst_src_good = <<EOF;
-EOF
-
-my $inst_src = $project->instrumented_src();
-ok( $inst_src );
-
-#eq_or_diff $inst_src, $inst_src_good, "instrumented source comparison";
-
-my ($ret, $err) = $project->run();
+$project->run();
+my ($ret, $err) = $project->wait();
 is($ret, 0, "instrumented program check return code");

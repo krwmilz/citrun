@@ -25,8 +25,6 @@ sub accept {
 
 	my $socket = $self->{viewer_socket};
 	$self->{client_socket} = $socket->accept();
-
-	print STDERR "accept(): accepted client\n";
 }
 
 sub request_data {

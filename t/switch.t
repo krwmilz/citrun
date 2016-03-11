@@ -1,8 +1,10 @@
 use strict;
 use SCV::Project;
+use SCV::Viewer;
 use Test::More tests => 3;
 use Test::Differences;
 
+my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 unified_diff;
 
@@ -31,7 +33,7 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_global.h>
-static unsigned int lines[15];
+static uint64_t lines[15];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
@@ -60,5 +62,6 @@ ok( $inst_src );
 
 eq_or_diff $inst_src, $inst_src_good, "instrumented source comparison";
 
-my ($ret) = $project->run();
+$project->run();
+my ($ret) = $project->wait();
 is($ret, 0, "instrumented program check");
