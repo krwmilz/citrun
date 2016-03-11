@@ -54,9 +54,17 @@ void
 walk_nodes(int fd)
 {
 	size_t file_name_sz;
+	uint64_t num_tus;
 
-	/* Copy node0, don't use it directly */
 	struct scv_node walk = node0;
+
+	/* Find how many translation units there are in this application */
+	for (num_tus = 0; walk.size != 0; num_tus++)
+		walk = *walk.next;
+	xwrite(fd, &num_tus, sizeof(num_tus));
+
+	/* Reset walk back to the start */
+	walk = node0;
 	while (walk.size != 0) {
 		file_name_sz = strnlen(walk.file_name, PATH_MAX);
 

@@ -33,18 +33,28 @@ sub request_data {
 
 	$client->syswrite("\x00", 1);
 
+	# First thing sent back is total number of translation units in the
+	# instrumentation chain
 	my $buf = read_all($client, 8);
-	my $file_name_sz = unpack("Q", $buf);
+	my $num_tus = unpack("Q", $buf);
 
-	my $file_name = read_all($client, $file_name_sz);
+	my %tu_data;
+	for (1..$num_tus) {
+		my $buf = read_all($client, 8);
+		my $file_name_sz = unpack("Q", $buf);
 
-	$buf = read_all($client, 8);
-	my $num_lines = unpack("Q", $buf);
+		my $file_name = read_all($client, $file_name_sz);
 
-	$buf = read_all($client, 8 * $num_lines);
-	my @data = unpack("Q$num_lines", $buf);
+		$buf = read_all($client, 8);
+		my $num_lines = unpack("Q", $buf);
 
-	return ({ file_name => $file_name, data => \@data });
+		$buf = read_all($client, 8 * $num_lines);
+		my @data = unpack("Q$num_lines", $buf);
+
+		$tu_data{$file_name} = \@data ;
+	}
+
+	return \%tu_data;
 }
 
 sub read_all {

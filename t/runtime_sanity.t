@@ -1,7 +1,7 @@
 use strict;
 use SCV::Project;
 use SCV::Viewer;
-use Test::More tests => 37;
+use Test::More tests => 38;
 use Test::Differences;
 use Time::HiRes qw( usleep );
 
@@ -57,11 +57,14 @@ $viewer->accept();
 usleep(100 * 1000);
 my $data = $viewer->request_data();
 
-like ($data->{file_name}, qr/tmp\/.*source_0\.c/, "runtime filename check");
-my @lines = @{ $data->{data} };
+my ($file_name, @others) = keys %$data;
+like ($file_name, qr/tmp\/.*source_0\.c/, "runtime filename check");
+is( @others, 0, "runtime check for a single tu" );
 
-# Check the line counts are something reasonable
+my @lines = @{ $data->{$file_name} };
 is (scalar(@lines), 33, "runtime lines count");
+
+# Do a pretty thorough coverage check
 is     ( $lines[$_], 0, "line $_ check" ) for (0..8);
 cmp_ok ( $lines[$_], ">", 0, "line $_ check" ) for (9..12);
 is     ( $lines[13], 0, "line 13 check" );
