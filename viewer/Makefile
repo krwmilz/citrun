@@ -1,5 +1,5 @@
 PROG = scv_viewer
-SRCS = viewer.cpp shader_utils.cpp text.cpp af_unix.cpp
+SRCS = viewer.cxx shader_utils.cxx text.cxx af_unix.cxx
 
 CXX = eg++ -std=c++1y
 CXXFLAGS += -I/usr/X11R6/include
