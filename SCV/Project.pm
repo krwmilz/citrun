@@ -50,7 +50,7 @@ EOF
 	syswrite( $makefile_fh, $makefile );
 
 	# Hook $PATH so we run our "compiler" first
-	$ENV{SCV_PATH} = "$ENV{HOME}/src/scv/compilers";
+	$ENV{SCV_PATH} = "$ENV{HOME}/src/scv/instrument/compilers";
 	$ENV{PATH} = "$ENV{SCV_PATH}:$ENV{PATH}";
 
 	# Link in the runtime
