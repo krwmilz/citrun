@@ -1,5 +1,5 @@
 PROG = scv_instrument
-SRCS = main.cpp instrumenter.cpp
+SRCS = main.cxx instrumenter.cxx
 
 CXXFLAGS += -I/usr/local/include
 CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
