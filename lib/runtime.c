@@ -83,12 +83,10 @@ walk_nodes(int fd)
 int
 xwrite(int d, const void *buf, size_t bytes_total)
 {
-	int bytes_left;
-	int bytes_wrote;
 	ssize_t n;
+	int bytes_left = bytes_total;
+	int bytes_wrote = 0;
 
-	bytes_left = bytes_total;
-	bytes_wrote = 0;
 	while (bytes_left > 0) {
 		n = write(d, buf + bytes_wrote, bytes_left);
 
@@ -105,18 +103,16 @@ xwrite(int d, const void *buf, size_t bytes_total)
 int
 xread(int d, void *buf, size_t bytes_total)
 {
-	ssize_t bytes_left;
-	size_t bytes_read;
 	ssize_t n;
+	ssize_t bytes_left = bytes_total;
+	size_t bytes_read = 0;
 
-	bytes_left = bytes_total;
-	bytes_read = 0;
 	while (bytes_left > 0) {
 		n = read(d, buf + bytes_read, bytes_left);
 
-		/* Disconnect */
 		if (n == 0)
-			err(1, "read 0 bytes on socket");
+			/* Disconnect */
+			errx(1, "read 0 bytes on socket");
 		if (n < 0)
 			err(1, "read()");
 
