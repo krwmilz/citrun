@@ -1,4 +1,4 @@
-SUBDIR= bin instrument include lib viewer
+SUBDIR= instrument lib viewer
 
 test:
 	prove

@@ -2,15 +2,15 @@
 
 scv_root=/home/kyle/src/scv
 
-if ! test -d $scv_root/compilers; then
+if ! test -d $scv_root/instrumnet/compilers; then
 	echo error: compilers/ directory does not exist
 	exit 1
 fi
 
-export SCV_PATH="$scv_root/compilers"
+export SCV_PATH="$scv_root/instrument/compilers"
 export PATH="$SCV_PATH:$PATH"
 
-export CFLAGS="-pthread -I$scv_root/include"
+export CFLAGS="-pthread -I$scv_root"
 export LDLIBS="-L$scv_root/lib -lruntime -pthread"
 
 exec $@
