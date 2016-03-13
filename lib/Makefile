@@ -1,7 +1,7 @@
 LIB = scv
 SRCS = runtime.c
 
-CFLAGS += -pthread -I../
+CFLAGS += -std=c89 -pthread -I../
 
 NOPROFILE = 1
 .include <bsd.lib.mk>

@@ -2,8 +2,8 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/socket.h>		// AF_UNIX
-#include <sys/un.h>		// sockaddr_un
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include <scv_global.h>
 
@@ -81,11 +81,11 @@ walk_nodes(int fd)
 }
 
 int
-xwrite(int d, const void *buf, size_t bytes_total)
+xwrite(int d, const uint8_t *buf, size_t bytes_total)
 {
-	ssize_t n;
 	int bytes_left = bytes_total;
 	int bytes_wrote = 0;
+	ssize_t n;
 
 	while (bytes_left > 0) {
 		n = write(d, buf + bytes_wrote, bytes_left);
@@ -101,11 +101,11 @@ xwrite(int d, const void *buf, size_t bytes_total)
 }
 
 int
-xread(int d, void *buf, size_t bytes_total)
+xread(int d, uint8_t *buf, size_t bytes_total)
 {
-	ssize_t n;
 	ssize_t bytes_left = bytes_total;
 	size_t bytes_read = 0;
+	ssize_t n;
 
 	while (bytes_left > 0) {
 		n = read(d, buf + bytes_read, bytes_left);
