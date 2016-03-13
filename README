@@ -12,6 +12,5 @@ OpenBSD:
 - freeglut
 - llvm
 - glew
-- freeglut
 - glm
 - g++
