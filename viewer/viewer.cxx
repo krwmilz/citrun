@@ -1,3 +1,5 @@
+#include <err.h>
+
 #include <iostream>
 #include <vector>
 
@@ -33,22 +35,18 @@ af_unix_nonblock window::socket;
 window::window(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
-	glutInitContextVersion(2,0);
+	glutInitContextVersion(2, 0);
 	glutInitDisplayMode(GLUT_RGB);
 	glutInitWindowSize(1600, 1200);
 	glutCreateWindow("Basic Text");
 
 	GLenum glew_status = glewInit();
 
-	if (GLEW_OK != glew_status) {
-		std::cerr << "Error: " << glewGetErrorString(glew_status) << std::endl;
-		exit(1);
-	}
+	if (GLEW_OK != glew_status)
+		errx(1, "%s", glewGetErrorString(glew_status));
 
-	if (!GLEW_VERSION_2_0) {
-		std::cerr << "No support for OpenGL 2.0 found" << std::endl;
-		exit(1);
-	}
+	if (!GLEW_VERSION_2_0)
+		errx(1, "No support for OpenGL 2.0 found");
 
 	glutDisplayFunc(display);
 	glutIdleFunc(idle);
@@ -103,8 +101,8 @@ window::idle(void)
 int
 main(int argc, char *argv[])
 {
-	window gl_window(argc, argv);
-	gl_window.start();
+	window glut_window(argc, argv);
+	glut_window.start();
 
 	return 0;
 }
