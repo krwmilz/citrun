@@ -7,7 +7,7 @@ use Test;
 use IPC::Open3;
 
 sub new {
-	my ($class, $tmp_dir) = @_;
+	my ($class) = @_;
 	my $self = {};
 	bless ($self, $class);
 
@@ -59,7 +59,6 @@ EOF
 	# Link in the runtime
 	$ENV{CFLAGS} = "-pthread -I$cwd";
 	$ENV{LDLIBS} = "-L$cwd/lib -lscv -pthread";
-	$ENV{LD_LIBRARY_PATH} = "lib";
 
 	my $ret = system( "make -C $tmp_dir" );
 	die "make failed: $ret\n" if ($ret);
@@ -79,6 +78,8 @@ sub instrumented_src {
 
 sub run {
 	my ($self, @args) = @_;
+
+	$ENV{LD_LIBRARY_PATH} = "lib";
 
 	my $tmp_dir = $self->{tmp_dir};
 	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/program", @args);

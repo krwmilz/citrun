@@ -5,13 +5,13 @@ use IO::Socket::UNIX;
 use Test;
 
 sub new {
-	my ($class, $tmp_dir) = @_;
+	my ($class) = @_;
 	my $self = {};
 	bless ($self, $class);
 
 	my $viewer_socket = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM(),
-		Local => "/tmp/viewer_test.socket",
+		Local => "viewer_test.socket",
 		Listen => 1,
 	);
 	die "socket error: $!\n" unless ($viewer_socket);
@@ -79,7 +79,7 @@ sub DESTROY {
 	my ($self) = @_;
 
 	close($self->{viewer_socket});
-	unlink "/tmp/viewer_test.socket";
+	unlink "viewer_test.socket";
 }
 
 1;

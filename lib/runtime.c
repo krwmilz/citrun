@@ -26,7 +26,7 @@ control_thread(void *arg)
 	struct sockaddr_un addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, "/tmp/viewer_test.socket", sizeof(addr.sun_path) - 1);
+	strncpy(addr.sun_path, "viewer_test.socket", sizeof(addr.sun_path) - 1);
 
 	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
 		err(1, "connect");
