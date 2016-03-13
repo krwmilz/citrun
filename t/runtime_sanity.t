@@ -1,31 +1,21 @@
 use strict;
+use Data::Dumper;
 use SCV::Project;
 use SCV::Viewer;
-use Test::More tests => 38;
+use Test::More tests => 47;
 use Test::Differences;
-use Time::HiRes qw( usleep );
 
-my $project = SCV::Project->new();
 my $viewer = SCV::Viewer->new();
+my $project = SCV::Project->new();
 unified_diff;
 
-$project->add_src(
-<<EOF
+$project->add_src(<<EOF
 #include <err.h>
 #include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>	/* strtonum */
 
-long long
-fib(long long n)
-{
-	if (n == 0)
-		return 0;
-	else if (n == 1)
-		return 1;
-
-	return fib(n - 1) + fib(n - 2);
-}
+long long fib(long long);
+void print_output(long long);
 
 int
 main(int argc, char *argv[])
@@ -40,44 +30,65 @@ main(int argc, char *argv[])
 	if (errstr)
 		err(1, "%s", errstr);
 
-	fprintf(stderr, "%lli", fib(n));
+	print_output(fib(n));
 	return 0;
 }
 EOF
 );
 
-# Compile the above inefficient program and have it compute the input 40, which
-# takes a few seconds
+$project->add_src(<<EOF
+long long
+fib(long long n)
+{
+	if (n == 0)
+		return 0;
+	else if (n == 1)
+		return 1;
+
+	return fib(n - 1) + fib(n - 2);
+}
+EOF
+);
+
+$project->add_src(<<EOF
+#include <stdio.h>
+
+void
+print_output(long long n)
+{
+	fprintf(stderr, "%lli", n);
+	return;
+}
+EOF
+);
+
 $project->compile();
-$project->run(40);
+$project->run(45);
 
-# Accept the runtime's connection
 $viewer->accept();
-
-usleep(100 * 1000);
 my $data = $viewer->request_data();
 
-my ($file_name, @others) = keys %$data;
-like ($file_name, qr/tmp\/.*source_0\.c/, "runtime filename check");
-is( @others, 0, "runtime check for a single tu" );
+like ($_, qr/tmp\/.*source_.*\.c/, "runtime filename check") for (keys %$data);
+my ($src_filename_0, $src_filename_1, $src_filename_2) = sort keys %$data;
 
-my @lines = @{ $data->{$file_name} };
-is (scalar(@lines), 33, "runtime lines count");
+my @lines = @{ $data->{$src_filename_0} };
+is     ( $lines[$_], 0, "src 0 line $_ check" ) for (0..13);
+is     ( $lines[14], 1, "src 0 line 14 check" );
+is     ( $lines[$_], 0, "src 0 line $_ check" ) for (15..16);
+is     ( $lines[$_], 1, "src 0 line $_ check" ) for (17..18);
+is     ( $lines[$_], 0, "src 0 line $_ check" ) for (19..20);
+is     ( $lines[21], 2, "src 0 line 21 check" );
+is     ( $lines[$_], 0, "src 0 line $_ check" ) for (22..23);
 
-# Do a pretty thorough coverage check
-is     ( $lines[$_], 0, "line $_ check" ) for (0..8);
-cmp_ok ( $lines[$_], ">", 0, "line $_ check" ) for (9..12);
-is     ( $lines[13], 0, "line 13 check" );
-cmp_ok ( $lines[14], ">", 0, "line 14 check" );
-is     ( $lines[$_], 0, "line $_ check" ) for (15..22);
-is     ( $lines[23], 1, "line 23 check" );
-is     ( $lines[$_], 0, "line $_ check" ) for (24..25);
-is     ( $lines[$_], 1, "line $_ check" ) for (26..27);
-is     ( $lines[$_], 0, "line $_ check" ) for (28..29);
-is     ( $lines[30], 2, "line 30 check" );
-# Make sure return code hasn't fired yet
-is     ( $lines[$_], 0, "line $_ check" ) for (31..32);
+my @lines = @{ $data->{$src_filename_1} };
+is     ( $lines[$_], 0, "src 1 line $_ check" ) for (0..3);
+cmp_ok ( $lines[$_], ">", 100, "src 1 line $_ check" ) for (4..7);
+is     ( $lines[8], 0, "src 1 line 8 check" );
 
+my @lines = @{ $data->{$src_filename_2} };
+is     ( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);
+
+$project->kill();
 my ($ret, $err) = $project->wait();
-is( $ret, 0, "runtime sanity return code check" );
-is( $err, "102334155", "runtime sanity program output" );
+is( $ret, 0, "instrumented program check return code" );
+is( $err, undef, "instrumented program check stderr" );

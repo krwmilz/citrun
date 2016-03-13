@@ -85,6 +85,11 @@ sub run {
 	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/program", @args);
 }
 
+sub kill {
+	my ($self) = @_;
+	kill 'TERM', $self->{pid};
+}
+
 sub wait {
 	my ($self) = @_;
 
