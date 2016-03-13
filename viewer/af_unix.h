@@ -11,10 +11,10 @@ public:
 
 	af_unix_nonblock *accept();
 	void set_listen();
-	void read();
+	int read_all(uint8_t *, size_t);
+	int write_all(uint8_t *, size_t);
 private:
 	int fd;
-	char buffer[4096];
 };
 
 #endif

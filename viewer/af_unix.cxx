@@ -42,6 +42,7 @@ af_unix_nonblock::accept()
 	struct sockaddr_un addr;
 	socklen_t len = sizeof(struct sockaddr_un);
 
+	// Namespace collision
 	new_fd = ::accept(fd, (struct sockaddr *)&addr, &len);
 	if (new_fd == -1) {
 		if (errno != EWOULDBLOCK) {
@@ -50,26 +51,56 @@ af_unix_nonblock::accept()
 		return NULL;
 	}
 
-	std::cout << "accepted new connection" << std::endl;
+	std::cerr << "accepted new connection" << std::endl;
 	return new af_unix_nonblock(new_fd);
 }
 
-void
-af_unix_nonblock::read()
+int
+af_unix_nonblock::write_all(uint8_t *buf, size_t bytes_total)
 {
-	int nread;
+	int bytes_left = bytes_total;
+	int bytes_wrote = 0;
+	ssize_t n;
 
-	nread = ::read(fd, buffer, sizeof buffer);
-	if (nread == 0) {
-		// don't try to read from this socket anymore
-		std::cerr << __func__ << ": eof read!" << std::endl;
+	while (bytes_left > 0) {
+		n = write(fd, buf + bytes_wrote, bytes_left);
+
+		if (n < 0 && errno == EAGAIN)
+			/* Do not try to continue writing data */
+			break;
+		if (n < 0)
+			err(1, "write()");
+
+		bytes_wrote += n;
+		bytes_left -= n;
 	}
-	if (nread > 0)
-		std::cout << __func__ << ": read " << nread << " bytes" << std::endl;
-	if (nread == -1)
-		if (errno != EAGAIN)
-			std::cerr << __func__ << ": read() failed: "
-				<< strerror(errno) << std::endl;
+
+	return bytes_wrote;
+}
+
+int
+af_unix_nonblock::read_all(uint8_t *buf, size_t bytes_total)
+{
+	int bytes_left = bytes_total;
+	int bytes_read = 0;
+	ssize_t n;
+
+	while (bytes_left > 0) {
+		n = read(fd, buf + bytes_read, bytes_left);
+
+		if (n == 0)
+			errx(1, "read(): read 0 bytes on socket");
+		if (n < 0 && errno != EAGAIN)
+			err(1, "read()");
+		if (n < 0 && errno == EAGAIN)
+			/* Do not try to continue reading data */
+			break;
+
+		bytes_read += n;
+		bytes_left -= n;
+	}
+
+	return bytes_read;
 }
 
 af_unix_nonblock::~af_unix_nonblock()

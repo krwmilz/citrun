@@ -139,4 +139,7 @@ text::draw()
 void
 text::idle()
 {
+	std::cerr << "text: idling" << std::endl;
+	uint8_t zero = 0;
+	socket->write_all(&zero, 1);
 }

@@ -1,7 +1,8 @@
 PROG = scv_viewer
 SRCS = viewer.cxx shader_utils.cxx text.cxx af_unix.cxx
 
-CXX = eg++ -std=c++1y
+CXX = eg++
+CXXFLAGS += -std=c++11
 CXXFLAGS += -I/usr/X11R6/include
 CXXFLAGS += -I/usr/X11R6/include/freetype2
 CXXFLAGS += -I/usr/X11R6/include/libdrm
