@@ -13,3 +13,4 @@ OpenBSD:
 - llvm
 - glew
 - freeglut
+- glm
