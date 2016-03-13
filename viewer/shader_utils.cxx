@@ -1,12 +1,9 @@
-/**
- * From the OpenGL Programming wikibook: http://en.wikibooks.org/wiki/OpenGL_Programming
- * This file is in the public domain.
- * Contributors: Sylvain Beucler
- */
-
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
+
+#include <fstream>
 
 #include "shader_utils.h"
 
@@ -21,14 +18,14 @@ GLint get_uniform(GLuint program, const char *name);
 shader::shader()
 {
 	program = create_program("text.v.glsl", "text.f.glsl");
-	if(program == 0)
+	if (program == 0)
 		exit(1);
 
 	attribute_coord = get_attrib(program, "coord");
 	uniform_tex = get_uniform(program, "tex");
 	uniform_color = get_uniform(program, "color");
 
-	if(attribute_coord == -1 || uniform_tex == -1 || uniform_color == -1)
+	if (attribute_coord == -1 || uniform_tex == -1 || uniform_color == -1)
 		exit(1);
 }
 
@@ -43,59 +40,53 @@ shader::~shader()
 	glDeleteProgram(program);
 }
 
-/**
- * Store all the file's contents in memory, useful to pass shaders
- * source code to OpenGL
- */
-char* file_read(const char* filename)
+char *
+file_read(const char *filename)
 {
-  FILE* in = fopen(filename, "rb");
-  if (in == NULL) return NULL;
+	std::ifstream in(filename);
+	int length;
 
-  int res_size = BUFSIZ;
-  char* res = (char*)malloc(res_size);
-  int nb_read_total = 0;
+	if (!in.good())
+		return NULL;
 
-  while (!feof(in) && !ferror(in)) {
-    if (nb_read_total + BUFSIZ > res_size) {
-      if (res_size > 10*1024*1024) break;
-      res_size = res_size * 2;
-      res = (char*)realloc(res, res_size);
-    }
-    char* p_res = res + nb_read_total;
-    nb_read_total += fread(p_res, 1, BUFSIZ, in);
-  }
-  
-  fclose(in);
-  res = (char*)realloc(res, nb_read_total + 1);
-  res[nb_read_total] = '\0';
-  return res;
+	in.seekg(0, std::ios::end);
+	length = in.tellg();
+	in.seekg(0, std::ios::beg);
+
+	char *buffer = new char[length];
+	in.read(buffer, length);
+
+	if (!in.good())
+		errx(1, "in.read(): only %i bytes could be read", in.gcount());
+
+	in.close();
+	return buffer;
 }
 
-/**
+/*
  * Display compilation errors from the OpenGL shader compiler
  */
 void print_log(GLuint object)
 {
-  GLint log_length = 0;
-  if (glIsShader(object))
-    glGetShaderiv(object, GL_INFO_LOG_LENGTH, &log_length);
-  else if (glIsProgram(object))
-    glGetProgramiv(object, GL_INFO_LOG_LENGTH, &log_length);
-  else {
-    fprintf(stderr, "printlog: Not a shader or a program\n");
-    return;
-  }
+	GLint log_length = 0;
+	if (glIsShader(object))
+		glGetShaderiv(object, GL_INFO_LOG_LENGTH, &log_length);
+	else if (glIsProgram(object))
+		glGetProgramiv(object, GL_INFO_LOG_LENGTH, &log_length);
+	else {
+		fprintf(stderr, "printlog: Not a shader or a program\n");
+		return;
+	}
 
-  char* log = (char*)malloc(log_length);
+	char* log = (char*)malloc(log_length);
 
-  if (glIsShader(object))
-    glGetShaderInfoLog(object, log_length, NULL, log);
-  else if (glIsProgram(object))
-    glGetProgramInfoLog(object, log_length, NULL, log);
+	if (glIsShader(object))
+		glGetShaderInfoLog(object, log_length, NULL, log);
+	else if (glIsProgram(object))
+		glGetProgramInfoLog(object, log_length, NULL, log);
 
-  fprintf(stderr, "%s", log);
-  free(log);
+	fprintf(stderr, "%s", log);
+	free(log);
 }
 
 /**
@@ -138,7 +129,7 @@ GLuint create_shader(const char* filename, GLenum type)
     ,
     source };
   glShaderSource(res, 3, sources, NULL);
-  free((void*)source);
+  delete[] source;
 
   glCompileShader(res);
   GLint compile_ok = GL_FALSE;

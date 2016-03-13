@@ -5,8 +5,8 @@
 class shader {
 public:
 	shader();
-	void use();
 	~shader();
+	void use();
 
 	GLint attribute_coord;
 	GLint uniform_tex;
