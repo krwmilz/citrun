@@ -1,6 +1,7 @@
 package SCV::Project;
 use strict;
 
+use Cwd;
 use File::Temp qw( tempdir );
 use Test;
 use IPC::Open3;
@@ -49,13 +50,15 @@ EOF
 	open( my $makefile_fh, ">", "$tmp_dir/Makefile" );
 	syswrite( $makefile_fh, $makefile );
 
+	my $cwd = getcwd;
+
 	# Hook $PATH so we run our "compiler" first
-	$ENV{SCV_PATH} = "$ENV{HOME}/src/scv/instrument/compilers";
+	$ENV{SCV_PATH} = "$cwd/instrument/compilers";
 	$ENV{PATH} = "$ENV{SCV_PATH}:$ENV{PATH}";
 
 	# Link in the runtime
-	$ENV{CFLAGS} = "-pthread -I/home/kyle/src/scv";
-	$ENV{LDLIBS} = "-L/home/kyle/src/scv/lib -lscv -pthread";
+	$ENV{CFLAGS} = "-pthread -I$cwd";
+	$ENV{LDLIBS} = "-L$cwd/lib -lscv -pthread";
 	$ENV{LD_LIBRARY_PATH} = "lib";
 
 	my $ret = system( "make -C $tmp_dir" );
