@@ -1,4 +1,4 @@
-SUBDIR= instrument lib viewer
+SUBDIR= instrument lib viewer wrap
 
 test:
 	prove
