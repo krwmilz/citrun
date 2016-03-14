@@ -114,10 +114,11 @@ main(int argc, char *argv[])
 		real_compiler_argv[i] = argv[i];
 
 		// Dirty hack to find source files
-		if (ends_with(arg, ".cpp") || ends_with(arg, ".c")) {
+		if (ends_with(arg, ".cpp") || ends_with(arg, ".c")
+		    || ends_with(arg, ".cxx")) {
+
 			// Keep track of original source file names
 			source_files.push_back(arg);
-			std::string inst_src_path;
 
 			// Find original directory or "." if relative path
 			char *src_dir = dirname(arg.c_str());
@@ -129,6 +130,7 @@ main(int argc, char *argv[])
 			if (src_name == NULL)
 				err(1, "basename");
 
+			std::string inst_src_path;
 			inst_src_path.append(src_dir);
 			inst_src_path.append("/inst/");
 			inst_src_path.append(src_name);
