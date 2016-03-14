@@ -1,11 +1,12 @@
 PROG = scv_instrument
 SRCS = main.cxx instrumenter.cxx
 
+CXX = eg++
+CXXFLAGS += -std=c++11
 CXXFLAGS += -I/usr/local/include
 CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 CXXFLAGS += -fno-rtti -Wall
 # CXXFLAGS += -ggdb -DDEBUG
-CXX = eg++ -std=c++11
 
 # OpenBSD has it's third part libraries here
 LDFLAGS += -L/usr/local/lib
