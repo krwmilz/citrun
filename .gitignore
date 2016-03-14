@@ -2,3 +2,6 @@
 *.o
 *.a
 *.swp
+scv_instrument
+libscv.so.0.0
+scv_viewer
