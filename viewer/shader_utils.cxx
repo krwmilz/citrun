@@ -57,7 +57,7 @@ file_read(const char *filename)
 	in.read(buffer, length);
 
 	if (!in.good())
-		errx(1, "in.read(): only %i bytes could be read", in.gcount());
+		errx(1, "in.read(): only %li bytes could be read", in.gcount());
 
 	in.close();
 	return buffer;
