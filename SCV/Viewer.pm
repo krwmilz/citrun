@@ -33,8 +33,11 @@ sub request_data {
 
 	$client->syswrite("\x00", 1);
 
-	# First thing sent back is total number of translation units in the
-	# instrumentation chain
+	# First thing sent back is total message size and then the total number
+	# of translation units.
+	my $buf = read_all($client, 8);
+	my $msg_size = unpack("Q", $buf);
+
 	my $buf = read_all($client, 8);
 	my $num_tus = unpack("Q", $buf);
 

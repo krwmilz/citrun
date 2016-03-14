@@ -54,13 +54,29 @@ void
 walk_nodes(int fd)
 {
 	size_t file_name_sz;
-	uint64_t num_tus;
+	uint64_t num_tus = 0;
+	uint64_t msg_size = 0;
 
 	struct scv_node walk = node0;
 
-	/* Find how many translation units there are in this application */
-	for (num_tus = 0; walk.size != 0; num_tus++)
+	/* Find out the total size of data we're going to send */
+	while (walk.size != 0) {
+		/* File name size, 8 bytes */
+		msg_size += sizeof(file_name_sz);
+		/* The file name */
+		msg_size += strnlen(walk.file_name, PATH_MAX);
+
+		/* Number of coverage lines */
+		msg_size += sizeof(uint64_t);
+		/* Coverage lines, one 8 byte integer each */
+		msg_size += walk.size * sizeof(uint64_t);
+
+		num_tus++;
 		walk = *walk.next;
+	}
+
+	/* Send total size and total number of translation units */
+	xwrite(fd, &msg_size, sizeof(msg_size));
 	xwrite(fd, &num_tus, sizeof(num_tus));
 
 	/* Reset walk back to the start */
