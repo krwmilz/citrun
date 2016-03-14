@@ -61,6 +61,9 @@ walk_nodes(int fd)
 
 	/* Find out the total size of data we're going to send */
 	while (walk.size != 0) {
+		/* Number of tus is 8 bytes */
+		msg_size += sizeof(num_tus);
+
 		/* File name size, 8 bytes */
 		msg_size += sizeof(file_name_sz);
 		/* The file name */
