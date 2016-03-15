@@ -1,5 +1,6 @@
 .depend
 *.o
+*.so
 *.a
 *.swp
 scv_instrument
