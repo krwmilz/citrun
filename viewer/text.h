@@ -4,11 +4,9 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <FTGL/ftgl.h>
 
 #include "af_unix.h"
-#include "shader_utils.h"
 #include "draw.h"
 
 class text : public drawable {
@@ -17,15 +15,23 @@ public:
 	void draw();
 	void idle();
 private:
-	std::string font_file_name;
-	FT_Library ft;
-	FT_Face face;
-	FT_GlyphSlot g;
-	GLuint vbo;
-	shader text_shader;
 	af_unix_nonblock *socket;
 
+	enum states {
+		WRITE_REQUEST,
+		READ_HEADER,
+		READ_MSG
+	};
+	enum states state;
+	uint64_t msg_size;
+	uint64_t bytes_left;
+	uint64_t bytes_read;
+	uint8_t *buffer;
+
 	void render_text(const char *, float x, float y, float sx, float sy);
+	void parse_buffer();
+
+	FTGLPixmapFont font;
 };
 
 #endif

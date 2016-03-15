@@ -71,7 +71,7 @@ void
 window::display(void)
 {
 	/* White background */
-	glClearColor(1, 1, 1, 1);
+	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Enable blending, necessary for our alpha texture */
@@ -92,7 +92,6 @@ window::idle(void)
 	temp_socket = socket.accept();
 	if (temp_socket)
 		drawables.push_back(new text(temp_socket));
-	// socket.read();
 
 	for (auto &i : drawables)
 		i->idle();
