@@ -17,19 +17,21 @@ public:
 private:
 	af_unix_nonblock *socket;
 
+	uint64_t num_tus;
+	char *file_name;
+	uint64_t num_lines;
+
 	enum states {
-		WRITE_REQUEST,
-		READ_HEADER,
-		READ_MSG
+		READ,
+		WRITE
 	};
 	enum states state;
 	uint64_t msg_size;
 	uint64_t bytes_left;
 	uint64_t bytes_read;
-	uint8_t *buffer;
+	uint64_t *buffer;
 
 	void render_text(const char *, float x, float y, float sx, float sy);
-	void parse_buffer();
 
 	FTGLPixmapFont font;
 };

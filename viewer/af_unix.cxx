@@ -26,7 +26,7 @@ af_unix_nonblock::set_listen()
 	struct sockaddr_un addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, "socket", sizeof(addr.sun_path) - 1);
+	strncpy(addr.sun_path, "../while/viewer_test.socket", sizeof(addr.sun_path) - 1);
 
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");
@@ -79,12 +79,39 @@ af_unix_nonblock::write_all(uint8_t *buf, size_t bytes_total)
 }
 
 int
-af_unix_nonblock::read_all(uint8_t *buf, size_t bytes_total)
+af_unix_nonblock::read_block(uint64_t &buf)
+{
+	int bytes_left = sizeof(uint64_t);
+	int bytes_read = 0;
+	ssize_t n;
+
+	// Read bytes, busy waiting when the socket returns EAGAIN
+	while (bytes_left > 0) {
+		n = read(fd, &buf + bytes_read, bytes_left);
+
+		if (n == 0)
+			errx(1, "read(): read 0 bytes on socket");
+		if (n < 0 && errno != EAGAIN)
+			err(1, "read()");
+		if (n < 0 && errno == EAGAIN)
+			// Don't let counters increment when n == -1!
+			continue;
+
+		bytes_read += n;
+		bytes_left -= n;
+	}
+
+	return bytes_read;
+}
+
+int
+af_unix_nonblock::read_block(uint8_t *buf, size_t bytes_total)
 {
 	int bytes_left = bytes_total;
 	int bytes_read = 0;
 	ssize_t n;
 
+	// Read bytes, busy waiting when the socket returns EAGAIN
 	while (bytes_left > 0) {
 		n = read(fd, buf + bytes_read, bytes_left);
 
@@ -93,7 +120,34 @@ af_unix_nonblock::read_all(uint8_t *buf, size_t bytes_total)
 		if (n < 0 && errno != EAGAIN)
 			err(1, "read()");
 		if (n < 0 && errno == EAGAIN)
-			/* Do not try to continue reading data */
+			// Don't let counters increment when n == -1!
+			continue;
+
+		bytes_read += n;
+		bytes_left -= n;
+	}
+
+	return bytes_read;
+}
+
+int
+af_unix_nonblock::read_nonblock(uint8_t *buf, size_t bytes_total)
+{
+	int bytes_left = bytes_total;
+	int bytes_read = 0;
+	ssize_t n;
+
+	// Try and read some bytes, returning the number of bytes read so far if
+	// the socket returns EAGAIN
+	while (bytes_left > 0) {
+		n = read(fd, buf + bytes_read, bytes_left);
+
+		if (n == 0)
+			errx(1, "read(): read 0 bytes on socket");
+		if (n < 0 && errno != EAGAIN)
+			err(1, "read()");
+		if (n < 0 && errno == EAGAIN)
+			// Break out of the loop and return bytes read so far
 			break;
 
 		bytes_read += n;

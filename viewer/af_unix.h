@@ -9,9 +9,13 @@ public:
 	af_unix_nonblock(int);
 	~af_unix_nonblock();
 
-	af_unix_nonblock *accept();
 	void set_listen();
-	int read_all(uint8_t *, size_t);
+	af_unix_nonblock *accept();
+
+	int read_block(uint64_t &);
+	int read_block(uint8_t *, size_t);
+
+	int read_nonblock(uint8_t *, size_t);
 	int write_all(uint8_t *, size_t);
 private:
 	int fd;
