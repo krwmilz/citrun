@@ -10,7 +10,8 @@
 /* Entry point into instrumented application */
 extern struct scv_node node0;
 
-void walk_nodes(int);
+void send_metadata(int);
+void send_execution_data(int);
 
 
 void *
@@ -37,7 +38,9 @@ control_thread(void *arg)
 		xread(fd, &msg_type, 1);
 
 		if (msg_type == 0)
-			walk_nodes(fd);
+			send_metadata(fd);
+		else if (msg_type == 1)
+			send_execution_data(fd);
 		else
 			errx(1, "unknown message type %i", msg_type);
 	}
@@ -51,50 +54,41 @@ static void runtime_init()
 }
 
 void
-walk_nodes(int fd)
+send_metadata(int fd)
 {
 	size_t file_name_sz;
 	uint64_t num_tus = 0;
-	uint64_t msg_size = 0;
-
 	struct scv_node walk = node0;
 
-	/* Find out the total size of data we're going to send */
 	while (walk.size != 0) {
-		/* Number of tus is 8 bytes */
-		msg_size += sizeof(num_tus);
-
-		/* File name size, 8 bytes */
-		msg_size += sizeof(file_name_sz);
-		/* The file name */
-		msg_size += strnlen(walk.file_name, PATH_MAX);
-
-		/* Number of coverage lines */
-		msg_size += sizeof(uint64_t);
-		/* Coverage lines, one 8 byte integer each */
-		msg_size += walk.size * sizeof(uint64_t);
-
-		num_tus++;
+		++num_tus;
 		walk = *walk.next;
 	}
 
-	/* Send total size and total number of translation units */
-	xwrite(fd, &msg_size, sizeof(msg_size));
 	xwrite(fd, &num_tus, sizeof(num_tus));
 
-	/* Reset walk back to the start */
 	walk = node0;
 	while (walk.size != 0) {
-		file_name_sz = strnlen(walk.file_name, PATH_MAX);
-
 		/* Send file name size and then the file name itself. */
+		file_name_sz = strnlen(walk.file_name, PATH_MAX);
 		xwrite(fd, &file_name_sz, sizeof(file_name_sz));
 		xwrite(fd, walk.file_name, file_name_sz);
 
-		/* Send the contents of the coverage buffer */
-		xwrite(fd, &walk.size, sizeof(uint64_t));
-		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
+		/* Send the size of the execution buffers */
+		xwrite(fd, &walk.size, sizeof(walk.size));
 
+		walk = *walk.next;
+	}
+}
+
+void
+send_execution_data(int fd)
+{
+	struct scv_node walk = node0;
+
+	while (walk.size != 0) {
+		/* Write execution buffer, one 8 byte counter per source line */
+		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
 		walk = *walk.next;
 	}
 }

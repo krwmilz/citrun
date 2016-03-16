@@ -27,21 +27,17 @@ sub accept {
 	$self->{client_socket} = $socket->accept();
 }
 
-sub request_data {
+sub get_metadata {
 	my ($self) = @_;
 	my $client = $self->{client_socket};
 
 	$client->syswrite("\x00", 1);
 
-	# First thing sent back is total message size and then the total number
-	# of translation units.
-	my $buf = read_all($client, 8);
-	my $msg_size = unpack("Q", $buf);
-
+	# First thing sent is total number of translation units
 	my $buf = read_all($client, 8);
 	my $num_tus = unpack("Q", $buf);
 
-	my %tu_data;
+	my @tus;
 	for (1..$num_tus) {
 		my $buf = read_all($client, 8);
 		my $file_name_sz = unpack("Q", $buf);
@@ -51,13 +47,30 @@ sub request_data {
 		$buf = read_all($client, 8);
 		my $num_lines = unpack("Q", $buf);
 
-		$buf = read_all($client, 8 * $num_lines);
-		my @data = unpack("Q$num_lines", $buf);
-
-		$tu_data{$file_name} = \@data ;
+		push @tus, { filename => $file_name, lines => $num_lines };
 	}
 
-	return \%tu_data;
+	$self->{tus} = \@tus;
+	return \@tus;
+}
+
+sub get_execution_data {
+	my ($self) = @_;
+	my $client = $self->{client_socket};
+	my @tus = @{ $self->{tus} };
+
+	$client->syswrite("\x01", 1);
+
+	my @data;
+	for (@tus) {
+		my $num_lines = $_->{lines};
+
+		my $buf = read_all($client, 8 * $num_lines);
+		my @data_tmp = unpack("Q$num_lines", $buf);
+
+		push @data, [@data_tmp];
+	}
+	return \@data;
 }
 
 sub read_all {

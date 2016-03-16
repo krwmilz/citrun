@@ -53,17 +53,17 @@ $project->run(45);
 
 # Accept the runtime's connection
 $viewer->accept();
+my $metadata = $viewer->get_metadata();
+is( scalar(@{ $metadata }), 1, "runtime check for a single tu" );
+
+my $source_0 = $metadata->[0];
+like ($source_0->{filename}, qr/tmp\/.*source_0\.c/, "runtime filename check");
+is( $source_0->{lines}, 33, "runtime lines count" );
 
 usleep(100 * 1000);
-my $data = $viewer->request_data();
+my $data = $viewer->get_execution_data();
 
-my ($file_name, @others) = keys %$data;
-like ($file_name, qr/tmp\/.*source_0\.c/, "runtime filename check");
-is( @others, 0, "runtime check for a single tu" );
-
-my @lines = @{ $data->{$file_name} };
-is (scalar(@lines), 33, "runtime lines count");
-
+my @lines = @{ $data->[0] };
 # Do a pretty thorough coverage check
 is     ( $lines[$_], 0, "line $_ check" ) for (0..8);
 cmp_ok ( $lines[$_], ">", 0, "line $_ check" ) for (9..12);
