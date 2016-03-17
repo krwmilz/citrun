@@ -38,13 +38,11 @@ sub compile {
 	my $src_files = join(" ", @{ $self->{src_files} });
 
 	my $makefile = <<EOF;
-BIN = program
+PROG = program
 SRCS = $src_files
-OBJS = \$(SRCS:c=o)
+MAN =
 
-\$(BIN): \$(OBJS)
-	\$(CC) -o \$(BIN) \$(OBJS) \$(LDLIBS)
-
+.include <bsd.prog.mk>
 EOF
 	# Write Makefile to temp directory
 	open( my $makefile_fh, ">", "$tmp_dir/Makefile" );
@@ -52,15 +50,8 @@ EOF
 
 	my $cwd = getcwd;
 
-	# Hook $PATH so we run our "compiler" first
-	$ENV{SCV_PATH} = "$cwd/instrument/compilers";
-	$ENV{PATH} = "$ENV{SCV_PATH}:$ENV{PATH}";
-
-	# Link in the runtime
-	$ENV{CFLAGS} = "-pthread -I$cwd";
-	$ENV{LDLIBS} = "-L$cwd/lib -lscv -pthread";
-
-	my $ret = system( "make -C $tmp_dir" );
+	# Use the wrapper to make sure it works
+	my $ret = system( "wrap/scv_wrap make -C $tmp_dir" );
 	die "make failed: $ret\n" if ($ret);
 }
 
@@ -79,10 +70,8 @@ sub instrumented_src {
 sub run {
 	my ($self, @args) = @_;
 
-	$ENV{LD_LIBRARY_PATH} = "lib";
-
 	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/program", @args);
+	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap", "$tmp_dir/program", @args);
 }
 
 sub kill {
