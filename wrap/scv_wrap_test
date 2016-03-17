@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# When running tests we always want to use the in-tree version of libraries,
+# header files, instrument
+CWD=`pwd`
+
+if ! test -d $CWD/instrument/compilers; then
+	echo error: compilers/ directory does not exist
+	exit 1
+fi
+
+export SCV_PATH="$CWD/instrument/compilers"
+export PATH="$SCV_PATH:$PATH"
+
+export CFLAGS="-I$CWD/lib"
+export LDFLAGS="-L$CWD/lib"
+
+export LDADD="-lscv"
+
+# Used for running programs
+export LD_LIBRARY_PATH="$CWD/lib"
+
+exec $@
