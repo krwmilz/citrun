@@ -26,7 +26,7 @@ $project->compile();
 my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
-#include <scv_global.h>
+#include <scv_runtime.h>
 static uint64_t lines[9];
 struct scv_node node1;
 struct scv_node node0 = {

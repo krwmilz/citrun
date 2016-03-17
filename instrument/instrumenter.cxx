@@ -178,7 +178,7 @@ MyFrontendAction::EndSourceFileAction()
 
 	std::stringstream ss;
 
-	ss << "#include <scv_global.h>" << std::endl;
+	ss << "#include <scv_runtime.h>" << std::endl;
 	// Define storage for coverage data
 	ss << "static uint64_t lines[" << num_lines << "];" << std::endl;
 
