@@ -31,8 +31,6 @@ sub get_metadata {
 	my ($self) = @_;
 	my $client = $self->{client_socket};
 
-	$client->syswrite("\x00", 1);
-
 	# First thing sent is total number of translation units
 	my $buf = read_all($client, 8);
 	my $num_tus = unpack("Q", $buf);
@@ -59,8 +57,6 @@ sub get_execution_data {
 	my $client = $self->{client_socket};
 	my @tus = @{ $self->{tus} };
 
-	$client->syswrite("\x01", 1);
-
 	my @data;
 	for (@tus) {
 		my $num_lines = $_->{lines};
@@ -70,6 +66,10 @@ sub get_execution_data {
 
 		push @data, [@data_tmp];
 	}
+
+	# Send an 'ok' response
+	$client->syswrite("\x01", 1);
+
 	return \@data;
 }
 

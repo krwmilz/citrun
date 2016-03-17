@@ -19,6 +19,7 @@ control_thread(void *arg)
 {
 	int fd;
 	int i;
+	uint8_t response;
 
 	fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fd == -1)
@@ -33,16 +34,13 @@ control_thread(void *arg)
 		err(1, "connect");
 	}
 
-	while (1) {
-		uint8_t msg_type;
-		xread(fd, &msg_type, 1);
+	/* Send metadata first */
+	send_metadata(fd);
 
-		if (msg_type == 0)
-			send_metadata(fd);
-		else if (msg_type == 1)
-			send_execution_data(fd);
-		else
-			errx(1, "unknown message type %i", msg_type);
+	/* Then synchronously send execution data */
+	while (1) {
+		send_execution_data(fd);
+		xread(fd, &response, 1);
 	}
 }
 
