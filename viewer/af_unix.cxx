@@ -1,4 +1,5 @@
 #include <err.h>		// err
+#include <fcntl.h>
 #include <string.h>		// memset
 #include <sys/socket.h>		// socket
 #include <sys/un.h>		// sockaddr_un
@@ -8,17 +9,17 @@
 
 #include "af_unix.h"
 
-af_unix_nonblock::af_unix_nonblock()
+af_unix::af_unix()
 {
 }
 
-af_unix_nonblock::af_unix_nonblock(int f) :
+af_unix::af_unix(int f) :
 	fd(f)
 {
 }
 
 void
-af_unix_nonblock::set_listen()
+af_unix::set_listen()
 {
 	if ((fd = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0)) == -1)
 		err(1, "socket");
@@ -35,8 +36,8 @@ af_unix_nonblock::set_listen()
 		err(1, "listen");
 }
 
-af_unix_nonblock *
-af_unix_nonblock::accept()
+af_unix *
+af_unix::accept()
 {
 	int new_fd;
 	struct sockaddr_un addr;
@@ -51,12 +52,20 @@ af_unix_nonblock::accept()
 		return NULL;
 	}
 
+	// Turn off non blocking mode
+	int flags = fcntl(new_fd, F_GETFL, 0);
+	if (flags < 0)
+		err(1, "fcntl(F_GETFL)");
+	fcntl(new_fd, F_SETFL, flags & ~O_NONBLOCK);
+	if (flags < 0)
+		err(1, "fcntl(F_SETFL)");
+
 	std::cerr << "accepted new connection" << std::endl;
-	return new af_unix_nonblock(new_fd);
+	return new af_unix(new_fd);
 }
 
 int
-af_unix_nonblock::write_all(uint8_t *buf, size_t bytes_total)
+af_unix::write_all(uint8_t *buf, size_t bytes_total)
 {
 	int bytes_left = bytes_total;
 	int bytes_wrote = 0;
@@ -65,9 +74,6 @@ af_unix_nonblock::write_all(uint8_t *buf, size_t bytes_total)
 	while (bytes_left > 0) {
 		n = write(fd, buf + bytes_wrote, bytes_left);
 
-		if (n < 0 && errno == EAGAIN)
-			/* Do not try to continue writing data */
-			break;
 		if (n < 0)
 			err(1, "write()");
 
@@ -79,23 +85,19 @@ af_unix_nonblock::write_all(uint8_t *buf, size_t bytes_total)
 }
 
 int
-af_unix_nonblock::read_block(uint64_t &buf)
+af_unix::read_all(uint64_t &buf)
 {
 	int bytes_left = sizeof(uint64_t);
 	int bytes_read = 0;
 	ssize_t n;
 
-	// Read bytes, busy waiting when the socket returns EAGAIN
 	while (bytes_left > 0) {
 		n = read(fd, &buf + bytes_read, bytes_left);
 
 		if (n == 0)
 			errx(1, "read(): read 0 bytes on socket");
-		if (n < 0 && errno != EAGAIN)
+		if (n < 0)
 			err(1, "read()");
-		if (n < 0 && errno == EAGAIN)
-			// Don't let counters increment when n == -1!
-			continue;
 
 		bytes_read += n;
 		bytes_left -= n;
@@ -105,23 +107,19 @@ af_unix_nonblock::read_block(uint64_t &buf)
 }
 
 int
-af_unix_nonblock::read_block(uint8_t *buf, size_t bytes_total)
+af_unix::read_all(uint8_t *buf, size_t bytes_total)
 {
 	int bytes_left = bytes_total;
 	int bytes_read = 0;
 	ssize_t n;
 
-	// Read bytes, busy waiting when the socket returns EAGAIN
 	while (bytes_left > 0) {
 		n = read(fd, buf + bytes_read, bytes_left);
 
 		if (n == 0)
 			errx(1, "read(): read 0 bytes on socket");
-		if (n < 0 && errno != EAGAIN)
+		if (n < 0)
 			err(1, "read()");
-		if (n < 0 && errno == EAGAIN)
-			// Don't let counters increment when n == -1!
-			continue;
 
 		bytes_read += n;
 		bytes_left -= n;
@@ -130,35 +128,8 @@ af_unix_nonblock::read_block(uint8_t *buf, size_t bytes_total)
 	return bytes_read;
 }
 
-int
-af_unix_nonblock::read_nonblock(uint8_t *buf, size_t bytes_total)
-{
-	int bytes_left = bytes_total;
-	int bytes_read = 0;
-	ssize_t n;
-
-	// Try and read some bytes, returning the number of bytes read so far if
-	// the socket returns EAGAIN
-	while (bytes_left > 0) {
-		n = read(fd, buf + bytes_read, bytes_left);
-
-		if (n == 0)
-			errx(1, "read(): read 0 bytes on socket");
-		if (n < 0 && errno != EAGAIN)
-			err(1, "read()");
-		if (n < 0 && errno == EAGAIN)
-			// Break out of the loop and return bytes read so far
-			break;
-
-		bytes_read += n;
-		bytes_left -= n;
-	}
-
-	return bytes_read;
-}
-
-af_unix_nonblock::~af_unix_nonblock()
+af_unix::~af_unix()
 {
 	close(fd);
-	unlink("socket");
+	unlink("../while/viewer_test.socket");
 }

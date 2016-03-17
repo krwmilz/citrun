@@ -23,14 +23,14 @@ public:
 
 private:
 	static std::vector<drawable*> drawables;
-	static af_unix_nonblock socket;
+	static af_unix socket;
 	static void display();
 	static void idle();
 };
 
 // fuckin c++
 std::vector<drawable*> window::drawables;
-af_unix_nonblock window::socket;
+af_unix window::socket;
 
 window::window(int argc, char *argv[])
 {
@@ -48,10 +48,10 @@ window::window(int argc, char *argv[])
 	if (!GLEW_VERSION_2_0)
 		errx(1, "No support for OpenGL 2.0 found");
 
-	glutDisplayFunc(display);
+	glutDisplayFunc(window::display);
 	glutIdleFunc(idle);
 
-	// set socket to listening mode
+	// This creates the socket with SOCK_NONBLOCK
 	socket.set_listen();
 }
 
@@ -81,15 +81,15 @@ window::display(void)
 	for (auto &d : drawables)
 		d->draw();
 
+	std::cerr << "window__display" << std::endl;
+
 	glutSwapBuffers();
 }
 
 void
 window::idle(void)
 {
-	af_unix_nonblock *temp_socket;
-
-	temp_socket = socket.accept();
+	af_unix *temp_socket = socket.accept();
 	if (temp_socket)
 		drawables.push_back(new text(temp_socket));
 

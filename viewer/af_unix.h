@@ -3,19 +3,18 @@
 
 #include <vector>
 
-class af_unix_nonblock {
+class af_unix {
 public:
-	af_unix_nonblock();
-	af_unix_nonblock(int);
-	~af_unix_nonblock();
+	af_unix();
+	af_unix(int);
+	~af_unix();
 
 	void set_listen();
-	af_unix_nonblock *accept();
+	af_unix *accept();
 
-	int read_block(uint64_t &);
-	int read_block(uint8_t *, size_t);
+	int read_all(uint64_t &);
+	int read_all(uint8_t *, size_t);
 
-	int read_nonblock(uint8_t *, size_t);
 	int write_all(uint8_t *, size_t);
 private:
 	int fd;
