@@ -16,30 +16,26 @@ text::text(af_unix *sock) :
 		errx(1, "%s", "font error");
 
 	assert(socket->read_all(num_tus) == 8);
-	std::cerr << "text::text() num tus = " << num_tus << std::endl;
 
 	for (int i = 0; i < num_tus; i++) {
 		uint64_t file_name_sz;
 		assert(socket->read_all(file_name_sz) == 8);
-		std::cerr << "text::text() file name size = " << file_name_sz << std::endl;
 
-		file_name = (char *)malloc(file_name_sz + 1);
-		assert(socket->read_all((uint8_t *)file_name, file_name_sz) == file_name_sz);
-		file_name[file_name_sz] = '\0';
-		std::cerr << "text::text() file name = " << file_name << std::endl;
+		file_name.resize(file_name_sz);
+		assert(socket->read_all((uint8_t *)&file_name[0], file_name_sz) == file_name_sz);
+
 		read_file();
 
 		assert(socket->read_all(num_lines) == 8);
 		execution_counts.resize(num_lines);
-		std::cerr << "text::text() num lines = " << num_lines << std::endl;
 	}
 
 	font.FaceSize(24);
 
-	font.Render(file_name);
+	font.Render(file_name.c_str());
 	int vertical = num_lines * 24;
 	for (auto &line : source_file_contents) {
-		font.Render(&line[0], line.size(), FTPoint(0, vertical, 0));
+		font.Render(line.c_str(), line.size(), FTPoint(0, vertical, 0));
 		vertical -= 24;
 	}
 }
@@ -47,16 +43,14 @@ text::text(af_unix *sock) :
 void
 text::read_file()
 {
-	std::wstring line;
-	std::wifstream file_stream(file_name);
+	std::string line;
+	std::ifstream file_stream(file_name);
 
 	if (file_stream.is_open() == 0)
 		errx(1, "ifstream.open()");
 
-	while (std::getline(file_stream, line)) {
+	while (std::getline(file_stream, line))
 		source_file_contents.push_back(line);
-		std::wcerr << line << std::endl;
-	}
 
 	file_stream.close();
 }

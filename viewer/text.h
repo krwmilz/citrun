@@ -18,10 +18,10 @@ private:
 	af_unix *socket;
 
 	uint64_t num_tus;
-	char *file_name;
+	std::string file_name;
 	uint64_t num_lines;
 
-	std::vector<std::wstring> source_file_contents;
+	std::vector<std::string> source_file_contents;
 	std::vector<uint64_t> execution_counts;
 
 	FTGLPixmapFont font;
