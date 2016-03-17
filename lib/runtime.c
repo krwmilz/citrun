@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include <scv_global.h>
+#include "scv_runtime.h"
 
 /* Entry point into instrumented application */
 extern struct scv_node node0;
@@ -42,13 +42,6 @@ control_thread(void *arg)
 		send_execution_data(fd);
 		xread(fd, &response, 1);
 	}
-}
-
-__attribute__((constructor))
-static void runtime_init()
-{
-	pthread_t tid;
-	pthread_create(&tid, NULL, control_thread, NULL);
 }
 
 void
@@ -132,4 +125,11 @@ xread(int d, uint8_t *buf, size_t bytes_total)
 	}
 
 	return bytes_read;
+}
+
+__attribute__((constructor))
+static void runtime_init()
+{
+	pthread_t tid;
+	pthread_create(&tid, NULL, control_thread, NULL);
 }
