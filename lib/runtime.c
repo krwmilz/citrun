@@ -4,6 +4,12 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#if __APPLE__
+#include <limits.h>		// PATH_MAX
+#include <sys/types.h>		// read
+#include <sys/uio.h>		// read
+#endif
+#include <unistd.h>		// read
 
 #include "scv_runtime.h"
 
@@ -13,6 +19,8 @@ extern struct scv_node node0;
 void send_metadata(int);
 void send_execution_data(int);
 
+int xread(int d, const void *buf, size_t bytes_total);
+int xwrite(int d, const void *buf, size_t bytes_total);
 
 void *
 control_thread(void *arg)
@@ -85,14 +93,14 @@ send_execution_data(int fd)
 }
 
 int
-xwrite(int d, const uint8_t *buf, size_t bytes_total)
+xwrite(int d, const void *buf, size_t bytes_total)
 {
 	int bytes_left = bytes_total;
 	int bytes_wrote = 0;
 	ssize_t n;
 
 	while (bytes_left > 0) {
-		n = write(d, buf + bytes_wrote, bytes_left);
+		n = write(d, (uint8_t *)buf + bytes_wrote, bytes_left);
 
 		if (n < 0)
 			err(1, "write()");
@@ -105,14 +113,14 @@ xwrite(int d, const uint8_t *buf, size_t bytes_total)
 }
 
 int
-xread(int d, uint8_t *buf, size_t bytes_total)
+xread(int d, const void *buf, size_t bytes_total)
 {
 	ssize_t bytes_left = bytes_total;
 	size_t bytes_read = 0;
 	ssize_t n;
 
 	while (bytes_left > 0) {
-		n = read(d, buf + bytes_read, bytes_left);
+		n = read(d, (uint8_t *)buf + bytes_read, bytes_left);
 
 		if (n == 0)
 			/* Disconnect */
