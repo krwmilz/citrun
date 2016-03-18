@@ -10,6 +10,7 @@
 class text : public drawable {
 public:
 	text(af_unix *);
+
 	void draw();
 	void idle();
 private:
