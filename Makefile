@@ -1,6 +1,6 @@
 SUBDIR= instrument lib viewer
 
-test:
+test: all
 	prove
 
 .include <bsd.subdir.mk>
