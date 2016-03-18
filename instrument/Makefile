@@ -25,6 +25,7 @@ LDADD += -Wl,--start-group \
 
 LDADD += `llvm-config --libs bitreader`
 LDADD += `llvm-config --libs mcparser`
+LDADD += `llvm-config --libs transformutils`
 LDADD += `llvm-config --libs option`
 LDADD += `llvm-config --system-libs`
 
