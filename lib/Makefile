@@ -1,7 +1,10 @@
 LIB = scv
 SRCS = runtime.c
 
-CFLAGS += -std=c89 -pthread
+SHLIB_MAJOR = 0
+SHLIB_MINOR = 0
+
+CFLAGS += -pthread
 LDADD += -pthread
 
 NOPROFILE = 1
