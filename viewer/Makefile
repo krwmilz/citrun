@@ -3,12 +3,12 @@ SRCS = viewer.cxx text.cxx af_unix.cxx
 
 CXX = eg++
 CXXFLAGS += -std=c++11
-CXXFLAGS += -I/usr/X11R6/include
-CXXFLAGS += -I/usr/X11R6/include/freetype2
-CXXFLAGS += -I/usr/X11R6/include/libdrm
-CXXFLAGS += -I/usr/local/include
+CXXFLAGS += `pkg-config glew --cflags`
+CXXFLAGS += `pkg-config ftgl --cflags`
 
-LDFLAGS += -L/usr/local/lib -L/usr/X11R6/lib
-LDADD += -lGL -lGLU -lGLEW -lftgl -lz -lglut
+LDFLAGS += `pkg-config glew --libs`
+LDFLAGS += `pkg-config ftgl --libs`
+
+LDADD += -lz -lglut
 
 .include <bsd.prog.mk>
