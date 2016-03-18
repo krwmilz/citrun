@@ -1,7 +1,6 @@
 PROG = scv_instrument
 SRCS = main.cxx instrumenter.cxx
 
-CXX = clang++
 CXXFLAGS = `llvm-config --cxxflags`
 LDFLAGS += `llvm-config --ldflags`
 
