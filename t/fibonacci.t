@@ -10,10 +10,8 @@ unified_diff;
 
 $project->add_src(
 <<EOF
-#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
 long long
 fibonacci(long long n)
@@ -30,16 +28,13 @@ int
 main(int argc, char *argv[])
 {
 	long long n;
-	const char *errstr = NULL;
 
 	if (argc != 2) {
 		fprintf(stderr, "usage: %s <N>", argv[0]);
 		return 1;
 	}
 
-	n = strtonum(argv[1], LONG_MIN, LONG_MAX, &errstr);
-	if (errstr)
-		err(1, "%s", errstr);
+	n = atoi(argv[1]);
 
 	fprintf(stderr, "result: %lli", fibonacci(n));
 
@@ -54,48 +49,43 @@ my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <scv_runtime.h>
-static uint64_t lines[36];
+static uint64_t lines[31];
 struct scv_node node1;
 struct scv_node node0 = {
 	.lines_ptr = lines,
-	.size = 36,
+	.size = 31,
 	.file_name = "$tmp_dir/source_0.c",
 	.next = &node1,
 };
-#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
 long long
 fibonacci(long long n)
 {
-	if ((++lines[9], n == 0))
-		return (++lines[10], 0);
-	else if ((++lines[11], n == 1))
-		return (++lines[12], 1);
+	if ((++lines[7], n == 0))
+		return (++lines[8], 0);
+	else if ((++lines[9], n == 1))
+		return (++lines[10], 1);
 
-	return (++lines[14], (++lines[14], fibonacci(n - 1)) + (++lines[14], fibonacci(n - 2)));
+	return (++lines[12], (++lines[12], fibonacci(n - 1)) + (++lines[12], fibonacci(n - 2)));
 }
 
 int
 main(int argc, char *argv[])
 {
 	long long n;
-	const char *errstr = NULL;
 
-	if ((++lines[23], argc != 2)) {
-		(++lines[24], fprintf(stderr, "usage: %s <N>", argv[0]));
-		return (++lines[25], 1);
+	if ((++lines[20], argc != 2)) {
+		(++lines[21], fprintf(stderr, "usage: %s <N>", argv[0]));
+		return (++lines[22], 1);
 	}
 
-	n = (++lines[28], strtonum(argv[1], LONG_MIN, LONG_MAX, &errstr));
-	if ((++lines[29], errstr))
-		(++lines[30], err(1, "%s", errstr));
+	n = (++lines[25], atoi(argv[1]));
 
-	(++lines[32], fprintf(stderr, "result: %lli", (++lines[32], fibonacci(n))));
+	(++lines[27], fprintf(stderr, "result: %lli", (++lines[27], fibonacci(n))));
 
-	return (++lines[34], 0);
+	return (++lines[29], 0);
 }
 EOF
 
