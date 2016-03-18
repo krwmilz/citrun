@@ -1,0 +1,101 @@
+diff --git a/SCV/Project.pm b/SCV/Project.pm
+index 6ff2664..5ab7fac 100644
+--- a/SCV/Project.pm
++++ b/SCV/Project.pm
+@@ -49,7 +49,7 @@ EOF
+ 	syswrite( $makefile_fh, $makefile );
+ 
+ 	# Use the wrapper to make sure it works
+-	my $ret = system( "wrap/scv_wrap_test make -C $tmp_dir" );
++	my $ret = system( "wrap/scv_wrap_test bsdmake -C $tmp_dir" );
+ 	die "make failed: $ret\n" if ($ret);
+ }
+ 
+diff --git a/instrument/Makefile b/instrument/Makefile
+index de6f643..0b39d1d 100644
+--- a/instrument/Makefile
++++ b/instrument/Makefile
+@@ -5,7 +5,8 @@ CXXFLAGS = `llvm-config --cxxflags`
+ LDFLAGS += `llvm-config --ldflags`
+ 
+ # Clang has a circular dependencies here, use "linker group options" to avoid
+-LDADD += -Wl,--start-group \
++LDADD += \
++	-lc++ \
+ 	-lclangAST \
+ 	-lclangAnalysis \
+ 	-lclangBasic \
+@@ -15,12 +16,11 @@ LDADD += -Wl,--start-group \
+ 	-lclangFrontendTool \
+ 	-lclangLex \
+ 	-lclangParse \
+-	-lclangRewriteCore \
++	-lclangRewrite \
+ 	-lclangRewriteFrontend \
+ 	-lclangSema \
+ 	-lclangSerialization \
+-	-lclangTooling \
+-	-Wl,--end-group \
++	-lclangTooling
+ 
+ LDADD += `llvm-config --libs bitreader`
+ LDADD += `llvm-config --libs mcparser`
+diff --git a/instrument/instrumenter.cxx b/instrument/instrumenter.cxx
+index b1da776..e585a0b 100644
+--- a/instrument/instrumenter.cxx
++++ b/instrument/instrumenter.cxx
+@@ -115,14 +115,14 @@ instrumenter::real_loc_end(Stmt *d)
+ 
+ // MyFrontendAction ---
+ 
+-ASTConsumer *
++std::unique_ptr<ASTConsumer>
+ MyFrontendAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
+ {
+ 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
+ 	SourceManager &sm = CI.getSourceManager();
+ 	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
+ 
+-	return new MyASTConsumer(TheRewriter);
++	return std::unique_ptr<ASTConsumer>(new MyASTConsumer(TheRewriter));
+ }
+ 
+ unsigned int
+diff --git a/instrument/instrumenter.h b/instrument/instrumenter.h
+index 3c2f019..08ed671 100644
+--- a/instrument/instrumenter.h
++++ b/instrument/instrumenter.h
+@@ -52,7 +52,7 @@ public:
+ 	MyFrontendAction() {};
+ 
+ 	void EndSourceFileAction() override;
+-	ASTConsumer *CreateASTConsumer(CompilerInstance &CI, StringRef file);
++	std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI, StringRef file) override;
+ 
+ private:
+ 	Rewriter TheRewriter;
+diff --git a/instrument/main.cxx b/instrument/main.cxx
+index e4cbc13..ab9c29f 100644
+--- a/instrument/main.cxx
++++ b/instrument/main.cxx
+@@ -87,7 +87,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
+ 	// that will return a new MyFrontendAction object every time.  To
+ 	// further customize this, we could create our own factory class.
+ 	// int ret = Tool.run(new MFAF(inst_files));
+-	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
++	int ret = Tool.run(&(*newFrontendActionFactory<MyFrontendAction>()));
+ 	if (ret)
+ 		errx(1, "Instrumentation failed");
+ }
+diff --git a/viewer/Makefile b/viewer/Makefile
+index ecd35ff..f73663f 100644
+--- a/viewer/Makefile
++++ b/viewer/Makefile
+@@ -11,6 +11,6 @@ LDFLAGS += `pkg-config gl --libs`
+ LDFLAGS += `pkg-config glew --libs`
+ LDFLAGS += `pkg-config ftgl --libs`
+ 
+-LDADD += -lz -lglut
++LDADD += -lc++ -lz -lglut
+ 
+ .include <bsd.prog.mk>
