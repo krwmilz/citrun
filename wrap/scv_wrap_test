@@ -17,7 +17,7 @@ export LDFLAGS="-L$CWD/lib"
 
 export LDADD="-lscv"
 
-# Used for running programs
 export LD_LIBRARY_PATH="$CWD/lib"
+export DYLD_LIBRARY_PATH="$CWD/lib"
 
 exec $@
