@@ -121,12 +121,22 @@ main(int argc, char *argv[])
 			source_files.push_back(arg);
 
 			// Find original directory or "." if relative path
+#ifdef __APPLE__
+			// Apple's man page says it modifies the argument
+			// pointer and the argument signature loses 'const'
+			char *src_dir = dirname(strdup(arg.c_str()));
+#else
 			char *src_dir = dirname(arg.c_str());
+#endif
 			if (src_dir == NULL)
 				err(1, "dirname");
 
 			// Find original file name
+#ifdef __APPLE__
+			char *src_name = basename(strdup(arg.c_str()));
+#else
 			char *src_name = basename(arg.c_str());
+#endif
 			if (src_name == NULL)
 				err(1, "basename");
 
