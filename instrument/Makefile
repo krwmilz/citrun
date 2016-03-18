@@ -1,15 +1,9 @@
 PROG = scv_instrument
 SRCS = main.cxx instrumenter.cxx
 
-CXX = eg++
-CXXFLAGS += -std=c++11
-CXXFLAGS += -I/usr/local/include
-CXXFLAGS += -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
-CXXFLAGS += -fno-rtti -Wall
-# CXXFLAGS += -ggdb -DDEBUG
-
-# OpenBSD has it's third part libraries here
-LDFLAGS += -L/usr/local/lib
+CXX = clang++
+CXXFLAGS = `llvm-config --cxxflags`
+LDFLAGS += `llvm-config --ldflags`
 
 # Clang has a circular dependencies here, use "linker group options" to avoid
 LDADD += -Wl,--start-group \
@@ -28,13 +22,10 @@ LDADD += -Wl,--start-group \
 	-lclangSerialization \
 	-lclangTooling \
 	-Wl,--end-group \
-	-lLLVMOption \
-	-lLLVMMCParser \
-	-lLLVMTransformUtils \
-	-lLLVMMC \
-	-lLLVMBitReader \
-	-lLLVMCore \
-	-lLLVMSupport \
-	-lpthread -lz
+
+LDADD += `llvm-config --libs bitreader`
+LDADD += `llvm-config --libs mcparser`
+LDADD += `llvm-config --libs option`
+LDADD += `llvm-config --system-libs`
 
 .include <bsd.prog.mk>
