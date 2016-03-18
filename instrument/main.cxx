@@ -105,13 +105,13 @@ int
 main(int argc, char *argv[])
 {
 	std::vector<std::string> source_files;
-	char *real_compiler_argv[argc + 1];
+	std::vector<char *> real_compiler_argv;
 
 	for (int i = 0; i < argc; i++) {
 		std::string arg(argv[i]);
 
 		// copy argument verbatim for now, we'll replace later if needed
-		real_compiler_argv[i] = argv[i];
+		real_compiler_argv.push_back(argv[i]);
 
 		// Dirty hack to find source files
 		if (ends_with(arg, ".cpp") || ends_with(arg, ".c")
@@ -130,8 +130,6 @@ main(int argc, char *argv[])
 #endif
 			if (src_dir == NULL)
 				err(1, "dirname");
-
-			// Find original file name
 #ifdef __APPLE__
 			char *src_name = basename(strdup(arg.c_str()));
 #else
@@ -146,11 +144,11 @@ main(int argc, char *argv[])
 			inst_src_path.append(src_name);
 
 			// Compilation file will be instrumented source
-			real_compiler_argv[i] = strdup(inst_src_path.c_str());
+			real_compiler_argv.at(i) = strdup(inst_src_path.c_str());
 		}
 	}
 	// Very important that argv passed to execvp is NULL terminated
-	real_compiler_argv[argc] = NULL;
+	real_compiler_argv.push_back(NULL);
 	argv[argc] = NULL;
 
 	// run native command if there's no source files to instrument
@@ -170,6 +168,6 @@ main(int argc, char *argv[])
 	std::cout << "Calling real compiler" << std::endl;
 #endif
 	clean_path();
-	if (execvp(real_compiler_argv[0], real_compiler_argv))
+	if (execvp(real_compiler_argv[0], &real_compiler_argv[0]))
 		err(1, "execvp");
 }
