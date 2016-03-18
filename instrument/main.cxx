@@ -57,18 +57,17 @@ clean_path()
 void
 instrument(int argc, char *argv[], std::vector<std::string> &source_files)
 {
-	const char *clang_argv[source_files.size() + 1 + argc];
-	int clang_argc = 0;
+	std::vector<const char *> clang_argv;
+	clang_argv.push_back(argv[0]);
 
-	clang_argv[clang_argc++] = argv[0];
 	for (auto s : source_files)
-		clang_argv[clang_argc++] = s.c_str();
+		clang_argv.push_back(s.c_str());
 
-	clang_argv[clang_argc++] = "--";
+	clang_argv.push_back("--");
 
 	// append original command line verbatim after --
 	for (int i = 0; i < argc; i++)
-		clang_argv[clang_argc++] = argv[i];
+		clang_argv.push_back(argv[i]);
 
 #ifdef DEBUG
 	// print out
@@ -78,7 +77,8 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
 #endif
 
 	// give clang it's <source files> -- <native command line> arg style
-	CommonOptionsParser op(clang_argc, clang_argv, ToolingCategory);
+	int clang_argc = clang_argv.size();
+	CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
 	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
 	// ClangTool::run accepts a FrontendActionFactory, which is then used to
