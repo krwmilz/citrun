@@ -1,7 +1,8 @@
 PROG = scv_instrument
 SRCS = main.cxx instrumenter.cxx
 
-CXXFLAGS = `llvm-config --cxxflags`
+CXXFLAGS += -std=c++11
+CXXFLAGS += `llvm-config --cxxflags`
 LDFLAGS += `llvm-config --ldflags`
 
 # Clang has a circular dependencies here, use "linker group options" to avoid
