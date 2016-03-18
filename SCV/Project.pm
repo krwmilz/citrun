@@ -95,6 +95,9 @@ sub wait {
 
 sub get_tmpdir {
 	my ($self) = @_;
+
+	return "/private$self->{tmp_dir}" if ($^O eq 'darwin');
+
 	return $self->{tmp_dir};
 }
 
