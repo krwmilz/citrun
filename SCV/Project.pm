@@ -48,8 +48,6 @@ EOF
 	open( my $makefile_fh, ">", "$tmp_dir/Makefile" );
 	syswrite( $makefile_fh, $makefile );
 
-	my $cwd = getcwd;
-
 	# Use the wrapper to make sure it works
 	my $ret = system( "wrap/scv_wrap_test make -C $tmp_dir" );
 	die "make failed: $ret\n" if ($ret);
