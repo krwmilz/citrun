@@ -1,7 +1,6 @@
 PROG = scv_viewer
 SRCS = viewer.cxx text.cxx af_unix.cxx
 
-CXX = eg++
 CXXFLAGS += -std=c++11
 CXXFLAGS += `pkg-config gl --cflags`
 CXXFLAGS += `pkg-config glew --cflags`
