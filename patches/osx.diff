@@ -12,7 +12,7 @@ index 6ff2664..5ab7fac 100644
  }
  
 diff --git a/instrument/Makefile b/instrument/Makefile
-index 965c8a9..ff068b7 100644
+index 965c8a9..13bfb56 100644
 --- a/instrument/Makefile
 +++ b/instrument/Makefile
 @@ -6,7 +6,8 @@ CXXFLAGS += `llvm-config --cxxflags`
@@ -21,7 +21,7 @@ index 965c8a9..ff068b7 100644
  # Clang has a circular dependencies here, use "linker group options" to avoid
 -LDADD += -Wl,--start-group \
 +LDADD += \
-+	-lc++ \
++	-lstdc++ \
  	-lclangAST \
  	-lclangAnalysis \
  	-lclangBasic \
@@ -41,10 +41,10 @@ index 965c8a9..ff068b7 100644
  LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
  
 diff --git a/instrument/instrumenter.cxx b/instrument/instrumenter.cxx
-index 8b62ac1..5b89fa2 100644
+index aa909af..42ae0fb 100644
 --- a/instrument/instrumenter.cxx
 +++ b/instrument/instrumenter.cxx
-@@ -106,14 +106,14 @@ instrumenter::real_loc_end(Stmt *d)
+@@ -108,14 +108,14 @@ instrumenter::real_loc_end(Stmt *d)
  
  // MyFrontendAction ---
  
@@ -87,3 +87,22 @@ index 28f4491..b95ef42 100644
  	if (ret)
  		errx(1, "Instrumentation failed");
  }
+diff --git a/viewer/Makefile b/viewer/Makefile
+index 82aa1d8..591b016 100644
+--- a/viewer/Makefile
++++ b/viewer/Makefile
+@@ -4,9 +4,11 @@ SRCS += demo-font.cxx demo-glstate.cxx demo-shader.cxx demo-view.cxx trackball.c
+ SRCS += matrix4x4.c
+ 
+ CXXFLAGS += -std=c++11
+-CXXFLAGS += `pkg-config gl glew freetype2 --cflags`
++CXXFLAGS += -Wno-deprecated
++CXXFLAGS += `pkg-config glew freetype2 --cflags`
+ 
+-LDFLAGS += `pkg-config gl glew freetype2 --libs`
+-LDADD += -lstdc++ -lz -lglut ../glyphy/libglyphy.a
++LDFLAGS += `pkg-config glew freetype2 --libs`
++LDADD += -framework OpenGL -framework GLUT
++LDADD += -lstdc++ -lz ../glyphy/libglyphy.a
+ 
+ .include <bsd.prog.mk>
