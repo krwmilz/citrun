@@ -88,7 +88,7 @@ is     ( $lines[$_], 0, "src 0 line $_ check" ) for (18..19);
 
 my @lines = @{ $data->[1] };
 is     ( $lines[$_], 0, "src 1 line $_ check" ) for (0..3);
-cmp_ok ( $lines[$_], ">", 100, "src 1 line $_ check" ) for (4..7);
+cmp_ok ( $lines[$_], ">", 10, "src 1 line $_ check" ) for (4..7);
 is     ( $lines[8], 0, "src 1 line 8 check" );
 
 my @lines = @{ $data->[2] };
