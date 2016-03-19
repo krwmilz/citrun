@@ -1,0 +1,18 @@
+# all components
+bmake
+g++
+pkg-config
+
+# scv_instrument
+libclang-dev
+libedit-dev
+llvm-dev
+zlib1g-dev
+
+# scv_viewer
+freeglut3-dev
+libftgl-dev
+libglew-dev
+
+# test suite
+libtest-differences-perl
