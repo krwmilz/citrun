@@ -18,7 +18,6 @@
 bool
 instrumenter::VisitVarDecl(VarDecl *d)
 {
-	// std::cout << "HERE" << std::endl;
 	return true;
 }
 
@@ -90,6 +89,9 @@ instrumenter::VisitFunctionDecl(FunctionDecl *f)
 		return true;
 
 	std::stringstream ss;
+	// On some platforms we need to depend directly on a symbol provided by
+	// the runtime. Normally this isn't needed because the runtime only
+	// depends on symbols in the isntrumented application.
 	ss << "libscv_init();";
 	SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
 	TheRewriter.InsertTextBefore(curly_brace, ss.str());
