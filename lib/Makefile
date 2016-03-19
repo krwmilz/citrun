@@ -10,7 +10,6 @@ CFLAGS += -pthread
 LDFLAGS += -Wl,-U,_node0
 LDADD += -pthread
 
-# OS X bsdmake squabbles over this
 NO_PROFILE = 1
 NOPROFILE = 1
 .include <bsd.lib.mk>
