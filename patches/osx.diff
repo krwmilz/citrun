@@ -12,10 +12,10 @@ index 6ff2664..5ab7fac 100644
  }
  
 diff --git a/instrument/Makefile b/instrument/Makefile
-index de6f643..0b39d1d 100644
+index b7cffc4..9d94419 100644
 --- a/instrument/Makefile
 +++ b/instrument/Makefile
-@@ -5,7 +5,8 @@ CXXFLAGS = `llvm-config --cxxflags`
+@@ -6,7 +6,8 @@ CXXFLAGS += `llvm-config --cxxflags`
  LDFLAGS += `llvm-config --ldflags`
  
  # Clang has a circular dependencies here, use "linker group options" to avoid
@@ -25,7 +25,7 @@ index de6f643..0b39d1d 100644
  	-lclangAST \
  	-lclangAnalysis \
  	-lclangBasic \
-@@ -15,12 +16,11 @@ LDADD += -Wl,--start-group \
+@@ -16,12 +17,11 @@ LDADD += -Wl,--start-group \
  	-lclangFrontendTool \
  	-lclangLex \
  	-lclangParse \
@@ -38,8 +38,8 @@ index de6f643..0b39d1d 100644
 -	-Wl,--end-group \
 +	-lclangTooling
  
- LDADD += `llvm-config --libs bitreader`
- LDADD += `llvm-config --libs mcparser`
+ LDADD += `llvm-config --libs bitreader mcparser transformutils option`
+ LDADD += `llvm-config --system-libs`
 diff --git a/instrument/instrumenter.cxx b/instrument/instrumenter.cxx
 index b1da776..e585a0b 100644
 --- a/instrument/instrumenter.cxx
@@ -75,7 +75,7 @@ index 3c2f019..08ed671 100644
  private:
  	Rewriter TheRewriter;
 diff --git a/instrument/main.cxx b/instrument/main.cxx
-index e4cbc13..ab9c29f 100644
+index 28f4491..b95ef42 100644
 --- a/instrument/main.cxx
 +++ b/instrument/main.cxx
 @@ -87,7 +87,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
@@ -88,13 +88,13 @@ index e4cbc13..ab9c29f 100644
  		errx(1, "Instrumentation failed");
  }
 diff --git a/viewer/Makefile b/viewer/Makefile
-index ecd35ff..f73663f 100644
+index 4585f8e..910fd95 100644
 --- a/viewer/Makefile
 +++ b/viewer/Makefile
-@@ -11,6 +11,6 @@ LDFLAGS += `pkg-config gl --libs`
- LDFLAGS += `pkg-config glew --libs`
- LDFLAGS += `pkg-config ftgl --libs`
+@@ -5,6 +5,6 @@ CXXFLAGS += -std=c++11
+ CXXFLAGS += `pkg-config gl glew ftgl --cflags`
  
+ LDFLAGS += `pkg-config gl glew ftgl --libs`
 -LDADD += -lz -lglut
 +LDADD += -lc++ -lz -lglut
  
