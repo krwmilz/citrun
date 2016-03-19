@@ -2,7 +2,6 @@
 #define TEXT_H
 
 #include <vector>
-#include <FTGL/ftgl.h>
 
 #include "af_unix.h"
 #include "draw.h"
@@ -24,8 +23,6 @@ private:
 
 	std::vector<std::string> source_file_contents;
 	std::vector<uint64_t> execution_counts;
-
-	FTGLPixmapFont font;
 };
 
 #endif

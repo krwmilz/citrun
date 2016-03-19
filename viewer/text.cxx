@@ -9,12 +9,8 @@
 #include "text.h"
 
 text::text(af_unix *sock) :
-	socket(sock),
-	font(FTGLPixmapFont("DejaVuSansMono.ttf"))
+	socket(sock)
 {
-	if (font.Error())
-		errx(1, "%s", "font error");
-
 	assert(socket->read_all(num_tus) == 8);
 
 	for (int i = 0; i < num_tus; i++) {
@@ -28,15 +24,6 @@ text::text(af_unix *sock) :
 
 		assert(socket->read_all(num_lines) == 8);
 		execution_counts.resize(num_lines);
-	}
-
-	font.FaceSize(24);
-
-	font.Render(file_name.c_str());
-	int vertical = num_lines * 24;
-	for (auto &line : source_file_contents) {
-		font.Render(line.c_str(), line.size(), FTPoint(0, vertical, 0));
-		vertical -= 24;
 	}
 }
 
@@ -69,14 +56,4 @@ text::idle()
 	// Send response back
 	uint8_t msg_type = 1;
 	assert(socket->write_all(&msg_type, 1) == 1);
-
-	int vertical = num_lines * 24;
-	for (auto &count : execution_counts) {
-		std::stringstream ss;
-		ss << count;
-		std::string s_count = ss.str();
-
-		font.Render(&s_count[0], s_count.size(), FTPoint(600, vertical, 0));
-		vertical -= 24;
-	}
 }

@@ -21,7 +21,7 @@ af_unix::af_unix(int f) :
 void
 af_unix::set_listen()
 {
-#ifdef __APPLE__
+#if defined(__APPLE__)
 	// OS X socket() doesn't take SOCK_NONBLOCK
 	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
@@ -29,7 +29,7 @@ af_unix::set_listen()
 	int flags = fcntl(fd, F_GETFL, 0);
 	if (flags < 0)
 		err(1, "fcntl(F_GETFL)");
-	fcntl(fd, F_SETFL, flags & O_NONBLOCK);
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 	if (flags < 0)
 		err(1, "fcntl(F_SETFL)");
 #else
