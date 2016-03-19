@@ -2,7 +2,7 @@ LIB= glyphy
 SRCS= glyphy-arc.cxx glyphy-arcs.cxx glyphy-blob.cxx glyphy-extents.cxx 
 SRCS += glyphy-outline.cxx glyphy-sdf.cxx glyphy-shaders.cxx
 
-CFLAGS += -I. -DPKGDATADIR=""
+CXXFLAGS += -I. -DPKGDATADIR=""
 LDADD += -lstdc++
 
 NOPROFILE=1
