@@ -73,7 +73,7 @@ fibonacci(long long n)
 
 int
 main(int argc, char *argv[])
-{
+{libscv_init();
 	long long n;
 
 	if ((++lines[20], argc != 2)) {

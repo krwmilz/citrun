@@ -39,7 +39,7 @@ struct scv_node node0 = {
 
 int
 main(void)
-{
+{libscv_init();
 	(++lines[6], fprintf(stderr, "hello, world!"));
 	return (++lines[7], 0);
 }

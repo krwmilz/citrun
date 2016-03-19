@@ -77,31 +77,22 @@ bool
 instrumenter::VisitFunctionDecl(FunctionDecl *f)
 {
 	// Only function definitions (with bodies), not declarations.
-	if (f->hasBody()) {
-#if 0
-		Stmt *FuncBody = f->getBody();
-		// Type name as string
-		QualType QT = f->getReturnType();
-		std::string TypeStr = QT.getAsString();
+	if (f->hasBody() == 0)
+		return true;
 
-		// Function name
-		DeclarationName DeclName = f->getNameInfo().getName();
-		std::string FuncName = DeclName.getAsString();
+	Stmt *FuncBody = f->getBody();
 
-		// Add comment before
-		std::stringstream SSBefore;
-		SSBefore << "// Begin function " << FuncName << " returning " << TypeStr
-			<< "\n";
-		SourceLocation ST = f->getSourceRange().getBegin();
-		TheRewriter.InsertText(ST, SSBefore.str(), true, true);
+	DeclarationName DeclName = f->getNameInfo().getName();
+	std::string FuncName = DeclName.getAsString();
 
-		// And after
-		std::stringstream SSAfter;
-		SSAfter << "\n// End function " << FuncName;
-		ST = FuncBody->getLocEnd().getLocWithOffset(1);
-		TheRewriter.InsertText(ST, SSAfter.str(), true, true);
-#endif
-	}
+	if (FuncName.compare("main") != 0)
+		// Function is not main
+		return true;
+
+	std::stringstream ss;
+	ss << "libscv_init();";
+	SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
+	TheRewriter.InsertTextBefore(curly_brace, ss.str());
 
 	return true;
 }

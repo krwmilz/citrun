@@ -42,7 +42,7 @@ int foo() {
 	return (++lines[2], 0);
 }
 
-int main(void) {
+int main(void) {libscv_init();
 	return (++lines[6], 10);
 
 	return (++lines[8], 10 + 10);

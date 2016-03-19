@@ -49,7 +49,7 @@ struct scv_node node0 = {
 
 int
 main(int argc, char *argv[])
-{
+{libscv_init();
 	if ((++lines[6], argc == 1))
 		return (++lines[7], 1);
 	else

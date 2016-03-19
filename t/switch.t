@@ -43,7 +43,7 @@ struct scv_node node0 = {
 };
 int
 main(void)
-{
+{libscv_init();
 	int i;
 
 	switch ((++lines[6], i)) {

@@ -22,6 +22,16 @@ void send_execution_data(int);
 int xread(int d, const void *buf, size_t bytes_total);
 int xwrite(int d, const void *buf, size_t bytes_total);
 
+/*
+ * Dummy function to make sure that the instrumented program gets linked against
+ * this library.
+ * Linux likes to liberally discard -l... flags given when linking.
+ */
+void
+libscv_init()
+{
+}
+
 void *
 control_thread(void *arg)
 {
