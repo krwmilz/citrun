@@ -7,3 +7,5 @@ struct scv_node {
 	const char *file_name;
 	struct scv_node *next;
 };
+
+void libscv_init();
