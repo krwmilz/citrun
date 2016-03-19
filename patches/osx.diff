@@ -12,7 +12,7 @@ index 6ff2664..5ab7fac 100644
  }
  
 diff --git a/instrument/Makefile b/instrument/Makefile
-index b7cffc4..9d94419 100644
+index 965c8a9..ff068b7 100644
 --- a/instrument/Makefile
 +++ b/instrument/Makefile
 @@ -6,7 +6,8 @@ CXXFLAGS += `llvm-config --cxxflags`
@@ -38,13 +38,13 @@ index b7cffc4..9d94419 100644
 -	-Wl,--end-group \
 +	-lclangTooling
  
- LDADD += `llvm-config --libs bitreader mcparser transformutils option`
- LDADD += `llvm-config --system-libs`
+ LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
+ 
 diff --git a/instrument/instrumenter.cxx b/instrument/instrumenter.cxx
-index b1da776..e585a0b 100644
+index 8b62ac1..5b89fa2 100644
 --- a/instrument/instrumenter.cxx
 +++ b/instrument/instrumenter.cxx
-@@ -115,14 +115,14 @@ instrumenter::real_loc_end(Stmt *d)
+@@ -106,14 +106,14 @@ instrumenter::real_loc_end(Stmt *d)
  
  // MyFrontendAction ---
  
