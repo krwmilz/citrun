@@ -5,6 +5,6 @@ CXXFLAGS += -std=c++11
 CXXFLAGS += `pkg-config gl glew ftgl --cflags`
 
 LDFLAGS += `pkg-config gl glew ftgl --libs`
-LDADD += -lz -lglut
+LDADD += -lstdc++ -lz -lglut
 
 .include <bsd.prog.mk>
