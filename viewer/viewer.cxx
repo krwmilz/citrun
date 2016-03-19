@@ -6,6 +6,7 @@
 #include "af_unix.h"
 #include "text.h"
 
+#include "default-text.h"
 #include "demo-buffer.h"
 #include "demo-font.h"
 #include "demo-view.h"
@@ -49,7 +50,6 @@ window::window(int argc, char *argv[])
 	glutSpecialFunc(special_func);
 	glutMouseFunc(mouse_func);
 	glutMotionFunc(motion_func);
-	glutIdleFunc(idle);
 
 	GLenum glew_status = glewInit();
 	if (GLEW_OK != glew_status)
@@ -72,8 +72,7 @@ window::window(int argc, char *argv[])
 	buffer = demo_buffer_create();
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
-	const char *the_text = ">>>>>>> HELLO WORLD <<<<<<<<";
-	demo_buffer_add_text(buffer, the_text, font, 1);
+	demo_buffer_add_text(buffer, default_text, font, 1);
 
 	demo_font_print_stats(font);
 
