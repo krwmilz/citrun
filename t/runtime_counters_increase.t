@@ -1,9 +1,8 @@
 use strict;
 use SCV::Project;
 use SCV::Viewer;
-use Test::More tests => 33;
+use Test::More tests => 15;
 use Test::Differences;
-use Time::HiRes qw( usleep );
 
 my $project = SCV::Project->new();
 my $viewer = SCV::Viewer->new();
@@ -21,7 +20,6 @@ fib(long long n)
 		return 0;
 	else if (n == 1)
 		return 1;
-
 	return fib(n - 1) + fib(n - 2);
 }
 
@@ -53,25 +51,20 @@ is( scalar(@{ $metadata }), 1, "runtime check for a single tu" );
 
 my $source_0 = $metadata->[0];
 like ($source_0->{filename}, qr/.*source_0\.c/, "runtime filename check");
-is( $source_0->{lines}, 29, "runtime lines count" );
+is( $source_0->{lines}, 28, "runtime lines count" );
 
-usleep(100 * 1000);
 my $data = $viewer->get_execution_data();
+my @exec_lines1 = @{ $data->[0] };
 
-my @lines = @{ $data->[0] };
-# Do a pretty thorough coverage check
-is     ( $lines[$_], 0, "line $_ check" ) for (1..7);
-cmp_ok ( $lines[$_], ">", 0, "line $_ check" ) for (8..11);
-is     ( $lines[12], 0, "line 12 check" );
-cmp_ok ( $lines[13], ">", 0, "line 13 check" );
-is     ( $lines[$_], 0, "line $_ check" ) for (14..20);
-is     ( $lines[21], 1, "line 21 check" );
-is     ( $lines[$_], 0, "line $_ check" ) for (22..23);
-is     ( $lines[24], 1, "line 24 check" );
-is     ( $lines[25], 0, "line 25 check" );
-is     ( $lines[26], 2, "line 26 check" );
-# Make sure return code hasn't fired yet
-is     ( $lines[$_], 0, "line $_ check" ) for (27..28);
+my $data = $viewer->get_execution_data();
+my @exec_lines2 = @{ $data->[0] };
+
+# Only lines 8 - 12 in the source code above are executing
+for (8..12) {
+	cmp_ok( $exec_lines1[$_], ">", 1, "line $_ executed nonzero times" );
+	# Make sure the second time we queried the execution counts they were higher
+	cmp_ok( $exec_lines2[$_], ">", $exec_lines1[$_], "line $_ after > before" );
+}
 
 $project->kill();
 my ($ret, $err) = $project->wait();
