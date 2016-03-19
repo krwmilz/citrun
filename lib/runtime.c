@@ -1,11 +1,11 @@
 #include <err.h>
+#include <limits.h>		// PATH_MAX
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #if __APPLE__
-#include <limits.h>		// PATH_MAX
 #include <sys/types.h>		// read
 #include <sys/uio.h>		// read
 #endif
