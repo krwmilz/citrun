@@ -7,6 +7,6 @@ CXXFLAGS += -std=c++11
 CXXFLAGS += `pkg-config gl glew ftgl --cflags`
 
 LDFLAGS += `pkg-config gl glew ftgl --libs`
-LDADD += -lstdc++ -lz -lglut
+LDADD += -lstdc++ -lz -lglut ../glyphy/libglyphy.a
 
 .include <bsd.prog.mk>

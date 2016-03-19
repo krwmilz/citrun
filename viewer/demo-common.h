@@ -32,9 +32,9 @@
 
 #include <GL/glew.h>
 #include <GLES2/gl2.h>
-#include <OpenGL/OpenGL.h>
 
 #if defined(__APPLE__)
+#  include <OpenGL/OpenGL.h>
 #  include <GLUT/glut.h>
 #else
 #  include <GL/glut.h>
