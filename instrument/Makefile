@@ -23,7 +23,6 @@ LDADD += -Wl,--start-group \
 	-lclangTooling \
 	-Wl,--end-group \
 
-LDADD += `llvm-config --libs bitreader mcparser transformutils option`
-LDADD += `llvm-config --system-libs`
+LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
 
 .include <bsd.prog.mk>
