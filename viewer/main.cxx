@@ -12,7 +12,6 @@
 #include "demo-font.h"
 
 
-
 class window {
 public:
 	window(int argc, char *argv[]);
@@ -22,6 +21,12 @@ public:
 	static void print_fps(int);
 	static void timed_step(int);
 	static void next_frame(View *);
+
+	static FT_Library ft_library;
+	static FT_Face ft_face;
+
+	static demo_font_t *font;
+	static demo_buffer_t *buffer;
 
 	static View *static_vu;
 	static af_unix socket;
@@ -35,13 +40,17 @@ private:
 	static void motion_func(int, int);
 
 	demo_glstate_t *st;
-	demo_buffer_t *buffer;
-	demo_font_t *font;
 };
 
 std::vector<drawable*> window::drawables;
 af_unix window::socket;
 View *window::static_vu;
+
+FT_Library window::ft_library;
+FT_Face window::ft_face;
+
+demo_font_t *window::font;
+demo_buffer_t *window::buffer;
 
 window::window(int argc, char *argv[])
 {
@@ -64,17 +73,17 @@ window::window(int argc, char *argv[])
 
 	st = demo_glstate_create();
 	buffer = demo_buffer_create();
-	//vu = demo_view_create(st);
+
 	static_vu = new View(st, buffer);
 	static_vu->print_help();
 
-	FT_Library ft_library;
 	FT_Init_FreeType(&ft_library);
 
-	FT_Face ft_face = NULL;
+	ft_face = NULL;
 	FT_New_Face(ft_library, "DejaVuSansMono.ttf", /* face_index */ 0, &ft_face);
 
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
+
 
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
@@ -141,14 +150,12 @@ current_time (void)
 void
 window::next_frame(View *vu)
 {
-	/*
 	af_unix *temp_socket = window::socket.accept();
 	if (temp_socket)
 		window::drawables.push_back(new RuntimeClient(temp_socket, buffer, font));
 
 	for (auto &i : window::drawables)
 		i->idle();
-	*/
 
 	glutPostRedisplay ();
 }
