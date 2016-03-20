@@ -21,9 +21,9 @@ public:
 	static void idle_step();
 	static void print_fps(int);
 	static void timed_step(int);
-	static void next_frame(demo_view_t *);
+	static void next_frame(View *);
 
-	static demo_view_t *static_vu;
+	static View *static_vu;
 	static af_unix socket;
 	static std::vector<drawable*> drawables;
 private:
@@ -41,7 +41,7 @@ private:
 
 std::vector<drawable*> window::drawables;
 af_unix window::socket;
-demo_view_t *window::static_vu;
+View *window::static_vu;
 
 window::window(int argc, char *argv[])
 {
@@ -65,8 +65,8 @@ window::window(int argc, char *argv[])
 	st = demo_glstate_create();
 	buffer = demo_buffer_create();
 	//vu = demo_view_create(st);
-	static_vu = new demo_view_t(st, buffer);
-	static_vu->demo_view_print_help();
+	static_vu = new View(st, buffer);
+	static_vu->print_help();
 
 	FT_Library ft_library;
 	FT_Init_FreeType(&ft_library);
@@ -82,7 +82,7 @@ window::window(int argc, char *argv[])
 
 	demo_font_print_stats(font);
 
-	static_vu->demo_view_setup();
+	static_vu->setup();
 
 	// This creates the socket with SOCK_NONBLOCK
 	socket.set_listen();
@@ -91,31 +91,31 @@ window::window(int argc, char *argv[])
 void
 window::reshape_func(int width, int height)
 {
-	static_vu->demo_view_reshape_func(width, height);
+	static_vu->reshape_func(width, height);
 }
 
 void
 window::keyboard_func(unsigned char key, int x, int y)
 {
-	static_vu->demo_view_keyboard_func(key, x, y);
+	static_vu->keyboard_func(key, x, y);
 }
 
 void
 window::special_func(int key, int x, int y)
 {
-	static_vu->demo_view_special_func(key, x, y);
+	static_vu->special_func(key, x, y);
 }
 
 void
 window::mouse_func(int button, int state, int x, int y)
 {
-	static_vu->demo_view_mouse_func(button, state, x, y);
+	static_vu->mouse_func(button, state, x, y);
 }
 
 void
 window::motion_func(int x, int y)
 {
-	static_vu->demo_view_motion_func(x, y);
+	static_vu->motion_func(x, y);
 }
 
 void
@@ -127,7 +127,7 @@ window::start()
 void
 window::display(void)
 {
-	static_vu->demo_view_display();
+	static_vu->display();
 }
 
 
@@ -139,7 +139,7 @@ current_time (void)
 }
 
 void
-window::next_frame(demo_view_t *vu)
+window::next_frame(View *vu)
 {
 	/*
 	af_unix *temp_socket = window::socket.accept();
@@ -156,7 +156,7 @@ window::next_frame(demo_view_t *vu)
 void
 window::timed_step(int ms)
 {
-	demo_view_t *vu = static_vu;
+	View *vu = static_vu;
 	if (vu->animate) {
 		glutTimerFunc (ms, timed_step, ms);
 		next_frame (vu);
@@ -166,7 +166,7 @@ window::timed_step(int ms)
 void
 window::idle_step(void)
 {
-	demo_view_t *vu = static_vu;
+	View *vu = static_vu;
 	if (vu->animate) {
 		next_frame (vu);
 	}
@@ -177,7 +177,7 @@ window::idle_step(void)
 void
 window::print_fps(int ms)
 {
-	demo_view_t *vu = static_vu;
+	View *vu = static_vu;
 	if (vu->animate) {
 		glutTimerFunc (ms, print_fps, ms);
 		long t = current_time ();
@@ -191,7 +191,7 @@ window::print_fps(int ms)
 void
 start_animation()
 {
-	demo_view_t *vu = window::static_vu;
+	View *vu = window::static_vu;
 	vu->num_frames = 0;
 	vu->last_frame_time = vu->fps_start_time = current_time();
 	//glutTimerFunc (1000/60, timed_step, 1000/60);

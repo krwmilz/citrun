@@ -17,7 +17,6 @@
  */
 
 #include "view.h"
-#include "af_unix.h"
 
 extern "C" {
 #include "trackball.h"
@@ -28,7 +27,7 @@ extern "C" {
 
 void start_animation();
 
-demo_view_t::demo_view_t(demo_glstate_t *st, demo_buffer_t *buf) :
+View::View(demo_glstate_t *st, demo_buffer_t *buf) :
 	st(st),
 	buffer(buf),
 	fullscreen(false),
@@ -37,10 +36,10 @@ demo_view_t::demo_view_t(demo_glstate_t *st, demo_buffer_t *buf) :
 {
 	TRACE();
 
-	demo_view_reset();
+	reset();
 }
 
-demo_view_t::~demo_view_t()
+View::~View()
 {
 	assert (refcount == 1);
 }
@@ -48,67 +47,67 @@ demo_view_t::~demo_view_t()
 
 #define ANIMATION_SPEED 1. /* Default speed, in radians second. */
 void
-demo_view_t::demo_view_reset()
+View::reset()
 {
 	perspective = 4;
-	scale = 1;
-	translate.x = translate.y = 0;
+	scale_ = 1;
+	translate_.x = translate_.y = 0;
 	trackball (quat , 0.0, 0.0, 0.0, 0.0);
 	vset (rot_axis, 0., 0., 1.);
 	rot_speed = ANIMATION_SPEED / 1000.;
 }
 
 void
-demo_view_t::demo_view_scale_gamma_adjust(double factor)
+View::scale_gamma_adjust(double factor)
 {
 	demo_glstate_scale_gamma_adjust(st, factor);
 }
 
 void
-demo_view_t::demo_view_scale_contrast(double factor)
+View::scale_contrast(double factor)
 {
-	demo_glstate_scale_contrast (st, factor);
+	demo_glstate_scale_contrast(st, factor);
 }
 
 void
-demo_view_t::demo_view_scale_perspective(double factor)
+View::scale_perspective(double factor)
 {
-	perspective = clamp (perspective * factor, .01, 100.);
+	perspective = clamp(perspective * factor, .01, 100.);
 }
 
 void
-demo_view_t::demo_view_toggle_outline()
+View::toggle_outline()
 {
 	demo_glstate_toggle_outline(st);
 }
 
 void
-demo_view_t::demo_view_scale_outline_thickness(double factor)
+View::scale_outline_thickness(double factor)
 {
 	demo_glstate_scale_outline_thickness(st, factor);
 }
 
 void
-demo_view_t::demo_view_adjust_boldness(double factor)
+View::adjust_boldness(double factor)
 {
 	demo_glstate_adjust_boldness(st, factor);
 }
 
 void
-demo_view_t::demo_view_scale(double factor)
+View::scale(double factor)
 {
-	scale *= factor;
+	scale_ *= factor;
 }
 
 void
-demo_view_t::demo_view_translate(double dx, double dy)
+View::translate(double dx, double dy)
 {
-	translate.x += dx / scale;
-	translate.y += dy / scale;
+	translate_.x += dx / scale_;
+	translate_.y += dy / scale_;
 }
 
 void
-demo_view_t::demo_view_apply_transform(float *mat)
+View::apply_transform(float *mat)
 {
 	int viewport[4];
 	glGetIntegerv (GL_VIEWPORT, viewport);
@@ -116,8 +115,8 @@ demo_view_t::demo_view_apply_transform(float *mat)
 	GLint height = viewport[3];
 
 	// View transform
-	m4Scale (mat, scale, scale, 1);
-	m4Translate (mat, translate.x, translate.y, 0);
+	m4Scale (mat, scale_, scale_, 1);
+	m4Translate (mat, translate_.x, translate_.y, 0);
 
 	// Perspective
 	{
@@ -147,7 +146,7 @@ current_time (void)
 }
 
 void
-demo_view_t::demo_view_toggle_animation()
+View::toggle_animation()
 {
 	animate = !animate;
 	if (animate)
@@ -155,7 +154,7 @@ demo_view_t::demo_view_toggle_animation()
 }
 
 void
-demo_view_t::demo_view_toggle_vsync()
+View::toggle_vsync()
 {
 	vsync = !vsync;
 	LOGI ("Setting vsync %s.\n", vsync ? "on" : "off");
@@ -177,7 +176,7 @@ demo_view_t::demo_view_toggle_vsync()
 }
 
 void
-demo_view_t::demo_view_toggle_srgb()
+View::toggle_srgb()
 {
 	srgb = !srgb;
 	LOGI ("Setting sRGB framebuffer %s.\n", srgb ? "on" : "off");
@@ -195,7 +194,7 @@ demo_view_t::demo_view_toggle_srgb()
 }
 
 void
-demo_view_t::demo_view_toggle_fullscreen()
+View::toggle_fullscreen()
 {
 	fullscreen = !fullscreen;
 	if (fullscreen) {
@@ -211,14 +210,14 @@ demo_view_t::demo_view_toggle_fullscreen()
 }
 
 void
-demo_view_t::demo_view_toggle_debug()
+View::toggle_debug()
 {
 	demo_glstate_toggle_debug(st);
 }
 
 
 void
-demo_view_t::demo_view_reshape_func(int width, int height)
+View::reshape_func(int width, int height)
 {
 	glViewport (0, 0, width, height);
 	glutPostRedisplay ();
@@ -226,7 +225,7 @@ demo_view_t::demo_view_reshape_func(int width, int height)
 
 #define STEP 1.05
 void
-demo_view_t::demo_view_keyboard_func(unsigned char key, int x, int y)
+View::keyboard_func(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
@@ -236,76 +235,76 @@ demo_view_t::demo_view_keyboard_func(unsigned char key, int x, int y)
 			break;
 
 		case ' ':
-			demo_view_toggle_animation();
+			toggle_animation();
 			break;
 		case 'v':
-			demo_view_toggle_vsync();
+			toggle_vsync();
 			break;
 
 		case 'f':
-			demo_view_toggle_fullscreen();
+			toggle_fullscreen();
 			break;
 
 		case 'd':
-			demo_view_toggle_debug();
+			toggle_debug();
 			break;
 
 		case 'o':
-			demo_view_toggle_outline();
+			toggle_outline();
 			break;
 		case 'p':
-			demo_view_scale_outline_thickness(STEP);
+			scale_outline_thickness(STEP);
 			break;
 		case 'i':
-			demo_view_scale_outline_thickness(1. / STEP);
+			scale_outline_thickness(1. / STEP);
 			break;
 
 		case '0':
-			demo_view_adjust_boldness(+.01);
+			adjust_boldness(+.01);
 			break;
 		case '9':
-			demo_view_adjust_boldness(-.01);
+			adjust_boldness(-.01);
 			break;
 
 
 		case 'a':
-			demo_view_scale_contrast(STEP);
+			scale_contrast(STEP);
 			break;
 		case 'z':
-			demo_view_scale_contrast(1. / STEP);
+			scale_contrast(1. / STEP);
 			break;
 		case 'g':
-			demo_view_scale_gamma_adjust(STEP);
+			scale_gamma_adjust(STEP);
 			break;
 		case 'b':
-			demo_view_scale_gamma_adjust(1. / STEP);
+			scale_gamma_adjust(1. / STEP);
 			break;
 		case 'c':
-			demo_view_toggle_srgb();
+			toggle_srgb();
 			break;
 
 		case '=':
-			demo_view_scale(STEP);
+			scale(STEP);
 			break;
 		case '-':
-			demo_view_scale(1. / STEP);
+			scale(1. / STEP);
 			break;
 
 		case 'k':
-			demo_view_translate(0, -.1);
+			translate(0, -.1);
 			break;
 		case 'j':
-			demo_view_translate(0, +.1);
+			translate(0, +.1);
 			break;
 		case 'h':
-			demo_view_translate(+.1, 0);
+			translate(+.1, 0);
 			break;
 		case 'l':
-			demo_view_translate(-.1, 0);
+			translate(-.1, 0);
 			break;
 
 		case 'r':
-			demo_view_reset();
+			reset();
 			break;
 
 		default:
@@ -315,21 +314,21 @@ demo_view_t::demo_view_keyboard_func(unsigned char key, int x, int y)
 }
 
 void
-demo_view_t::demo_view_special_func(int key, int x, int y)
+View::special_func(int key, int x, int y)
 {
 	switch (key)
 	{
 		case GLUT_KEY_UP:
-			demo_view_translate(0, -.1);
+			translate(0, -.1);
 			break;
 		case GLUT_KEY_DOWN:
-			demo_view_translate(0, +.1);
+			translate(0, +.1);
 			break;
 		case GLUT_KEY_LEFT:
-			demo_view_translate(+.1, 0);
+			translate(+.1, 0);
 			break;
 		case GLUT_KEY_RIGHT:
-			demo_view_translate(-.1, 0);
+			translate(-.1, 0);
 			break;
 
 		default:
@@ -339,7 +338,7 @@ demo_view_t::demo_view_special_func(int key, int x, int y)
 }
 
 void
-demo_view_t::demo_view_mouse_func(int button, int state, int x, int y)
+View::mouse_func(int button, int state, int x, int y)
 {
 	if (state == GLUT_DOWN) {
 		buttons |= (1 << button);
@@ -353,7 +352,7 @@ demo_view_t::demo_view_mouse_func(int button, int state, int x, int y)
 		switch (state) {
 		case GLUT_DOWN:
 			if (animate) {
-				demo_view_toggle_animation();
+				toggle_animation();
 				click_handled = true;
 			}
 			break;
@@ -361,11 +360,11 @@ demo_view_t::demo_view_mouse_func(int button, int state, int x, int y)
 			if (!animate)
 			{
 				if (!dragged && !click_handled)
-					demo_view_toggle_animation();
+					toggle_animation();
 				else if (dt) {
 					double speed = hypot (dx, dy) / dt;
 					if (speed > 0.1)
-						demo_view_toggle_animation();
+						toggle_animation();
 				}
 				dx = dy = dt = 0;
 			}
@@ -378,11 +377,11 @@ demo_view_t::demo_view_mouse_func(int button, int state, int x, int y)
 #define GLUT_WHEEL_DOWN 4
 #endif
 	case GLUT_WHEEL_UP:
-		demo_view_scale(STEP);
+		scale(STEP);
 		break;
 
 	case GLUT_WHEEL_DOWN:
-		demo_view_scale(1. / STEP);
+		scale(1. / STEP);
 		break;
 	}
 
@@ -394,7 +393,7 @@ demo_view_t::demo_view_mouse_func(int button, int state, int x, int y)
 }
 
 void
-demo_view_t::demo_view_motion_func(int x, int y)
+View::motion_func(int x, int y)
 {
 	dragged = true;
 
@@ -407,11 +406,11 @@ demo_view_t::demo_view_motion_func(int x, int y)
 	{
 		if (modifiers & GLUT_ACTIVE_SHIFT) {
 			/* adjust contrast/gamma */
-			demo_view_scale_gamma_adjust(1 - ((y - lasty) / height));
-			demo_view_scale_contrast(1 + ((x - lastx) / width));
+			scale_gamma_adjust(1 - ((y - lasty) / height));
+			scale_contrast(1 + ((x - lastx) / width));
 		} else {
 			/* translate */
-			demo_view_translate(
+			translate(
 					+2 * (x - lastx) / width,
 					-2 * (y - lasty) / height);
 		}
@@ -421,7 +420,7 @@ demo_view_t::demo_view_motion_func(int x, int y)
 	{
 		if (modifiers & GLUT_ACTIVE_SHIFT) {
 			/* adjust perspective */
-			demo_view_scale_perspective(1 - ((y - lasty) / height) * 5);
+			scale_perspective(1 - ((y - lasty) / height) * 5);
 		} else {
 			/* rotate */
 			float dquat[4];
@@ -449,9 +448,9 @@ demo_view_t::demo_view_motion_func(int x, int y)
 	{
 		/* scale */
 		double factor = 1 - ((y - lasty) / height) * 5;
-		demo_view_scale(factor);
+		scale(factor);
 		/* adjust translate so we scale centered at the drag-begin mouse position */
-		demo_view_translate(
+		translate(
 				+(2. * beginx / width  - 1) * (1 - factor),
 				-(2. * beginy / height - 1) * (1 - factor));
 	}
@@ -464,13 +463,13 @@ demo_view_t::demo_view_motion_func(int x, int y)
 }
 
 void
-demo_view_t::demo_view_print_help()
+View::print_help()
 {
 	LOGI ("Welcome to GLyphy demo\n");
 }
 
 void
-demo_view_t::advance_frame(long dtime)
+View::advance_frame(long dtime)
 {
 	if (animate) {
 		float dquat[4];
@@ -481,7 +480,7 @@ demo_view_t::advance_frame(long dtime)
 }
 
 void
-demo_view_t::demo_view_display()
+View::display()
 {
 	long new_time = current_time ();
 	advance_frame(new_time - last_frame_time);
@@ -497,7 +496,7 @@ demo_view_t::demo_view_display()
 
 	m4LoadIdentity (mat);
 
-	demo_view_apply_transform(mat);
+	apply_transform(mat);
 
 	// Buffer best-fit
 	glyphy_extents_t extents;
@@ -521,11 +520,11 @@ demo_view_t::demo_view_display()
 }
 
 void
-demo_view_t::demo_view_setup()
+View::setup()
 {
 	if (!vsync)
-		demo_view_toggle_vsync();
+		toggle_vsync();
 	if (!srgb)
-		demo_view_toggle_srgb();
+		toggle_srgb();
 	demo_glstate_setup(st);
 }
