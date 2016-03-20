@@ -88,21 +88,21 @@ index 28f4491..b95ef42 100644
  		errx(1, "Instrumentation failed");
  }
 diff --git a/viewer/Makefile b/viewer/Makefile
-index 82aa1d8..591b016 100644
+index 3d09885..f7a07f0 100644
 --- a/viewer/Makefile
 +++ b/viewer/Makefile
-@@ -4,9 +4,11 @@ SRCS += demo-font.cxx demo-glstate.cxx demo-shader.cxx demo-view.cxx trackball.c
- SRCS += matrix4x4.c
+@@ -13,9 +13,11 @@ SRCS = viewer.cxx \
+        trackball.c
  
  CXXFLAGS += -std=c++11
--CXXFLAGS += `pkg-config gl glew freetype2 --cflags`
+-CXXFLAGS += `pkg-config gl glew freetype2 --cflags` -I/usr/local/include
 +CXXFLAGS += -Wno-deprecated
 +CXXFLAGS += `pkg-config glew freetype2 --cflags`
  
 -LDFLAGS += `pkg-config gl glew freetype2 --libs`
--LDADD += -lstdc++ -lz -lglut ../glyphy/libglyphy.a
+-LDADD += -lstdc++ -lz -lglut glyphy/libglyphy.a
 +LDFLAGS += `pkg-config glew freetype2 --libs`
 +LDADD += -framework OpenGL -framework GLUT
-+LDADD += -lstdc++ -lz ../glyphy/libglyphy.a
++LDADD += -lstdc++ -lz glyphy/libglyphy.a
  
  .include <bsd.prog.mk>
