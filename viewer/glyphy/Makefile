@@ -8,7 +8,7 @@ SRCS += glyphy-arc.cxx \
 	glyphy-sdf.cxx \
 	glyphy-shaders.cxx
 
-CXXFLAGS += -std=c++11 -I. -DPKGDATADIR=""
+CXXFLAGS += -I. -DPKGDATADIR=""
 
 NOPROFILE=1
 NO_PROFILE=1
