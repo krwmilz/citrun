@@ -69,13 +69,6 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
 	for (int i = 0; i < argc; i++)
 		clang_argv.push_back(argv[i]);
 
-#ifdef DEBUG
-	// print out
-	for (int i = 0; i < clang_argc; i++)
-		std::cout << clang_argv[i] << " ";
-	std::cout << std::endl;
-#endif
-
 	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();
 	CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
@@ -145,26 +138,23 @@ main(int argc, char *argv[])
 			real_compiler_argv.at(i) = strdup(inst_src_path.c_str());
 		}
 	}
-	// Very important that argv passed to execvp is NULL terminated
+
+	// NULL terminate arguments we will be passing to exec*()
 	real_compiler_argv.push_back(NULL);
 	argv[argc] = NULL;
 
-	// run native command if there's no source files to instrument
 	if (source_files.size() == 0) {
-#ifdef DEBUG
-		warnx("no source files found on command line");
-#endif
+		// We didn't detect any source code on the command line
 		clean_path();
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
 	}
 
-	// run instrumentation on detected source files
+	// Instument the detected source files, storing them in inst/
 	instrument(argc, argv, source_files);
 
-#ifdef DEBUG
-	std::cout << "Calling real compiler" << std::endl;
-#endif
+	// Run the native compiler on the *instrumented* source files.
+	// Source file name substitution has already been done.
 	clean_path();
 	if (execvp(real_compiler_argv[0], &real_compiler_argv[0]))
 		err(1, "execvp");
