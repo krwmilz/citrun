@@ -30,8 +30,11 @@ RuntimeClient::RuntimeClient(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) 
 	}
 
 	glyphy_point_t top_left = { 0, 0 };
-	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, default_text, font, 1);
+	for (auto &line : source_file_contents) {
+		demo_buffer_move_to(buffer, &top_left);
+		demo_buffer_add_text(buffer, line.c_str(), font, 1);
+		++top_left.y;
+	}
 }
 
 void
