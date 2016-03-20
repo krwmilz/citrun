@@ -19,7 +19,7 @@
 #ifndef DEMO_COMMON_H
 #define DEMO_COMMON_H
 
-#include "../glyphy/glyphy.h"
+#include "glyphy/glyphy.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -22,7 +22,7 @@
 
 #include "demo-font.h"
 
-#include "../glyphy/glyphy-freetype.h"
+#include "glyphy/glyphy-freetype.h"
 
 #include <ext/hash_map>
 
