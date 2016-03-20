@@ -16,7 +16,7 @@
  * Google Author(s): Behdad Esfahbod, Maysum Panju, Wojciech Baranowski
  */
 
-#include "demo-view.h"
+#include "view.h"
 #include "af_unix.h"
 
 extern "C" {

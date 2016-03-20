@@ -3,13 +3,14 @@
 #include <iostream>
 #include <vector>
 
+#include "default-text.h"
 #include "af_unix.h"
 #include "runtime_client.h"
+#include "view.h"
 
-#include "default-text.h"
 #include "demo-buffer.h"
 #include "demo-font.h"
-#include "demo-view.h"
+
 
 
 class window {
