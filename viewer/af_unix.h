@@ -1,6 +1,8 @@
 #ifndef AF_UNIX_H
 #define AF_UNIX_H
 
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
 class af_unix {
