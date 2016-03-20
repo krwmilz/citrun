@@ -1,14 +1,14 @@
 PROG = scv_viewer
 
-SRCS = viewer.cxx \
+SRCS = main.cxx \
        runtime_client.cxx \
        af_unix.cxx \
+       view.cxx \
        demo-atlas.cxx \
        demo-buffer.cxx \
        demo-font.cxx \
        demo-glstate.cxx \
        demo-shader.cxx \
-       demo-view.cxx \
        matrix4x4.c \
        trackball.c
 
