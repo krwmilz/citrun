@@ -1,7 +1,7 @@
 PROG = scv_viewer
 
 SRCS = viewer.cxx \
-       text.cxx \
+       runtime_client.cxx \
        af_unix.cxx \
        demo-atlas.cxx \
        demo-buffer.cxx \

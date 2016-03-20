@@ -6,10 +6,13 @@
 #include <sstream>
 #include <vector>
 
-#include "text.h"
+#include "default-text.h"
+#include "runtime_client.h"
 
-text::text(af_unix *sock) :
-	socket(sock)
+RuntimeClient::RuntimeClient(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) :
+	socket(sock),
+	buffer(buf),
+	font(f)
 {
 	assert(socket->read_all(num_tus) == 8);
 
@@ -25,10 +28,14 @@ text::text(af_unix *sock) :
 		assert(socket->read_all(num_lines) == 8);
 		execution_counts.resize(num_lines);
 	}
+
+	glyphy_point_t top_left = { 0, 0 };
+	demo_buffer_move_to(buffer, &top_left);
+	demo_buffer_add_text(buffer, default_text, font, 1);
 }
 
 void
-text::read_file()
+RuntimeClient::read_file()
 {
 	std::string line;
 	std::ifstream file_stream(file_name);
@@ -43,12 +50,12 @@ text::read_file()
 }
 
 void
-text::draw()
+RuntimeClient::draw()
 {
 }
 
 void
-text::idle()
+RuntimeClient::idle()
 {
 	size_t bytes_total = num_lines * sizeof(uint64_t);
 	assert(socket->read_all((uint8_t *)&execution_counts[0], bytes_total) == bytes_total);

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "af_unix.h"
-#include "text.h"
+#include "runtime_client.h"
 
 #include "default-text.h"
 #include "demo-buffer.h"
@@ -13,7 +13,8 @@
 
 demo_glstate_t *st;
 demo_view_t *vu;
-demo_buffer_t *buffer;
+static demo_buffer_t *buffer;
+static demo_font_t *font;
 
 class window {
 public:
@@ -34,7 +35,6 @@ private:
 
 };
 
-// fuckin c++
 std::vector<drawable*> window::drawables;
 af_unix window::socket;
 
@@ -67,9 +67,10 @@ window::window(int argc, char *argv[])
 	FT_Face ft_face = NULL;
 	FT_New_Face(ft_library, "DejaVuSansMono.ttf", /* face_index */ 0, &ft_face);
 
-	demo_font_t *font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
+	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
 
 	buffer = demo_buffer_create();
+
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
 	demo_buffer_add_text(buffer, default_text, font, 1);
@@ -129,7 +130,7 @@ window::idle(void)
 {
 	af_unix *temp_socket = socket.accept();
 	if (temp_socket)
-		drawables.push_back(new text(temp_socket));
+		drawables.push_back(new RuntimeClient(temp_socket, buffer, font));
 
 	for (auto &i : drawables)
 		i->idle();
