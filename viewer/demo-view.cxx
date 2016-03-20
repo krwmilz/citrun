@@ -40,15 +40,6 @@ demo_view_t::demo_view_t(demo_glstate_t *st, demo_buffer_t *buf) :
 	demo_view_reset();
 }
 
-#if 0
-demo_view_t *
-demo_view_reference (demo_view_t *vu)
-{
-	if (vu) vu->refcount++;
-	return vu;
-}
-#endif
-
 demo_view_t::~demo_view_t()
 {
 	assert (refcount == 1);
