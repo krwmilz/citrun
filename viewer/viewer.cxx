@@ -11,32 +11,36 @@
 #include "demo-font.h"
 #include "demo-view.h"
 
-demo_glstate_t *st;
-demo_view_t *vu;
-static demo_buffer_t *buffer;
-static demo_font_t *font;
 
 class window {
 public:
 	window(int argc, char *argv[]);
 	void start();
-	void add(drawable &);
 
-private:
-	static std::vector<drawable*> drawables;
+	static void idle_step();
+	static void print_fps(int);
+	static void timed_step(int);
+	static void next_frame(demo_view_t *);
+
+	static demo_view_t *static_vu;
 	static af_unix socket;
+	static std::vector<drawable*> drawables;
+private:
 	static void display();
 	static void reshape_func(int, int);
 	static void keyboard_func(unsigned char, int, int);
 	static void special_func(int, int, int);
 	static void mouse_func(int, int, int, int);
 	static void motion_func(int, int);
-	static void idle();
 
+	demo_glstate_t *st;
+	demo_buffer_t *buffer;
+	demo_font_t *font;
 };
 
 std::vector<drawable*> window::drawables;
 af_unix window::socket;
+demo_view_t *window::static_vu;
 
 window::window(int argc, char *argv[])
 {
@@ -58,8 +62,10 @@ window::window(int argc, char *argv[])
 		errx(1, "No support for OpenGL 2.0 found");
 
 	st = demo_glstate_create();
-	vu = demo_view_create(st);
-	demo_view_print_help(vu);
+	buffer = demo_buffer_create();
+	//vu = demo_view_create(st);
+	static_vu = new demo_view_t(st, buffer);
+	static_vu->demo_view_print_help();
 
 	FT_Library ft_library;
 	FT_Init_FreeType(&ft_library);
@@ -69,15 +75,13 @@ window::window(int argc, char *argv[])
 
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
 
-	buffer = demo_buffer_create();
-
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
 	demo_buffer_add_text(buffer, default_text, font, 1);
 
 	demo_font_print_stats(font);
 
-	demo_view_setup(vu);
+	static_vu->demo_view_setup();
 
 	// This creates the socket with SOCK_NONBLOCK
 	socket.set_listen();
@@ -86,31 +90,31 @@ window::window(int argc, char *argv[])
 void
 window::reshape_func(int width, int height)
 {
-	demo_view_reshape_func(vu, width, height);
+	static_vu->demo_view_reshape_func(width, height);
 }
 
 void
 window::keyboard_func(unsigned char key, int x, int y)
 {
-	demo_view_keyboard_func(vu, key, x, y);
+	static_vu->demo_view_keyboard_func(key, x, y);
 }
 
 void
 window::special_func(int key, int x, int y)
 {
-	demo_view_special_func(vu, key, x, y);
+	static_vu->demo_view_special_func(key, x, y);
 }
 
 void
 window::mouse_func(int button, int state, int x, int y)
 {
-	demo_view_mouse_func(vu, button, state, x, y);
+	static_vu->demo_view_mouse_func(button, state, x, y);
 }
 
 void
 window::motion_func(int x, int y)
 {
-	demo_view_motion_func(vu, x, y);
+	static_vu->demo_view_motion_func(x, y);
 }
 
 void
@@ -122,18 +126,79 @@ window::start()
 void
 window::display(void)
 {
-	demo_view_display(vu, buffer);
+	static_vu->demo_view_display();
+}
+
+
+/* return current time in milli-seconds */
+static long
+current_time (void)
+{
+	return glutGet (GLUT_ELAPSED_TIME);
 }
 
 void
-window::idle(void)
+window::next_frame(demo_view_t *vu)
 {
-	af_unix *temp_socket = socket.accept();
+	/*
+	af_unix *temp_socket = window::socket.accept();
 	if (temp_socket)
-		drawables.push_back(new RuntimeClient(temp_socket, buffer, font));
+		window::drawables.push_back(new RuntimeClient(temp_socket, buffer, font));
 
-	for (auto &i : drawables)
+	for (auto &i : window::drawables)
 		i->idle();
+	*/
+
+	glutPostRedisplay ();
+}
+
+void
+window::timed_step(int ms)
+{
+	demo_view_t *vu = static_vu;
+	if (vu->animate) {
+		glutTimerFunc (ms, timed_step, ms);
+		next_frame (vu);
+	}
+}
+
+void
+window::idle_step(void)
+{
+	demo_view_t *vu = static_vu;
+	if (vu->animate) {
+		next_frame (vu);
+	}
+	else
+		glutIdleFunc(NULL);
+}
+
+void
+window::print_fps(int ms)
+{
+	demo_view_t *vu = static_vu;
+	if (vu->animate) {
+		glutTimerFunc (ms, print_fps, ms);
+		long t = current_time ();
+		LOGI ("%gfps\n", vu->num_frames * 1000. / (t - vu->fps_start_time));
+		vu->num_frames = 0;
+		vu->fps_start_time = t;
+	} else
+		vu->has_fps_timer = false;
+}
+
+void
+start_animation()
+{
+	demo_view_t *vu = window::static_vu;
+	vu->num_frames = 0;
+	vu->last_frame_time = vu->fps_start_time = current_time();
+	//glutTimerFunc (1000/60, timed_step, 1000/60);
+	glutIdleFunc(window::idle_step);
+	if (!vu->has_fps_timer) {
+		vu->has_fps_timer = true;
+		glutTimerFunc (5000, window::print_fps, 5000);
+	}
 }
 
 int

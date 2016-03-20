@@ -1,21 +1,3 @@
-/*
- * Copyright 2012 Google, Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Google Author(s): Behdad Esfahbod
- */
-
 #ifndef DEMO_VIEW_H
 #define DEMO_VIEW_H
 
@@ -23,44 +5,78 @@
 #include "demo-buffer.h"
 #include "demo-glstate.h"
 
-typedef struct demo_view_t demo_view_t;
+class demo_view_t {
+public:
+	demo_view_t(demo_glstate_t *, demo_buffer_t *);
+	~demo_view_t();
 
-demo_view_t *
-demo_view_create (demo_glstate_t *st);
+	void demo_view_reset();
+	void demo_view_reshape_func(int, int);
+	void demo_view_keyboard_func(unsigned char key, int x, int y);
+	void demo_view_special_func(int key, int x, int y);
+	void demo_view_mouse_func(int button, int state, int x, int y);
+	void demo_view_motion_func(int x, int y);
+	void demo_view_print_help();
+	void demo_view_display();
+	void demo_view_setup();
 
-demo_view_t *
-demo_view_reference (demo_view_t *vu);
+	/* Animation */
+	bool animate;
+	int num_frames;
+	long fps_start_time;
+	bool has_fps_timer;
+	long last_frame_time;
+private:
+	void demo_view_scale_gamma_adjust(double);
+	void demo_view_scale_contrast(double);
+	void demo_view_scale_perspective(double);
+	void demo_view_toggle_outline();
+	void demo_view_scale_outline_thickness(double);
+	void demo_view_adjust_boldness(double);
+	void demo_view_scale(double);
+	void demo_view_translate(double, double);
+	void demo_view_apply_transform(float *);
+	void demo_view_toggle_animation();
+	void demo_view_toggle_vsync();
+	void demo_view_toggle_srgb();
+	void demo_view_toggle_fullscreen();
+	void demo_view_toggle_debug();
+	void advance_frame(long);
 
-void
-demo_view_destroy (demo_view_t *vu);
+	unsigned int   refcount;
 
+	demo_glstate_t *st;
+	demo_buffer_t *buffer;
 
-void
-demo_view_reset (demo_view_t *vu);
+	/* Output */
+	GLint vsync;
+	glyphy_bool_t srgb;
+	glyphy_bool_t fullscreen;
 
-void
-demo_view_reshape_func (demo_view_t *vu, int width, int height);
+	/* Mouse handling */
+	int buttons;
+	int modifiers;
+	bool dragged;
+	bool click_handled;
+	double beginx, beginy;
+	double lastx, lasty, lastt;
+	double dx,dy, dt;
 
-void
-demo_view_keyboard_func (demo_view_t *vu, unsigned char key, int x, int y);
+	/* Transformation */
+	float quat[4];
+	double scale;
+	glyphy_point_t translate;
+	double perspective;
 
-void
-demo_view_special_func (demo_view_t *view, int key, int x, int y);
+	/* Animation */
+	float rot_axis[3];
+	float rot_speed;
 
-void
-demo_view_mouse_func (demo_view_t *vu, int button, int state, int x, int y);
-
-void
-demo_view_motion_func (demo_view_t *vu, int x, int y);
-
-void
-demo_view_print_help (demo_view_t *vu);
-
-void
-demo_view_display (demo_view_t *vu, demo_buffer_t *buffer);
-
-void
-demo_view_setup (demo_view_t *vu);
-
+	/* Window geometry just before going fullscreen */
+	int x;
+	int y;
+	int width;
+	int height;
+};
 
 #endif /* DEMO_VIEW_H */
