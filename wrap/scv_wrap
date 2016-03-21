@@ -17,5 +17,6 @@ export LDADD="-lscv"
 
 # Used for running programs
 export LD_LIBRARY_PATH="$scv_root/lib"
+export DYLD_LIBRARY_PATH="$scv_root/lib"
 
 exec $@
