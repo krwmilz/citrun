@@ -104,6 +104,6 @@ is($ret, 0, "instrumented program check correctness 1");
 is($err, "result: 55", "instrumented program check correctness 1");
 
 $project->run(20);
-my ($ret, $err) = $project->wait(20);
+my ($ret, $err) = $project->wait();
 is($ret, 0, "instrumented program check correctness 2");
 is($err, "result: 6765", "instrumented program check correctness 2");
