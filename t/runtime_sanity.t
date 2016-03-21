@@ -64,9 +64,10 @@ $project->run(45);
 $viewer->accept();
 
 # Request and check metadata first
-my $metadata = $viewer->get_metadata();
+my $runtime_metadata = $viewer->get_metadata();
+my $tus = $runtime_metadata->{tus};
 
-my ($source_0, $source_1, $source_2) = @{ $metadata };
+my ($source_0, $source_1, $source_2) = @$tus;
 like ($source_0->{filename}, qr/.*source_0.c/, "runtime filename check 0") ;
 is ($source_0->{lines}, 20, "runtime line count check 0");
 like ($source_1->{filename}, qr/.*source_1.c/, "runtime filename check 1") ;
@@ -75,7 +76,7 @@ like ($source_2->{filename}, qr/.*source_2.c/, "runtime filename check 2") ;
 is ($source_2->{lines}, 9, "runtime line count check 2");
 
 # Request and check execution data
-my $data = $viewer->get_execution_data();
+my $data = $viewer->get_execution_data($tus);
 
 my @lines = @{ $data->[0] };
 is     ( $lines[$_], 0, "src 0 line $_ check" ) for (1..11);

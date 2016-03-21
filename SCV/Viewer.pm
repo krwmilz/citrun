@@ -35,6 +35,16 @@ sub get_metadata {
 	my $buf = read_all($client, 8);
 	my $num_tus = unpack("Q", $buf);
 
+	# Next is the 3 4 byte pid_t's
+	$buf = read_all($client, 12);
+	my ($pid, $ppid, $pgrp) = unpack("L3", $buf);
+
+	my $runtime_metadata = {
+		pid => $pid,
+		ppid => $ppid,
+		pgrp => $pgrp,
+	};
+
 	my @tus;
 	for (1..$num_tus) {
 		my $buf = read_all($client, 8);
@@ -47,18 +57,17 @@ sub get_metadata {
 
 		push @tus, { filename => $file_name, lines => $num_lines };
 	}
+	$runtime_metadata->{tus} = \@tus;
 
-	$self->{tus} = \@tus;
-	return \@tus;
+	return $runtime_metadata;
 }
 
 sub get_execution_data {
-	my ($self) = @_;
+	my ($self, $tus) = @_;
 	my $client = $self->{client_socket};
-	my @tus = @{ $self->{tus} };
 
 	my @data;
-	for (@tus) {
+	for (@$tus) {
 		my $num_lines = $_->{lines};
 
 		my $buf = read_all($client, 8 * $num_lines);

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <err.h>
 #include <limits.h>		// PATH_MAX
 #include <pthread.h>
@@ -9,7 +10,7 @@
 #include <sys/types.h>		// read
 #include <sys/uio.h>		// read
 #endif
-#include <unistd.h>		// read
+#include <unistd.h>		// read, getpid, getppid, getpgrp
 
 #include "scv_runtime.h"
 
@@ -69,14 +70,25 @@ send_metadata(int fd)
 	uint64_t num_tus = 0;
 	struct scv_node walk = node0;
 
+	/* Send the total number of translation unit records we'll send later */
 	while (walk.size != 0) {
 		++num_tus;
 		walk = *walk.next;
 	}
-
 	xwrite(fd, &num_tus, sizeof(num_tus));
 
+	/* Send process id, parent process id and group process id. */
+	pid_t process_id = getpid();
+	pid_t parent_process_id = getppid();
+	pid_t process_group = getpgrp();
+
+	assert(sizeof(pid_t) == 4);
+	xwrite(fd, &process_id, sizeof(pid_t));
+	xwrite(fd, &parent_process_id, sizeof(pid_t));
+	xwrite(fd, &process_group, sizeof(pid_t));
+
 	walk = node0;
+	/* Send translation unit records */
 	while (walk.size != 0) {
 		/* Send file name size and then the file name itself. */
 		file_name_sz = strnlen(walk.file_name, PATH_MAX);
