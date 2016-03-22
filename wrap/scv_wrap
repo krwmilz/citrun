@@ -1,6 +1,7 @@
 #!/bin/sh
 
-scv_root=/home/kyle/src/scv
+script_dir=`dirname ${0}`
+scv_root=`cd "$script_dir/.."; pwd`
 
 if ! test -d $scv_root/instrument/compilers; then
 	echo error: compilers/ directory does not exist

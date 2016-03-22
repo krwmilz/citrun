@@ -49,7 +49,7 @@ EOF
 	syswrite( $makefile_fh, $makefile );
 
 	# Use the wrapper to make sure it works
-	my $ret = system( "wrap/scv_wrap_test make -C $tmp_dir" );
+	my $ret = system( "wrap/scv_wrap make -C $tmp_dir" );
 	die "make failed: $ret\n" if ($ret);
 }
 
@@ -69,7 +69,7 @@ sub run {
 	my ($self, @args) = @_;
 
 	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap_test", "$tmp_dir/program", @args);
+	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap", "$tmp_dir/program", @args);
 }
 
 sub kill {
