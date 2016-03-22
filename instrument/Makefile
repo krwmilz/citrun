@@ -1,6 +1,8 @@
 PROG = scv_instrument
 SRCS = main.cc instrumenter.cc
 
+MKDEP = `llvm-config --cppflags`
+
 CXXFLAGS += -std=c++11
 CXXFLAGS += `llvm-config --cxxflags`
 LDFLAGS += `llvm-config --ldflags`
@@ -24,5 +26,8 @@ LDADD += -Wl,--start-group \
 	-Wl,--end-group \
 
 LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
+
+depend:
+	# fucking thing doesn't work
 
 .include <bsd.prog.mk>
