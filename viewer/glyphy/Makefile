@@ -1,12 +1,12 @@
 LIB = glyphy
 
-SRCS += glyphy-arc.cxx \
-	glyphy-arcs.cxx \
-	glyphy-blob.cxx \
-	glyphy-extents.cxx \
-	glyphy-outline.cxx \
-	glyphy-sdf.cxx \
-	glyphy-shaders.cxx
+SRCS += glyphy-arc.cc \
+	glyphy-arcs.cc \
+	glyphy-blob.cc \
+	glyphy-extents.cc \
+	glyphy-outline.cc \
+	glyphy-sdf.cc \
+	glyphy-shaders.cc
 
 CXXFLAGS += -I. -DPKGDATADIR=""
 
