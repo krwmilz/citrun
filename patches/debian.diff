@@ -12,10 +12,10 @@ index 6ff2664..5f4c540 100644
  }
  
 diff --git a/instrument/Makefile b/instrument/Makefile
-index 965c8a9..ffd0cff 100644
+index 5d3511b..24389a8 100644
 --- a/instrument/Makefile
 +++ b/instrument/Makefile
-@@ -16,12 +16,13 @@ LDADD += -Wl,--start-group \
+@@ -18,12 +18,13 @@ LDADD += -Wl,--start-group \
  	-lclangFrontendTool \
  	-lclangLex \
  	-lclangParse \
@@ -30,11 +30,11 @@ index 965c8a9..ffd0cff 100644
  
  LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
  
-diff --git a/instrument/main.cxx b/instrument/main.cxx
-index 28f4491..b95ef42 100644
---- a/instrument/main.cxx
-+++ b/instrument/main.cxx
-@@ -87,7 +87,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
+diff --git a/instrument/main.cc b/instrument/main.cc
+index 3b54a1b..3480838 100644
+--- a/instrument/main.cc
++++ b/instrument/main.cc
+@@ -80,7 +80,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
  	// that will return a new MyFrontendAction object every time.  To
  	// further customize this, we could create our own factory class.
  	// int ret = Tool.run(new MFAF(inst_files));
