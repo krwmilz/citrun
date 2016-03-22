@@ -1,21 +1,21 @@
 diff --git a/SCV/Project.pm b/SCV/Project.pm
-index 6ff2664..5ab7fac 100644
+index 106f930..bc87aea 100644
 --- a/SCV/Project.pm
 +++ b/SCV/Project.pm
 @@ -49,7 +49,7 @@ EOF
  	syswrite( $makefile_fh, $makefile );
  
  	# Use the wrapper to make sure it works
--	my $ret = system( "wrap/scv_wrap_test make -C $tmp_dir" );
-+	my $ret = system( "wrap/scv_wrap_test bsdmake -C $tmp_dir" );
+-	my $ret = system( "wrap/scv_wrap make -C $tmp_dir" );
++	my $ret = system( "wrap/scv_wrap bsdmake -C $tmp_dir" );
  	die "make failed: $ret\n" if ($ret);
  }
  
 diff --git a/instrument/Makefile b/instrument/Makefile
-index 965c8a9..13bfb56 100644
+index 5d3511b..bea4c35 100644
 --- a/instrument/Makefile
 +++ b/instrument/Makefile
-@@ -6,7 +6,8 @@ CXXFLAGS += `llvm-config --cxxflags`
+@@ -8,7 +8,8 @@ CXXFLAGS += `llvm-config --cxxflags`
  LDFLAGS += `llvm-config --ldflags`
  
  # Clang has a circular dependencies here, use "linker group options" to avoid
@@ -25,7 +25,7 @@ index 965c8a9..13bfb56 100644
  	-lclangAST \
  	-lclangAnalysis \
  	-lclangBasic \
-@@ -16,12 +17,11 @@ LDADD += -Wl,--start-group \
+@@ -18,12 +19,11 @@ LDADD += -Wl,--start-group \
  	-lclangFrontendTool \
  	-lclangLex \
  	-lclangParse \
@@ -40,10 +40,10 @@ index 965c8a9..13bfb56 100644
  
  LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
  
-diff --git a/instrument/instrumenter.cxx b/instrument/instrumenter.cxx
+diff --git a/instrument/instrumenter.cc b/instrument/instrumenter.cc
 index aa909af..42ae0fb 100644
---- a/instrument/instrumenter.cxx
-+++ b/instrument/instrumenter.cxx
+--- a/instrument/instrumenter.cc
++++ b/instrument/instrumenter.cc
 @@ -108,14 +108,14 @@ instrumenter::real_loc_end(Stmt *d)
  
  // MyFrontendAction ---
@@ -74,11 +74,11 @@ index 3c2f019..08ed671 100644
  
  private:
  	Rewriter TheRewriter;
-diff --git a/instrument/main.cxx b/instrument/main.cxx
-index 28f4491..b95ef42 100644
---- a/instrument/main.cxx
-+++ b/instrument/main.cxx
-@@ -87,7 +87,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
+diff --git a/instrument/main.cc b/instrument/main.cc
+index 3b54a1b..3480838 100644
+--- a/instrument/main.cc
++++ b/instrument/main.cc
+@@ -80,7 +80,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
  	// that will return a new MyFrontendAction object every time.  To
  	// further customize this, we could create our own factory class.
  	// int ret = Tool.run(new MFAF(inst_files));
@@ -88,11 +88,11 @@ index 28f4491..b95ef42 100644
  		errx(1, "Instrumentation failed");
  }
 diff --git a/viewer/Makefile b/viewer/Makefile
-index 3d09885..f7a07f0 100644
+index 6de9010..9c9a1ad 100644
 --- a/viewer/Makefile
 +++ b/viewer/Makefile
-@@ -13,9 +13,11 @@ SRCS = viewer.cxx \
-        trackball.c
+@@ -15,9 +15,11 @@ SRCS = main.cc \
+ MKDEP = `pkg-config gl glew freetype2 --cflags`
  
  CXXFLAGS += -std=c++11
 -CXXFLAGS += `pkg-config gl glew freetype2 --cflags` -I/usr/local/include
@@ -100,9 +100,9 @@ index 3d09885..f7a07f0 100644
 +CXXFLAGS += `pkg-config glew freetype2 --cflags`
  
 -LDFLAGS += `pkg-config gl glew freetype2 --libs`
--LDADD += -lstdc++ -lz -lglut glyphy/libglyphy.a
+-LDADD += -lstdc++ -lm -lglut glyphy/libglyphy.a
 +LDFLAGS += `pkg-config glew freetype2 --libs`
 +LDADD += -framework OpenGL -framework GLUT
-+LDADD += -lstdc++ -lz glyphy/libglyphy.a
++LDADD += -lstdc++ -lm glyphy/libglyphy.a
  
  .include <bsd.prog.mk>
