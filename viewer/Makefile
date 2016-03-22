@@ -12,6 +12,8 @@ SRCS = main.cc \
        matrix4x4.c \
        trackball.c
 
+MKDEP = `pkg-config gl glew freetype2 --cflags`
+
 CXXFLAGS += -std=c++11
 CXXFLAGS += `pkg-config gl glew freetype2 --cflags` -I/usr/local/include
 
