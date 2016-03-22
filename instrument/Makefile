@@ -1,5 +1,5 @@
 PROG = scv_instrument
-SRCS = main.cxx instrumenter.cxx
+SRCS = main.cc instrumenter.cc
 
 CXXFLAGS += -std=c++11
 CXXFLAGS += `llvm-config --cxxflags`
