@@ -43,11 +43,13 @@ RuntimeClient::RuntimeClient(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) 
 		socket->read_all((uint8_t *)&current_unit.file_name[0], file_name_sz);
 
 		read_file(current_unit.file_name, top_left);
-		top_left.x += 40;
+		top_left.x += 50;
 
 		socket->read_all(current_unit.num_lines);
 		current_unit.execution_counts.resize(current_unit.num_lines);
 	}
+
+	demo_font_print_stats(font);
 }
 
 void
@@ -60,6 +62,14 @@ RuntimeClient::read_file(std::string file_name, glyphy_point_t top_left)
 		errx(1, "ifstream.open()");
 
 	while (std::getline(file_stream, line)) {
+		size_t tab_pos = 0;
+		// Find and replace replace all tabs with spaces
+		while ((tab_pos = line.find('\t')) != std::string::npos) {
+			int rem = tab_pos % 8;
+			line.erase(tab_pos, 1);
+			line.insert(tab_pos, std::string(8 - rem, ' '));
+		}
+
 		demo_buffer_move_to(buffer, &top_left);
 		demo_buffer_add_text(buffer, line.c_str(), font, 1);
 		++top_left.y;
