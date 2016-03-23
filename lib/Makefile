@@ -7,7 +7,7 @@ SHLIB_MINOR = 0
 CFLAGS += -pthread
 
 # OS X linker will not do runtime symbol lookup by default
-LDFLAGS += -Wl,-U,_node0
+LDFLAGS += -Wl,-U,__scv_node0
 LDADD += -pthread
 
 NO_PROFILE = 1
