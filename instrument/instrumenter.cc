@@ -14,6 +14,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 
 #include "instrumenter.h"
+#include "runtime_h.h"
 
 bool
 instrumenter::VisitVarDecl(VarDecl *d)
@@ -29,24 +30,19 @@ instrumenter::VisitStmt(Stmt *s)
 	Stmt *stmt_to_inst = NULL;
 
 	if (isa<IfStmt>(s)) {
-		IfStmt *IfStatement = cast<IfStmt>(s);
-		stmt_to_inst = IfStatement->getCond();
+		stmt_to_inst = cast<IfStmt>(s)->getCond();
 	}
 	else if (isa<ForStmt>(s)) {
-		ForStmt *ForStatement = cast<ForStmt>(s);
-		stmt_to_inst = ForStatement->getCond();
+		stmt_to_inst = cast<ForStmt>(s)->getCond();
 	}
 	else if (isa<WhileStmt>(s)) {
-		WhileStmt *WhileStatement = cast<WhileStmt>(s);
-		stmt_to_inst = WhileStatement->getCond();
+		stmt_to_inst = cast<WhileStmt>(s)->getCond();
 	}
 	else if (isa<SwitchStmt>(s)) {
-		SwitchStmt *SwitchStatement = cast<SwitchStmt>(s);
-		stmt_to_inst = SwitchStatement->getCond();
+		stmt_to_inst = cast<SwitchStmt>(s)->getCond();
 	}
 	else if (isa<ReturnStmt>(s)) {
-		ReturnStmt *ReturnStatement = cast<ReturnStmt>(s);
-		stmt_to_inst = ReturnStatement->getRetValue();
+		stmt_to_inst = cast<ReturnStmt>(s)->getRetValue();
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
@@ -62,7 +58,7 @@ instrumenter::VisitStmt(Stmt *s)
 	if (stmt_to_inst == NULL)
 		return true;
 
-	ss << "(++lines[" << line << "], ";
+	ss << "(++_scv_lines[" << line << "], ";
 	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
 		return true;
@@ -170,21 +166,22 @@ MyFrontendAction::EndSourceFileAction()
 	unsigned int tu_number = get_src_number();
 
 	std::stringstream ss;
+	// Embed the header directly in the primary source file.
+	ss << runtime_h << std::endl;
 
-	ss << "#include <scv_runtime.h>" << std::endl;
 	// Define storage for coverage data
-	ss << "static uint64_t lines[" << num_lines << "];" << std::endl;
+	ss << "static uint64_t _scv_lines[" << num_lines << "];" << std::endl;
 
 	// Always declare this. The next TU will overwrite this or there won't
 	// be a next TU.
-	ss << "struct scv_node node" << tu_number + 1 << ";" << std::endl;
+	ss << "struct _scv_node _scv_node" << tu_number + 1 << ";" << std::endl;
 
 	// Define this translation units main book keeping data structure
-	ss << "struct scv_node node" << tu_number << " = {" << std::endl
-		<< "	.lines_ptr = lines," << std::endl
+	ss << "struct _scv_node _scv_node" << tu_number << " = {" << std::endl
+		<< "	.lines_ptr = _scv_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl;
-		ss << "	.next = &node" << tu_number + 1 << "," << std::endl;
+		ss << "	.next = &_scv_node" << tu_number + 1 << "," << std::endl;
 	ss << "};" << std::endl;
 
 	TheRewriter.InsertTextAfter(start, ss.str());

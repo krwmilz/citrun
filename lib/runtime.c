@@ -12,10 +12,10 @@
 #endif
 #include <unistd.h>		// read, getpid, getppid, getpgrp
 
-#include "scv_runtime.h"
+#include "runtime.h"
 
 /* Entry point into instrumented application */
-extern struct scv_node node0;
+extern struct _scv_node _scv_node0;
 
 void send_metadata(int);
 void send_execution_data(int);
@@ -68,7 +68,7 @@ send_metadata(int fd)
 {
 	size_t file_name_sz;
 	uint64_t num_tus = 0;
-	struct scv_node walk = node0;
+	struct _scv_node walk = _scv_node0;
 
 	/* Send the total number of translation unit records we'll send later */
 	while (walk.size != 0) {
@@ -87,7 +87,7 @@ send_metadata(int fd)
 	xwrite(fd, &parent_process_id, sizeof(pid_t));
 	xwrite(fd, &process_group, sizeof(pid_t));
 
-	walk = node0;
+	walk = _scv_node0;
 	/* Send translation unit records */
 	while (walk.size != 0) {
 		/* Send file name size and then the file name itself. */
@@ -105,7 +105,7 @@ send_metadata(int fd)
 void
 send_execution_data(int fd)
 {
-	struct scv_node walk = node0;
+	struct _scv_node walk = _scv_node0;
 
 	while (walk.size != 0) {
 		/* Write execution buffer, one 8 byte counter per source line */

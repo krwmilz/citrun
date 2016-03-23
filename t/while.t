@@ -30,14 +30,22 @@ $project->compile();
 my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
-#include <scv_runtime.h>
-static uint64_t lines[13];
-struct scv_node node1;
-struct scv_node node0 = {
-	.lines_ptr = lines,
+#include <stdint.h>
+struct _scv_node {
+	uint64_t *lines_ptr;
+	uint64_t size;
+	const char *file_name;
+	struct _scv_node *next;
+};
+void libscv_init();
+
+static uint64_t _scv_lines[13];
+struct _scv_node _scv_node1;
+struct _scv_node _scv_node0 = {
+	.lines_ptr = _scv_lines,
 	.size = 13,
 	.file_name = "$tmp_dir/source_0.c",
-	.next = &node1,
+	.next = &_scv_node1,
 };
 int
 main(void)
@@ -45,11 +53,11 @@ main(void)
 	int i;
 
 	i = 0;
-	while ((++lines[7], i < 17)) {
+	while ((++_scv_lines[7], i < 17)) {
 		i++;
 	}
 
-	return (++lines[11], i);
+	return (++_scv_lines[11], i);
 }
 EOF
 

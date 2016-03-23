@@ -26,22 +26,30 @@ $project->compile();
 my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
-#include <scv_runtime.h>
-static uint64_t lines[9];
-struct scv_node node1;
-struct scv_node node0 = {
-	.lines_ptr = lines,
+#include <stdint.h>
+struct _scv_node {
+	uint64_t *lines_ptr;
+	uint64_t size;
+	const char *file_name;
+	struct _scv_node *next;
+};
+void libscv_init();
+
+static uint64_t _scv_lines[9];
+struct _scv_node _scv_node1;
+struct _scv_node _scv_node0 = {
+	.lines_ptr = _scv_lines,
 	.size = 9,
 	.file_name = "$tmp_dir/source_0.c",
-	.next = &node1,
+	.next = &_scv_node1,
 };
 #include <stdio.h>
 
 int
 main(void)
 {libscv_init();
-	(++lines[6], fprintf(stderr, "hello, world!"));
-	return (++lines[7], 0);
+	(++_scv_lines[6], fprintf(stderr, "hello, world!"));
+	return (++_scv_lines[7], 0);
 }
 EOF
 

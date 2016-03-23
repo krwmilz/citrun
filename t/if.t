@@ -36,33 +36,41 @@ $project->compile();
 my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
-#include <scv_runtime.h>
-static uint64_t lines[21];
-struct scv_node node1;
-struct scv_node node0 = {
-	.lines_ptr = lines,
+#include <stdint.h>
+struct _scv_node {
+	uint64_t *lines_ptr;
+	uint64_t size;
+	const char *file_name;
+	struct _scv_node *next;
+};
+void libscv_init();
+
+static uint64_t _scv_lines[21];
+struct _scv_node _scv_node1;
+struct _scv_node _scv_node0 = {
+	.lines_ptr = _scv_lines,
 	.size = 21,
 	.file_name = "$tmp_dir/source_0.c",
-	.next = &node1,
+	.next = &_scv_node1,
 };
 #include <stdlib.h>
 
 int
 main(int argc, char *argv[])
 {libscv_init();
-	if ((++lines[6], argc == 1))
-		return (++lines[7], 1);
+	if ((++_scv_lines[6], argc == 1))
+		return (++_scv_lines[7], 1);
 	else
-		(++lines[9], exit(14));
+		(++_scv_lines[9], exit(14));
 
-	if ((++lines[11], argc == 2)) {
-		return (++lines[12], 5);
+	if ((++_scv_lines[11], argc == 2)) {
+		return (++_scv_lines[12], 5);
 	}
-	else if ((++lines[14], argc == 3)) {
-		return (++lines[15], 0);
+	else if ((++_scv_lines[14], argc == 3)) {
+		return (++_scv_lines[15], 0);
 	}
 	else {
-		(++lines[18], exit(0));
+		(++_scv_lines[18], exit(0));
 	}
 }
 EOF

@@ -48,14 +48,22 @@ $project->compile();
 my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
-#include <scv_runtime.h>
-static uint64_t lines[31];
-struct scv_node node1;
-struct scv_node node0 = {
-	.lines_ptr = lines,
+#include <stdint.h>
+struct _scv_node {
+	uint64_t *lines_ptr;
+	uint64_t size;
+	const char *file_name;
+	struct _scv_node *next;
+};
+void libscv_init();
+
+static uint64_t _scv_lines[31];
+struct _scv_node _scv_node1;
+struct _scv_node _scv_node0 = {
+	.lines_ptr = _scv_lines,
 	.size = 31,
 	.file_name = "$tmp_dir/source_0.c",
-	.next = &node1,
+	.next = &_scv_node1,
 };
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,12 +71,12 @@ struct scv_node node0 = {
 long long
 fibonacci(long long n)
 {
-	if ((++lines[7], n == 0))
-		return (++lines[8], 0);
-	else if ((++lines[9], n == 1))
-		return (++lines[10], 1);
+	if ((++_scv_lines[7], n == 0))
+		return (++_scv_lines[8], 0);
+	else if ((++_scv_lines[9], n == 1))
+		return (++_scv_lines[10], 1);
 
-	return (++lines[12], (++lines[12], fibonacci(n - 1)) + (++lines[12], fibonacci(n - 2)));
+	return (++_scv_lines[12], (++_scv_lines[12], fibonacci(n - 1)) + (++_scv_lines[12], fibonacci(n - 2)));
 }
 
 int
@@ -76,16 +84,16 @@ main(int argc, char *argv[])
 {libscv_init();
 	long long n;
 
-	if ((++lines[20], argc != 2)) {
-		(++lines[21], fprintf(stderr, "usage: %s <N>", argv[0]));
-		return (++lines[22], 1);
+	if ((++_scv_lines[20], argc != 2)) {
+		(++_scv_lines[21], fprintf(stderr, "usage: %s <N>", argv[0]));
+		return (++_scv_lines[22], 1);
 	}
 
-	n = (++lines[25], atoi(argv[1]));
+	n = (++_scv_lines[25], atoi(argv[1]));
 
-	(++lines[27], fprintf(stderr, "result: %lli", (++lines[27], fibonacci(n))));
+	(++_scv_lines[27], fprintf(stderr, "result: %lli", (++_scv_lines[27], fibonacci(n))));
 
-	return (++lines[29], 0);
+	return (++_scv_lines[29], 0);
 }
 EOF
 
