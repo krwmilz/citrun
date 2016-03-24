@@ -33,6 +33,9 @@ libscv_init()
 {
 }
 
+/*
+ * Sets up the connection to the server socket and then drops into an io loop.
+ */
 void *
 control_thread(void *arg)
 {
@@ -58,7 +61,7 @@ control_thread(void *arg)
 		err(1, "connect");
 	}
 
-	/* Send metadata first */
+	/* Send static information firsrt. */
 	send_metadata(fd);
 
 	/* Then synchronously send execution data */
@@ -68,12 +71,17 @@ control_thread(void *arg)
 	}
 }
 
+/*
+ * Walks the translation unit list and writes all of the static information
+ * contained in the nodes.
+ */
 void
 send_metadata(int fd)
 {
-	size_t file_name_sz;
-	uint64_t num_tus = 0;
 	struct _scv_node walk = _scv_node0;
+	pid_t process_id, parent_process_id, process_group;
+	uint64_t num_tus = 0;
+	size_t file_name_sz;
 
 	/* Send the total number of translation unit records we'll send later */
 	while (walk.size != 0) {
@@ -83,9 +91,9 @@ send_metadata(int fd)
 	xwrite(fd, &num_tus, sizeof(num_tus));
 
 	/* Send process id, parent process id and group process id. */
-	pid_t process_id = getpid();
-	pid_t parent_process_id = getppid();
-	pid_t process_group = getpgrp();
+	process_id = getpid();
+	parent_process_id = getppid();
+	process_group = getpgrp();
 
 	assert(sizeof(pid_t) == 4);
 	xwrite(fd, &process_id, sizeof(pid_t));
