@@ -2,7 +2,7 @@
 #include <err.h>
 #include <limits.h>		// PATH_MAX
 #include <pthread.h>
-#include <stdio.h>
+#include <stdlib.h>		// getenv
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -37,17 +37,22 @@ void *
 control_thread(void *arg)
 {
 	int fd;
-	int i;
 	uint8_t response;
+	struct sockaddr_un addr;
+	char *viewer_sock = NULL;
 
-	fd = socket(AF_UNIX, SOCK_STREAM, 0);
-	if (fd == -1)
+	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
 
-	struct sockaddr_un addr;
+	/* The default socket location can be overridden */
+	if ((viewer_sock = getenv("SCV_VIEWER_SOCKET")) == NULL)
+		/* There was an error getting the env var, use the default */
+		viewer_sock = "/tmp/scv_viewer.socket";
+
+	/* Connect the socket to the server which should already be running */
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, "viewer_test.socket", sizeof(addr.sun_path) - 1);
+	strncpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path) - 1);
 
 	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
 		err(1, "connect");

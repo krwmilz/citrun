@@ -68,6 +68,8 @@ sub instrumented_src {
 sub run {
 	my ($self, @args) = @_;
 
+	$ENV{SCV_VIEWER_SOCKET} = "SCV::Viewer.socket";
+
 	my $tmp_dir = $self->{tmp_dir};
 	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap", "$tmp_dir/program", @args);
 }

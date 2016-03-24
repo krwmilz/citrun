@@ -11,7 +11,7 @@ sub new {
 
 	my $viewer_socket = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM(),
-		Local => "viewer_test.socket",
+		Local => "SCV::Viewer.socket",
 		Listen => 1,
 	);
 	die "socket error: $!\n" unless ($viewer_socket);
@@ -104,7 +104,7 @@ sub DESTROY {
 	my ($self) = @_;
 
 	close($self->{viewer_socket});
-	unlink "viewer_test.socket";
+	unlink "SCV::Viewer.socket";
 }
 
 1;
