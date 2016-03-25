@@ -1,21 +1,19 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
-using namespace clang;
 
-
-class RewriteASTVisitor : public RecursiveASTVisitor<RewriteASTVisitor> {
+class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor> {
 public:
-	RewriteASTVisitor(Rewriter &R) : TheRewriter(R), SM(R.getSourceMgr()) {}
+	RewriteASTVisitor(clang::Rewriter &R) : TheRewriter(R), SM(R.getSourceMgr()) {}
 
-	bool VisitVarDecl(VarDecl *d);
-	bool VisitStmt(Stmt *s);
-	bool VisitFunctionDecl(FunctionDecl *f);
+	bool VisitVarDecl(clang::VarDecl *d);
+	bool VisitStmt(clang::Stmt *s);
+	bool VisitFunctionDecl(clang::FunctionDecl *f);
 
 private:
-	Rewriter &TheRewriter;
-	SourceManager &SM;
-	LangOptions lopt;
+	clang::Rewriter &TheRewriter;
+	clang::SourceManager &SM;
+	clang::LangOptions lopt;
 
-	SourceLocation real_loc_end(Stmt *s);
+	clang::SourceLocation real_loc_end(clang::Stmt *s);
 };

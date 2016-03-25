@@ -7,41 +7,41 @@
 #include "rewrite_ast_visitor.h"
 
 bool
-RewriteASTVisitor::VisitVarDecl(VarDecl *d)
+RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 {
 	return true;
 }
 
 bool
-RewriteASTVisitor::VisitStmt(Stmt *s)
+RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
 	std::stringstream ss;
 	unsigned line = SM.getPresumedLineNumber(s->getLocStart());
-	Stmt *stmt_to_inst = NULL;
+	clang::Stmt *stmt_to_inst = NULL;
 
-	if (isa<IfStmt>(s)) {
-		stmt_to_inst = cast<IfStmt>(s)->getCond();
+	if (clang::isa<clang::IfStmt>(s)) {
+		stmt_to_inst = clang::cast<clang::IfStmt>(s)->getCond();
 	}
-	else if (isa<ForStmt>(s)) {
-		stmt_to_inst = cast<ForStmt>(s)->getCond();
+	else if (clang::isa<clang::ForStmt>(s)) {
+		stmt_to_inst = clang::cast<clang::ForStmt>(s)->getCond();
 	}
-	else if (isa<WhileStmt>(s)) {
-		stmt_to_inst = cast<WhileStmt>(s)->getCond();
+	else if (clang::isa<clang::WhileStmt>(s)) {
+		stmt_to_inst = clang::cast<clang::WhileStmt>(s)->getCond();
 	}
-	else if (isa<SwitchStmt>(s)) {
-		stmt_to_inst = cast<SwitchStmt>(s)->getCond();
+	else if (clang::isa<clang::SwitchStmt>(s)) {
+		stmt_to_inst = clang::cast<clang::SwitchStmt>(s)->getCond();
 	}
-	else if (isa<ReturnStmt>(s)) {
-		stmt_to_inst = cast<ReturnStmt>(s)->getRetValue();
+	else if (clang::isa<clang::ReturnStmt>(s)) {
+		stmt_to_inst = clang::cast<clang::ReturnStmt>(s)->getRetValue();
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
 		|| isa<SwitchCase>(s)) {
 	}
 	*/
-	else if (isa<DeclStmt>(s)) {
+	else if (clang::isa<clang::DeclStmt>(s)) {
 	}
-	else if (isa<CallExpr>(s)) {
+	else if (clang::isa<clang::CallExpr>(s)) {
 		stmt_to_inst = s;
 	}
 
@@ -59,15 +59,15 @@ RewriteASTVisitor::VisitStmt(Stmt *s)
 }
 
 bool
-RewriteASTVisitor::VisitFunctionDecl(FunctionDecl *f)
+RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 {
 	// Only function definitions (with bodies), not declarations.
 	if (f->hasBody() == 0)
 		return true;
 
-	Stmt *FuncBody = f->getBody();
+	clang::Stmt *FuncBody = f->getBody();
 
-	DeclarationName DeclName = f->getNameInfo().getName();
+	clang::DeclarationName DeclName = f->getNameInfo().getName();
 	std::string FuncName = DeclName.getAsString();
 
 	if (FuncName.compare("main") != 0)
@@ -79,15 +79,15 @@ RewriteASTVisitor::VisitFunctionDecl(FunctionDecl *f)
 	// the runtime. Normally this isn't needed because the runtime only
 	// depends on symbols in the isntrumented application.
 	ss << "libscv_init();";
-	SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
+	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
 	TheRewriter.InsertTextBefore(curly_brace, ss.str());
 
 	return true;
 }
 
-SourceLocation
-RewriteASTVisitor::real_loc_end(Stmt *d)
+clang::SourceLocation
+RewriteASTVisitor::real_loc_end(clang::Stmt *d)
 {
-	SourceLocation _e(d->getLocEnd());
-	return SourceLocation(Lexer::getLocForEndOfToken(_e, 0, SM, lopt));
+	clang::SourceLocation _e(d->getLocEnd());
+	return clang::SourceLocation(clang::Lexer::getLocForEndOfToken(_e, 0, SM, lopt));
 }
