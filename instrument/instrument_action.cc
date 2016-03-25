@@ -24,7 +24,7 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 
 	// Hang onto a reference to this so we can read from it later
 	InstrumentASTConsumer = new RewriteASTConsumer(TheRewriter);
-	return &InstrumentASTConsumer;
+	return InstrumentASTConsumer;
 }
 
 unsigned int
