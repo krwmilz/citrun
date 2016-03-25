@@ -1,5 +1,5 @@
 diff --git a/SCV/Project.pm b/SCV/Project.pm
-index 106f930..bc87aea 100644
+index 5b608cc..296ec68 100644
 --- a/SCV/Project.pm
 +++ b/SCV/Project.pm
 @@ -49,7 +49,7 @@ EOF
@@ -41,10 +41,10 @@ index 5d3511b..bea4c35 100644
  LDADD += `llvm-config --libs bitreader mcparser transformutils option --system-libs`
  
 diff --git a/instrument/instrumenter.cc b/instrument/instrumenter.cc
-index aa909af..42ae0fb 100644
+index 29d84c0..9688e8e 100644
 --- a/instrument/instrumenter.cc
 +++ b/instrument/instrumenter.cc
-@@ -108,14 +108,14 @@ instrumenter::real_loc_end(Stmt *d)
+@@ -104,14 +104,14 @@ instrumenter::real_loc_end(Stmt *d)
  
  // MyFrontendAction ---
  
@@ -75,18 +75,18 @@ index 3c2f019..08ed671 100644
  private:
  	Rewriter TheRewriter;
 diff --git a/instrument/main.cc b/instrument/main.cc
-index 3b54a1b..3480838 100644
+index c497dc9..cd589b0 100644
 --- a/instrument/main.cc
 +++ b/instrument/main.cc
-@@ -80,7 +80,7 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
+@@ -83,7 +85,7 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
  	// that will return a new MyFrontendAction object every time.  To
  	// further customize this, we could create our own factory class.
  	// int ret = Tool.run(new MFAF(inst_files));
 -	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
 +	int ret = Tool.run(&(*newFrontendActionFactory<MyFrontendAction>()));
  	if (ret)
- 		errx(1, "Instrumentation failed");
- }
+ 		warnx("Instrumentation failed");
+ 	return ret;
 diff --git a/viewer/Makefile b/viewer/Makefile
 index 6de9010..9c9a1ad 100644
 --- a/viewer/Makefile
