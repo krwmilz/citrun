@@ -2,7 +2,7 @@ use strict;
 use Data::Dumper;
 use SCV::Project;
 use SCV::Viewer;
-use Test::More tests => 45;
+use Test::More tests => 48;
 use Test::Differences;
 
 my $viewer = SCV::Viewer->new();
@@ -68,12 +68,17 @@ my $runtime_metadata = $viewer->get_metadata();
 my $tus = $runtime_metadata->{tus};
 
 my ($source_0, $source_1, $source_2) = @$tus;
-like ($source_0->{filename}, qr/.*source_0.c/, "runtime filename check 0") ;
-is ($source_0->{lines}, 20, "runtime line count check 0");
-like ($source_1->{filename}, qr/.*source_1.c/, "runtime filename check 1") ;
-is ($source_1->{lines}, 11, "runtime line count check 1");
-like ($source_2->{filename}, qr/.*source_2.c/, "runtime filename check 2") ;
-is ($source_2->{lines}, 9, "runtime line count check 2");
+like( $source_0->{filename}, qr/.*source_0.c/, "runtime filename check 0" );
+is( $source_0->{lines}, 20, "runtime line count check 0" );
+is( $source_0->{inst_sites}, 7, "instrumented site count 0" );
+
+like( $source_1->{filename}, qr/.*source_1.c/, "runtime filename check 1" );
+is( $source_1->{lines}, 11, "runtime line count check 1" );
+is( $source_1->{inst_sites}, 7, "instrumented site count 1" );
+
+like( $source_2->{filename}, qr/.*source_2.c/, "runtime filename check 2" );
+is( $source_2->{lines}, 9, "runtime line count check 2" );
+is( $source_2->{inst_sites}, 6, "instrumented site count 2" );
 
 # Request and check execution data
 my $data = $viewer->get_execution_data($tus);

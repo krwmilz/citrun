@@ -32,7 +32,8 @@ my $inst_src_good = <<EOF;
 #include <stdint.h>
 struct _scv_node {
 	uint64_t *lines_ptr;
-	uint64_t size;
+	uint32_t size;
+	uint32_t inst_sites;
 	const char *file_name;
 	struct _scv_node *next;
 };
@@ -43,6 +44,7 @@ struct _scv_node _scv_node1;
 struct _scv_node _scv_node0 = {
 	.lines_ptr = _scv_lines,
 	.size = 12,
+	.inst_sites = 5,
 	.file_name = "$tmp_dir/source_0.c",
 	.next = &_scv_node1,
 };
