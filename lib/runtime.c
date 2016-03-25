@@ -52,20 +52,20 @@ control_thread(void *arg)
 		/* There was an error getting the env var, use the default */
 		viewer_sock = "/tmp/scv_viewer.socket";
 
-	/* Connect the socket to the server which should already be running */
+	/* Connect the socket to the server */
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	strncpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path) - 1);
-
-	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
-		err(1, "connect");
+	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+		warn("connect");
+		pthread_exit(NULL);
 	}
 
-	/* Send static information firsrt. */
+	/* Send static information first. */
 	send_metadata(fd);
 
-	/* Then synchronously send execution data */
 	while (1) {
+		/* Synchronously send execution data */
 		send_execution_data(fd);
 		xread(fd, &response, 1);
 	}
