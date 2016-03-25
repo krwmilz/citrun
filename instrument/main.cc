@@ -81,7 +81,7 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 	// that will return a new MyFrontendAction object every time.  To
 	// further customize this, we could create our own factory class.
 	// int ret = Tool.run(new MFAF(inst_files));
-	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
+	int ret = Tool.run(newFrontendActionFactory<InstrumentAction>());
 	if (ret)
 		warnx("Instrumentation failed");
 	return ret;
