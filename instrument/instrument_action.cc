@@ -15,11 +15,11 @@
 #include "runtime_h.h"
 
 
-ASTConsumer *
-InstrumentAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
+clang::ASTConsumer *
+InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, StringRef file)
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
-	SourceManager &sm = CI.getSourceManager();
+	clang::SourceManager &sm = CI.getSourceManager();
 	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
 
 	return new MyASTConsumer(TheRewriter);
@@ -71,15 +71,14 @@ write_src_number(int src_num)
 void
 InstrumentAction::EndSourceFileAction()
 {
-	SourceManager &sm = TheRewriter.getSourceMgr();
-	const FileID main_fid = sm.getMainFileID();
+	clang::SourceManager &sm = TheRewriter.getSourceMgr();
+	const clang::FileID main_fid = sm.getMainFileID();
 	// llvm::errs() << "** EndSourceFileAction for: "
 	// 	<< sm.getFileEntryForID(main_fid)->getName()
 	// 	<< "\n";
 
-	SourceLocation start = sm.getLocForStartOfFile(main_fid);
-
-	SourceLocation end = sm.getLocForEndOfFile(main_fid);
+	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
+	clang::SourceLocation end = sm.getLocForEndOfFile(main_fid);
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
 	std::string file_name = getCurrentFile();
