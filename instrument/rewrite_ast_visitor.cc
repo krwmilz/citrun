@@ -54,6 +54,7 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 		return true;
 
 	TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
+	++rewrite_count;
 
 	return true;
 }

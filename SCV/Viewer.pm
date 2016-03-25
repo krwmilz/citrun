@@ -52,10 +52,13 @@ sub get_metadata {
 
 		my $file_name = read_all($client, $file_name_sz);
 
-		$buf = read_all($client, 8);
-		my $num_lines = unpack("Q", $buf);
+		$buf = read_all($client, 4);
+		my $num_lines = unpack("L", $buf);
 
-		push @tus, { filename => $file_name, lines => $num_lines };
+		$buf = read_all($client, 4);
+		my $inst_sites = unpack("L", $buf);
+
+		push @tus, { filename => $file_name, lines => $num_lines, inst_sites => $inst_sites };
 	}
 	$runtime_metadata->{tus} = \@tus;
 

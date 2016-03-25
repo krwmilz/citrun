@@ -19,6 +19,7 @@ public:
 		return true;
 	}
 
+	RewriteASTVisitor& get_visitor() { return Visitor; };
 private:
 	RewriteASTVisitor Visitor;
 };

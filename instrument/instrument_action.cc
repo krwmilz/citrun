@@ -97,10 +97,14 @@ InstrumentAction::EndSourceFileAction()
 	// be a next TU.
 	ss << "struct _scv_node _scv_node" << tu_number + 1 << ";" << std::endl;
 
+	// Get visitor instance to check how many times it rewrote something
+	RewriteASTVisitor visitor = InstrumentASTConsumer->get_visitor();
+
 	// Define this translation units main book keeping data structure
 	ss << "struct _scv_node _scv_node" << tu_number << " = {" << std::endl
 		<< "	.lines_ptr = _scv_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
+		<< "	.inst_sites = " << visitor.GetRewriteCount() << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl
 		<< "	.next = &_scv_node" << tu_number + 1 << "," << std::endl
 		<< "};" << std::endl;

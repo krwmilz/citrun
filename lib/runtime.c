@@ -111,6 +111,9 @@ send_metadata(int fd)
 		/* Send the size of the execution buffers */
 		xwrite(fd, &walk.size, sizeof(walk.size));
 
+		/* Send the total number of instrumentation sites */
+		xwrite(fd, &walk.inst_sites, sizeof(walk.size));
+
 		walk = *walk.next;
 	}
 }
