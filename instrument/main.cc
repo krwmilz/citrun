@@ -54,20 +54,23 @@ clean_path()
 	setenv("PATH", new_path.str().c_str(), 1);
 }
 
-void
-instrument(int argc, char *argv[], std::vector<std::string> &source_files)
+int
+instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 {
 	std::vector<const char *> clang_argv;
-	clang_argv.push_back(argv[0]);
 
+	if (source_files.size() == 0)
+		// Nothing to do
+		return 1;
+
+	clang_argv.push_back(argv[0]);
 	for (auto s : source_files)
 		clang_argv.push_back(s.c_str());
 
 	clang_argv.push_back("--");
 
-	// append original command line verbatim after --
-	for (int i = 0; i < argc; i++)
-		clang_argv.push_back(argv[i]);
+	// Append original command line verbatim
+	clang_argv.insert(clang_argv.end(), argv, argv + argc);
 
 	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();
@@ -82,7 +85,8 @@ instrument(int argc, char *argv[], std::vector<std::string> &source_files)
 	// int ret = Tool.run(new MFAF(inst_files));
 	int ret = Tool.run(newFrontendActionFactory<MyFrontendAction>());
 	if (ret)
-		errx(1, "Instrumentation failed");
+		warnx("Instrumentation failed");
+	return ret;
 }
 
 bool
@@ -97,16 +101,26 @@ ends_with(std::string const &value, std::string const &suffix)
 int
 main(int argc, char *argv[])
 {
+	std::vector<std::string> args(argv, argv + argc);
+	std::vector<char *> modified_args;
 	std::vector<std::string> source_files;
-	std::vector<char *> real_compiler_argv;
+	bool preprocess_arg = false;
+	bool object_arg = false;
+	bool compile_arg = false;
 
-	for (int i = 0; i < argc; i++) {
-		std::string arg(argv[i]);
+	// Set a better name than the symlink that was used to find this program
+	setprogname("scv_instrument");
 
-		// copy argument verbatim for now, we'll replace later if needed
-		real_compiler_argv.push_back(argv[i]);
+	for (auto &arg : args) {
+		// Special case some hopefully universal arguments
+		if (arg.compare("-E") == 0)
+			preprocess_arg = true;
+		else if (arg.compare("-o") == 0)
+			object_arg = true;
+		else if (arg.compare("-c") == 0)
+			compile_arg = true;
 
-		// Dirty hack to find source files
+		// Find source files
 		if (ends_with(arg, ".cpp") || ends_with(arg, ".c")
 		    || ends_with(arg, ".cxx")) {
 
@@ -129,33 +143,49 @@ main(int argc, char *argv[])
 			if (src_name == NULL)
 				err(1, "basename");
 
-			std::string inst_src_path;
-			inst_src_path.append(src_dir);
-			inst_src_path.append("/inst/");
-			inst_src_path.append(src_name);
+			// modified_args will hang onto the contents of this
+			std::string *inst_src_path = new std::string();
+			inst_src_path->append(src_dir);
+			inst_src_path->append("/inst/");
+			inst_src_path->append(src_name);
 
-			// Compilation file will be instrumented source
-			real_compiler_argv.at(i) = strdup(inst_src_path.c_str());
+			// Switch the original file name with the instrumented
+			// one.
+			modified_args.push_back(&(*inst_src_path)[0]);
+			continue;
 		}
+
+		// Non source file argument, copy verbatim
+		modified_args.push_back((char *)arg.c_str());
 	}
 
-	// NULL terminate arguments we will be passing to exec*()
-	real_compiler_argv.push_back(NULL);
+	// NULL terminate the arg vectors we pass to exec()
+	modified_args.push_back(NULL);
 	argv[argc] = NULL;
 
-	if (source_files.size() == 0) {
-		// We didn't detect any source code on the command line
+	// -o with -c means output object file
+	// -o without -c means output binary
+	if (object_arg && !compile_arg) {
+		char *cwd = getcwd(NULL, PATH_MAX);
+		if (cwd == NULL)
+			errx(1, "getcwd");
+
+		std::string src_number_filename(cwd);
+		src_number_filename.append("/SRC_NUMBER");
+		unlink(src_number_filename.c_str());
+	}
+
+	if (preprocess_arg || instrument(argc, argv, source_files)) {
+		// The preprocessor arg was found or instrumentation failed.
+		// In Either case, run the native command unmodified.
 		clean_path();
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
 	}
 
-	// Instument the detected source files, storing them in inst/
-	instrument(argc, argv, source_files);
-
-	// Run the native compiler on the *instrumented* source files.
-	// Source file name substitution has already been done.
+	// Instrumentation succeeded. Run the native compiler with a modified
+	// command line.
 	clean_path();
-	if (execvp(real_compiler_argv[0], &real_compiler_argv[0]))
+	if (execvp(modified_args[0], &modified_args[0]))
 		err(1, "execvp");
 }

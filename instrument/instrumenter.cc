@@ -115,37 +115,46 @@ MyFrontendAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
 }
 
 unsigned int
-get_src_number()
+read_src_number()
 {
 	char *cwd = getcwd(NULL, PATH_MAX);
 	if (cwd == NULL)
 		errx(1, "getcwd");
+
 	std::string src_number_filename(cwd);
 	src_number_filename.append("/SRC_NUMBER");
 
-	std::fstream src_number_file;
 	if (access(src_number_filename.c_str(), F_OK) == -1) {
-		// SRC_NUMBER does not exist, create it
-		src_number_file.open(src_number_filename, std::fstream::out);
-		src_number_file << 0;
-		src_number_file.close();
-
-		// First source file is zero
+		// SRC_NUMBER does not exist, source number is 0
 		return 0;
 	}
 
-	// SRC_NUMBER existed, read its contents and write incremented value
-	src_number_file.open(src_number_filename, std::fstream::in | std::fstream::out);
-
+	// SRC_NUMBER exists, read its content
+	std::ifstream src_number_file;
 	unsigned int src_num = 0;
+
+	src_number_file.open(src_number_filename, std::fstream::in);
 	src_number_file >> src_num;
-	++src_num;
+	src_number_file.close();
 
-	// Write the new source number
-	src_number_file.seekg(0);
+	// Pre-increment. The current source number is the last one plus one
+	return ++src_num;
+}
+
+void
+write_src_number(int src_num)
+{
+	char *cwd = getcwd(NULL, PATH_MAX);
+	if (cwd == NULL)
+		errx(1, "getcwd");
+
+	std::string src_number_filename(cwd);
+	src_number_filename.append("/SRC_NUMBER");
+
+	std::ofstream src_number_file;
+	src_number_file.open(src_number_filename, std::fstream::out);
 	src_number_file << src_num;
-
-	return src_num;
+	src_number_file.close();
 }
 
 void
@@ -163,7 +172,7 @@ MyFrontendAction::EndSourceFileAction()
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
 	std::string file_name = getCurrentFile();
-	unsigned int tu_number = get_src_number();
+	unsigned int tu_number = read_src_number();
 
 	std::stringstream ss;
 	// Embed the header directly in the primary source file.
@@ -180,25 +189,34 @@ MyFrontendAction::EndSourceFileAction()
 	ss << "struct _scv_node _scv_node" << tu_number << " = {" << std::endl
 		<< "	.lines_ptr = _scv_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
-		<< "	.file_name = \"" << file_name << "\"," << std::endl;
-		ss << "	.next = &_scv_node" << tu_number + 1 << "," << std::endl;
-	ss << "};" << std::endl;
+		<< "	.file_name = \"" << file_name << "\"," << std::endl
+		<< "	.next = &_scv_node" << tu_number + 1 << "," << std::endl
+		<< "};" << std::endl;
 
 	TheRewriter.InsertTextAfter(start, ss.str());
 
-	// write the instrumented source file to another directory
-	if (mkdir("inst", S_IWUSR | S_IRUSR | S_IXUSR))
-		// already existing directory is ok
+	size_t last_slash = file_name.find_last_of('/');
+	std::string base_dir(file_name.substr(0, last_slash + 1));
+	base_dir.append("inst");
+
+	if (mkdir(base_dir.c_str(), S_IWUSR | S_IRUSR | S_IXUSR))
 		if (errno != EEXIST)
+			// An error other than the directory existing occurred
 			err(1, "mkdir");
 
-	size_t last_slash = file_name.find_last_of('/');
 	file_name.insert(last_slash + 1, "inst/");
-	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT,
-			S_IRUSR | S_IWUSR);
+
+	// Instrumented source file might already exist
+	unlink(file_name.c_str());
+
+	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd < 0)
 		err(1, "open");
 	llvm::raw_fd_ostream output(fd, /* close */ 1);
+
+	// Write the instrumented source file
 	TheRewriter.getEditBuffer(main_fid).write(output);
-	// TheRewriter.getEditBuffer(main_fid).write(llvm::outs());
+
+	// If we got this far write the new translation unit number
+	write_src_number(tu_number);
 }
