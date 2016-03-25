@@ -65,7 +65,22 @@ sub instrumented_src {
 	while (my $line = <$inst_fh>) {
 		$inst_src .= $line;
 	}
+	close( $inst_fh );
 	return $inst_src;
+}
+
+sub inst_src_preamble {
+	my ($self) = @_;
+
+	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
+
+	my $preamble;
+	for (1..19) {
+		my $line = <$inst_fh>;
+		$preamble .= $line;
+	}
+	close( $inst_fh );
+	return $preamble;
 }
 
 sub run {
