@@ -13,9 +13,6 @@
 
 #include "instrument_action.h"
 
-using namespace clang;
-using namespace clang::tooling;
-
 static llvm::cl::OptionCategory ToolingCategory("instrument options");
 
 void
@@ -72,8 +69,8 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 
 	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();
-	CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
-	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
+	clang::tooling::CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
+	clang::tooling::ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
 	// ClangTool::run accepts a FrontendActionFactory, which is then used to
 	// create new objects implementing the FrontendAction interface. Here we
@@ -81,7 +78,7 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 	// that will return a new MyFrontendAction object every time.  To
 	// further customize this, we could create our own factory class.
 	// int ret = Tool.run(new MFAF(inst_files));
-	int ret = Tool.run(newFrontendActionFactory<InstrumentAction>());
+	int ret = Tool.run(clang::tooling::newFrontendActionFactory<InstrumentAction>());
 	if (ret)
 		warnx("Instrumentation failed");
 	return ret;
