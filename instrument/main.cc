@@ -156,7 +156,7 @@ main(int argc, char *argv[])
 		}
 
 		// Non source file argument, copy verbatim
-		modified_args.push_back((char *)arg.c_str());
+		modified_args.push_back(const_cast<char *>(arg.c_str()));
 	}
 
 	// NULL terminate the arg vectors we pass to exec()
