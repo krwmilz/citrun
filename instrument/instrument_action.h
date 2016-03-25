@@ -12,7 +12,7 @@ public:
 	InstrumentAction() {};
 
 	void EndSourceFileAction() override;
-	std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &, StringRef) override;
+	ASTConsumer *CreateASTConsumer(CompilerInstance &, StringRef) override;
 
 private:
 	Rewriter TheRewriter;

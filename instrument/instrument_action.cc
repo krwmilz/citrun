@@ -15,14 +15,14 @@
 #include "runtime_h.h"
 
 
-std::unique_ptr<ASTConsumer>
+ASTConsumer *
 InstrumentAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
 	SourceManager &sm = CI.getSourceManager();
 	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
 
-	return std::unique_ptr<ASTConsumer>(new MyASTConsumer(TheRewriter));
+	return new MyASTConsumer(TheRewriter);
 }
 
 unsigned int
