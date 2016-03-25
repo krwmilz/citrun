@@ -61,7 +61,7 @@ my @exec_lines2 = @{ $data->[0] };
 
 # Only lines 8 - 12 in the source code above are executing
 for (8..12) {
-	cmp_ok( $exec_lines1[$_], ">", 1, "line $_ executed nonzero times" );
+	cmp_ok( $exec_lines1[$_], ">", 0, "line $_ executed nonzero times" );
 	# Make sure the second time we queried the execution counts they were higher
 	cmp_ok( $exec_lines2[$_], ">=", $exec_lines1[$_], "line $_ after > before" );
 }
