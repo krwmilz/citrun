@@ -57,11 +57,14 @@ sub instrumented_src {
 	my ($self) = @_;
 
 	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
+
+	# Knock off the instrumentation preamble
+	my $line = <$inst_fh> for (1..19);
+
 	my $inst_src;
 	while (my $line = <$inst_fh>) {
 		$inst_src .= $line;
 	}
-
 	return $inst_src;
 }
 
