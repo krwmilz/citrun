@@ -16,7 +16,7 @@
 
 
 clang::ASTConsumer *
-InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, StringRef file)
+InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRef file)
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
 	clang::SourceManager &sm = CI.getSourceManager();

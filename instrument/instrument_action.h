@@ -10,7 +10,7 @@ public:
 	InstrumentAction() {};
 
 	void EndSourceFileAction() override;
-	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, StringRef) override;
+	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
 
 private:
 	clang::Rewriter TheRewriter;
