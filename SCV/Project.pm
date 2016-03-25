@@ -1,7 +1,6 @@
 package SCV::Project;
 use strict;
 
-use Cwd;
 use File::Temp qw( tempdir );
 use Test;
 use IPC::Open3;
@@ -14,6 +13,7 @@ sub new {
 	# Make new temporary directory, clean it up at exit
 	$self->{tmp_dir} = tempdir( CLEANUP => 1 );
 	$self->{src_files} = [];
+	$self->{prog_name} = "program";
 	return $self;
 }
 
@@ -38,7 +38,7 @@ sub compile {
 	my $src_files = join(" ", @{ $self->{src_files} });
 
 	my $makefile = <<EOF;
-PROG = program
+PROG = $self->{prog_name}
 SRCS = $src_files
 MAN =
 
@@ -89,7 +89,7 @@ sub run {
 	$ENV{SCV_VIEWER_SOCKET} = "SCV::Viewer.socket";
 
 	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap", "$tmp_dir/program", @args);
+	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap", "$tmp_dir/$self->{prog_name}", @args);
 }
 
 sub kill {

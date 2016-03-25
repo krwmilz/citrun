@@ -40,6 +40,7 @@ sub get_metadata {
 	my ($pid, $ppid, $pgrp) = unpack("L3", $buf);
 
 	my $runtime_metadata = {
+		num_tus => $num_tus,
 		pid => $pid,
 		ppid => $ppid,
 		pgrp => $pgrp,
