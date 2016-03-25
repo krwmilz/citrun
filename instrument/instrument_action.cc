@@ -9,109 +9,20 @@
 #include <sstream>
 #include <string>
 
-#include <clang/AST/AST.h>
-#include <clang/Lex/Lexer.h>
 #include <clang/Frontend/CompilerInstance.h>
 
-#include "instrumenter.h"
+#include "instrument_action.h"
 #include "runtime_h.h"
 
-bool
-instrumenter::VisitVarDecl(VarDecl *d)
-{
-	return true;
-}
 
-bool
-instrumenter::VisitStmt(Stmt *s)
-{
-	std::stringstream ss;
-	unsigned line = SM.getPresumedLineNumber(s->getLocStart());
-	Stmt *stmt_to_inst = NULL;
-
-	if (isa<IfStmt>(s)) {
-		stmt_to_inst = cast<IfStmt>(s)->getCond();
-	}
-	else if (isa<ForStmt>(s)) {
-		stmt_to_inst = cast<ForStmt>(s)->getCond();
-	}
-	else if (isa<WhileStmt>(s)) {
-		stmt_to_inst = cast<WhileStmt>(s)->getCond();
-	}
-	else if (isa<SwitchStmt>(s)) {
-		stmt_to_inst = cast<SwitchStmt>(s)->getCond();
-	}
-	else if (isa<ReturnStmt>(s)) {
-		stmt_to_inst = cast<ReturnStmt>(s)->getRetValue();
-	}
-	/*
-	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
-		|| isa<SwitchCase>(s)) {
-	}
-	*/
-	else if (isa<DeclStmt>(s)) {
-	}
-	else if (isa<CallExpr>(s)) {
-		stmt_to_inst = s;
-	}
-
-	if (stmt_to_inst == NULL)
-		return true;
-
-	ss << "(++_scv_lines[" << line << "], ";
-	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
-		// writing failed, don't attempt to add ")"
-		return true;
-
-	TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
-
-	return true;
-}
-
-bool
-instrumenter::VisitFunctionDecl(FunctionDecl *f)
-{
-	// Only function definitions (with bodies), not declarations.
-	if (f->hasBody() == 0)
-		return true;
-
-	Stmt *FuncBody = f->getBody();
-
-	DeclarationName DeclName = f->getNameInfo().getName();
-	std::string FuncName = DeclName.getAsString();
-
-	if (FuncName.compare("main") != 0)
-		// Function is not main
-		return true;
-
-	std::stringstream ss;
-	// On some platforms we need to depend directly on a symbol provided by
-	// the runtime. Normally this isn't needed because the runtime only
-	// depends on symbols in the isntrumented application.
-	ss << "libscv_init();";
-	SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
-	TheRewriter.InsertTextBefore(curly_brace, ss.str());
-
-	return true;
-}
-
-SourceLocation
-instrumenter::real_loc_end(Stmt *d)
-{
-	SourceLocation _e(d->getLocEnd());
-	return SourceLocation(Lexer::getLocForEndOfToken(_e, 0, SM, lopt));
-}
-
-// MyFrontendAction ---
-
-ASTConsumer *
-MyFrontendAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
+std::unique_ptr<ASTConsumer>
+InstrumentAction::CreateASTConsumer(CompilerInstance &CI, StringRef file)
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
 	SourceManager &sm = CI.getSourceManager();
 	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
 
-	return new MyASTConsumer(TheRewriter);
+	return std::unique_ptr<ASTConsumer>(new MyASTConsumer(TheRewriter));
 }
 
 unsigned int
@@ -158,7 +69,7 @@ write_src_number(int src_num)
 }
 
 void
-MyFrontendAction::EndSourceFileAction()
+InstrumentAction::EndSourceFileAction()
 {
 	SourceManager &sm = TheRewriter.getSourceMgr();
 	const FileID main_fid = sm.getMainFileID();
@@ -217,6 +128,5 @@ MyFrontendAction::EndSourceFileAction()
 	// Write the instrumented source file
 	TheRewriter.getEditBuffer(main_fid).write(output);
 
-	// If we got this far write the new translation unit number
 	write_src_number(tu_number);
 }

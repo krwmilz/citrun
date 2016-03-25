@@ -1,7 +1,7 @@
 PROG = scv_instrument
-SRCS = main.cc instrumenter.cc
-
-MKDEP = `llvm-config --cppflags`
+SRCS = main.cc \
+	instrument_action.cc \
+	rewrite_ast_visitor.cc
 
 CXXFLAGS += -std=c++11
 CXXFLAGS += `llvm-config --cxxflags`
