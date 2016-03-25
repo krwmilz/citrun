@@ -8,7 +8,7 @@ my $project = SCV::Project->new();
 my $viewer = SCV::Viewer->new();
 unified_diff;
 
-$project->add_src(<<EOF
+$project->add_src(<<EOF);
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +37,6 @@ main(int argc, char *argv[])
 	return 0;
 }
 EOF
-);
 
 # Compile the above inefficient program and have it compute the input 40, which
 # takes a few seconds

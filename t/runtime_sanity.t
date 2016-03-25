@@ -9,7 +9,7 @@ my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 unified_diff;
 
-$project->add_src(<<EOF
+$project->add_src(<<EOF);
 #include <err.h>
 #include <stdlib.h>
 
@@ -30,9 +30,8 @@ main(int argc, char *argv[])
 	return 0;
 }
 EOF
-);
 
-$project->add_src(<<EOF
+$project->add_src(<<EOF);
 long long
 fib(long long n)
 {
@@ -44,9 +43,8 @@ fib(long long n)
 	return fib(n - 1) + fib(n - 2);
 }
 EOF
-);
 
-$project->add_src(<<EOF
+$project->add_src(<<EOF);
 #include <stdio.h>
 
 void
@@ -56,7 +54,6 @@ print_output(long long n)
 	return;
 }
 EOF
-);
 
 $project->compile();
 $project->run(45);

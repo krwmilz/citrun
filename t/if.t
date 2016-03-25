@@ -6,8 +6,7 @@ use Test::Differences;
 my $project = SCV::Project->new();
 unified_diff;
 
-$project->add_src(
-<<EOF
+$project->add_src(<<EOF);
 #include <stdlib.h>
 
 int
@@ -29,11 +28,8 @@ main(int argc, char *argv[])
 	}
 }
 EOF
-);
 
 $project->compile();
-
-my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 #include <stdlib.h>

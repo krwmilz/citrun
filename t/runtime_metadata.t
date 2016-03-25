@@ -6,7 +6,7 @@ use Test::More tests => 11;
 my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 
-$project->add_src(<<EOF
+$project->add_src(<<EOF);
 int
 main(void)
 {
@@ -15,7 +15,6 @@ main(void)
 	return 0;
 }
 EOF
-);
 
 $project->compile();
 $project->run();

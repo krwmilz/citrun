@@ -8,8 +8,7 @@ my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 unified_diff;
 
-$project->add_src(
-<<EOF
+$project->add_src(<<EOF);
 int foo() {
 	return 0;
 }
@@ -22,11 +21,8 @@ int main(void) {
 	return foo();
 }
 EOF
-);
 
 $project->compile();
-
-my $tmp_dir = $project->get_tmpdir();
 
 my $inst_src_good = <<EOF;
 int foo() {
