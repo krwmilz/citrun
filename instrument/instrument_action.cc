@@ -22,7 +22,9 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 	clang::SourceManager &sm = CI.getSourceManager();
 	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
 
-	return new MyASTConsumer(TheRewriter);
+	// Hang onto a reference to this so we can read from it later
+	InstrumentASTConsumer = new RewriteASTConsumer(TheRewriter);
+	return &InstrumentASTConsumer;
 }
 
 unsigned int

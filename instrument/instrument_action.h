@@ -4,24 +4,9 @@
 
 #include "rewrite_ast_visitor.h"
 
-// For each source file provided to the tool, a new FrontendAction is created.
-class InstrumentAction : public clang::ASTFrontendAction {
+class RewriteASTConsumer : public clang::ASTConsumer {
 public:
-	InstrumentAction() {};
-
-	void EndSourceFileAction() override;
-	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
-
-private:
-	clang::Rewriter TheRewriter;
-};
-
-
-// Implementation of the ASTConsumer interface for reading an AST produced
-// by the Clang parser.
-class MyASTConsumer : public clang::ASTConsumer {
-public:
-	MyASTConsumer(clang::Rewriter &R) : Visitor(R) {}
+	RewriteASTConsumer(clang::Rewriter &R) : Visitor(R) {}
 
 	// Override the method that gets called for each parsed top-level
 	// declaration.
@@ -36,4 +21,17 @@ public:
 
 private:
 	RewriteASTVisitor Visitor;
+};
+
+// For each source file provided to the tool, a new FrontendAction is created.
+class InstrumentAction : public clang::ASTFrontendAction {
+public:
+	InstrumentAction() {};
+
+	void EndSourceFileAction() override;
+	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
+
+private:
+	clang::Rewriter TheRewriter;
+	RewriteASTConsumer *InstrumentASTConsumer;
 };
