@@ -32,7 +32,8 @@ View::View(demo_glstate_t *st, demo_buffer_t *buf) :
 	buffer(buf),
 	fullscreen(false),
 	animate(false),
-	refcount(1)
+	refcount(1),
+	has_fps_timer(0)
 {
 	TRACE();
 
