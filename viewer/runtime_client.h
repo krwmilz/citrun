@@ -12,8 +12,9 @@
 
 struct TranslationUnit {
 	std::string file_name;
-	uint64_t num_lines;
+	uint32_t num_lines;
 	std::vector<uint64_t> execution_counts;
+	uint32_t inst_sites;
 };
 
 class RuntimeClient : public drawable {
