@@ -17,9 +17,9 @@ struct TranslationUnit {
 	uint32_t inst_sites;
 };
 
-class RuntimeClient : public drawable {
+class RuntimeProcess : public drawable {
 public:
-	RuntimeClient(af_unix *, demo_buffer_t *, demo_font_t *);
+	RuntimeProcess(af_unix *, demo_buffer_t *, demo_font_t *);
 
 	void draw();
 	void idle();

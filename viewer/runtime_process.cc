@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "default-text.h"
-#include "runtime_client.h"
+#include "runtime_process.h"
 
-RuntimeClient::RuntimeClient(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) :
+RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) :
 	socket(sock),
 	buffer(buf),
 	font(f)
@@ -55,7 +55,7 @@ RuntimeClient::RuntimeClient(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) 
 }
 
 void
-RuntimeClient::read_file(std::string file_name, glyphy_point_t top_left)
+RuntimeProcess::read_file(std::string file_name, glyphy_point_t top_left)
 {
 	std::string line;
 	std::ifstream file_stream(file_name);
@@ -81,12 +81,12 @@ RuntimeClient::read_file(std::string file_name, glyphy_point_t top_left)
 }
 
 void
-RuntimeClient::draw()
+RuntimeProcess::draw()
 {
 }
 
 void
-RuntimeClient::idle()
+RuntimeProcess::idle()
 {
 	for (auto &trans_unit : translation_units) {
 		size_t bytes_total = trans_unit.num_lines * sizeof(uint64_t);

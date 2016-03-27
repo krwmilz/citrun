@@ -5,7 +5,7 @@
 
 #include "default-text.h"
 #include "af_unix.h"
-#include "runtime_client.h"
+#include "runtime_process.h"
 #include "view.h"
 
 #include "demo-buffer.h"
@@ -152,7 +152,7 @@ window::next_frame(View *vu)
 {
 	af_unix *temp_socket = window::socket.accept();
 	if (temp_socket)
-		window::drawables.push_back(new RuntimeClient(temp_socket, buffer, font));
+		window::drawables.push_back(new RuntimeProcess(temp_socket, buffer, font));
 
 	for (auto &i : window::drawables)
 		i->idle();

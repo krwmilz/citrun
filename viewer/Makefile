@@ -1,7 +1,7 @@
 PROG = scv_viewer
 
 SRCS = main.cc \
-       runtime_client.cc \
+       runtime_process.cc \
        af_unix.cc \
        view.cc \
        demo-atlas.cc \
