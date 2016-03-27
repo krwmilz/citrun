@@ -89,7 +89,7 @@ sub run {
 	$ENV{SCV_VIEWER_SOCKET} = "SCV::Viewer.socket";
 
 	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "wrap/scv_wrap", "$tmp_dir/$self->{prog_name}", @args);
+	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/$self->{prog_name}", @args);
 }
 
 sub kill {
