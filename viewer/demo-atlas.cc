@@ -16,10 +16,7 @@
  * Google Author(s): Behdad Esfahbod
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
+#include <err.h>
 #include "demo-atlas.h"
 
 #define gl(name) \
@@ -134,7 +131,7 @@ demo_atlas_alloc (demo_atlas_t  *at,
     y = at->cursor_y;
     at->cursor_y += (h + at->item_h_q - 1) & ~(at->item_h_q - 1);
   } else
-    die ("Ran out of atlas memory");
+    errx(1, "Ran out of atlas memory");
 
   demo_atlas_bind_texture (at);
   if (w * h == len)

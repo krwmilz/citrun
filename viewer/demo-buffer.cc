@@ -16,11 +16,8 @@
  * Google Author(s): Behdad Esfahbod
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "demo-buffer.h"
+
 
 struct demo_buffer_t {
   unsigned int   refcount;

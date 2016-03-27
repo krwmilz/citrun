@@ -16,11 +16,8 @@
  * Google Author(s): Behdad Esfahbod, Maysum Panju, Wojciech Baranowski
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "demo-glstate.h"
+
 
 struct demo_glstate_t {
   unsigned int   refcount;

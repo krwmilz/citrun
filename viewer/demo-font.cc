@@ -16,12 +16,15 @@
  * Google Author(s): Behdad Esfahbod
  */
 
+#include <err.h>
+
 #include "demo-font.h"
 #include "glyphy/glyphy-freetype.h"
 
-#include <unordered_map>
+#include <tr1/unordered_map>
 
-typedef std::unordered_map<unsigned int, glyph_info_t> glyph_cache_t;
+
+typedef std::tr1::unordered_map<unsigned int, glyph_info_t> glyph_cache_t;
 
 struct demo_font_t {
   unsigned int   refcount;
@@ -125,10 +128,10 @@ encode_ft_glyph (demo_font_t      *font,
 				  FT_LOAD_NO_SCALE |
 				  FT_LOAD_LINEAR_DESIGN |
 				  FT_LOAD_IGNORE_TRANSFORM))
-    die ("Failed loading FreeType glyph");
+    errx(1, "Failed loading FreeType glyph");
 
   if (face->glyph->format != FT_GLYPH_FORMAT_OUTLINE)
-    die ("FreeType loaded glyph format is not outline");
+    errx(1, "FreeType loaded glyph format is not outline");
 
   unsigned int upem = face->units_per_EM;
   double tolerance = upem * tolerance_per_em; /* in font design units */
@@ -142,7 +145,7 @@ encode_ft_glyph (demo_font_t      *font,
 				       &endpoints);
 
   if (FT_Err_Ok != glyphy_freetype(outline_decompose) (&face->glyph->outline, font->acc))
-    die ("Failed converting glyph outline to arcs");
+    errx(1, "Failed converting glyph outline to arcs");
 
   assert (glyphy_arc_accumulator_get_error (font->acc) <= tolerance);
 
@@ -179,7 +182,7 @@ encode_ft_glyph (demo_font_t      *font,
 				    nominal_width,
 				    nominal_height,
 				    extents))
-    die ("Failed encoding arcs");
+    errx(1, "Failed encoding arcs");
 
   glyphy_extents_scale (extents, 1. / upem, 1. / upem);
   glyphy_extents_scale (extents, SCALE, SCALE);

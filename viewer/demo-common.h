@@ -50,13 +50,6 @@
 #define LOGW(...) ((void) fprintf (stderr, __VA_ARGS__))
 #define LOGE(...) ((void) fprintf (stderr, __VA_ARGS__), abort ())
 
-static inline void
-die (const char *msg)
-{
-	fprintf (stderr, "%s\n", msg);
-	exit (1);
-}
-
 template <typename T>
 T clamp (T v, T m, T M)
 {
