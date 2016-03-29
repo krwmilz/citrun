@@ -1,2 +1,5 @@
 #OPTIM = -O2 ;
-#C++ = clang++ ;
+
+if $(OS) = OPENBSD {
+	C++ = eg++ ;
+}
