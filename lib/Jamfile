@@ -1,0 +1,7 @@
+SubDir TOP lib ;
+
+SubDirCcFlags -pthread -fpic -DPIC ;
+
+Main libscv.so.0.0 : runtime.c ;
+
+LINKFLAGS on libscv.so.0.0 = -shared -fpic -pthread ;

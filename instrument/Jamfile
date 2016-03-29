@@ -1,0 +1,28 @@
+SubDir TOP instrument ;
+
+SUBDIRC++FLAGS = `llvm-config --cxxflags` ;
+
+Main scv_instrument : main.cc
+	instrument_action.cc
+	rewrite_ast_visitor.cc ;
+
+LINKFLAGS on scv_instrument = `llvm-config --ldflags` ;
+LINKLIBS on scv_instrument =
+	-lestdc++
+	-Wl,--start-group
+	-lclangAST
+	-lclangAnalysis
+	-lclangBasic
+	-lclangDriver
+	-lclangEdit
+	-lclangFrontend
+	-lclangFrontendTool
+	-lclangLex -lclangParse
+	-lclangRewriteCore
+	-lclangRewriteFrontend
+	-lclangSema
+	-lclangSerialization
+	-lclangTooling
+	-Wl,--end-group ;
+
+LINKLIBS on scv_instrument += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;

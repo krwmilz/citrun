@@ -1,0 +1,26 @@
+SubDir TOP viewer ;
+
+SUBDIRC++FLAGS = `pkg-config gl glew freetype2 --cflags` ;
+SUBDIRC++FLAGS += -I/usr/local/include ;
+SUBDIRC++FLAGS += -std=c++11 ;
+
+LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
+LINKLIBS on scv_viewer += -lstdc++ -lm -lglut ;
+LINK on scv_viewer = eg++ ;
+
+Main scv_viewer :
+	main.cc
+	runtime_process.cc
+	af_unix.cc
+	view.cc
+	demo-atlas.cc
+	demo-buffer.cc
+	demo-font.cc
+	demo-glstate.cc
+	demo-shader.cc
+	matrix4x4.c
+	trackball.c ;
+
+LinkLibraries scv_viewer : libglyphy ;
+
+SubInclude TOP viewer glyphy ;

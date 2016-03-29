@@ -1,0 +1,3 @@
+SubDir TOP wrap ;
+
+Shell $(TOP)/wrap/scv_wrap : wrap.sh ;

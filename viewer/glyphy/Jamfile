@@ -1,0 +1,12 @@
+SubDir TOP viewer glyphy ;
+
+SubDirHdrs . ;
+SubDirC++Flags -DPKGDATADIR="" ;
+
+Library libglyphy : glyphy-arc.cc
+	glyphy-arcs.cc
+	glyphy-blob.cc
+	glyphy-extents.cc
+	glyphy-outline.cc
+	glyphy-sdf.cc
+	glyphy-shaders.cc ;
