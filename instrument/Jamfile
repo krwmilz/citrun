@@ -1,6 +1,6 @@
 SubDir TOP instrument ;
 
-SUBDIRC++FLAGS = `llvm-config --cxxflags` ;
+SUBDIRC++FLAGS = -std=c++11 `llvm-config --cxxflags` ;
 
 Main scv_instrument : main.cc
 	instrument_action.cc
