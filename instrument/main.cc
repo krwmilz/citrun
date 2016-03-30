@@ -2,6 +2,9 @@
 #include <libgen.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef __gnu_linux__
+ #include <bsd/stdlib.h>			// setprogname
+#endif
 
 #include <fstream>
 #include <iostream>
