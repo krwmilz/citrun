@@ -21,10 +21,10 @@
 #include "demo-font.h"
 #include "glyphy/glyphy-freetype.h"
 
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 
-typedef std::tr1::unordered_map<unsigned int, glyph_info_t> glyph_cache_t;
+typedef std::unordered_map<unsigned int, glyph_info_t> glyph_cache_t;
 
 struct demo_font_t {
   unsigned int   refcount;
