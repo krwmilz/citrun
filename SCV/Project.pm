@@ -4,7 +4,7 @@ use strict;
 use Cwd;
 use File::Temp qw( tempdir );
 use Test;
-use IPC::Open3;
+use IPC::Open2;
 
 sub new {
 	my ($class) = @_;
@@ -93,7 +93,7 @@ sub run {
 	$ENV{DYLD_LIBRARY_PATH} = "lib";
 
 	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open3(undef, \*CHLD_OUT, undef, "$tmp_dir/$self->{prog_name}", @args);
+	$self->{pid} = open2(\*CHLD_OUT, undef, "$tmp_dir/$self->{prog_name}", @args);
 }
 
 sub kill {

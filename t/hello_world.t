@@ -14,7 +14,7 @@ $project->add_src(<<EOF);
 int
 main(void)
 {
-	fprintf(stderr, "hello, world!");
+	printf("hello, world!");
 	return 0;
 }
 EOF
@@ -27,7 +27,7 @@ my $inst_src_good = <<EOF;
 int
 main(void)
 {libscv_init();
-	(++_scv_lines[6], fprintf(stderr, "hello, world!"));
+	(++_scv_lines[6], printf("hello, world!"));
 	return (++_scv_lines[7], 0);
 }
 EOF

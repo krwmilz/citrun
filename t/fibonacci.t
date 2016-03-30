@@ -29,13 +29,13 @@ main(int argc, char *argv[])
 	long long n;
 
 	if (argc != 2) {
-		fprintf(stderr, "usage: %s <N>", argv[0]);
+		printf("usage: %s <N>", argv[0]);
 		return 1;
 	}
 
 	n = atoi(argv[1]);
 
-	fprintf(stderr, "result: %lli", fibonacci(n));
+	printf("result: %lli", fibonacci(n));
 
 	return 0;
 }
@@ -64,13 +64,13 @@ main(int argc, char *argv[])
 	long long n;
 
 	if ((++_scv_lines[20], argc != 2)) {
-		(++_scv_lines[21], fprintf(stderr, "usage: %s <N>", argv[0]));
+		(++_scv_lines[21], printf("usage: %s <N>", argv[0]));
 		return (++_scv_lines[22], 1);
 	}
 
 	n = (++_scv_lines[25], atoi(argv[1]));
 
-	(++_scv_lines[27], fprintf(stderr, "result: %lli", (++_scv_lines[27], fibonacci(n))));
+	(++_scv_lines[27], printf("result: %lli", (++_scv_lines[27], fibonacci(n))));
 
 	return (++_scv_lines[29], 0);
 }
