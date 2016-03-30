@@ -4,9 +4,6 @@ SUBDIRC++FLAGS = `pkg-config gl glew freetype2 --cflags` ;
 SUBDIRC++FLAGS += -I/usr/local/include ;
 SUBDIRC++FLAGS += -std=c++11 ;
 
-LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
-LINKLIBS on scv_viewer += -lstdc++ -lm -lglut ;
-
 Main scv_viewer :
 	main.cc
 	runtime_process.cc

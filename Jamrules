@@ -2,5 +2,8 @@
 
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
-	LINK on scv_viewer = eg++ ;
+
+	# Link directly against libestdc++ from ports
+	LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
+	LINKLIBS on scv_viewer += -lestdc++ -lm -lglut ;
 }
