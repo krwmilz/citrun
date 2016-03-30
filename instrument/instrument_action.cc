@@ -15,7 +15,7 @@
 #include "runtime_h.h"
 
 
-#ifdef __APPLE__
+#if LLVM_VER > 35
 std::unique_ptr<clang::ASTConsumer>
 #else
 clang::ASTConsumer *
@@ -28,7 +28,7 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 
 	// Hang onto a reference to this so we can read from it later
 	InstrumentASTConsumer = new RewriteASTConsumer(TheRewriter);
-#ifdef __APPLE__
+#if LLVM_VER > 35
 	return std::unique_ptr<clang::ASTConsumer>(InstrumentASTConsumer);
 #else
 	return InstrumentASTConsumer;

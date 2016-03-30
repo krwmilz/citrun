@@ -4,6 +4,8 @@ if $(OS) = OPENBSD {
 	C++ = eg++ ;
 	SHLIB_SUF = so.0.0 ;
 
+	C++FLAGS = -DLLVM_VER=34 ;
+
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
 	LINKLIBS on scv_viewer = -lestdc++ -lm -lglut ;
@@ -30,7 +32,7 @@ if $(OS) = OPENBSD {
 if $(OS) = MACOSX {
 	SHLIB_SUF = 0.dylib ;
 
-	C++FLAGS = -Wno-deprecated ;
+	C++FLAGS = -Wno-deprecated -DLLVM_VER=37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on scv_viewer = -framework OpenGL -framework GLUT ;

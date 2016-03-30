@@ -30,7 +30,7 @@ public:
 	InstrumentAction() {};
 
 	void EndSourceFileAction() override;
-#ifdef __APPLE__
+#if LLVM_VER > 35
 	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
 #else
 	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
