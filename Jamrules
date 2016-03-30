@@ -6,6 +6,8 @@ if $(OS) = OPENBSD {
 	# Link directly against libestdc++ from ports
 	LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
 	LINKLIBS on scv_viewer += -lestdc++ -lm -lglut ;
+
+	SHLIB_SUF = so.0.0 ;
 }
 
 if $(OS) = MACOSX {
@@ -14,4 +16,8 @@ if $(OS) = MACOSX {
 	LINKLIBS on scv_viewer += -lc++ -lm ;
 
 	C++FLAGS = -Wno-deprecated ;
+
+	SHLIB_SUF = 0.dylib ;
+	# We must specify that _scv_node0 will be available at runtime
+	LINKFLAGS on libscv.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
 }
