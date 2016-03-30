@@ -87,6 +87,8 @@ sub run {
 	my ($self, @args) = @_;
 
 	$ENV{SCV_VIEWER_SOCKET} = "SCV::Viewer.socket";
+	$ENV{LD_LIBRARY_PATH} = "lib";
+	$ENV{DYLD_LIBRARY_PATH} = "lib";
 
 	my $tmp_dir = $self->{tmp_dir};
 	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/$self->{prog_name}", @args);
