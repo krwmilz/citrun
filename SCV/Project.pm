@@ -1,6 +1,7 @@
 package SCV::Project;
 use strict;
 
+use Cwd;
 use File::Temp qw( tempdir );
 use Test;
 use IPC::Open3;
@@ -37,19 +38,20 @@ sub compile {
 	my $tmp_dir = $self->{tmp_dir};
 	my $src_files = join(" ", @{ $self->{src_files} });
 
-	my $makefile = <<EOF;
-PROG = $self->{prog_name}
-SRCS = $src_files
-MAN =
+	my $jamfile = <<EOF;
+LINKFLAGS = \$(LDFLAGS) ;
+LINKLIBS = \$(LDADD) ;
 
-.include <bsd.prog.mk>
+Main $self->{prog_name} : $src_files ;
 EOF
-	# Write Makefile to temp directory
-	open( my $makefile_fh, ">", "$tmp_dir/Makefile" );
-	syswrite( $makefile_fh, $makefile );
+	# Write Jamfile to temp directory
+	open( my $jamfile_fh, ">", "$tmp_dir/Jamfile" );
+	syswrite( $jamfile_fh, $jamfile );
+	close( $jamfile_fh );
 
 	# Use the wrapper to make sure it works
-	my $ret = system( "wrap/scv_wrap make -C $tmp_dir" );
+	my $cwd = getcwd;
+	my $ret = system( "cd $tmp_dir && $cwd/wrap/scv_wrap jam" );
 	die "make failed: $ret\n" if ($ret);
 }
 
@@ -91,7 +93,7 @@ sub run {
 	$ENV{DYLD_LIBRARY_PATH} = "lib";
 
 	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open3(undef, undef, \*CHLD_ERR, "$tmp_dir/$self->{prog_name}", @args);
+	$self->{pid} = open3(undef, \*CHLD_OUT, undef, "$tmp_dir/$self->{prog_name}", @args);
 }
 
 sub kill {
@@ -106,7 +108,7 @@ sub wait {
 	my $real_ret = $? >> 8;
 
 	my $stderr;
-	while (my $line = <CHLD_ERR>) {
+	while (my $line = <CHLD_OUT>) {
 		$stderr .= $line;
 	}
 
