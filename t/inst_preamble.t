@@ -19,6 +19,8 @@ $project->compile();
 
 my $tmp_dir = $project->get_tmpdir();
 
+$tmp_dir = substr( $tmp_dir, 8 ) if ($^O eq "darwin");
+
 my $preamble_good = <<EOF;
 #include <stdint.h>
 struct _scv_node {
