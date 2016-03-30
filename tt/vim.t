@@ -1,11 +1,14 @@
 use strict;
+use Cwd;
 use SCV::Project;
 use SCV::Viewer;
 use Test::More tests => 7;
+use Time::HiRes qw( time );
 
 my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 
+my $cwd = getcwd;
 my $tmpdir = $project->get_tmpdir();
 
 my $vim_src = "ftp://ftp.vim.org/pub/vim/unix/vim-7.4.tar.bz2";
@@ -13,10 +16,11 @@ is( system("cd $tmpdir && curl -O $vim_src"), 0, "download" );
 is( system("cd $tmpdir && tar xjf vim-7.4.tar.bz2"), 0, "extract" );
 
 my $scv_wrap = "wrap/scv_wrap";
-is( system("$scv_wrap make -C $tmpdir/vim74/src scratch"), 0, "make scratch" );
+is( system("make -C $tmpdir/vim74/src scratch"), 0, "make scratch" );
+# LDADD variable does not get picked up by auto conf, use LIBS instread
 is( system("$scv_wrap make -C $tmpdir/vim74/src config LIBS=-lscv"), 0, "make config" );
 is( system("rm $tmpdir/vim74/src/SRC_NUMBER"), 0, "rm SRC_NUMBER" );
-system("$scv_wrap make -C $tmpdir/vim74/src myself");
+is( system("$scv_wrap make -C $tmpdir/vim74/src myself"), 0, "make myself" );
 
 # Launch the newly compiled programs and make sure the runtime is communicating
 $project->{prog_name} = "vim74/src/vim";
@@ -35,9 +39,16 @@ for (@$tus) {
 	print STDERR "$_->{filename}, $_->{lines} lines, $_->{inst_sites} inst sites\n";
 }
 
+print STDERR ">>> START\n";
+# Lets see how long it takes to do 60 data calls
+for (1..60) {
+	my $data1 = $viewer->get_execution_data($tus);
+}
+print STDERR ">>> END\n";
+
 $project->kill();
 $project->wait();
 
-$ENV{SCV_VIEWER_SOCKET} = "SCV::Viewer.socket";
+#$ENV{SCV_VIEWER_SOCKET} = "$cwd/SCV::Viewer.socket";
 # Check that the native test suite can pass with instrumented binaries
-is( system("$scv_wrap make -C $tmpdir/vim74/src test"), 0, "make test" );
+#is( system("make -C $tmpdir/vim74/src test"), 0, "make test" );
