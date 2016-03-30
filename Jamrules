@@ -57,3 +57,32 @@ if $(OS) = MACOSX {
 		-lclangSerialization
 		-lclangTooling ;
 }
+
+if $(OS) = LINUX {
+	SHLIB_SUF = so ;
+
+	C++FLAGS = -DLLVM_VER=35 ;
+
+	PKG_CONFIG_LIBS = gl glew freetype2 ;
+	# Link directly against libestdc++ from ports
+	LINKLIBS on scv_viewer = -lstdc++ -lm -lglut ;
+
+	LINKLIBS on scv_instrument =
+		-Wl,--start-group
+		-lclangAST
+		-lclangAnalysis
+		-lclangBasic
+		-lclangDriver
+		-lclangEdit
+		-lclangFrontend
+		-lclangFrontendTool
+		-lclangLex -lclangParse
+		-lclangRewrite
+		-lclangRewriteFrontend
+		-lclangSema
+		-lclangSerialization
+		-lclangTooling
+		-Wl,--end-group
+		-lstdc++
+		-lbsd ;
+}
