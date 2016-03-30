@@ -38,4 +38,20 @@ if $(OS) = MACOSX {
 
 	# We must specify that _scv_node0 will be available at runtime
 	LINKFLAGS on libscv.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
+
+	LINKLIBS on scv_instrument =
+		-lc++
+		-lclangAST
+		-lclangAnalysis
+		-lclangBasic
+		-lclangDriver
+		-lclangEdit
+		-lclangFrontend
+		-lclangFrontendTool
+		-lclangLex -lclangParse
+		-lclangRewrite
+		-lclangRewriteFrontend
+		-lclangSema
+		-lclangSerialization
+		-lclangTooling ;
 }
