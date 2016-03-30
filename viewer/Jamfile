@@ -6,7 +6,6 @@ SUBDIRC++FLAGS += -std=c++11 ;
 
 LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
 LINKLIBS on scv_viewer += -lstdc++ -lm -lglut ;
-LINK on scv_viewer = eg++ ;
 
 Main scv_viewer :
 	main.cc
