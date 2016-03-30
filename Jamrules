@@ -7,3 +7,11 @@ if $(OS) = OPENBSD {
 	LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
 	LINKLIBS on scv_viewer += -lestdc++ -lm -lglut ;
 }
+
+if $(OS) = MACOSX {
+	LINKLIBS on scv_viewer = `pkg-config glew freetype2 --libs` ;
+	LINKLIBS on scv_viewer += -framework OpenGL -framework GLUT ;
+	LINKLIBS on scv_viewer += -lc++ -lm ;
+
+	C++FLAGS = -Wno-deprecated ;
+}
