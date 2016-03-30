@@ -2,22 +2,23 @@
 
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
-
-	# Link directly against libestdc++ from ports
-	LINKLIBS on scv_viewer = `pkg-config gl glew freetype2 --libs` ;
-	LINKLIBS on scv_viewer += -lestdc++ -lm -lglut ;
-
 	SHLIB_SUF = so.0.0 ;
+
+	PKG_CONFIG_LIBS = gl glew freetype2 ;
+	# Link directly against libestdc++ from ports
+	LINKLIBS on scv_viewer = -lestdc++ -lm -lglut ;
+
 }
 
 if $(OS) = MACOSX {
-	LINKLIBS on scv_viewer = `pkg-config glew freetype2 --libs` ;
-	LINKLIBS on scv_viewer += -framework OpenGL -framework GLUT ;
-	LINKLIBS on scv_viewer += -lc++ -lm ;
+	SHLIB_SUF = 0.dylib ;
 
 	C++FLAGS = -Wno-deprecated ;
 
-	SHLIB_SUF = 0.dylib ;
+	PKG_CONFIG_LIBS = glew freetype2 ;
+	LINKLIBS on scv_viewer = -framework OpenGL -framework GLUT ;
+	LINKLIBS on scv_viewer += -lc++ -lm ;
+
 	# We must specify that _scv_node0 will be available at runtime
 	LINKFLAGS on libscv.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
 }
