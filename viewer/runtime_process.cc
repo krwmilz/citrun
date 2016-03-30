@@ -6,7 +6,6 @@
 #include <sstream>
 #include <vector>
 
-#include "default-text.h"
 #include "runtime_process.h"
 
 RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) :
