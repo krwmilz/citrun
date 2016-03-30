@@ -30,7 +30,11 @@ public:
 	InstrumentAction() {};
 
 	void EndSourceFileAction() override;
+#ifdef __APPLE__
+	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
+#else
 	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
+#endif
 
 private:
 	clang::Rewriter TheRewriter;

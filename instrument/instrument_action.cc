@@ -15,7 +15,11 @@
 #include "runtime_h.h"
 
 
+#ifdef __APPLE__
+std::unique_ptr<clang::ASTConsumer>
+#else
 clang::ASTConsumer *
+#endif
 InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRef file)
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
@@ -24,7 +28,11 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 
 	// Hang onto a reference to this so we can read from it later
 	InstrumentASTConsumer = new RewriteASTConsumer(TheRewriter);
+#ifdef __APPLE__
+	return std::unique_ptr<clang::ASTConsumer>(InstrumentASTConsumer);
+#else
 	return InstrumentASTConsumer;
+#endif
 }
 
 unsigned int
