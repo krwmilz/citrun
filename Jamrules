@@ -8,6 +8,23 @@ if $(OS) = OPENBSD {
 	# Link directly against libestdc++ from ports
 	LINKLIBS on scv_viewer = -lestdc++ -lm -lglut ;
 
+	LINKLIBS on scv_instrument =
+		-lestdc++
+		-Wl,--start-group
+		-lclangAST
+		-lclangAnalysis
+		-lclangBasic
+		-lclangDriver
+		-lclangEdit
+		-lclangFrontend
+		-lclangFrontendTool
+		-lclangLex -lclangParse
+		-lclangRewriteCore
+		-lclangRewriteFrontend
+		-lclangSema
+		-lclangSerialization
+		-lclangTooling
+		-Wl,--end-group ;
 }
 
 if $(OS) = MACOSX {
