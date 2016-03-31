@@ -19,7 +19,6 @@ public:
 
 	static void idle_step();
 	static void print_fps(int);
-	static void timed_step(int);
 	static void next_frame(View *);
 
 	static FT_Library ft_library;
@@ -161,16 +160,6 @@ window::next_frame(View *vu)
 }
 
 void
-window::timed_step(int ms)
-{
-	View *vu = static_vu;
-	if (vu->animate) {
-		glutTimerFunc (ms, timed_step, ms);
-		next_frame (vu);
-	}
-}
-
-void
 window::idle_step(void)
 {
 	View *vu = static_vu;
@@ -201,7 +190,6 @@ start_animation()
 	View *vu = window::static_vu;
 	vu->num_frames = 0;
 	vu->last_frame_time = vu->fps_start_time = current_time();
-	//glutTimerFunc (1000/60, timed_step, 1000/60);
 	glutIdleFunc(window::idle_step);
 	if (!vu->has_fps_timer) {
 		vu->has_fps_timer = true;
