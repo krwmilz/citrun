@@ -7,4 +7,14 @@
 .Sh SYNOPSIS
 .Nm
 .Sh DESCRIPTION
-Instrument source code for execution analysis.
+.Nm
+is not meant to be invoked directly. Rather it is meant to be called from
+compiler named symlinks that are put on the $PATH by
+.Xr scv_wrap 1 .
+.Pp
+If an
+.Xr scv_viewer 1
+is running any instrumented applications will try connecting to it.
+.Sh SEE ALSO
+.Xr scv_viewer 1 ,
+.Xr scv_wrap 1
