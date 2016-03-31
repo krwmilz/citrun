@@ -45,6 +45,7 @@ af_unix::set_listen()
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");
 
+	/* Size 1024 backlog */
 	if (listen(fd, 1024))
 		err(1, "listen");
 }
@@ -66,11 +67,10 @@ af_unix::accept()
 	}
 
 	// Turn off non blocking mode
-	int flags = fcntl(new_fd, F_GETFL, 0);
-	if (flags < 0)
+	int flags;
+	if ((flags = fcntl(new_fd, F_GETFL, 0)) < 0)
 		err(1, "fcntl(F_GETFL)");
-	fcntl(new_fd, F_SETFL, flags & ~O_NONBLOCK);
-	if (flags < 0)
+	if (fcntl(new_fd, F_SETFL, flags & ~O_NONBLOCK) < 0)
 		err(1, "fcntl(F_SETFL)");
 
 	std::cerr << "accepted new connection" << std::endl;
