@@ -94,6 +94,8 @@ window::window(int argc, char *argv[])
 
 	// This creates the socket with SOCK_NONBLOCK
 	socket.set_listen();
+
+	static_vu->toggle_animation();
 }
 
 void
