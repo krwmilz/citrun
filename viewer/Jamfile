@@ -21,4 +21,7 @@ Main scv_viewer :
 
 LinkLibraries scv_viewer : libglyphy ;
 
+InstallBin $(PREFIX)/bin : scv_viewer ;
+InstallMan $(PREFIX)/man : scv_viewer.1 ;
+
 SubInclude TOP viewer glyphy ;

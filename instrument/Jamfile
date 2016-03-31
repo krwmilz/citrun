@@ -1,11 +1,12 @@
 SubDir TOP instrument ;
 
 SUBDIRC++FLAGS = -std=c++11 `llvm-config --cxxflags` ;
+LINKFLAGS on scv_instrument = `llvm-config --ldflags` ;
+LINKLIBS on scv_instrument += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;
 
 Main scv_instrument : main.cc
 	instrument_action.cc
 	rewrite_ast_visitor.cc ;
 
-LINKFLAGS on scv_instrument = `llvm-config --ldflags` ;
-
-LINKLIBS on scv_instrument += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;
+InstallBin $(PREFIX)/bin : scv_instrument ;
+InstallMan $(PREFIX)/man : scv_instrument.1 ;
