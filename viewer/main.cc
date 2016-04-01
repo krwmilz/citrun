@@ -81,8 +81,10 @@ window::window(int argc, char *argv[])
 	ft_face = NULL;
 #ifdef __OPENBSD__
 	FT_New_Face(ft_library, "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf", /* face_index */ 0, &ft_face);
+#elif __APPLE__
+	FT_New_Face(ft_library, "/Library/Fonts/Andale Mono.ttf", /* face_index */ 0, &ft_face);
 #else
-	FT_New_Face(ft_library, "DejaVuSansMono.ttf", /* face_index */ 0, &ft_face);
+	errx(1, "PICK A FONT FOR THIS PLATFORM");
 #endif
 
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
