@@ -14,6 +14,9 @@ if [ "`uname`" == "OpenBSD" ]; then
 	pkg_dir=`pwd`/pkg
 	export PORTSDIR_PATH="/usr/ports:$pkg_dir"
 	export DISTDIR=$pkg_dir
+	# Disable tarball checksumming.
+	# Continuous integration does not like this kind of stuff.
+	export NO_CHECKSUM=1
 	make -C pkg/devel/citrun clean=all
 	make -C pkg/devel/citrun package
 fi
