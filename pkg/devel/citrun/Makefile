@@ -27,7 +27,7 @@ BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
 do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q
 
 do-install:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${ALL_FAKE_FLAGS} jam install
