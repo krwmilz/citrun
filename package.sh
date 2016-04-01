@@ -21,6 +21,8 @@ if [ "`uname`" == "OpenBSD" ]; then
 	export NO_CHECKSUM=1
 	make -C pkg/devel/citrun clean=all
 	make -C pkg/devel/citrun package
+else
+	echo error: `uname` needs package magic
 fi
 
 echo done
