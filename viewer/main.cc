@@ -55,7 +55,7 @@ window::window(int argc, char *argv[])
 	glutInit(&argc, argv);
 	glutInitWindowSize(1600, 1200);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	int window = glutCreateWindow("C trace);
+	int window = glutCreateWindow("Source Code Visualizer");
 	glutReshapeFunc(reshape_func);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard_func);
