@@ -77,14 +77,15 @@ window::window(int argc, char *argv[])
 
 	FT_Init_FreeType(&ft_library);
 
-	ft_face = NULL;
 #if defined(__OpenBSD__)
-	FT_New_Face(ft_library, "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf", /* face_index */ 0, &ft_face);
+	const char *font_path = "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf";
 #elif defined(__APPLE__)
-	FT_New_Face(ft_library, "/Library/Fonts/Andale Mono.ttf", /* face_index */ 0, &ft_face);
+	const char *font_path = "/Library/Fonts/Andale Mono.ttf";
 #else
 	errx(1, "PICK A FONT FOR THIS PLATFORM");
 #endif
+	ft_face = NULL;
+	FT_New_Face(ft_library, font_path, /* face_index */ 0, &ft_face);
 
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
 
