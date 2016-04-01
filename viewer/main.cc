@@ -142,7 +142,7 @@ window::display(void)
 
 /* Return current time in milli-seconds */
 static long
-current_time (void)
+current_time(void)
 {
 	return glutGet (GLUT_ELAPSED_TIME);
 }
