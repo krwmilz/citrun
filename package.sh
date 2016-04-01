@@ -12,7 +12,9 @@ if [ "`uname`" == "OpenBSD" ]; then
 		exit 1
 	fi
 	pkg_dir=`pwd`/pkg
+	# OpenBSD port building stuff needs to know where home is
 	export PORTSDIR_PATH="/usr/ports:$pkg_dir"
+	# Tarball is located here
 	export DISTDIR=$pkg_dir
 	# Disable tarball checksumming.
 	# Continuous integration does not like this kind of stuff.
