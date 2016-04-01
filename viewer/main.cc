@@ -144,7 +144,7 @@ window::display(void)
 static long
 current_time(void)
 {
-	return glutGet (GLUT_ELAPSED_TIME);
+	return glutGet(GLUT_ELAPSED_TIME);
 }
 
 void
