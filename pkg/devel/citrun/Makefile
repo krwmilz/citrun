@@ -3,7 +3,6 @@
 COMMENT =		see your source code run
 
 DISTNAME =		citrun-0
-REVISION =		1
 CATEGORIES =		devel
 
 HOMEPAGE =		http://citrun.com
