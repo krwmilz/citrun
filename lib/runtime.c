@@ -118,6 +118,10 @@ send_metadata(int fd)
 	}
 }
 
+/*
+ * For each link in the instrumented translation unit chain send the contents
+ * of that links execution buffers.
+ */
 void
 send_execution_data(int fd)
 {
