@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 
-#include "default-text.h"
 #include "af_unix.h"
 #include "runtime_process.h"
 #include "view.h"
@@ -88,13 +87,6 @@ window::window(int argc, char *argv[])
 #endif
 
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
-
-
-	glyphy_point_t top_left = { 0, 0 };
-	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, default_text, font, 1);
-
-	demo_font_print_stats(font);
 
 	static_vu->setup();
 
