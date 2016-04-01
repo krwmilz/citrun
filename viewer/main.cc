@@ -79,9 +79,9 @@ window::window(int argc, char *argv[])
 	FT_Init_FreeType(&ft_library);
 
 	ft_face = NULL;
-#ifdef __OPENBSD__
+#if defined(__OpenBSD__)
 	FT_New_Face(ft_library, "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf", /* face_index */ 0, &ft_face);
-#elif __APPLE__
+#elif defined(__APPLE__)
 	FT_New_Face(ft_library, "/Library/Fonts/Andale Mono.ttf", /* face_index */ 0, &ft_face);
 #else
 	errx(1, "PICK A FONT FOR THIS PLATFORM");
