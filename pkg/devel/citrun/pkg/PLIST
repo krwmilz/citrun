@@ -1,0 +1,8 @@
+@comment $OpenBSD$
+@bin bin/scv_instrument
+@bin bin/scv_viewer
+bin/scv_wrap
+@lib lib/libscv.so.${LIBscv_VERSION}
+@man man/man1/scv_instrument.1
+@man man/man1/scv_viewer.1
+@man man/man1/scv_wrap.1

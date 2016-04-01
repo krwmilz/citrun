@@ -1,0 +1,20 @@
+--- Jamrules
++++ Jamrules
+@@ -4,7 +4,7 @@ if $(OS) = OPENBSD {
+ 	C++ = eg++ ;
+ 	SHLIB_SUF = so.0.0 ;
+ 
+-	C++FLAGS = -DLLVM_VER=34 ;
++	C++FLAGS = -DLLVM_VER=37 ;
+ 
+ 	PKG_CONFIG_LIBS = gl glew freetype2 ;
+ 	# Link directly against libestdc++ from ports
+@@ -21,7 +21,7 @@ if $(OS) = OPENBSD {
+ 		-lclangFrontend
+ 		-lclangFrontendTool
+ 		-lclangLex -lclangParse
+-		-lclangRewriteCore
++		-lclangRewrite
+ 		-lclangRewriteFrontend
+ 		-lclangSema
+ 		-lclangSerialization
