@@ -1,8 +1,8 @@
 .Dd April 1, 2016
-.Dt SCV_INSTRUMENT 1
+.Dt CITRUN_INSTRUMENT 1
 .Os
 .Sh NAME
-.Nm scv_instrument
+.Nm citrun_instrument
 .Nd instrument source code
 .Sh SYNOPSIS
 .Nm
@@ -10,11 +10,11 @@
 .Nm
 is not meant to be invoked directly. Rather it is meant to be called from
 compiler named symlinks that are put on the $PATH by
-.Xr scv_wrap 1 .
+.Xr citrun_wrap 1 .
 .Pp
-If an
-.Xr scv_viewer 1
-is running any instrumented applications will try connecting to it.
+If
+.Xr citrun_gl 1
+is running any applications instrumented by this utility will try connecting to it.
 .Sh SEE ALSO
-.Xr scv_viewer 1 ,
-.Xr scv_wrap 1
+.Xr citrun_gl 1 ,
+.Xr citrun_wrap 1
