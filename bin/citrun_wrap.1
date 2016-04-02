@@ -1,10 +1,21 @@
 .Dd March 11, 2016
-.Dt SCV_WRAP 1
+.Dt CITRUN_WRAP 1
 .Os
 .Sh NAME
-.Nm scv_wrap
+.Nm citrun_wrap
 .Nd wrap a build command
 .Sh SYNOPSIS
 .Nm
+make
 .Sh DESCRIPTION
-Wraps an existing build command adding instrumentation and runtime components.
+Wraps an existing build command putting compiler aliases on $PATH so
+.Xr citrun_instrument 1
+is called instead of the native compiler.
+.Pp
+When using the wrapper any created object files should contain instrumentation.
+The created object files should attempt connections to a running
+.Xr citrun_gl 1
+program.
+.Sh SEE ALSO
+.Xr citrun_gl 1 ,
+.Xr citrun_instrument 1
