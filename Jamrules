@@ -10,7 +10,7 @@ if $(OS) = OPENBSD {
 	# Link directly against libestdc++ from ports
 	LINKLIBS on scv_viewer = -lestdc++ -lm -lglut ;
 
-	LINKLIBS on scv_instrument =
+	LINKLIBS on citrun_instrument =
 		-lestdc++
 		-Wl,--start-group
 		-lclangAST
@@ -41,7 +41,7 @@ if $(OS) = MACOSX {
 	# We must specify that _scv_node0 will be available at runtime
 	LINKFLAGS on libscv.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
 
-	LINKLIBS on scv_instrument =
+	LINKLIBS on citrun_instrument =
 		-lc++
 		-lclangAST
 		-lclangAnalysis
@@ -67,7 +67,7 @@ if $(OS) = LINUX {
 	# Link directly against libestdc++ from ports
 	LINKLIBS on scv_viewer = -lstdc++ -lm -lglut ;
 
-	LINKLIBS on scv_instrument =
+	LINKLIBS on citrun_instrument =
 		-Wl,--start-group
 		-lclangAST
 		-lclangAnalysis

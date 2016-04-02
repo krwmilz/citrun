@@ -1,0 +1,13 @@
+SubDir TOP src ;
+
+SUBDIRC++FLAGS = -std=c++11 `llvm-config --cxxflags` ;
+LINKFLAGS on citrun_instrument = `llvm-config --ldflags` ;
+LINKLIBS on citrun_instrument += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;
+
+Main citrun_instrument :
+	instrument_main.cc
+	instrument_action.cc
+	instrument_ast_visitor.cc ;
+
+InstallBin $(PREFIX)/bin : citrun_instrument ;
+InstallMan $(PREFIX)/man : citrun_instrument.1 ;

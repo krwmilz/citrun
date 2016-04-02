@@ -4,7 +4,7 @@
 #include <clang/AST/AST.h>
 #include <clang/Lex/Lexer.h>
 
-#include "rewrite_ast_visitor.h"
+#include "instrument_ast_visitor.h"
 
 bool
 RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)

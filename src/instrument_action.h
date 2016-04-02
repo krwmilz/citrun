@@ -2,7 +2,7 @@
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
-#include "rewrite_ast_visitor.h"
+#include "instrument_ast_visitor.h"
 
 class RewriteASTConsumer : public clang::ASTConsumer {
 public:
