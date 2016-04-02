@@ -4,7 +4,7 @@ set -e
 ver=0
 
 echo archiving
-(cd .. && git archive --prefix=citrun-$ver/ -o pkg/citrun-$ver.tar.gz HEAD)
+(cd .. && git archive --prefix=citrun-$ver/ -o citrun-$ver.tar.gz HEAD)
 
 if [ "`uname`" == "OpenBSD" ]; then
 	echo OpenBSD detected
@@ -15,8 +15,8 @@ if [ "`uname`" == "OpenBSD" ]; then
 		echo ..extracting
 		tar xzf ports.tar.gz
 
-		echo overlaying CVS metadata and getting latest patches
-		cvs -qd anoncvs@anoncvs.usa.openbsd.org:/cvs get -rOPENBSD_5_8 -P ports
+		#echo overlaying CVS metadata and getting latest patches
+		#cvs -qd anoncvs@anoncvs.usa.openbsd.org:/cvs get -rOPENBSD_5_8 -P ports
 	else
 		echo assuming ports/ tree already checked out
 	fi
@@ -26,7 +26,7 @@ if [ "`uname`" == "OpenBSD" ]; then
 	cp -R openbsd ports/devel/citrun
 
 	mkdir -p ports/distfiles
-	mv citrun-$ver.tar.gz ports/distfiles/
+	mv ../citrun-$ver.tar.gz ports/distfiles/
 
 	echo creating package from citrun-$ver.tar.gz
 	export PORTSDIR=`pwd`/ports
