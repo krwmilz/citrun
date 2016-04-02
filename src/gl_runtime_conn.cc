@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-#include "runtime_process.h"
+#include "gl_runtime_conn.h"
 
 RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) :
 	socket(sock),

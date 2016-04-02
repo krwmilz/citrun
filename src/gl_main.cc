@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "af_unix.h"
-#include "runtime_process.h"
+#include "gl_runtime_conn.h"
 #include "view.h"
 
 #include "demo-buffer.h"

@@ -6,8 +6,8 @@ INSTRUMENT_SRCS =
 	instrument_ast_visitor.cc ;
 
 CITRUN_SRCS =
-	main.cc
-	runtime_process.cc
+	gl_main.cc
+	gl_runtime_conn.cc
 	af_unix.cc
 	view.cc
 	demo-atlas.cc
