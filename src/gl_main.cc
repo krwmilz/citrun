@@ -5,7 +5,7 @@
 
 #include "af_unix.h"
 #include "gl_runtime_conn.h"
-#include "view.h"
+#include "gl_view.h"
 
 #include "gl_buffer.h"
 #include "demo-font.h"

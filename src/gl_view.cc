@@ -16,7 +16,7 @@
  * Google Author(s): Behdad Esfahbod, Maysum Panju, Wojciech Baranowski
  */
 
-#include "view.h"
+#include "gl_view.h"
 
 extern "C" {
 #include "trackball.h"

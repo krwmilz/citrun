@@ -9,7 +9,7 @@ CITRUN_SRCS =
 	gl_main.cc
 	gl_runtime_conn.cc
 	af_unix.cc
-	view.cc
+	gl_view.cc
 	demo-atlas.cc
 	gl_buffer.cc
 	demo-font.cc
