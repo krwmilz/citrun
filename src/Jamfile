@@ -1,12 +1,11 @@
-SubDir TOP viewer ;
+SubDir TOP src ;
 
-SUBDIRC++FLAGS = `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
-SUBDIRC++FLAGS += -I/usr/local/include ;
-SUBDIRC++FLAGS += -std=c++11 ;
+INSTRUMENT_SRCS =
+	instrument_main.cc
+	instrument_action.cc
+	instrument_ast_visitor.cc ;
 
-LINKLIBS on scv_viewer += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
-
-Main scv_viewer :
+CITRUN_SRCS =
 	main.cc
 	runtime_process.cc
 	af_unix.cc
@@ -19,9 +18,27 @@ Main scv_viewer :
 	matrix4x4.c
 	trackball.c ;
 
-LinkLibraries scv_viewer : libglyphy ;
+# libglyphy won't compile with c++11 right now so we have to special case here
+ObjectC++Flags $(INSTRUMENT_SRCS) $(CITRUN_SRCS) : -std=c++11 ;
 
-InstallBin $(PREFIX)/bin : scv_viewer ;
-InstallMan $(PREFIX)/man : scv_viewer.1 ;
+# Instrument uses clang/llvm to do its job
+ObjectC++Flags $(INSTRUMENT_SRCS) : `llvm-config --cxxflags` ;
+ObjectC++Flags $(CITRUN_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
+ObjectC++Flags $(CITRUN_SRCS) : -I/usr/local/include ;
 
-SubInclude TOP viewer glyphy ;
+# Common link libraries on all platforms
+LINKFLAGS on citrun_instrument = `llvm-config --ldflags` ;
+LINKLIBS on citrun_instrument += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;
+LINKLIBS on citrun_gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
+
+Main citrun_instrument : $(INSTRUMENT_SRCS) ;
+Main citrun_gl : $(CITRUN_SRCS) ;
+
+LinkLibraries citrun_gl : libglyphy ;
+
+InstallBin $(PREFIX)/bin : citrun_instrument ;
+InstallBin $(PREFIX)/bin : citrun_gl ;
+InstallMan $(PREFIX)/man : citrun_instrument.1 ;
+InstallMan $(PREFIX)/man : citrun_gl.1 ;
+
+SubInclude TOP src glyphy ;
