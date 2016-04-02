@@ -30,7 +30,7 @@ if $(OS) = OPENBSD {
 }
 
 if $(OS) = MACOSX {
-	SHLIB_SUF = 0.dylib ;
+	SHLIB_SUF = dylib ;
 
 	C++FLAGS = -Wno-deprecated -DLLVM_VER=37 ;
 
