@@ -16,7 +16,7 @@
  * Google Author(s): Behdad Esfahbod
  */
 
-#include "demo-buffer.h"
+#include "gl_buffer.h"
 
 
 struct demo_buffer_t {

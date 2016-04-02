@@ -7,7 +7,7 @@
 #include "af_unix.h"
 #include "draw.h"
 
-#include "demo-buffer.h"
+#include "gl_buffer.h"
 #include "demo-font.h"
 
 struct TranslationUnit {

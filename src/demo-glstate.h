@@ -20,7 +20,7 @@
 #define DEMO_GLSTATE_H
 
 #include "demo-common.h"
-#include "demo-buffer.h"
+#include "gl_buffer.h"
 
 #include "demo-atlas.h"
 #include "demo-shader.h"

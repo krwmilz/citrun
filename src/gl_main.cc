@@ -7,7 +7,7 @@
 #include "gl_runtime_conn.h"
 #include "view.h"
 
-#include "demo-buffer.h"
+#include "gl_buffer.h"
 #include "demo-font.h"
 
 

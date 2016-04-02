@@ -2,7 +2,7 @@
 #define VIEW_H
 
 #include "demo-common.h"
-#include "demo-buffer.h"
+#include "gl_buffer.h"
 #include "demo-glstate.h"
 
 class View {
