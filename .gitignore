@@ -1,9 +1,4 @@
-.depend
 *.o
-*.so*
-*.dylib
-*.So
-*.a
 *.swp
 scv_instrument
 scv_viewer
