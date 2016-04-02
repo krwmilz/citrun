@@ -2,8 +2,8 @@
 
 ver=0
 
-echo downloading
-cp /var/www/htdocs/citrun.com/citrun-0.tar.gz .
+echo archiving
+(cd .. && git archive --prefix=citrun-$ver/ -o pkg/citrun-$ver.tar.gz HEAD)
 
 if [ "`uname`" == "OpenBSD" ]; then
 	echo creating OpenBSD package
