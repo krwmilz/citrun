@@ -1,4 +1,4 @@
-SubDir TOP viewer glyphy ;
+SubDir TOP src glyphy ;
 
 SubDirHdrs . ;
 SubDirC++Flags -DPKGDATADIR="" ;
