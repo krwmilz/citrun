@@ -1,10 +1,17 @@
 .Dd March 13, 2016
-.Dt SCV_VIEWER 1
+.Dt CITRUN_GL 1
 .Os
 .Sh NAME
-.Nm scv_viewer
-.Nd view execution
+.Nm citrun_gl
+.Nd see it run
 .Sh SYNOPSIS
 .Nm
 .Sh DESCRIPTION
-Displays execution paths from instrumented binaries.
+Displays executing source code from any instrumented binaries running on the
+system.
+.Pp
+Instrumented binaries are typically built by wrapping an applications native
+build command with
+.Xr citrun_wrap 1 .
+.Sh SEE ALSO
+.Xr citrun_wrap 1
