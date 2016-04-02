@@ -14,7 +14,7 @@ MASTER_SITES =		http://git.0x30.net/
 
 WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
 
-SHARED_LIBS +=		scv		0.0 # 0.0
+SHARED_LIBS +=		citrun		0.0 # 0.0
 
 # -std=c++11
 MODULES =		gcc4

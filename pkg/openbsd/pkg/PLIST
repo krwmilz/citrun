@@ -1,8 +1,8 @@
 @comment $OpenBSD$
-@bin bin/scv_instrument
-@bin bin/scv_viewer
-bin/scv_wrap
-@lib lib/libscv.so.${LIBscv_VERSION}
-@man man/man1/scv_instrument.1
-@man man/man1/scv_viewer.1
-@man man/man1/scv_wrap.1
+@bin bin/citrun_gl
+@bin bin/citrun_instrument
+bin/citrun_wrap
+@lib lib/libcitrun.so.${LIBcitrun_VERSION}
+@man man/man1/citrun_gl.1
+@man man/man1/citrun_instrument.1
+@man man/man1/citrun_wrap.1
