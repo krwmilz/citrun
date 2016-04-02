@@ -1,0 +1,12 @@
+p {
+	line-height: 1.5em;
+}
+
+li {
+	line-height: 1.5em;
+}
+
+.column {
+	max-width: 80em;
+	margin: auto;
+}
