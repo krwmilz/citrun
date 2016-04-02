@@ -25,9 +25,11 @@ if [ "`uname`" == "OpenBSD" ]; then
 	rm -rf ports/devel/citrun
 	cp -R openbsd ports/devel/citrun
 
+	mkdir -p ports/distfiles
+	mv citrun-$ver.tar.gz ports/distfiles/
+
 	echo creating package from citrun-$ver.tar.gz
-	export PORTSDIR_PATH=`pwd`/ports
-	export DISTDIR=`pwd`
+	export PORTSDIR=`pwd`/ports
 	# Disable tarball checksumming.
 	export NO_CHECKSUM=1
 	make -C ports/devel/citrun clean=all
