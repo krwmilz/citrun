@@ -51,7 +51,7 @@ EOF
 
 	# Use the wrapper to make sure it works
 	my $cwd = getcwd;
-	my $ret = system( "cd $tmp_dir && $cwd/wrap/scv_wrap jam" );
+	my $ret = system( "cd $tmp_dir && $cwd/bin/citrun_wrap jam" );
 	die "make failed: $ret\n" if ($ret);
 }
 

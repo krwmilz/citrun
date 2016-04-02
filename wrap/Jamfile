@@ -1,4 +1,0 @@
-SubDir TOP wrap ;
-
-InstallBin $(PREFIX)/bin : scv_wrap ;
-InstallMan $(PREFIX)/man : scv_wrap.1 ;

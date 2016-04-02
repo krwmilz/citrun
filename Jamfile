@@ -1,5 +1,5 @@
 SubDir TOP ;
 
+SubInclude TOP bin ;
 SubInclude TOP lib ;
 SubInclude TOP src ;
-SubInclude TOP wrap ;
