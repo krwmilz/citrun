@@ -12,6 +12,6 @@ export SCV_PATH="$scv_root/src/compilers"
 export PATH="$SCV_PATH:$PATH"
 
 export LDFLAGS="-L$scv_root/lib"
-export LDADD="-lscv"
+export LDADD="-lcitrun"
 
 exec $@

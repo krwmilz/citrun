@@ -39,7 +39,7 @@ if $(OS) = MACOSX {
 	LINKLIBS on citrun_gl += -lc++ -lm ;
 
 	# We must specify that _scv_node0 will be available at runtime
-	LINKFLAGS on libscv.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
+	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
 
 	LINKLIBS on citrun_instrument =
 		-lc++
