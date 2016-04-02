@@ -3,12 +3,12 @@
 script_dir=`dirname ${0}`
 scv_root=`cd "$script_dir/.."; pwd`
 
-if ! test -d $scv_root/instrument/compilers; then
+if ! test -d $scv_root/src/compilers; then
 	echo error: compilers/ directory does not exist
 	exit 1
 fi
 
-export SCV_PATH="$scv_root/instrument/compilers"
+export SCV_PATH="$scv_root/src/compilers"
 export PATH="$SCV_PATH:$PATH"
 
 export LDFLAGS="-L$scv_root/lib"
