@@ -2,6 +2,9 @@
 
 ver=0
 
+# We need to share /usr/ports with other users
+umask 002
+
 echo archiving
 (cd .. && git archive --prefix=citrun-$ver/ -o pkg/citrun-$ver.tar.gz HEAD)
 
