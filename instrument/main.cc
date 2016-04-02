@@ -103,15 +103,16 @@ ends_with(std::string const &value, std::string const &suffix)
 int
 main(int argc, char *argv[])
 {
+	// Set a better name than the symlink that was used to find this program
+	setprogname("scv_instrument");
+
 	std::vector<std::string> args(argv, argv + argc);
-	std::vector<char *> modified_args;
 	std::vector<std::string> source_files;
+	std::vector<char *> modified_args;
+	// Keep track of some "well known" compiler flags for later.
 	bool preprocess_arg = false;
 	bool object_arg = false;
 	bool compile_arg = false;
-
-	// Set a better name than the symlink that was used to find this program
-	setprogname("scv_instrument");
 
 	for (auto &arg : args) {
 		// Special case some hopefully universal arguments
@@ -123,8 +124,8 @@ main(int argc, char *argv[])
 			compile_arg = true;
 
 		// Find source files
-		if (ends_with(arg, ".cpp") || ends_with(arg, ".c")
-		    || ends_with(arg, ".cxx")) {
+		if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
+		    ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
 
 			// Keep track of original source file names
 			source_files.push_back(arg);
