@@ -30,3 +30,11 @@ pre {
 .link_bar {
 	text-align: right;
 }
+
+/*
+ * Logos displayed next to package download links need to be the same height as
+ * the text.
+ */
+.inline_logo {
+	height: 1em;
+}
