@@ -25,8 +25,8 @@
 	<ul>
 		<li><a href="/pkg/sparc64/citrun-0.tgz">OpenBSD sparc64</a>
 		<li><a href="/pkg/amd64/citrun-0.tgz">OpenBSD amd64</a>
-		<li><a href="/pkg/amd64/citrun-0.deb">Debian amd64</a>
-		<li><a href="/pkg/amd64/citrun-0.dmg">Mac OS X amd64</a>
+		<li>Debian amd64
+		<li>Mac OS X amd64
 	</ul>
 	</p>
 
@@ -42,6 +42,22 @@
 	<pre> <span class="prompt">$</span> man citrun_wrap </pre>
 	<p> The manual pages that come with the package should be enough to get you
 	going. If not then they should be improved.
+	</p>
+
+	<h2>Building</h2>
+	<p> You'll need development packages installed for:
+	<ul>
+		<li>LLVM and Clang
+		<li>FreeType2
+		<li>OpenGL
+		<li>freeglut and glew
+		<li>DejaVu Sans Mono
+	</ul>
+	Also jam and a c++11 capable compiler are needed.
+	</p>
+	Once the build requirements have been met get the source and jam in the
+	root:
+	<pre> <span class="prompt">$</span> cd citrun-0 && jam</pre>
 	</p>
 </div>
 </body>

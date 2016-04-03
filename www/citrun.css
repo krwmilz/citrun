@@ -13,5 +13,9 @@ li {
 }
 
 .prompt {
-	color: limegreen;
+	color: green;
+}
+
+pre {
+	background-color: ivory;
 }
