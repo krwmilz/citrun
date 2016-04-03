@@ -1,21 +1,32 @@
-p {
-	line-height: 1.5em;
-}
+/*
+ * This was recommended to me once on a website somewhere. It stuck.
+ */
+p  { line-height: 1.5em; }
+li { line-height: 1.5em; }
 
-li {
-	line-height: 1.5em;
-}
-
+/*
+ * Make it about 80 chars width max.
+ */
 .main {
 	max-width: 60em;
 	margin: auto;
 	font-family: monospace;
 }
 
+/*
+ * For "prompt" style stuff
+ */
+pre {
+	background-color: ivory;
+}
 .prompt {
 	color: green;
 }
 
-pre {
-	background-color: ivory;
+/*
+ * This is the link bar just below the main title.
+ * Looks good over on the right.
+ */
+.link_bar {
+	text-align: right;
 }
