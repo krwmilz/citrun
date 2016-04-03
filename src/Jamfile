@@ -36,9 +36,7 @@ Main citrun_gl : $(CITRUN_SRCS) ;
 
 LinkLibraries citrun_gl : libglyphy ;
 
-InstallBin $(PREFIX)/bin : citrun_instrument ;
-InstallBin $(PREFIX)/bin : citrun_gl ;
-InstallMan $(PREFIX)/man : citrun_instrument.1 ;
-InstallMan $(PREFIX)/man : citrun_gl.1 ;
+InstallBin $(PREFIX)/bin : citrun_instrument citrun_gl ;
+InstallMan $(PREFIX)/man : citrun_instrument.1 citrun_gl.1 ;
 
 SubInclude TOP src glyphy ;
