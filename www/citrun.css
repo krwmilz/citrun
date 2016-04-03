@@ -7,7 +7,7 @@ li {
 }
 
 .main {
-	max-width: 80em;
+	max-width: 60em;
 	margin: auto;
-	font: monospace;
+	font-family: monospace;
 }
