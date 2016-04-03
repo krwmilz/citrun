@@ -104,7 +104,7 @@ int
 main(int argc, char *argv[])
 {
 	// Set a better name than the symlink that was used to find this program
-	setprogname("scv_instrument");
+	setprogname("citrun_instrument");
 
 	std::vector<std::string> args(argv, argv + argc);
 	std::vector<std::string> source_files;
