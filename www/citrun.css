@@ -11,3 +11,7 @@ li {
 	margin: auto;
 	font-family: monospace;
 }
+
+.prompt {
+	color: limegreen;
+}
