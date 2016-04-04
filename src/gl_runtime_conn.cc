@@ -18,9 +18,9 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 	translation_units.resize(num_tus);
 
 	assert(sizeof(pid_t) == 4);
-	socket->read_all((uint8_t *)&process_id, 4);
-	socket->read_all((uint8_t *)&parent_process_id, 4);
-	socket->read_all((uint8_t *)&process_group, 4);
+	socket->read_all(process_id);
+	socket->read_all(parent_process_id);
+	socket->read_all(process_group);
 
 	std::stringstream ss;
 	ss << "Translation Units: " << num_tus << std::endl;
@@ -44,10 +44,10 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 		read_file(current_unit.file_name, top_left);
 		top_left.x += 50;
 
-		socket->read_all((uint8_t *)&current_unit.num_lines, 4);
+		socket->read_all(current_unit.num_lines);
 		current_unit.execution_counts.resize(current_unit.num_lines);
 
-		socket->read_all((uint8_t *)&current_unit.inst_sites, 4);
+		socket->read_all(current_unit.inst_sites);
 	}
 
 	demo_font_print_stats(font);

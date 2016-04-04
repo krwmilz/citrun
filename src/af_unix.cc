@@ -97,28 +97,6 @@ af_unix::write_all(uint8_t *buf, size_t bytes_total)
 }
 
 int
-af_unix::read_all(uint64_t &buf)
-{
-	int bytes_left = sizeof(uint64_t);
-	int bytes_read = 0;
-	ssize_t n;
-
-	while (bytes_left > 0) {
-		n = read(fd, &buf + bytes_read, bytes_left);
-
-		if (n == 0)
-			errx(1, "read(): read 0 bytes on socket");
-		if (n < 0)
-			err(1, "read()");
-
-		bytes_read += n;
-		bytes_left -= n;
-	}
-
-	return bytes_read;
-}
-
-int
 af_unix::read_all(uint8_t *buf, size_t bytes_total)
 {
 	int bytes_left = bytes_total;
