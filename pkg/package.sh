@@ -55,7 +55,7 @@ elif [ "`uname`" == "Darwin" ]; then
 	cp osx/Info.plist Citrun.app/Contents/
 
 	# In case this didn't happen last time
-	umount /Volumes/_Packager || true
+	umount /Volumes/Citrun || true
 	hdiutil create -size 32m -fs HFS+ -volname "Citrun" citrun_rw_img.dmg
 	hdiutil attach citrun_rw_img.dmg
 
