@@ -39,9 +39,6 @@ sub compile {
 	my $src_files = join(" ", @{ $self->{src_files} });
 
 	my $jamfile = <<EOF;
-LINKFLAGS = \$(LDFLAGS) ;
-LINKLIBS = \$(LDADD) ;
-
 Main $self->{prog_name} : $src_files ;
 EOF
 	# Write Jamfile to temp directory
@@ -49,9 +46,16 @@ EOF
 	syswrite( $jamfile_fh, $jamfile );
 	close( $jamfile_fh );
 
-	# Use the wrapper to make sure it works
 	my $cwd = getcwd;
-	my $ret = system( "cd $tmp_dir && $cwd/bin/citrun_wrap jam" );
+
+	$ENV{SCV_PATH} = "$cwd/src/compilers";
+	$ENV{PATH} = "$ENV{SCV_PATH}:$ENV{PATH}";
+
+	# Jam style LDFLAGS and LDADD
+	$ENV{LINKFLAGS} = "-L$cwd/lib";
+	$ENV{LINKLIBS} = "-lcitrun";
+
+	my $ret = system( "cd $tmp_dir && jam" );
 	die "make failed: $ret\n" if ($ret);
 }
 
