@@ -56,14 +56,14 @@ elif [ "`uname`" == "Darwin" ]; then
 
 	# In case this didn't happen last time
 	umount /Volumes/_Packager || true
-	hdiutil create -size 32m -fs HFS+ -volname "_Packager" citrun_rw_img.dmg
+	hdiutil create -size 32m -fs HFS+ -volname "Citrun" citrun_rw_img.dmg
 	hdiutil attach citrun_rw_img.dmg
 
 	# Figure out what device we just mounted
 	DEVS=$(hdiutil attach citrun_rw_img.dmg | cut -f 1)
 	DEV=$(echo $DEVS | cut -f 1 -d ' ')
 
-	cp -R Citrun.app /Volumes/_Packager/
+	cp -R Citrun.app /Volumes/Citrun/
 
 	hdiutil detach $DEV
 	hdiutil convert citrun_rw_img.dmg -format UDZO -o Citrun-$ver.dmg
