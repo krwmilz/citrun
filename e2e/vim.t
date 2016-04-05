@@ -1,26 +1,27 @@
 use strict;
-use Cwd;
 use SCV::Project;
 use SCV::Viewer;
 use Test::More tests => 7;
 use Time::HiRes qw( time );
 
+#
+# This uses tools installed from a package, not the in tree build!
+#
+
 my $viewer = SCV::Viewer->new();
 my $project = SCV::Project->new();
 
-my $cwd = getcwd;
 my $tmpdir = $project->get_tmpdir();
 
 my $vim_src = "ftp://ftp.vim.org/pub/vim/unix/vim-7.4.tar.bz2";
 is( system("cd $tmpdir && curl -O $vim_src"), 0, "download" );
 is( system("cd $tmpdir && tar xjf vim-7.4.tar.bz2"), 0, "extract" );
 
-my $scv_wrap = "wrap/scv_wrap";
 is( system("make -C $tmpdir/vim74/src scratch"), 0, "make scratch" );
 # LDADD variable does not get picked up by auto conf, use LIBS instread
-is( system("$scv_wrap make -C $tmpdir/vim74/src config LIBS=-lscv"), 0, "make config" );
+is( system("citrun_wrap make -C $tmpdir/vim74/src config LDFLAGS=-L/usr/local/lib LIBS=-lcitrun"), 0, "make config" );
 is( system("rm $tmpdir/vim74/src/SRC_NUMBER"), 0, "rm SRC_NUMBER" );
-is( system("$scv_wrap make -C $tmpdir/vim74/src myself"), 0, "make myself" );
+is( system("citrun_wrap make -C $tmpdir/vim74/src myself"), 0, "make myself" );
 
 # Launch the newly compiled programs and make sure the runtime is communicating
 $project->{prog_name} = "vim74/src/vim";
