@@ -49,6 +49,6 @@ print STDERR ">>> END\n";
 $project->kill();
 $project->wait();
 
-#$ENV{SCV_VIEWER_SOCKET} = "$cwd/SCV::Viewer.socket";
+#$ENV{CITRUN_SOCKET} = "$cwd/SCV::Viewer.socket";
 # Check that the native test suite can pass with instrumented binaries
 #is( system("make -C $tmpdir/vim74/src test"), 0, "make test" );

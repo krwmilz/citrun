@@ -48,7 +48,7 @@ control_thread(void *arg)
 		err(1, "socket");
 
 	/* The default socket location can be overridden */
-	if ((viewer_sock = getenv("SCV_VIEWER_SOCKET")) == NULL)
+	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
 		/* There was an error getting the env var, use the default */
 		viewer_sock = "/tmp/citrun_gl.socket";
 

@@ -94,7 +94,7 @@ sub run {
 
 	$ENV{LD_LIBRARY_PATH} = "lib";
 	$ENV{DYLD_LIBRARY_PATH} = "lib";
-	$ENV{SCV_VIEWER_SOCKET} = "SCV::Viewer.socket";
+	$ENV{CITRUN_SOCKET} = "SCV::Viewer.socket";
 
 	my $tmp_dir = $self->{tmp_dir};
 	$self->{pid} = open2(\*CHLD_OUT, undef, "$tmp_dir/$self->{prog_name}", @args);
