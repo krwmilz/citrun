@@ -6,3 +6,8 @@ bin/citrun_wrap
 @man man/man1/citrun_gl.1
 @man man/man1/citrun_instrument.1
 @man man/man1/citrun_wrap.1
+share/citrun/
+share/citrun/c++
+share/citrun/cc
+share/citrun/g++
+share/citrun/gcc
