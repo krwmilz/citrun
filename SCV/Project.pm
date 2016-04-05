@@ -48,8 +48,8 @@ EOF
 
 	my $cwd = getcwd;
 
-	$ENV{SCV_PATH} = "$cwd/src/compilers";
-	$ENV{PATH} = "$ENV{SCV_PATH}:$ENV{PATH}";
+	$ENV{CITRUN_PATH} = "$cwd/src/compilers";
+	$ENV{PATH} = "$ENV{CITRUN_PATH}:$ENV{PATH}";
 
 	# Jam style LDFLAGS and LDADD
 	$ENV{LINKFLAGS} = "-L$cwd/lib";
