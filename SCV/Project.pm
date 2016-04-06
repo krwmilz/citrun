@@ -48,7 +48,7 @@ EOF
 
 	my $cwd = getcwd;
 
-	$ENV{CITRUN_PATH} = "$cwd/src/compilers";
+	$ENV{CITRUN_PATH} = "$cwd/share";
 	$ENV{PATH} = "$ENV{CITRUN_PATH}:$ENV{PATH}";
 
 	# Jam style LDFLAGS and LDADD
