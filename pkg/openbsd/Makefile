@@ -27,14 +27,9 @@ BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
 do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q -j2
 
 do-install:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${ALL_FAKE_FLAGS} jam install
-	mkdir -p ${PREFIX}/share/citrun
-	cd ${PREFIX}/share/citrun && ln -s ../../bin/citrun_instrument cc
-	cd ${PREFIX}/share/citrun && ln -s ../../bin/citrun_instrument gcc
-	cd ${PREFIX}/share/citrun && ln -s ../../bin/citrun_instrument c++
-	cd ${PREFIX}/share/citrun && ln -s ../../bin/citrun_instrument g++
 
 .include <bsd.port.mk>
