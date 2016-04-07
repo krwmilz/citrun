@@ -9,5 +9,9 @@ bin/citrun_wrap
 share/citrun/
 share/citrun/c++
 share/citrun/cc
+share/citrun/clang
+share/citrun/clang++
+share/citrun/eg++
+share/citrun/egcc
 share/citrun/g++
 share/citrun/gcc
