@@ -95,6 +95,12 @@ InstrumentAction::EndSourceFileAction()
 	unsigned int tu_number = read_src_number();
 
 	std::stringstream ss;
+	// Add preprocessor stuff so that the C runtime library links against
+	// C++ object code.
+	ss << "#ifdef __cplusplus" << std::endl;
+	ss << "extern \"C\" {" << std::endl;
+	ss << "#endif" << std::endl;
+
 	// Embed the header directly in the primary source file.
 	ss << runtime_h << std::endl;
 
@@ -116,6 +122,11 @@ InstrumentAction::EndSourceFileAction()
 		<< "	.file_name = \"" << file_name << "\"," << std::endl
 		<< "	.next = &_scv_node" << tu_number + 1 << "," << std::endl
 		<< "};" << std::endl;
+
+	// Close extern "C" {
+	ss << "#ifdef __cplusplus" << std::endl;
+	ss << "}" << std::endl;
+	ss << "#endif" << std::endl;
 
 	TheRewriter.InsertTextAfter(start, ss.str());
 

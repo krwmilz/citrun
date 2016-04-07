@@ -22,6 +22,9 @@ my $tmp_dir = $project->get_tmpdir();
 $tmp_dir = substr( $tmp_dir, 8 ) if ($^O eq "darwin");
 
 my $preamble_good = <<EOF;
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdint.h>
 struct _scv_node {
 	uint64_t *lines_ptr;
@@ -41,6 +44,9 @@ struct _scv_node _scv_node0 = {
 	.file_name = "$tmp_dir/source_0.c",
 	.next = &_scv_node1,
 };
+#ifdef __cplusplus
+}
+#endif
 EOF
 
 my $preamble = $project->inst_src_preamble();
