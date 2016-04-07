@@ -27,7 +27,6 @@
 #include <math.h>
 #include <assert.h>
 
-#include <algorithm>
 #include <vector>
 
 #include <GL/glew.h>
