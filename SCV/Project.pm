@@ -51,10 +51,6 @@ EOF
 	$ENV{CITRUN_PATH} = "$cwd/share";
 	$ENV{PATH} = "$ENV{CITRUN_PATH}:$ENV{PATH}";
 
-	# Jam style LDFLAGS and LDADD
-	$ENV{LINKFLAGS} = "-L$cwd/lib";
-	$ENV{LINKLIBS} = "-lcitrun";
-
 	my $ret = system( "cd $tmp_dir && jam" );
 	die "make failed: $ret\n" if ($ret);
 }

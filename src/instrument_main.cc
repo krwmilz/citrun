@@ -55,12 +55,10 @@ clean_path()
 int
 instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 {
-	std::vector<const char *> clang_argv;
-
 	if (source_files.size() == 0)
-		// Nothing to do
-		return 1;
+		return 0;
 
+	std::vector<const char *> clang_argv;
 	clang_argv.push_back(argv[0]);
 	for (auto s : source_files)
 		clang_argv.push_back(s.c_str());
@@ -105,19 +103,24 @@ main(int argc, char *argv[])
 {
 	// Set a better name than the symlink that was used to find this program
 	setprogname("citrun_instrument");
+	clean_path();
 
 	std::vector<std::string> args(argv, argv + argc);
 	std::vector<std::string> source_files;
 	std::vector<char *> modified_args;
 	// Keep track of some "well known" compiler flags for later.
-	bool preprocess_arg = false;
 	bool object_arg = false;
 	bool compile_arg = false;
 
+	// We're going to be passing argv to execvp
+	argv[argc] = NULL;
+
 	for (auto &arg : args) {
-		// Special case some hopefully universal arguments
-		if (arg.compare("-E") == 0)
-			preprocess_arg = true;
+		if (arg.compare("-E") == 0) {
+			// Preprocessing arument found, exec native command
+			if (execvp(argv[0], argv))
+				err(1, "execvp");
+		}
 		else if (arg.compare("-o") == 0)
 			object_arg = true;
 		else if (arg.compare("-c") == 0)
@@ -162,33 +165,61 @@ main(int argc, char *argv[])
 		modified_args.push_back(const_cast<char *>(arg.c_str()));
 	}
 
-	// NULL terminate the arg vectors we pass to exec()
-	modified_args.push_back(NULL);
-	argv[argc] = NULL;
+	// Instrument source files found on the command line
+	if (instrument(argc, argv, source_files)) {
+		// Instrumentation failed, exec native command
+		if (execvp(argv[0], argv))
+			err(1, "execvp");
+	}
 
+	bool linking = false;
 	// -o with -c means output object file
 	// -o without -c means output binary
-	if (object_arg && !compile_arg) {
+	if (!object_arg && !compile_arg && source_files.size() > 0)
+		// Assume single line a.out compilation
+		// $ gcc main.c
+		linking = true;
+	else if (object_arg && !compile_arg)
+		// gcc -o main main.o fib.o while.o
+		// gcc -o main main.c fib.c
+		linking = true;
+
+	if (linking) {
 		char *cwd = getcwd(NULL, PATH_MAX);
 		if (cwd == NULL)
 			errx(1, "getcwd");
 
 		std::string src_number_filename(cwd);
 		src_number_filename.append("/SRC_NUMBER");
-		unlink(src_number_filename.c_str());
-	}
 
-	if (preprocess_arg || instrument(argc, argv, source_files)) {
-		// The preprocessor arg was found or instrumentation failed.
-		// In Either case, run the native command unmodified.
-		clean_path();
-		if (execvp(argv[0], argv))
-			err(1, "execvp");
+		if (access(src_number_filename.c_str(), F_OK)) {
+			// Couldn't access the SRC_NUMBER file, we cannot link
+			// to the runtime library without it.
+			warnx("SRC_NUMBER file not found.");
+			if (execvp(argv[0], argv))
+				err(1, "execvp");
+		}
+
+		std::ifstream src_number_file;
+		std::string src_number_buffer;
+		src_number_file.open(src_number_filename, std::fstream::in);
+		src_number_file >> src_number_buffer;
+		src_number_file.close();
+
+		std::stringstream src_number;
+		src_number << "-Wl,--defsym=\"_scv_node0=";
+		src_number << src_number_buffer;
+		src_number << "\"";
+
+		// Add the runtime library and the symbol define hack
+		// automatically to the command line
+		modified_args.push_back("/home/kyle/citrun/lib/libcitrun.so.0.0");
+		//modified_args.push_back(const_cast<char *>(src_number.str().c_str()));
 	}
 
 	// Instrumentation succeeded. Run the native compiler with a modified
 	// command line.
-	clean_path();
+	modified_args.push_back(NULL);
 	if (execvp(modified_args[0], &modified_args[0]))
 		err(1, "execvp");
 }
