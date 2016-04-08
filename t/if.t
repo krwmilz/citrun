@@ -37,19 +37,19 @@ my $inst_src_good = <<EOF;
 int
 main(int argc, char *argv[])
 {libscv_init();
-	if ((++_scv_lines[6], argc == 1))
-		return (++_scv_lines[7], 1);
+	if ((++_citrun_lines[6], argc == 1))
+		return (++_citrun_lines[7], 1);
 	else
-		(++_scv_lines[9], exit(14));
+		(++_citrun_lines[9], exit(14));
 
-	if ((++_scv_lines[11], argc == 2)) {
-		return (++_scv_lines[12], 5);
+	if ((++_citrun_lines[11], argc == 2)) {
+		return (++_citrun_lines[12], 5);
 	}
-	else if ((++_scv_lines[14], argc == 3)) {
-		return (++_scv_lines[15], 0);
+	else if ((++_citrun_lines[14], argc == 3)) {
+		return (++_citrun_lines[15], 0);
 	}
 	else {
-		(++_scv_lines[18], exit(0));
+		(++_citrun_lines[18], exit(0));
 	}
 }
 EOF

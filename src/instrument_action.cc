@@ -35,46 +35,55 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 #endif
 }
 
-unsigned int
-read_src_number()
+std::string
+get_current_node(std::string file_path)
+{
+	size_t last_slash = file_path.find_last_of('/');
+	std::string fn(file_path.substr(last_slash + 1));
+
+	std::replace(fn.begin(), fn.end(), '.', '_');
+
+	return fn;
+}
+
+std::string
+get_last_node()
 {
 	char *cwd = getcwd(NULL, PATH_MAX);
 	if (cwd == NULL)
 		errx(1, "getcwd");
 
 	std::string src_number_filename(cwd);
-	src_number_filename.append("/SRC_NUMBER");
+	src_number_filename.append("/LAST_NODE");
 
-	if (access(src_number_filename.c_str(), F_OK) == -1) {
-		// SRC_NUMBER does not exist, source number is 0
-		return 0;
-	}
+	if (access(src_number_filename.c_str(), F_OK) == -1)
+		// No LAST_NODE, the .next pointer will be NULL
+		return std::string("NULL");
 
-	// SRC_NUMBER exists, read its content
+	// LAST_NODE exists, read its content
 	std::ifstream src_number_file;
-	unsigned int src_num = 0;
+	std::string last_node;
 
 	src_number_file.open(src_number_filename, std::fstream::in);
-	src_number_file >> src_num;
+	src_number_file >> last_node;
 	src_number_file.close();
 
-	// Pre-increment. The current source number is the last one plus one
-	return ++src_num;
+	return last_node;
 }
 
 void
-write_src_number(int src_num)
+set_last_node(std::string curr_node)
 {
 	char *cwd = getcwd(NULL, PATH_MAX);
 	if (cwd == NULL)
 		errx(1, "getcwd");
 
 	std::string src_number_filename(cwd);
-	src_number_filename.append("/SRC_NUMBER");
+	src_number_filename.append("/LAST_NODE");
 
 	std::ofstream src_number_file;
 	src_number_file.open(src_number_filename, std::fstream::out);
-	src_number_file << src_num;
+	src_number_file << curr_node;
 	src_number_file.close();
 }
 
@@ -92,7 +101,10 @@ InstrumentAction::EndSourceFileAction()
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
 	std::string file_name = getCurrentFile();
-	unsigned int tu_number = read_src_number();
+	std::string last_node = get_last_node();
+	std::string curr_node = get_current_node(file_name);
+
+	//std::cerr << "LAST NODE = " << last_node << std::endl;
 
 	std::stringstream ss;
 	// Add preprocessor stuff so that the C runtime library links against
@@ -105,23 +117,25 @@ InstrumentAction::EndSourceFileAction()
 	ss << runtime_h << std::endl;
 
 	// Define storage for coverage data
-	ss << "static uint64_t _scv_lines[" << num_lines << "];" << std::endl;
-
-	// Always declare this. The next TU will overwrite this or there won't
-	// be a next TU.
-	ss << "struct _scv_node _scv_node" << tu_number + 1 << ";" << std::endl;
+	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
 
 	// Get visitor instance to check how many times it rewrote something
 	RewriteASTVisitor visitor = InstrumentASTConsumer->get_visitor();
 
+	// Let the struct know this definition will be elsewhere
+	ss << "extern struct _citrun_node _citrun_node_" << last_node << ";" << std::endl;
+
 	// Define this translation units main book keeping data structure
-	ss << "struct _scv_node _scv_node" << tu_number << " = {" << std::endl
-		<< "	.lines_ptr = _scv_lines," << std::endl
+	ss << "struct _citrun_node _citrun_node_" << curr_node << " = {" << std::endl
+		<< "	.lines_ptr = _citrun_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
 		<< "	.inst_sites = " << visitor.GetRewriteCount() << "," << std::endl
-		<< "	.file_name = \"" << file_name << "\"," << std::endl
-		<< "	.next = &_scv_node" << tu_number + 1 << "," << std::endl
-		<< "};" << std::endl;
+		<< "	.file_name = \"" << file_name << "\"," << std::endl;
+	if (last_node.compare("NULL") == 0)
+		ss << "	.next = NULL," << std::endl;
+	else
+		ss << "	.next = &_citrun_node_" << last_node << "," << std::endl;
+	ss << "};" << std::endl;
 
 	// Close extern "C" {
 	ss << "#ifdef __cplusplus" << std::endl;
@@ -152,5 +166,5 @@ InstrumentAction::EndSourceFileAction()
 	// Write the instrumented source file
 	TheRewriter.getEditBuffer(main_fid).write(output);
 
-	write_src_number(tu_number);
+	set_last_node(curr_node);
 }

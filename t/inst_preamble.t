@@ -26,23 +26,24 @@ my $preamble_good = <<EOF;
 extern "C" {
 #endif
 #include <stdint.h>
-struct _scv_node {
+#include <stddef.h>
+struct _citrun_node {
 	uint64_t *lines_ptr;
 	uint32_t size;
 	uint32_t inst_sites;
 	const char *file_name;
-	struct _scv_node *next;
+	struct _citrun_node *next;
 };
 void libscv_init();
 
-static uint64_t _scv_lines[6];
-struct _scv_node _scv_node1;
-struct _scv_node _scv_node0 = {
-	.lines_ptr = _scv_lines,
+static uint64_t _citrun_lines[6];
+extern struct _citrun_node _citrun_node_NULL;
+struct _citrun_node _citrun_node_source_0_c = {
+	.lines_ptr = _citrun_lines,
 	.size = 6,
 	.inst_sites = 1,
 	.file_name = "$tmp_dir/source_0.c",
-	.next = &_scv_node1,
+	.next = NULL,
 };
 #ifdef __cplusplus
 }

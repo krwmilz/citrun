@@ -32,11 +32,11 @@ main(void)
 	int i;
 
 	i = 0;
-	while ((++_scv_lines[7], i < 17)) {
+	while ((++_citrun_lines[7], i < 17)) {
 		i++;
 	}
 
-	return (++_scv_lines[11], i);
+	return (++_citrun_lines[11], i);
 }
 EOF
 

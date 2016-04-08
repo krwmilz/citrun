@@ -48,7 +48,7 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 	if (stmt_to_inst == NULL)
 		return true;
 
-	ss << "(++_scv_lines[" << line << "], ";
+	ss << "(++_citrun_lines[" << line << "], ";
 	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
 		return true;

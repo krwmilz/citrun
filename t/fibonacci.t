@@ -50,12 +50,12 @@ my $inst_src_good = <<EOF;
 long long
 fibonacci(long long n)
 {
-	if ((++_scv_lines[7], n == 0))
-		return (++_scv_lines[8], 0);
-	else if ((++_scv_lines[9], n == 1))
-		return (++_scv_lines[10], 1);
+	if ((++_citrun_lines[7], n == 0))
+		return (++_citrun_lines[8], 0);
+	else if ((++_citrun_lines[9], n == 1))
+		return (++_citrun_lines[10], 1);
 
-	return (++_scv_lines[12], (++_scv_lines[12], fibonacci(n - 1)) + (++_scv_lines[12], fibonacci(n - 2)));
+	return (++_citrun_lines[12], (++_citrun_lines[12], fibonacci(n - 1)) + (++_citrun_lines[12], fibonacci(n - 2)));
 }
 
 int
@@ -63,16 +63,16 @@ main(int argc, char *argv[])
 {libscv_init();
 	long long n;
 
-	if ((++_scv_lines[20], argc != 2)) {
-		(++_scv_lines[21], printf("usage: %s <N>", argv[0]));
-		return (++_scv_lines[22], 1);
+	if ((++_citrun_lines[20], argc != 2)) {
+		(++_citrun_lines[21], printf("usage: %s <N>", argv[0]));
+		return (++_citrun_lines[22], 1);
 	}
 
-	n = (++_scv_lines[25], atoi(argv[1]));
+	n = (++_citrun_lines[25], atoi(argv[1]));
 
-	(++_scv_lines[27], printf("result: %lli", (++_scv_lines[27], fibonacci(n))));
+	(++_citrun_lines[27], printf("result: %lli", (++_citrun_lines[27], fibonacci(n))));
 
-	return (++_scv_lines[29], 0);
+	return (++_citrun_lines[29], 0);
 }
 EOF
 

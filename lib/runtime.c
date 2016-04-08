@@ -15,7 +15,7 @@
 #include "runtime.h"
 
 /* Entry point into instrumented application */
-extern struct _scv_node _scv_node0;
+extern struct _citrun_node _citrun_tu_head;
 
 void send_metadata(int);
 void send_execution_data(int);
@@ -78,14 +78,17 @@ control_thread(void *arg)
 void
 send_metadata(int fd)
 {
-	struct _scv_node walk = _scv_node0;
+	struct _citrun_node walk = _citrun_tu_head;
 	pid_t process_id, parent_process_id, process_group;
 	uint64_t num_tus = 0;
 	size_t file_name_sz;
 
 	/* Send the total number of translation unit records we'll send later */
-	while (walk.size != 0) {
+	while (1) {
 		++num_tus;
+
+		if (walk.next == NULL)
+			break;
 		walk = *walk.next;
 	}
 	xwrite(fd, &num_tus, sizeof(num_tus));
@@ -100,9 +103,9 @@ send_metadata(int fd)
 	xwrite(fd, &parent_process_id, sizeof(pid_t));
 	xwrite(fd, &process_group, sizeof(pid_t));
 
-	walk = _scv_node0;
+	walk = _citrun_tu_head;
 	/* Send translation unit records */
-	while (walk.size != 0) {
+	while (1) {
 		/* Send file name size and then the file name itself. */
 		file_name_sz = strnlen(walk.file_name, PATH_MAX);
 		xwrite(fd, &file_name_sz, sizeof(file_name_sz));
@@ -114,6 +117,8 @@ send_metadata(int fd)
 		/* Send the total number of instrumentation sites */
 		xwrite(fd, &walk.inst_sites, sizeof(walk.size));
 
+		if (walk.next == NULL)
+			break;
 		walk = *walk.next;
 	}
 }
@@ -125,11 +130,14 @@ send_metadata(int fd)
 void
 send_execution_data(int fd)
 {
-	struct _scv_node walk = _scv_node0;
+	struct _citrun_node walk = _citrun_tu_head;
 
-	while (walk.size != 0) {
+	while (1) {
 		/* Write execution buffer, one 8 byte counter per source line */
 		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
+
+		if (walk.next == NULL)
+			break;
 		walk = *walk.next;
 	}
 }

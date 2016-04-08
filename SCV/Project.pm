@@ -46,8 +46,8 @@ EOF
 	syswrite( $jamfile_fh, $jamfile );
 	close( $jamfile_fh );
 
+	# Use the tools in this source tree
 	my $cwd = getcwd;
-
 	$ENV{CITRUN_PATH} = "$cwd/share";
 	$ENV{PATH} = "$ENV{CITRUN_PATH}:$ENV{PATH}";
 
@@ -61,7 +61,7 @@ sub instrumented_src {
 	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
 
 	# Knock off the instrumentation preamble
-	my $line = <$inst_fh> for (1..25);
+	my $line = <$inst_fh> for (1..26);
 
 	my $inst_src;
 	while (my $line = <$inst_fh>) {
@@ -77,7 +77,7 @@ sub inst_src_preamble {
 	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
 
 	my $preamble;
-	for (1..25) {
+	for (1..26) {
 		my $line = <$inst_fh>;
 		$preamble .= $line;
 	}

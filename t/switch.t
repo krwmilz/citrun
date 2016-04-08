@@ -33,14 +33,14 @@ main(void)
 {libscv_init();
 	int i;
 
-	switch ((++_scv_lines[6], i)) {
+	switch ((++_citrun_lines[6], i)) {
 	case 0:
 		break;
 	case 1:
 		break;
 	}
 
-	return (++_scv_lines[13], 0);
+	return (++_citrun_lines[13], 0);
 }
 EOF
 

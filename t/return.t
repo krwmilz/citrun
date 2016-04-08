@@ -26,15 +26,15 @@ $project->compile();
 
 my $inst_src_good = <<EOF;
 int foo() {
-	return (++_scv_lines[2], 0);
+	return (++_citrun_lines[2], 0);
 }
 
 int main(void) {libscv_init();
-	return (++_scv_lines[6], 10);
+	return (++_citrun_lines[6], 10);
 
-	return (++_scv_lines[8], 10 + 10);
+	return (++_citrun_lines[8], 10 + 10);
 
-	return (++_scv_lines[10], (++_scv_lines[10], foo()));
+	return (++_citrun_lines[10], (++_citrun_lines[10], foo()));
 }
 EOF
 

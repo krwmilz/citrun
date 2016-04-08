@@ -30,11 +30,11 @@ main(void)
 {libscv_init();
 	int i;
 
-	for (i = 0; (++_scv_lines[6], i < 19); i++) {
+	for (i = 0; (++_citrun_lines[6], i < 19); i++) {
 		i++;
 	}
 
-	return (++_scv_lines[10], i);
+	return (++_citrun_lines[10], i);
 }
 EOF
 

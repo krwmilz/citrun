@@ -167,7 +167,7 @@ main(int argc, char *argv[])
 
 	// Instrument source files found on the command line
 	if (instrument(argc, argv, source_files)) {
-		// Instrumentation failed, exec native command
+		warnx("instrumentation failed, running unmodified command");
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
 	}
@@ -185,36 +185,30 @@ main(int argc, char *argv[])
 		linking = true;
 
 	if (linking) {
-		char *cwd = getcwd(NULL, PATH_MAX);
-		if (cwd == NULL)
-			errx(1, "getcwd");
-
-		std::string src_number_filename(cwd);
-		src_number_filename.append("/SRC_NUMBER");
-
-		if (access(src_number_filename.c_str(), F_OK)) {
-			// Couldn't access the SRC_NUMBER file, we cannot link
+		std::string last_node_path("LAST_NODE");
+		if (access(last_node_path.c_str(), F_OK)) {
+			// Couldn't access the LAST_NODE file, we cannot link
 			// to the runtime library without it.
-			warnx("SRC_NUMBER file not found.");
+			warnx("LAST_NODE file not found.");
 			if (execvp(argv[0], argv))
 				err(1, "execvp");
 		}
 
-		std::ifstream src_number_file;
-		std::string src_number_buffer;
-		src_number_file.open(src_number_filename, std::fstream::in);
-		src_number_file >> src_number_buffer;
-		src_number_file.close();
+		std::ifstream last_node_ifstream;
+		std::string last_node;
 
-		std::stringstream src_number;
-		src_number << "-Wl,--defsym=\"_scv_node0=";
-		src_number << src_number_buffer;
-		src_number << "\"";
+		last_node_ifstream.open(last_node_path, std::fstream::in);
+		last_node_ifstream >> last_node;
+		last_node_ifstream.close();
+
+		std::stringstream defsym_arg;
+		defsym_arg << "-Wl,--defsym=_citrun_tu_head=_citrun_node_";
+		defsym_arg << last_node;
 
 		// Add the runtime library and the symbol define hack
 		// automatically to the command line
-		modified_args.push_back("/home/kyle/citrun/lib/libcitrun.so.0.0");
-		//modified_args.push_back(const_cast<char *>(src_number.str().c_str()));
+		modified_args.push_back(strdup(defsym_arg.str().c_str()));
+		modified_args.push_back(const_cast<char *>("/home/kyle/citrun/lib/libcitrun.so.0.0"));
 	}
 
 	// Instrumentation succeeded. Run the native compiler with a modified
