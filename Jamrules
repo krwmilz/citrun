@@ -26,7 +26,8 @@ if $(OS) = OPENBSD {
 		-lclangEdit
 		-lclangFrontend
 		-lclangFrontendTool
-		-lclangLex -lclangParse
+		-lclangLex
+		-lclangParse
 		-lclangRewriteCore
 		-lclangRewriteFrontend
 		-lclangSema
@@ -57,7 +58,8 @@ if $(OS) = MACOSX {
 		-lclangEdit
 		-lclangFrontend
 		-lclangFrontendTool
-		-lclangLex -lclangParse
+		-lclangLex
+		-lclangParse
 		-lclangRewrite
 		-lclangRewriteFrontend
 		-lclangSema
@@ -83,7 +85,8 @@ if $(OS) = LINUX {
 		-lclangEdit
 		-lclangFrontend
 		-lclangFrontendTool
-		-lclangLex -lclangParse
+		-lclangLex
+		-lclangParse
 		-lclangRewrite
 		-lclangRewriteFrontend
 		-lclangSema
