@@ -25,7 +25,6 @@ ObjectC++Flags $(INSTRUMENT_SRCS) $(CITRUN_SRCS) : -std=c++11 ;
 ObjectC++Flags $(INSTRUMENT_SRCS) : `llvm-config --cxxflags` ;
 ObjectC++Flags $(CITRUN_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
 ObjectC++Flags $(CITRUN_SRCS) : -I/usr/local/include ;
-ObjectDefines $(INSTRUMENT_SRCS) : PREFIX='\"$(PREFIX)\"' ;
 
 # Common link libraries on all platforms
 LINKFLAGS on citrun_instrument = `llvm-config --ldflags` ;
