@@ -205,8 +205,14 @@ main(int argc, char *argv[])
 		last_node_ifstream.close();
 
 		std::stringstream defsym_arg;
+#ifdef __APPLE__
+		defsym_arg << "-Wl,-alias,__citrun_node_";
+		defsym_arg << last_node;
+		defsym_arg << ",__citrun_tu_head";
+#else
 		defsym_arg << "-Wl,--defsym=_citrun_tu_head=_citrun_node_";
 		defsym_arg << last_node;
+#endif
 
 		// Add the runtime library and the symbol define hack
 		// automatically to the command line
