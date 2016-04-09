@@ -42,6 +42,7 @@ get_current_node(std::string file_path)
 	std::string fn(file_path.substr(last_slash + 1));
 
 	std::replace(fn.begin(), fn.end(), '.', '_');
+	std::replace(fn.begin(), fn.end(), '-', '_');
 
 	return fn;
 }
