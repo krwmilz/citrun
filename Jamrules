@@ -5,7 +5,8 @@ if $(OS) = OPENBSD {
 	SHLIB_SUF = so.0.0 ;
 
 	PREFIX ?= `pwd`/$(TOP) ;
-	C++FLAGS = -DLLVM_VER=34 -DPREFIX=$(PREFIX) ;
+	CLANG_INCL = "-I/usr/local/lib/clang/3.7.1/include" ;
+	C++FLAGS = -DLLVM_VER=34 -DPREFIX=$(PREFIX) -DCLANG_INCL=$(CLANG_INCL) ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports

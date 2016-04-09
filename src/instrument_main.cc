@@ -16,6 +16,9 @@
 
 #include "instrument_action.h"
 
+#define STR_EXPAND(tok) #tok
+#define STR(tok) STR_EXPAND(tok)
+
 static llvm::cl::OptionCategory ToolingCategory("instrument options");
 
 void
@@ -67,6 +70,10 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 
 	// Append original command line verbatim
 	clang_argv.insert(clang_argv.end(), argv, argv + argc);
+
+	// When instrumenting certain code clang sometimes needs its own include
+	// files. These are defined globally per platform.
+	clang_argv.push_back(STR(CLANG_INCL));
 
 	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();
@@ -204,8 +211,6 @@ main(int argc, char *argv[])
 		// Add the runtime library and the symbol define hack
 		// automatically to the command line
 		modified_args.push_back(strdup(defsym_arg.str().c_str()));
-#define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
 		modified_args.push_back(const_cast<char *>(STR(PREFIX) "/lib/libcitrun.so.0.0"));
 	}
 
