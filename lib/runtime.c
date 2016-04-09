@@ -56,18 +56,22 @@ control_thread(void *arg)
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	strncpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path) - 1);
-	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-		warn("connect");
-		pthread_exit(NULL);
-	}
-
-	/* Send static information first. */
-	send_metadata(fd);
 
 	while (1) {
-		/* Synchronously send execution data */
-		send_execution_data(fd);
-		xread(fd, &response, 1);
+		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
+			warn("connect");
+			sleep(1);
+			continue;
+		}
+
+		/* Send static information first. */
+		send_metadata(fd);
+
+		while (1) {
+			/* Synchronously send execution data */
+			send_execution_data(fd);
+			xread(fd, &response, 1);
+		}
 	}
 }
 
