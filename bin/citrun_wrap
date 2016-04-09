@@ -3,7 +3,4 @@
 export CITRUN_PATH="/usr/local/share/citrun"
 export PATH="$CITRUN_PATH:$PATH"
 
-export LDFLAGS="-L/usr/local/lib"
-export LDADD="-lcitrun"
-
 exec $@
