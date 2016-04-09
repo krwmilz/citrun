@@ -2,7 +2,8 @@ SubDir TOP share ;
 
 actions InstallCompilerSyms
 {
-	mkdir -p $(PREFIX)/share/citrun
+	mkdir $(PREFIX)/share
+	mkdir $(PREFIX)/share/citrun
 	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/cc
 	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/gcc
 	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/egcc
