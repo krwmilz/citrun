@@ -84,8 +84,6 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 #else
 	int ret = Tool.run(clang::tooling::newFrontendActionFactory<InstrumentAction>());
 #endif
-	if (ret)
-		warnx("Instrumentation failed");
 	return ret;
 }
 
