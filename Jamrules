@@ -1,12 +1,16 @@
 #OPTIM = -O2 ;
 
+# This should be set by the packaging system so that we can make binaries that
+# will find everything they need to.
+# If not, it will build binaries pointing to in-tree versions of everything.
+PREFIX ?= `pwd`/$(TOP) ;
+
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 	SHLIB_SUF = so.0.0 ;
 
-	PREFIX ?= `pwd`/$(TOP) ;
 	CLANG_INCL = "-I/usr/local/lib/clang/3.7.1/include" ;
-	C++FLAGS = -DLLVM_VER=34 -DPREFIX=$(PREFIX) -DCLANG_INCL=$(CLANG_INCL) ;
+	C++FLAGS = -DLLVM_VER=34 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
@@ -34,6 +38,7 @@ if $(OS) = OPENBSD {
 if $(OS) = MACOSX {
 	SHLIB_SUF = dylib ;
 
+	CLANG_INCL = "-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include" ;
 	C++FLAGS = -Wno-deprecated -DLLVM_VER=37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
@@ -88,3 +93,8 @@ if $(OS) = LINUX {
 		-lstdc++
 		-lbsd ;
 }
+
+# We have to set this down here because LIBCITRUN_PATH and CLANG_INCL depend on
+# operating system specific locations and names.
+LIBCITRUN_PATH = $(PREFIX)/lib/libcitrun.$(SHLIB_SUF) ;
+C++FLAGS += -DLIBCITRUN_PATH=$(LIBCITRUN_PATH) -DCLANG_INCL=$(CLANG_INCL) ;

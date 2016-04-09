@@ -211,7 +211,7 @@ main(int argc, char *argv[])
 		// Add the runtime library and the symbol define hack
 		// automatically to the command line
 		modified_args.push_back(strdup(defsym_arg.str().c_str()));
-		modified_args.push_back(const_cast<char *>(STR(PREFIX) "/lib/libcitrun.so.0.0"));
+		modified_args.push_back(const_cast<char *>(STR(LIBCITRUN_PATH)));
 	}
 
 	// Instrumentation succeeded. Run the native compiler with a modified
