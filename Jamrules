@@ -39,8 +39,8 @@ if $(OS) = MACOSX {
 	LINKLIBS on citrun_gl = -framework OpenGL -framework GLUT ;
 	LINKLIBS on citrun_gl += -lc++ -lm ;
 
-	# We must specify that _scv_node0 will be available at runtime
-	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,__scv_node0 ;
+	# We must specify that the entry point will be available at runtime
+	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,__citrun_tu_head ;
 
 	LINKLIBS on citrun_instrument =
 		-lc++
