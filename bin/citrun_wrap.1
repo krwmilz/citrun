@@ -1,4 +1,4 @@
-.Dd March 11, 2016
+.Dd April 10, 2016
 .Dt CITRUN_WRAP 1
 .Os
 .Sh NAME
@@ -8,35 +8,37 @@
 .Nm
 make
 .Sh DESCRIPTION
-Wrap an existing native build command by first exporting the
-.Ev CITRUN_PATH
-and
-.Ev PATH
-environment variables and then calling the native build command.
+Add instrumentation to an existing native build command by configuring the
+environment and then calling the command.
 .Pp
-If the native build system calls any of the following compilers any output
-object files should contain instrumentation:
+If the native build system calls any of the following compilers, any output
+object files should be instrumented:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It cc
-.It c++
 .It gcc
-.It g++
 .It egcc
+.It c++
+.It g++
 .It eg++
 .El
 .Pp
+.Nm
+exports the
 .Ev CITRUN_PATH
-points to a directory containing compiler named symlinks that all point to
-.Xr citrun_instrument 1 .
-.Pp
+and
 .Ev PATH
-gets
+environment variables before calling the native build command.
+.Pp
+.Bl -tag -width Ds
+.It Ev CITRUN_PATH
+Points to a directory containing compiler named symlinks that all point to
+.Xr citrun_instrument 1 .
+.It Ev PATH
+Is prepended with
 .Ev CITRUN_PATH
-prepended to it so that the compiler named symlinks get called instead of the
-real compiler.
-.Sh EXIT STATUS
-Never fails.
+so that it has the highest precedence.
+.El
 .Sh EXAMPLES
 The following
 .Qq Makefile
