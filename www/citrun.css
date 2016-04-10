@@ -16,10 +16,6 @@ body {
 /*
  * For "prompt" style stuff
  */
-pre {
-	background-color: ivory;
-}
-
 .prompt {
 	color: green;
 }
