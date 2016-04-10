@@ -40,19 +40,21 @@ Is prepended with
 so that binaries in that directory have the highest precedence.
 .El
 .Sh EXAMPLES
-The following
-.Qq Makefile
-is for a simple target application that we want to see run:
+The following Makefile builds a simple target application named
+.Qq program .
 .Bd -literal -offset indent
 PROG = program
 SRCS = main.c
 
-include <bsd.prog.mk>
+\&.include <bsd.prog.mk>
 .Ed
 .Pp
-Then
+To see
+.Qq program
+run, prepend
 .Nm
-is used to setup the environment correctly for instrumentation:
+to the native build command. In this case that build command is
+.Qq make :
 .Pp
 .Dl $ citrun_wrap make
 .Sh SEE ALSO
