@@ -1,17 +1,26 @@
-.Dd March 13, 2016
+.Dd April 9, 2016
 .Dt CITRUN_GL 1
 .Os
 .Sh NAME
 .Nm citrun_gl
-.Nd see it run
+.Nd watch instrumented binaries run
 .Sh SYNOPSIS
 .Nm
 .Sh DESCRIPTION
 Displays executing source code from any instrumented binaries running on the
 system.
 .Pp
-Instrumented binaries are typically built by wrapping an applications native
-build command with
-.Xr citrun_wrap 1 .
+Instrumented binaries built with
+.Xr citrun_wrap 1
+automatically attempt connections to the
+.Nm
+socket.
+.Sh FILES
+.Bl -tag -width Ds
+.It Pa /tmp/citrun_gl.socket
+Default listening socket.
+.El
+.Sh EXIT STATUS
+.Ex -std
 .Sh SEE ALSO
 .Xr citrun_wrap 1
