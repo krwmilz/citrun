@@ -4,8 +4,6 @@
 .Sh NAME
 .Nm citrun_instrument
 .Nd modify command line and instrument source
-.Sh SYNOPSIS
-.Nm
 .Sh DESCRIPTION
 .Nm
 is not meant to be invoked directly. Rather it is meant to be called from
@@ -18,10 +16,10 @@ chooses.
 .Pp
 Instrumentation will be attempted on any source files found on the command line.
 When instrumentation is successful original source file paths are switched with
-instrumented ones.
+instrumented ones and then compilation takes place.
 .Pp
-When application link attempts are detected link flags for the citrun runtime are
-inserted into the command line.
+When application link attempts are detected flags for the runtime are appended
+to the command line.
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
 .It Ev CITRUN_PATH
