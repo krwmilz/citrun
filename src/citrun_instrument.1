@@ -3,18 +3,40 @@
 .Os
 .Sh NAME
 .Nm citrun_instrument
-.Nd instrument source code
+.Nd modify command line and instrument source
 .Sh SYNOPSIS
 .Nm
 .Sh DESCRIPTION
 .Nm
 is not meant to be invoked directly. Rather it is meant to be called from
-compiler named symlinks that are put on the $PATH by
+compiler named symlinks that are put on the PATH by
 .Xr citrun_wrap 1 .
+This hook allows
+.Nm
+to run before the native compiler command, reading and modifying arguments it
+chooses.
 .Pp
-If
-.Xr citrun_gl 1
-is running any applications instrumented by this utility will try connecting to it.
+Instrumentation will be attempted on any source files found on the command line.
+When instrumentation is successful original source file paths are switched with
+instrumented ones.
+.Pp
+When application link attempts are detected link flags for the citrun runtime are
+inserted into the command line.
+.Sh ENVIRONMENT
+.Bl -tag -width Ds
+.It Ev CITRUN_PATH
+Location where compiler named symlinks are installed.
+.It Ev PATH
+Must contain
+.Ev CITRUN_PATH .
+.Sh FILES
+.Bl -tag -width Ds
+.It Pa LAST_NODE
+Last instrumented symbol name. Can be deleted after successfully linking an
+instrumented application.
+.El
+.Sh EXIT STATUS
+.Ex -std
 .Sh SEE ALSO
 .Xr citrun_gl 1 ,
 .Xr citrun_wrap 1
