@@ -3,19 +3,56 @@
 .Os
 .Sh NAME
 .Nm citrun_wrap
-.Nd wrap a build command
+.Nd add instrumentation to a native build command
 .Sh SYNOPSIS
 .Nm
 make
 .Sh DESCRIPTION
-Wraps an existing build command putting compiler named symlinks on $PATH so
-.Xr citrun_instrument 1
-is called instead of the native compiler.
+Wrap an existing native build command by first exporting the
+.Ev CITRUN_PATH
+and
+.Ev PATH
+environment variables and then calling the native build command.
 .Pp
-When using the wrapper any created object files should contain instrumentation.
-The created object files should attempt connections to a running
-.Xr citrun_gl 1
-program.
+If the native build system calls any of the following compilers any output
+object files should contain instrumentation:
+.Pp
+.Bl -tag -width Ds -offset indent -compact
+.It cc
+.It c++
+.It gcc
+.It g++
+.It egcc
+.It eg++
+.El
+.Pp
+.Ev CITRUN_PATH
+points to a directory containing compiler named symlinks that all point to
+.Xr citrun_instrument 1 .
+.Pp
+.Ev PATH
+gets
+.Ev CITRUN_PATH
+prepended to it so that the compiler named symlinks get called instead of the
+real compiler.
+.Sh EXIT STATUS
+Never fails.
+.Sh EXAMPLES
+The following
+.Qq Makefile
+is for a simple target application that we want to see run:
+.Bd -literal -offset indent
+PROG = program
+SRCS = main.c
+
+include <bsd.prog.mk>
+.Ed
+.Pp
+Then
+.Nm
+is used to setup the environment correctly for instrumentation:
+.Pp
+.Dl $ citrun_wrap make
 .Sh SEE ALSO
 .Xr citrun_gl 1 ,
 .Xr citrun_instrument 1
