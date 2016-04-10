@@ -13,12 +13,21 @@ Instead
 is called from compiler named symlinks put on the
 PATH by
 .Xr citrun_wrap 1 .
-This makes adding instrumentation nearly transparent to the native build system
-with no special modifications necessary.
+This makes adding instrumentation transparent to the native build system with no
+special modifications necessary.
 .Pp
-Instrumentation will be attempted on any source files found on the command line.
-When instrumentation is successful original source file paths are switched with
-instrumented ones and then native compilation takes place.
+Instrumentation will be attempted on any arguments found on the command line
+that have one of the following suffixes:
+.Pp
+.Bl -tag -width Ds -offset indent -compact
+.It c
+.It cc
+.It cpp
+.It cxx
+.El
+.Pp
+When instrumentation is successful original source file paths are replaced with
+instrumented ones. Finally the real compiler is called.
 .Pp
 When application link commands are detected flags for the citrun runtime are
 automatically added.
