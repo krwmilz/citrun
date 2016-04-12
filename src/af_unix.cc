@@ -1,4 +1,5 @@
 #include <err.h>		// err
+#include <errno.h>		// EWOULDBLOCK
 #include <fcntl.h>
 #include <string.h>		// memset
 #include <sys/socket.h>		// socket
