@@ -9,7 +9,7 @@ if $(OS) = OPENBSD {
 	C++ = eg++ ;
 	SHLIB_SUF = so.0.0 ;
 
-	CLANG_INCL = "-I/usr/local/lib/clang/3.7.1/include" ;
+	CLANG_INCL = "-I/usr/local/lib/clang/3.5/include" ;
 	C++FLAGS = -DLLVM_VER=34 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
