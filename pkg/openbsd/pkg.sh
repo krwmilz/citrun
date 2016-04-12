@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 ver=0
-pkgname="ccitrunrun"
+pkgname="citrun"
 distname="${pkgname}-${ver}"
 distfile="$distname.tar.gz"
 
