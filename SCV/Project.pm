@@ -88,8 +88,6 @@ sub inst_src_preamble {
 sub run {
 	my ($self, @args) = @_;
 
-	$ENV{LD_LIBRARY_PATH} = "lib";
-	$ENV{DYLD_LIBRARY_PATH} = "lib";
 	$ENV{CITRUN_SOCKET} = "SCV::Viewer.socket";
 
 	my $tmp_dir = $self->{tmp_dir};
