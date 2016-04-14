@@ -10,7 +10,7 @@ HOMEPAGE =		http://citrun.com
 # BSD
 PERMIT_PACKAGE_CDROM =	Yes
 
-MASTER_SITES =		http://git.0x30.net/
+MASTER_SITES =		http://citrun.com/src/
 
 WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
 
