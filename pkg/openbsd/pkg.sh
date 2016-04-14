@@ -10,7 +10,7 @@ fi
 export PORTSDIR_PATH="`pwd`:/usr/ports"
 export NO_CHECKSUM=1
 # Always re-fetch the latest sources
-rm /usr/ports/distfiles/citrun-0.tar.gz
+rm -f /usr/ports/distfiles/citrun-0.tar.gz
 make -C devel/$portname clean=all
 make -C devel/$portname package
 
