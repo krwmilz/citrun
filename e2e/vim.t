@@ -1,4 +1,5 @@
 use strict;
+use Cwd;
 use Expect;
 use File::Temp qw( tempdir );
 use SCV::Viewer;
@@ -9,7 +10,7 @@ use Time::HiRes qw( time );
 # This uses tools installed from a package, not the in tree build!
 #
 
-# XXX: check package is installed
+# XXX: check that citrun is installed
 
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $vim_src = "ftp://ftp.vim.org/pub/vim/unix/vim-7.4.tar.bz2";
@@ -27,7 +28,7 @@ system("citrun_wrap make -C $srcdir myself") == 0 or die "citrun_wrap make faile
 # Create a new fake viewer to attach the instrumented program to
 my $viewer = SCV::Viewer->new();
 
-$ENV{CITRUN_SOCKET} = "SCV::Viewer.socket";
+$ENV{CITRUN_SOCKET} = getcwd . "/SCV::Viewer.socket";
 my $exp = Expect->spawn("$srcdir/vim");
 
 $viewer->accept();
