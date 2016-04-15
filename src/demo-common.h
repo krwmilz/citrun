@@ -30,12 +30,12 @@
 #include <vector>
 
 #include <GL/glew.h>
-#include <GLES2/gl2.h>
 
 #if defined(__APPLE__)
 #  include <OpenGL/OpenGL.h>
 #  include <GLUT/glut.h>
 #else
+#  include <GLES2/gl2.h>
 #  include <GL/glut.h>
 #endif
 
