@@ -6,7 +6,7 @@ use Expect;
 use File::Temp qw( tempdir );
 use List::MoreUtils qw ( each_array );
 use SCV::Viewer;
-use Test::More tests => 172;
+use Test::More tests => 227;
 use Time::HiRes qw( time );
 
 #
@@ -127,7 +127,10 @@ my $it = each_array( @known_good, @sorted_tus );
 while ( my ($x, $y) = $it->() ) {
 	like( $y->{filename},	qr/.*$x->[0]/,	"vim $x->[0]: filename check" );
 	is ( $y->{lines},	$x->[1],	"vim $x->[0]: total lines check" );
-	is ( $y->{inst_sites},	$x->[2],	"vim $x->[0]: instrumented sites check" );
+
+	# Check instrumented sites as a range
+	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 3, "vim $x->[0]: instrumented sites check lower" );
+	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 3, "vim $x->[0]: instrumented sites check upper" );
 }
 
 print STDERR ">>> START\n";
