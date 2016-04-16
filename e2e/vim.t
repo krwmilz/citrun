@@ -36,14 +36,15 @@ system("citrun_wrap make -C $srcdir myself") == 0 or die "citrun_wrap make faile
 #
 my $exp = Expect->spawn("make", "-C", "$srcdir/testdir");
 $exp->expect(undef, ("ALL DONE"));
-
-
-my $viewer = SCV::Viewer->new();
-$ENV{CITRUN_SOCKET} = getcwd . "/SCV::Viewer.socket";
+# Unfuck the terminal after the testsuite is done
+system("resize");
 
 #
 # Make sure the instrumentation for vim is working correctly
 #
+my $viewer = SCV::Viewer->new();
+$ENV{CITRUN_SOCKET} = getcwd . "/SCV::Viewer.socket";
+
 $exp = Expect->spawn("$srcdir/vim");
 $viewer->accept();
 
@@ -56,7 +57,12 @@ cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"vim ppid upper bound check" );
 cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"vim pgrp lower bound check" );
 cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"vim pgrp upper bound check" );
 
+my $tus = $runtime_metadata->{tus};
+my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
+
 # Element order: filename, total lines in file, instrumented sites
+# Use this to regenerate:
+# print STDERR "[ \"$_->{filename}\", $_->{lines}, $_->{inst_sites} ],\n" for (@sorted_tus);
 my @known_good = (
 	[ "auto/pathdef.c", 11, 71 ],
 	[ "blowfish.c", 708, 121 ],
@@ -115,9 +121,6 @@ my @known_good = (
 	[ "window.c", 6993, 1525 ],
 );
 
-my $tus = $runtime_metadata->{tus};
-my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
-
 # Walk two lists at the same time
 # http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
 my $it = each_array( @known_good, @sorted_tus );
@@ -127,13 +130,11 @@ while ( my ($x, $y) = $it->() ) {
 	is ( $y->{inst_sites},	$x->[2],	"vim $x->[0]: instrumented sites check" );
 }
 
-# Use this to regenerate @known_good
-# print STDERR "[ \"$_->{filename}\", $_->{lines}, $_->{inst_sites} ],\n" for (@sorted_tus);
-
 print STDERR ">>> START\n";
 # Lets see how long it takes to do 60 data calls
 for (1..60) {
 	my $data1 = $viewer->get_execution_data($tus);
+	print STDERR ">>> LOOP\n";
 }
 print STDERR ">>> END\n";
 
