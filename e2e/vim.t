@@ -129,8 +129,8 @@ while ( my ($x, $y) = $it->() ) {
 	is ( $y->{lines},	$x->[1],	"vim $x->[0]: total lines check" );
 
 	# Check instrumented sites as a range
-	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 3, "vim $x->[0]: instrumented sites check lower" );
-	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 3, "vim $x->[0]: instrumented sites check upper" );
+	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "vim $x->[0]: instrumented sites check lower" );
+	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "vim $x->[0]: instrumented sites check upper" );
 }
 
 print STDERR ">>> START\n";
