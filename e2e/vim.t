@@ -84,7 +84,7 @@ my @known_good = (
 	[ "gui_beval.c", 1344, 237 ],
 	[ "gui_gtk.c", 1962, 531 ],
 	[ "gui_gtk_f.c", 845, 189 ],
-	[ "gui_gtk_x11.c", 6058, 1106 ],
+	[ "gui_gtk_x11.c", 6058, 1107 ],
 	[ "hardcopy.c", 3682, 800 ],
 	[ "hashtab.c", 504, 126 ],
 	[ "if_cscope.c", 2611, 71 ],
