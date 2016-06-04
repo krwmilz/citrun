@@ -12,6 +12,7 @@ export NO_CHECKSUM=1
 # Always re-fetch the latest sources
 rm -f /usr/ports/distfiles/citrun-0.tar.gz
 make -C devel/$portname clean=all
+make -C devel/$portname test
 make -C devel/$portname package
 
 doas pkg_delete citrun || true
