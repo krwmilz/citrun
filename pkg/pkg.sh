@@ -4,4 +4,9 @@
 # for building packages on all platforms.
 
 uname_lc=`uname | tr '[:upper:]' '[:lower:]'`
+if [ ! -d $uname_lc ]; then
+	echo Error: Need packaging directory for "$uname_lc"
+	exit 1;
+fi
+
 (cd $uname_lc && sh pkg.sh)
