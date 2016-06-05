@@ -116,12 +116,12 @@ main(int argc, char *argv[])
 	bool object_arg = false;
 	bool compile_arg = false;
 
-	// We're going to be passing argv to execvp
+	// Necessary because we're going to pass argv to execvp
 	argv[argc] = NULL;
 
 	for (auto &arg : args) {
 		if (strcmp(arg, "-E") == 0) {
-			// Preprocessing arument found, exec native command
+			// Preprocessing argument found, exec native command
 			if (execvp(argv[0], argv))
 				err(1, "execvp");
 		}
@@ -139,9 +139,10 @@ main(int argc, char *argv[])
 		}
 	}
 
-	// Instrument source files found on the command line
 	if (instrument(argc, argv, source_files)) {
-		warnx("instrumentation failed, running unmodified command");
+		// If instrumentation failed, then modified source files were
+		// not written. So no need to replace them.
+		warnx("Instrumentation failed, running unmodified command.");
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
 	}
@@ -173,6 +174,8 @@ main(int argc, char *argv[])
 		last_node_ifstream >> last_node;
 		last_node_ifstream.close();
 
+		// We need to link the entry point in the runtime to the
+		// instrumented application. OS independent.
 		std::stringstream defsym_arg;
 #ifdef __APPLE__
 		defsym_arg << "-Wl,-alias,__citrun_node_";
