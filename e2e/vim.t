@@ -28,7 +28,7 @@ system("citrun_wrap make -C $srcdir config") == 0 or die "citrun_wrap make confi
 
 # Remove last instrumented node from configure run
 system("rm $srcdir/LAST_NODE");
-system("citrun_wrap make -C $srcdir myself") == 0 or die "citrun_wrap make failed";
+system("citrun_wrap make -C $srcdir -j8 myself") == 0 or die "citrun_wrap make failed";
 
 #
 # Check that the native test suite can pass, validating that the instrumentation
