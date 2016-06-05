@@ -110,9 +110,8 @@ main(int argc, char *argv[])
 	setprogname("citrun_instrument");
 	clean_path();
 
-	std::vector<std::string> args(argv, argv + argc);
+	std::vector<char *> args(argv, argv + argc);
 	std::vector<std::string> source_files;
-	std::vector<char *> modified_args;
 	// Keep track of some "well known" compiler flags for later.
 	bool object_arg = false;
 	bool compile_arg = false;
@@ -121,14 +120,14 @@ main(int argc, char *argv[])
 	argv[argc] = NULL;
 
 	for (auto &arg : args) {
-		if (arg.compare("-E") == 0) {
+		if (strcmp(arg, "-E") == 0) {
 			// Preprocessing arument found, exec native command
 			if (execvp(argv[0], argv))
 				err(1, "execvp");
 		}
-		else if (arg.compare("-o") == 0)
+		else if (strcmp(arg, "-o") == 0)
 			object_arg = true;
-		else if (arg.compare("-c") == 0)
+		else if (strcmp(arg, "-c") == 0)
 			compile_arg = true;
 
 		// Find source files
@@ -137,37 +136,7 @@ main(int argc, char *argv[])
 
 			// Keep track of original source file names
 			source_files.push_back(arg);
-
-			// Find original directory or "." if relative path
-#ifdef __OpenBSD__
-			char *src_dir = dirname(arg.c_str());
-#else
-			char *src_dir = dirname(strdup(arg.c_str()));
-#endif
-			if (src_dir == NULL)
-				err(1, "dirname");
-#ifdef __OpenBSD__
-			char *src_name = basename(arg.c_str());
-#else
-			char *src_name = basename(strdup(arg.c_str()));
-#endif
-			if (src_name == NULL)
-				err(1, "basename");
-
-			// modified_args will hang onto the contents of this
-			std::string *inst_src_path = new std::string();
-			inst_src_path->append(src_dir);
-			inst_src_path->append("/inst/");
-			inst_src_path->append(src_name);
-
-			// Switch the original file name with the instrumented
-			// one.
-			modified_args.push_back(&(*inst_src_path)[0]);
-			continue;
 		}
-
-		// Non source file argument, copy verbatim
-		modified_args.push_back(const_cast<char *>(arg.c_str()));
 	}
 
 	// Instrument source files found on the command line
@@ -216,13 +185,13 @@ main(int argc, char *argv[])
 
 		// Add the runtime library and the symbol define hack
 		// automatically to the command line
-		modified_args.push_back(strdup(defsym_arg.str().c_str()));
-		modified_args.push_back(const_cast<char *>(STR(LIBCITRUN_PATH)));
+		args.push_back(strdup(defsym_arg.str().c_str()));
+		args.push_back(const_cast<char *>(STR(LIBCITRUN_PATH)));
 	}
 
 	// Instrumentation succeeded. Run the native compiler with a modified
 	// command line.
-	modified_args.push_back(NULL);
-	if (execvp(modified_args[0], &modified_args[0]))
+	args.push_back(NULL);
+	if (execvp(args[0], &args[0]))
 		err(1, "execvp");
 }

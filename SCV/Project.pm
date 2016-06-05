@@ -58,7 +58,7 @@ EOF
 sub instrumented_src {
 	my ($self) = @_;
 
-	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
+	open( my $inst_fh, "<", "$self->{tmp_dir}/source_0.c" );
 
 	# Knock off the instrumentation preamble
 	my $line = <$inst_fh> for (1..26);
@@ -74,7 +74,7 @@ sub instrumented_src {
 sub inst_src_preamble {
 	my ($self) = @_;
 
-	open( my $inst_fh, "<", "$self->{tmp_dir}/inst/source_0.c" );
+	open( my $inst_fh, "<", "$self->{tmp_dir}/source_0.c" );
 
 	my $preamble;
 	for (1..26) {

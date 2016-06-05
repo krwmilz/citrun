@@ -133,20 +133,6 @@ InstrumentAction::EndSourceFileAction()
 
 	TheRewriter.InsertTextAfter(start, ss.str());
 
-	size_t last_slash = file_name.find_last_of('/');
-	std::string base_dir(file_name.substr(0, last_slash + 1));
-	base_dir.append("inst");
-
-	if (mkdir(base_dir.c_str(), S_IWUSR | S_IRUSR | S_IXUSR))
-		if (errno != EEXIST)
-			// An error other than the directory existing occurred
-			err(1, "mkdir");
-
-	file_name.insert(last_slash + 1, "inst/");
-
-	// Instrumented source file might already exist
-	unlink(file_name.c_str());
-
 	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd < 0)
 		err(1, "open");
