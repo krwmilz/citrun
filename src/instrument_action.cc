@@ -48,7 +48,7 @@ get_current_node(std::string file_path)
 }
 
 std::string
-get_last_node()
+swap_last_node(std::string curr_node)
 {
 	char *cwd = getcwd(NULL, PATH_MAX);
 	if (cwd == NULL)
@@ -57,35 +57,23 @@ get_last_node()
 	std::string src_number_filename(cwd);
 	src_number_filename.append("/LAST_NODE");
 
-	if (access(src_number_filename.c_str(), F_OK) == -1)
-		// No LAST_NODE, the .next pointer will be NULL
-		return std::string("NULL");
+	std::string last_node("NULL");
 
-	// LAST_NODE exists, read its content
-	std::ifstream src_number_file;
-	std::string last_node;
+	if (access(src_number_filename.c_str(), F_OK) == 0) {
+		// LAST_NODE exists, read last_node from file
+		std::ifstream src_number_file;
+		src_number_file.open(src_number_filename, std::fstream::in);
+		src_number_file >> last_node;
+		src_number_file.close();
+	}
 
-	src_number_file.open(src_number_filename, std::fstream::in);
-	src_number_file >> last_node;
-	src_number_file.close();
-
-	return last_node;
-}
-
-void
-set_last_node(std::string curr_node)
-{
-	char *cwd = getcwd(NULL, PATH_MAX);
-	if (cwd == NULL)
-		errx(1, "getcwd");
-
-	std::string src_number_filename(cwd);
-	src_number_filename.append("/LAST_NODE");
-
+	// Always write curr_node to file
 	std::ofstream src_number_file;
 	src_number_file.open(src_number_filename, std::fstream::out);
 	src_number_file << curr_node;
 	src_number_file.close();
+
+	return last_node;
 }
 
 void
@@ -102,8 +90,8 @@ InstrumentAction::EndSourceFileAction()
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
 	std::string file_name = getCurrentFile();
-	std::string last_node = get_last_node();
 	std::string curr_node = get_current_node(file_name);
+	std::string last_node = swap_last_node(curr_node);
 
 	//std::cerr << "LAST NODE = " << last_node << std::endl;
 
@@ -166,6 +154,4 @@ InstrumentAction::EndSourceFileAction()
 
 	// Write the instrumented source file
 	TheRewriter.getEditBuffer(main_fid).write(output);
-
-	set_last_node(curr_node);
 }
