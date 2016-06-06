@@ -1,10 +1,14 @@
 #include <err.h>
+#include <fcntl.h>		// open
 #include <libgen.h>
 #include <string.h>
-#include <unistd.h>
+#include <stdlib.h>		// mkstemp, getenv
+#include <stdio.h>		// tmpnam
+#include <unistd.h>		// fork
 #ifdef __gnu_linux__
  #include <bsd/stdlib.h>			// setprogname
 #endif
+#include <sys/wait.h>		// waitpid
 
 #include <fstream>
 #include <iostream>
@@ -103,6 +107,15 @@ ends_with(std::string const &value, std::string const &suffix)
 	return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
 }
 
+void
+copy_file(std::string dst_fn, std::string src_fn)
+{
+	std::ifstream src(src_fn, std::ios::binary);
+	std::ofstream dst(dst_fn, std::ios::binary);
+
+	dst << src.rdbuf();
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -112,6 +125,7 @@ main(int argc, char *argv[])
 
 	std::vector<char *> args(argv, argv + argc);
 	std::vector<std::string> source_files;
+	std::map<std::string, std::string> temp_file_map;
 	// Keep track of some "well known" compiler flags for later.
 	bool object_arg = false;
 	bool compile_arg = false;
@@ -136,6 +150,17 @@ main(int argc, char *argv[])
 
 			// Keep track of original source file names
 			source_files.push_back(arg);
+
+			if (getenv("CITRUN_LEAVE_MODIFIED_SRC"))
+				// Don't copy and restore original source files
+				continue;
+
+			char *dst_fn;
+			if ((dst_fn = tmpnam(NULL)) == NULL)
+				err(1, "tmpnam");
+
+			copy_file(dst_fn, arg);
+			temp_file_map[arg] = dst_fn;
 		}
 	}
 
@@ -157,8 +182,8 @@ main(int argc, char *argv[])
 		// gcc -o main main.c fib.c
 		linking = true;
 
+	std::string last_node_path("LAST_NODE");
 	if (linking) {
-		std::string last_node_path("LAST_NODE");
 		if (access(last_node_path.c_str(), F_OK)) {
 			// Couldn't access the LAST_NODE file, we cannot link
 			// to the runtime library without it.
@@ -195,6 +220,26 @@ main(int argc, char *argv[])
 	// Instrumentation succeeded. Run the native compiler with a modified
 	// command line.
 	args.push_back(NULL);
-	if (execvp(args[0], &args[0]))
-		err(1, "execvp");
+
+	pid_t child_pid;
+	if ((child_pid = fork()) < 0)
+		err(1, "fork");
+
+	if (child_pid == 0) {
+		// In child
+		if (execvp(args[0], &args[0]))
+			err(1, "execvp");
+	}
+
+	int status;
+	if (waitpid(child_pid, &status, 0) < 0)
+		err(1, "waitpid");
+
+	for (auto &tmp_file : temp_file_map) {
+		copy_file(tmp_file.first, tmp_file.second);
+		unlink(tmp_file.second.c_str());
+	}
+
+	if (linking)
+		unlink(last_node_path.c_str());
 }
