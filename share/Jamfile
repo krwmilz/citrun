@@ -4,14 +4,14 @@ actions InstallCompilerSyms
 {
 	mkdir $(PREFIX)/share
 	mkdir $(PREFIX)/share/citrun
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/cc
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/gcc
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/egcc
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/clang
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/c++
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/g++
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/eg++
-	ln -s ../../bin/citrun_instrument $(PREFIX)/share/citrun/clang++
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/cc
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/gcc
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/egcc
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/clang
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/c++
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/g++
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/eg++
+	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/clang++
 }
 
 InstallCompilerSyms install : ;

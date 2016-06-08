@@ -27,16 +27,16 @@ ObjectC++Flags $(CITRUN_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
 ObjectC++Flags $(CITRUN_SRCS) : -I/usr/local/include ;
 
 # Common link libraries on all platforms
-LINKFLAGS on citrun_instrument = `llvm-config --ldflags` ;
-LINKLIBS on citrun_instrument += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;
+LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
+LINKLIBS on citrun-inst += `llvm-config --libs bitreader mcparser transformutils option --system-libs` ;
 LINKLIBS on citrun_gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
 
-Main citrun_instrument : $(INSTRUMENT_SRCS) ;
+Main citrun-inst : $(INSTRUMENT_SRCS) ;
 Main citrun_gl : $(CITRUN_SRCS) ;
 
 LinkLibraries citrun_gl : libglyphy ;
 
-InstallBin $(PREFIX)/bin : citrun_instrument citrun_gl ;
-InstallMan $(PREFIX)/man : citrun_instrument.1 citrun_gl.1 ;
+InstallBin $(PREFIX)/bin : citrun-inst citrun_gl ;
+InstallMan $(PREFIX)/man : citrun-inst.1 citrun_gl.1 ;
 
 SubInclude TOP src glyphy ;

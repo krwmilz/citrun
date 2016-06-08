@@ -120,7 +120,7 @@ int
 main(int argc, char *argv[])
 {
 	// Set a better name than the symlink that was used to find this program
-	setprogname("citrun_instrument");
+	setprogname("citrun-inst");
 	clean_path();
 
 	std::vector<char *> args(argv, argv + argc);

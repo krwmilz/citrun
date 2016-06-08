@@ -16,7 +16,7 @@ if $(OS) = OPENBSD {
 	# Link directly against libestdc++ from ports
 	LINKLIBS on citrun_gl = -lestdc++ -lm -lglut ;
 
-	LINKLIBS on citrun_instrument =
+	LINKLIBS on citrun-inst =
 		-lestdc++
 		-Wl,--start-group
 		-lclangAST
@@ -49,7 +49,7 @@ if $(OS) = MACOSX {
 	# We must specify that the entry point will be available at runtime
 	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,__citrun_tu_head ;
 
-	LINKLIBS on citrun_instrument =
+	LINKLIBS on citrun-inst =
 		-lc++
 		-lclangAST
 		-lclangAnalysis
@@ -76,7 +76,7 @@ if $(OS) = LINUX {
 	# Link directly against libestdc++ from ports
 	LINKLIBS on citrun_gl = -lstdc++ -lm -lglut ;
 
-	LINKLIBS on citrun_instrument =
+	LINKLIBS on citrun-inst =
 		-Wl,--start-group
 		-lclangAST
 		-lclangAnalysis
