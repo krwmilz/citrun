@@ -1,4 +1,4 @@
 SubDir TOP bin ;
 
-InstallBin $(PREFIX)/bin : citrun_wrap ;
-InstallMan $(PREFIX)/man : citrun_wrap.1 ;
+InstallBin $(PREFIX)/bin : citrun-wrap ;
+InstallMan $(PREFIX)/man : citrun-wrap.1 ;

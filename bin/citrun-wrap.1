@@ -1,13 +1,15 @@
 .Dd April 10, 2016
-.Dt CITRUN_WRAP 1
+.Dt CITRUN-WRAP 1
 .Os
 .Sh NAME
-.Nm citrun_wrap
+.Nm citrun-wrap
 .Nd add instrumentation to a native build command
 .Sh SYNOPSIS
 .Nm
 .Ar make | jam | gcc | cmake | ...
 .Sh DESCRIPTION
+Modifies source code in place, adding instrumentation to native source code.
+Warning, read that last sentence again.
 Add instrumentation to an existing native build command by configuring the
 environment and then calling the command.
 .Pp
@@ -58,7 +60,7 @@ run, prepend
 to the native build command. In this case that build command is
 .Qq make :
 .Pp
-.Dl $ citrun_wrap make
+.Dl $ citrun-wrap make
 .Sh SEE ALSO
 .Xr citrun_gl 1 ,
 .Xr citrun_instrument 1
