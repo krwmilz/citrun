@@ -192,10 +192,9 @@ main(int argc, char *argv[])
 				err(1, "execvp");
 		}
 
-		std::ifstream last_node_ifstream;
+		std::ifstream last_node_ifstream(last_node_path);
 		std::string last_node;
 
-		last_node_ifstream.open(last_node_path, std::fstream::in);
 		last_node_ifstream >> last_node;
 		last_node_ifstream.close();
 
