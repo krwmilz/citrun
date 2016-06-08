@@ -24,11 +24,11 @@ system("cd $tmpdir && curl -O $vim_src") == 0 or die "download failed";
 system("cd $tmpdir && tar xjf vim-7.4.tar.bz2") == 0 or die "extract failed";
 
 my $srcdir = "$tmpdir/vim74/src";
-system("citrun_wrap make -C $srcdir config") == 0 or die "citrun_wrap make config failed";
+system("citrun-wrap make -C $srcdir config") == 0 or die "citrun-wrap make config failed";
 
 # Remove last instrumented node from configure run
 system("rm $srcdir/LAST_NODE");
-system("citrun_wrap make -C $srcdir -j8 myself") == 0 or die "citrun_wrap make failed";
+system("citrun-wrap make -C $srcdir -j8 myself") == 0 or die "citrun-wrap make failed";
 
 #
 # Check that the native test suite can pass, validating that the instrumentation
