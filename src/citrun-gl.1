@@ -1,8 +1,8 @@
 .Dd April 9, 2016
-.Dt CITRUN_GL 1
+.Dt CITRUN-GL 1
 .Os
 .Sh NAME
-.Nm citrun_gl
+.Nm citrun-gl
 .Nd watch instrumented binaries run
 .Sh SYNOPSIS
 .Nm
@@ -11,16 +11,16 @@ Displays executing source code from any instrumented binaries running on the
 system.
 .Pp
 Instrumented binaries built with
-.Xr citrun_wrap 1
+.Xr citrun-wrap 1
 automatically attempt connections to the
 .Nm
 socket.
 .Sh FILES
 .Bl -tag -width Ds
-.It Pa /tmp/citrun_gl.socket
+.It Pa /tmp/citrun-gl.socket
 Default listening socket.
 .El
 .Sh EXIT STATUS
 .Ex -std
 .Sh SEE ALSO
-.Xr citrun_wrap 1
+.Xr citrun-wrap 1

@@ -14,7 +14,7 @@ if $(OS) = OPENBSD {
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
-	LINKLIBS on citrun_gl = -lestdc++ -lm -lglut ;
+	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
 
 	LINKLIBS on citrun-inst =
 		-lestdc++
@@ -43,8 +43,8 @@ if $(OS) = MACOSX {
 	C++FLAGS = -Wno-deprecated -DLLVM_VER=37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
-	LINKLIBS on citrun_gl = -framework OpenGL -framework GLUT ;
-	LINKLIBS on citrun_gl += -lc++ -lm ;
+	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT ;
+	LINKLIBS on citrun-gl += -lc++ -lm ;
 
 	# We must specify that the entry point will be available at runtime
 	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,__citrun_tu_head ;
@@ -74,7 +74,7 @@ if $(OS) = LINUX {
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
-	LINKLIBS on citrun_gl = -lstdc++ -lm -lglut ;
+	LINKLIBS on citrun-gl = -lstdc++ -lm -lglut ;
 
 	LINKLIBS on citrun-inst =
 		-Wl,--start-group

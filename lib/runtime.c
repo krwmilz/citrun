@@ -50,7 +50,7 @@ control_thread(void *arg)
 	/* The default socket location can be overridden */
 	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
 		/* There was an error getting the env var, use the default */
-		viewer_sock = "/tmp/citrun_gl.socket";
+		viewer_sock = "/tmp/citrun-gl.socket";
 
 	/* Connect the socket to the server */
 	memset(&addr, 0, sizeof(addr));
