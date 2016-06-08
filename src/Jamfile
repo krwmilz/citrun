@@ -1,9 +1,9 @@
 SubDir TOP src ;
 
 INSTRUMENT_SRCS =
-	instrument_main.cc
-	instrument_action.cc
-	instrument_ast_visitor.cc ;
+	inst_main.cc
+	inst_action.cc
+	inst_ast_visitor.cc ;
 
 CITRUN_SRCS =
 	gl_main.cc

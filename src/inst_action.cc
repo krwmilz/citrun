@@ -11,7 +11,7 @@
 
 #include <clang/Frontend/CompilerInstance.h>
 
-#include "instrument_action.h"
+#include "inst_action.h"
 #include "runtime_h.h"
 
 
