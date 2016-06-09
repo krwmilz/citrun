@@ -34,7 +34,7 @@ libscv_init()
 }
 
 /*
- * Sets up the connection to the server socket and then drops into an io loop.
+ * Sets up connection to the server socket and drops into an io loop.
  */
 void *
 control_thread(void *arg)
