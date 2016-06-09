@@ -3,18 +3,17 @@
 .Os
 .Sh NAME
 .Nm citrun-wrap
-.Nd add instrumentation to a native build command
+.Nd prepare to see it run
 .Sh SYNOPSIS
 .Nm
 .Ar make | jam | gcc | cmake | ...
 .Sh DESCRIPTION
-Modifies source code in place, adding instrumentation to native source code.
-Warning, read that last sentence again.
-Add instrumentation to an existing native build command by configuring the
-environment and then calling the command.
+Adds instrumentation to a native build command by modifying C/C++ source files
+found on any compiler command lines.
 .Pp
-If the native build system calls any of the following compilers, any output
-object files should be instrumented:
+Linking a program causes additional arguments to be added to the command line.
+.Pp
+These compiler binary names are supported:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It c++
@@ -26,26 +25,9 @@ object files should be instrumented:
 .It g++
 .It gcc
 .El
-.Pp
-.Nm
-exports the
-.Ev CITRUN_PATH
-and
-.Ev PATH
-environment variables before calling the native build command.
-.Pp
-.Bl -tag -width Ds
-.It Ev CITRUN_PATH
-Points to a directory containing compiler named symlinks that all point to
-.Xr citrun-inst 1 .
-.It Ev PATH
-Is prepended with
-.Ev CITRUN_PATH
-so that binaries in that directory have the highest precedence.
-.El
 .Sh EXAMPLES
-The following Makefile builds a simple target application named
-.Qq program .
+Given a Makefile for
+.Qq program :
 .Bd -literal -offset indent
 PROG = program
 SRCS = main.c
@@ -53,14 +35,20 @@ SRCS = main.c
 \&.include <bsd.prog.mk>
 .Ed
 .Pp
-To see
+Prepare
 .Qq program
-run, prepend
+by prepending
 .Nm
-to the native build command. In this case that build command is
-.Qq make :
+to the native build command:
 .Pp
 .Dl $ citrun-wrap make
+.Pp
+And then see
+.Qq program
+run:
+.Dl $ citrun-gl &
+.Dl $ ./program
+.Pp
 .Sh SEE ALSO
 .Xr citrun-gl 1 ,
 .Xr citrun-inst 1
