@@ -61,15 +61,13 @@ swap_last_node(std::string curr_node)
 
 	if (access(src_number_filename.c_str(), F_OK) == 0) {
 		// LAST_NODE exists, read last_node from file
-		std::ifstream src_number_file;
-		src_number_file.open(src_number_filename, std::fstream::in);
+		std::ifstream src_number_file(src_number_filename);
 		src_number_file >> last_node;
 		src_number_file.close();
 	}
 
 	// Always write curr_node to file
-	std::ofstream src_number_file;
-	src_number_file.open(src_number_filename, std::fstream::out);
+	std::ofstream src_number_file(src_number_filename);
 	src_number_file << curr_node;
 	src_number_file.close();
 
