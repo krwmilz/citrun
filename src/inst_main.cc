@@ -216,8 +216,8 @@ main(int argc, char *argv[])
 		args.push_back(const_cast<char *>(STR(LIBCITRUN_PATH)));
 	}
 
-	// Instrumentation succeeded. Run the native compiler with a modified
-	// command line.
+	// Instrumentation succeeded. Run the native compiler with a possibly
+	// modified command line.
 	args.push_back(NULL);
 
 	pid_t child_pid;
