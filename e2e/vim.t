@@ -32,7 +32,7 @@ system("citrun-wrap make -C $srcdir -j8 myself") == 0 or die "citrun-wrap make f
 
 #
 # Check that the native test suite can pass, validating that the instrumentation
-# hasn't broken the actual intent of the program.
+# hasn't broken the intent of the program.
 #
 my $exp = Expect->spawn("make", "-C", "$srcdir/testdir");
 $exp->expect(undef, ("ALL DONE"));
@@ -40,7 +40,7 @@ $exp->expect(undef, ("ALL DONE"));
 system("resize");
 
 #
-# Make sure the instrumentation for vim is working correctly
+# Make sure the instrumentation for Vim is working correctly
 #
 my $viewer = SCV::Viewer->new();
 $ENV{CITRUN_SOCKET} = getcwd . "/SCV::Viewer.socket";
