@@ -210,10 +210,14 @@ main(int argc, char *argv[])
 		defsym_arg << last_node;
 #endif
 
+		char *lib_str;
+		if ((lib_str = getenv("CITRUN_LIB")) == NULL)
+			errx(1, "CITRUN_LIB not found in environment.");
+
 		// Add the runtime library and the symbol define hack
 		// automatically to the command line
 		args.push_back(strdup(defsym_arg.str().c_str()));
-		args.push_back(const_cast<char *>(STR(LIBCITRUN_PATH)));
+		args.push_back(lib_str);
 	}
 
 	// Instrumentation succeeded. Run the native compiler with a possibly
