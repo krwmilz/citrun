@@ -97,7 +97,5 @@ if $(OS) = LINUX {
 		-lbsd ;
 }
 
-# We have to set this down here because LIBCITRUN_PATH and CLANG_INCL depend on
-# operating system specific locations and names.
-LIBCITRUN_PATH = $(PREFIX)/lib/libcitrun.$(SHLIB_SUF) ;
-C++FLAGS += -DLIBCITRUN_PATH=$(LIBCITRUN_PATH) -DCLANG_INCL=$(CLANG_INCL) ;
+# Set this down here because CLANG_INCL is OS dependent.
+C++FLAGS += -DCLANG_INCL=$(CLANG_INCL) ;
