@@ -9,4 +9,9 @@ if [ ! -d $uname_lc ]; then
 	exit 1;
 fi
 
-(cd $uname_lc && sh pkg.sh)
+if [ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ]; then
+	echo Error: package name must be "citrun" or "ccitrunrun"
+	exit 2;
+fi
+
+(cd $uname_lc && sh pkg.sh ${1})

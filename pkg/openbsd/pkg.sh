@@ -3,7 +3,7 @@
 set -e
 set -x
 
-portname="citrun"
+portname="${1}"
 
 # Make sure package building doesn't rely on anything that's already installed
 doas pkg_delete $portname || true
