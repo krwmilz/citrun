@@ -26,46 +26,47 @@
 	</p>
 
 	<h2>Packages</h2>
-	<p> No official release yet.
-	</p>
 	<p>Development packages are being created for the following platforms
 	and architectures:
 	</p>
 	<ul>
 		<li><img class="inline_logo" src="apple.png" alt="OS X Logo" />
-			<a href="/pkg/amd64/Citrun-0.dmg">Darwin 15 x86_64</a>
+			Darwin 15 x86_64
+			<a href="/pkg/amd64/Citrun-0.dmg">Citrun-0.dmg</a>
 		</li>
 		<li><img class="inline_logo" src="debian.png" alt="Debian logo"/>
 			Debian 8.4 amd64
 		</li>
 		<li><img class="inline_logo" src="puffy.gif" alt="OpenBSD logo"/>
-			<a href="/pkg/amd64/citrun-0.tgz">OpenBSD 5.9 amd64</a>
+			OpenBSD 5.9 amd64
+			<a href="/pkg/amd64/citrun-0.tgz">citrun-0.tgz</a>
 		</li>
 		<li><img class="inline_logo" src="puffy.gif" alt="OpenBSD Logo" />
-			<a href="/pkg/sparc64/citrun-0.tgz">OpenBSD 5.9 sparc64</a>
+			OpenBSD 5.9 sparc64
+			<a href="/pkg/sparc64/citrun-0.tgz">citrun-0.tgz</a>
 		</li>
 	</ul>
-	<h3>Self Instrumented Packages</h3>
-	<p>C It Run is able to partly instrument itself, which is fun.
-	</p>
+	<h3>ccitrunrun</h3>
 	<p>Self instrumented development packages are being created for
 	the following platforms and architectures:
 	</p>
 	<ul>
 		<li><img class="inline_logo" src="puffy.gif" alt="OpenBSD Logo" />
-			OpenBSD 5.8 amd64
+			OpenBSD 5.9 sparc64
+			<a href="/pkg/sparc64/ccitrunrun-0.tgz">ccitrunrun-0.tgz</a>
 	</ul>
 
 	<h2>Source</h2>
 	<p> There are two methods available:
 	</p>
 	<ul>
-		<li>Current <a href="/src/citrun-0.tar.gz">tarball</a> or</li>
-		<li>Read-only Git repository at http://git.0x30.net/citrun</li>
+		<li>Distribution tarball
+			<a href="/src/citrun-0.tar.gz">citrun-0.tar.gz</a> or</li>
+		<li>Read only repository at http://git.0x30.net/citrun</li>
 	</ul>
 
 	<h2>Documentation</h2>
-	<p> The source tarball comes with these manuals:
+	<p> The distribution tarball comes with these manuals:
 	</p>
 	<ul>
 		<li><a href="man/citrun-gl.1.html">citrun-gl(1)</a>
@@ -73,22 +74,22 @@
 		<li><a href="man/citrun-wrap.1.html">citrun-wrap(1)</a>
 	</ul>
 
-	<h2>Building</h2>
-	<p> You'll need jam, a c++11 capable compiler and the development
-	packages installed for:
+	<h2>Building from Source</h2>
+	<p> You'll need a C++11 capable compiler and the development packages
+	installed for:
 	</p>
 	<ul>
 		<li>DejaVu Sans Mono</li>
 		<li>freeglut and glew</li>
 		<li>FreeType2</li>
+		<li>Jam</li>
 		<li>LLVM and Clang > 3.4</li>
 		<li>OpenGLES >= 2.0</li>
 	</ul>
-	<p> Once that's done get a copy of the source tree, change directory to
-	the root and jam:
+	<p> Unpack the distribution tarball, cd to the folder created and jam:
 	</p>
 	<pre> <span class="prompt">$</span> jam</pre>
-	<p> It wouldn't be stupid to run the integration tests either:
+	<p> Run the tests with prove:
 	</p>
 	<pre> <span class="prompt">$</span> prove</pre>
 </body>
