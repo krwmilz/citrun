@@ -124,6 +124,9 @@ copy_file(std::string dst_fn, std::string src_fn)
 
 	dst << src.rdbuf();
 
+	src.close();
+	dst.close();
+
 	utimes(dst_fn.c_str(), st_tim);
 }
 
