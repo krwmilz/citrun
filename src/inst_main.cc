@@ -116,6 +116,15 @@ copy_file(std::string dst_fn, std::string src_fn)
 	dst << src.rdbuf();
 }
 
+void
+restore_original_src(std::map<std::string, std::string> const &temp_file_map)
+{
+	for (auto &tmp_file : temp_file_map) {
+		copy_file(tmp_file.first, tmp_file.second);
+		unlink(tmp_file.second.c_str());
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -165,9 +174,11 @@ main(int argc, char *argv[])
 	}
 
 	if (instrument(argc, argv, source_files)) {
-		// If instrumentation failed, then modified source files were
-		// not written. So no need to replace them.
-		warnx("Instrumentation failed, running unmodified command.");
+		warnx("Instrumentation failed, compiling unmodified code.");
+
+		// It seems necessary right now to do this.
+		restore_original_src(temp_file_map);
+
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
 	}
@@ -238,10 +249,7 @@ main(int argc, char *argv[])
 	if (waitpid(child_pid, &status, 0) < 0)
 		err(1, "waitpid");
 
-	for (auto &tmp_file : temp_file_map) {
-		copy_file(tmp_file.first, tmp_file.second);
-		unlink(tmp_file.second.c_str());
-	}
+	restore_original_src(temp_file_map);
 
 	if (linking)
 		unlink(last_node_path.c_str());
