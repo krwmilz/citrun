@@ -6,8 +6,10 @@
 #include <stdio.h>		// tmpnam
 #include <unistd.h>		// fork
 #ifdef __gnu_linux__
- #include <bsd/stdlib.h>			// setprogname
+ #include <bsd/stdlib.h>	// setprogname
 #endif
+#include <sys/stat.h>		// stat
+#include <sys/time.h>		// utimes
 #include <sys/wait.h>		// waitpid
 
 #include <fstream>
@@ -110,10 +112,19 @@ ends_with(std::string const &value, std::string const &suffix)
 void
 copy_file(std::string dst_fn, std::string src_fn)
 {
+	struct stat sb;
+	struct timeval st_tim[2];
+
+	stat(src_fn.c_str(), &sb);
+	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atim);
+	TIMESPEC_TO_TIMEVAL(&st_tim[1], &sb.st_mtim);
+
 	std::ifstream src(src_fn, std::ios::binary);
 	std::ofstream dst(dst_fn, std::ios::binary);
 
 	dst << src.rdbuf();
+
+	utimes(dst_fn.c_str(), st_tim);
 }
 
 void
