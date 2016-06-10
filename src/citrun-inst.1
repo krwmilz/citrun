@@ -3,21 +3,15 @@
 .Os
 .Sh NAME
 .Nm citrun-inst
-.Nd modify command line and instrument source
+.Nd instrument source code
 .Sh DESCRIPTION
+Warning:
 .Nm
-will not function correctly when invoked directly.
-.Pp
-Instead
-.Nm
-is called from compiler named symlinks put on the
-PATH by
+is not meant to be invoked directly. Instead, it is called automatically from
 .Xr citrun-wrap 1 .
-This makes adding instrumentation transparent to the native build system with no
-special modifications necessary.
 .Pp
-Instrumentation will be attempted on any arguments found on the command line
-that have one of the following suffixes:
+Instrumentation will be attempted on any C/C++ source files found on the command
+line. Source files are matched on suffix, one of:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It .c
@@ -26,15 +20,18 @@ that have one of the following suffixes:
 .It .cxx
 .El
 .Pp
-When instrumentation is successful original source file paths are replaced with
-instrumented ones. Finally the real compiler is called.
+When instrumentation is successful modified source files are compiled with
+the native command line.
 .Pp
-When application link commands are detected flags for the citrun runtime are
-automatically added.
+When application link commands are detected the value of
+.Ev CITRUN_LIB
+is appended to the command line.
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
+.It Ev CITRUN_LIB
+The arguments necessary to link to the runtime library on this platform.
 .It Ev CITRUN_PATH
-Location where compiler named symlinks are installed.
+Directory of symlinks named after supported compiler binaries.
 .It Ev PATH
 Must contain
 .Ev CITRUN_PATH .
@@ -42,8 +39,7 @@ Must contain
 .Sh FILES
 .Bl -tag -width Ds
 .It Pa LAST_NODE
-Last instrumented symbol name. Must be deleted after successfully linking an
-instrumented application.
+The runtime entry point is linked with the contents of this file.
 .El
 .Sh EXIT STATUS
 .Ex -std
