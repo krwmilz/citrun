@@ -12,9 +12,9 @@ PERMIT_PACKAGE_CDROM =	Yes
 
 MASTER_SITES =		http://citrun.com/src/
 
-WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
+WANTLIB +=		GL GLU GLEW glut c citrun freetype m pthread z
 
-SHARED_LIBS +=		ccitrunrun	0.0 # 0.0
+#SHARED_LIBS +=		ccitrunrun	0.0 # 0.0
 
 # -std=c++11
 MODULES =		gcc4
@@ -28,7 +28,8 @@ BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
 do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} citrun-wrap jam
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} citrun-wrap jam ccitrunrun-inst
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} citrun-wrap jam ccitrunrun-gl
 
 do-test:
 	cd ${WRKSRC} && prove
