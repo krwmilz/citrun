@@ -1,4 +1,17 @@
 SubDir TOP bin ;
 
+rule Generate
+{
+	Depends $(1) : $(2) ;
+	Depends all : $(1) ;
+}
+
+actions Generate
+{
+	sed -e s,%PREFIX%,$(PREFIX), -e s,%SHLIB_SUF%,$(SHLIB_SUF), < $(2) > $(1) ;
+}
+
+Generate $(TOP)/bin/citrun-wrap : $(TOP)/bin/citrun-wrap.sh ;
+
 InstallBin $(PREFIX)/bin : citrun-wrap ;
 InstallMan $(PREFIX)/man : citrun-wrap.1 ;

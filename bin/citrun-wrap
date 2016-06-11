@@ -1,7 +1,0 @@
-#!/bin/sh
-
-export CITRUN_PATH="/usr/local/share/citrun"
-export CITRUN_LIB="/usr/local/lib/libcitrun.so.0.0"
-export PATH="$CITRUN_PATH:$PATH"
-
-exec $@
