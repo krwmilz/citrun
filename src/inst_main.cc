@@ -116,8 +116,13 @@ copy_file(std::string dst_fn, std::string src_fn)
 	struct timeval st_tim[2];
 
 	stat(src_fn.c_str(), &sb);
+#ifdef __APPLE__
+	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atimespec);
+	TIMESPEC_TO_TIMEVAL(&st_tim[1], &sb.st_mtimespec);
+#else
 	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atim);
 	TIMESPEC_TO_TIMEVAL(&st_tim[1], &sb.st_mtim);
+#endif
 
 	std::ifstream src(src_fn, std::ios::binary);
 	std::ofstream dst(dst_fn, std::ios::binary);
