@@ -1,4 +1,4 @@
-#OPTIM = -O2 ;
+OPTIM = -O2 ;
 
 # This should be set by the packaging system so that we can make binaries that
 # will find everything they need to.
