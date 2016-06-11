@@ -142,3 +142,36 @@ for (1..60) {
 print STDERR ">>> END\n";
 
 $exp->hard_close();
+$viewer->close();
+
+$exp = Expect->spawn("$srcdir/xxd/xxd");
+$viewer->accept();
+
+$runtime_metadata = $viewer->get_metadata();
+is( $runtime_metadata->{num_tus}, 1,		"vim translation unit count" );
+cmp_ok( $runtime_metadata->{pid}, ">", 1,	"vim pid lower bound check" );
+cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"vim pid upper bound check" );
+cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"vim ppid lower bound check" );
+cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"vim ppid upper bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"vim pgrp lower bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"vim pgrp upper bound check" );
+
+$tus = $runtime_metadata->{tus};
+@sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
+
+# Use this to regenerate:
+@known_good = (
+	[ "src/xxd/xxd.c",	851,	277 ],
+);
+
+$it = each_array( @known_good, @sorted_tus );
+while ( my ($x, $y) = $it->() ) {
+	like( $y->{filename},	qr/.*$x->[0]/,	"xxd $x->[0]: filename check" );
+	is ( $y->{lines},	$x->[1],	"xxd $x->[0]: total lines check" );
+
+	# Check instrumented sites as a range
+	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "xxd $x->[0]: instrumented sites check lower" );
+	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "xxd $x->[0]: instrumented sites check upper" );
+}
+
+$exp->hard_close();
