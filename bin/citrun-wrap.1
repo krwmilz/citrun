@@ -9,11 +9,9 @@
 .Ar make | jam | gcc | cmake | ...
 .Sh DESCRIPTION
 Adds instrumentation to a native build command by modifying C/C++ source files
-found on any compiler command lines.
+found on any descendant compiler command lines.
 .Pp
-Linking a program causes additional arguments to be added to the command line.
-.Pp
-These compiler binary names are supported:
+The following compiler binary names are supported:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It c++
@@ -48,7 +46,6 @@ And then see
 run:
 .Dl $ citrun-gl &
 .Dl $ ./program
-.Pp
 .Sh SEE ALSO
 .Xr citrun-gl 1 ,
 .Xr citrun-inst 1
