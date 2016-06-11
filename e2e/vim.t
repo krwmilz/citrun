@@ -6,7 +6,7 @@ use Expect;
 use File::Temp qw( tempdir );
 use List::MoreUtils qw ( each_array );
 use SCV::Viewer;
-use Test::More tests => 227;
+use Test::More tests => 238;
 use Time::HiRes qw( time );
 
 #
