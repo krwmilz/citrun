@@ -104,6 +104,11 @@ sub read_all {
 	return $data;
 }
 
+sub close {
+	my ($self) = @_;
+	close ($self->{client_socket});
+}
+
 sub DESTROY {
 	my ($self) = @_;
 
