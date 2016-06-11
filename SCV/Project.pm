@@ -52,7 +52,11 @@ EOF
 	# Use the tools in this source tree
 	my $cwd = getcwd;
 	$ENV{CITRUN_PATH} = "$cwd/share";
-	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.so.0.0";
+
+	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.so.0.0" if ($^O eq "openbsd");
+	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.dylib" if ($^O eq "darwin");
+	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.so" if ($^O eq "linux");
+
 	$ENV{PATH} = "$ENV{CITRUN_PATH}:$ENV{PATH}";
 
 	my $ret = system( "cd $tmp_dir && jam" );
