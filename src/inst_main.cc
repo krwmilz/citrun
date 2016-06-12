@@ -115,6 +115,7 @@ copy_file(std::string dst_fn, std::string src_fn)
 	struct stat sb;
 	struct timeval st_tim[2];
 
+	// Save original access and modification times
 	stat(src_fn.c_str(), &sb);
 #ifdef __APPLE__
 	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atimespec);
@@ -132,6 +133,7 @@ copy_file(std::string dst_fn, std::string src_fn)
 	src.close();
 	dst.close();
 
+	// Restore the original access and modification time
 	utimes(dst_fn.c_str(), st_tim);
 }
 
