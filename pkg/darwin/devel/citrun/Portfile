@@ -13,19 +13,28 @@ long_description    Citrun adds compile time instrumentation so you can watch yo
 homepage            http://citrun.com
 master_sites        http://citrun.com/src/
 
-checksums           rmd160  126ccbf671855eb5943a5246df6ab768e04eea1f \
-                    sha256  62e44e64b0ac744d075e2813ec8284fc3922f2f985c79e6d7f9f3592bd9c4ed8
+checksums           rmd160  3bfad1d8d64a9dd189be9fc2290d7335427eeca0 \
+                    sha256  b442f9b469dba3abc9f46e48f9b888c7fb5f12fba753c0f70bedeb2097e1732f
+
+#fetch.type          git
+#git.url             http://git.0x30.net/citrun
 
 depends_lib         path:bin/perl:perl5 \
                     port:llvm-3.7 \
+                    port:freetype
 
 depends_build       path:bin/pkg-config:pkgconfig \
                     bin:jam:jam
 
-configure {}
+# depends_test        port:p5-file-which \
+#                     port:p5-expect \
+#                     port:p5-list-moreutils
 
-build.cmd           jam
+use_configure       no
 
+build.cmd           PREFIX=${prefix} jam
+
+destroot.cmd        PREFIX=${destroot}${prefix} jam
 destroot.destdir
 
 test.run            yes
