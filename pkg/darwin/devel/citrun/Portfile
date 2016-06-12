@@ -6,29 +6,35 @@ PortSystem          1.0
 name                citrun
 version             0
 categories          devel
+maintainers         openmaintainer@macports.org
 platforms           darwin
 license             BSD
 description         Watch your source code execute
 long_description    Citrun adds compile time instrumentation so you can watch your program run
 homepage            http://citrun.com
-#master_sites        http://citrun.com/src/
+master_sites        http://citrun.com/src/
 
+# This is easier for continuous integration style builds
 fetch.type          git
 git.url             http://git.0x30.net/citrun
 git.branch          origin/master
 
-depends_lib         path:bin/perl:perl5 \
-                    port:llvm-3.7 \
-                    port:freetype
-
-depends_build       path:bin/pkg-config:pkgconfig \
-                    bin:jam:jam
-
-# depends_test        port:p5-file-which \
-#                     port:p5-expect \
-#                     port:p5-list-moreutils
-
 use_configure       no
+
+# I'm not sure if the Jamfiles are compatible with other jam's
+depends_build       port:pkgconfig \
+                    port:jam
+
+# Test dependencies
+depends_run         port:perl5 \
+                    port:p5-file-which \
+                    port:p5-expect \
+                    port:p5-list-moreutils \
+                    port:p5-test-differences
+
+depends_lib         port:llvm-3.7 \
+                    port:clang-3.7 \
+                    port:freetype
 
 build.cmd           PREFIX=${prefix} jam
 
