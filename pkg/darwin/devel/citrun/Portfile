@@ -1,0 +1,37 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+PortSystem          1.0
+
+name                citrun
+version             0
+categories          devel
+platforms           darwin
+license             BSD
+description         Watch your source code execute
+long_description    Citrun adds compile time instrumentation so you can watch your program run
+homepage            http://citrun.com
+master_sites        http://citrun.com/src/
+
+#checksums           rmd160  532d946a8b3597dd8faece269f490c3d1f560d13 \
+#                    sha256  059e3e4494b4705b2281176f9b09cfa36a237b086247bc48031200d0ffe0b487
+checksums           rmd160  5fbb8e8e057f38017cbb8c79b43bf6e57b661e46 \
+                    sha256 1bf4c80d7bd0438f6ccca04485cc62e09fb508266fe54c91ab0ec6bbe2713e0c
+
+
+depends_lib         path:bin/perl:perl5 \
+                    port:llvm-3.7 \
+
+depends_build       path:bin/pkg-config:pkgconfig \
+                    bin:jam:jam
+
+configure {}
+
+build {
+        system "cd ${worksrcpath} && jam"
+}
+
+destroot {
+        system "cd ${worksrcpath} && PREFIX=${destroot}${prefix} jam install"
+        #system "cd ${worksrcpath} && jam -sprefix=${destroot}${prefix} install"
+}
