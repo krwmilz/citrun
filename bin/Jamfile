@@ -9,6 +9,7 @@ rule Generate
 actions Generate
 {
 	sed -e s,%PREFIX%,$(PREFIX), -e s,%SHLIB_SUF%,$(SHLIB_SUF), < $(2) > $(1) ;
+	chmod 644 $(1) ;
 }
 
 Generate $(TOP)/bin/citrun-wrap : $(TOP)/bin/citrun-wrap.sh ;
