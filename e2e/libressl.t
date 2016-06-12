@@ -39,13 +39,13 @@ my $exp = Expect->spawn("$srcdir/apps/openssl/openssl");
 $viewer->accept();
 
 my $runtime_metadata = $viewer->get_metadata();
-is( $runtime_metadata->{num_tus}, 50,		"vim translation unit count" );
-cmp_ok( $runtime_metadata->{pid}, ">", 1,	"vim pid lower bound check" );
-cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"vim pid upper bound check" );
-cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"vim ppid lower bound check" );
-cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"vim ppid upper bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"vim pgrp lower bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"vim pgrp upper bound check" );
+is( $runtime_metadata->{num_tus}, 50,		"libressl translation unit count" );
+cmp_ok( $runtime_metadata->{pid}, ">", 1,	"libressl pid lower bound check" );
+cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"libressl pid upper bound check" );
+cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"libressl ppid lower bound check" );
+cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"libressl ppid upper bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"libressl pgrp lower bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"libressl pgrp upper bound check" );
 
 my $tus = $runtime_metadata->{tus};
 my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
@@ -110,12 +110,12 @@ my @known_good = (
 # http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
 my $it = each_array( @known_good, @sorted_tus );
 while ( my ($x, $y) = $it->() ) {
-	like( $y->{filename},	qr/.*$x->[0]/,	"vim $x->[0]: filename check" );
-	is ( $y->{lines},	$x->[1],	"vim $x->[0]: total lines check" );
+	like( $y->{filename},	qr/.*$x->[0]/,	"libressl $x->[0]: filename check" );
+	is ( $y->{lines},	$x->[1],	"libressl $x->[0]: total lines check" );
 
 	# Check instrumented sites as a range
-	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "vim $x->[0]: instrumented sites check lower" );
-	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "vim $x->[0]: instrumented sites check upper" );
+	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "libressl $x->[0]: instrumented sites check lower" );
+	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "libressl $x->[0]: instrumented sites check upper" );
 }
 
 $exp->hard_close();

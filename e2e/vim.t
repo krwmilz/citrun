@@ -149,13 +149,13 @@ $exp = Expect->spawn("$srcdir/xxd/xxd");
 $viewer->accept();
 
 $runtime_metadata = $viewer->get_metadata();
-is( $runtime_metadata->{num_tus}, 1,		"vim translation unit count" );
-cmp_ok( $runtime_metadata->{pid}, ">", 1,	"vim pid lower bound check" );
-cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"vim pid upper bound check" );
-cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"vim ppid lower bound check" );
-cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"vim ppid upper bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"vim pgrp lower bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"vim pgrp upper bound check" );
+is( $runtime_metadata->{num_tus}, 1,		"xxd translation unit count" );
+cmp_ok( $runtime_metadata->{pid}, ">", 1,	"xxd pid lower bound check" );
+cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"xxd pid upper bound check" );
+cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"xxd ppid lower bound check" );
+cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"xxd ppid upper bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"xxd pgrp lower bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"xxd pgrp upper bound check" );
 
 $tus = $runtime_metadata->{tus};
 @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
