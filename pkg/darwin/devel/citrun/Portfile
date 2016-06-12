@@ -13,11 +13,8 @@ long_description    Citrun adds compile time instrumentation so you can watch yo
 homepage            http://citrun.com
 master_sites        http://citrun.com/src/
 
-#checksums           rmd160  532d946a8b3597dd8faece269f490c3d1f560d13 \
-#                    sha256  059e3e4494b4705b2281176f9b09cfa36a237b086247bc48031200d0ffe0b487
-checksums           rmd160  5fbb8e8e057f38017cbb8c79b43bf6e57b661e46 \
-                    sha256 1bf4c80d7bd0438f6ccca04485cc62e09fb508266fe54c91ab0ec6bbe2713e0c
-
+checksums           rmd160  126ccbf671855eb5943a5246df6ab768e04eea1f \
+                    sha256  62e44e64b0ac744d075e2813ec8284fc3922f2f985c79e6d7f9f3592bd9c4ed8
 
 depends_lib         path:bin/perl:perl5 \
                     port:llvm-3.7 \
@@ -27,11 +24,10 @@ depends_build       path:bin/pkg-config:pkgconfig \
 
 configure {}
 
-build {
-        system "cd ${worksrcpath} && jam"
-}
+build.cmd           jam
 
-destroot {
-        system "cd ${worksrcpath} && PREFIX=${destroot}${prefix} jam install"
-        #system "cd ${worksrcpath} && jam -sprefix=${destroot}${prefix} install"
-}
+destroot.destdir
+
+test.run            yes
+test.cmd            prove
+test.target
