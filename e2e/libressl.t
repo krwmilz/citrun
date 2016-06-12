@@ -28,7 +28,7 @@ system("cd $tmpdir && tar xzf $libressl_src") == 0 or die "extract failed";
 my $srcdir = "$tmpdir/libressl-2.4.1";
 system("cd $srcdir && citrun-wrap ./configure") == 0 or die "citrun-wrap ./configure failed";
 
-system("citrun-wrap make -C $srcdir -j4") == 0 or die "citrun-wrap make failed";
+system("citrun-wrap make -C $srcdir -j8") == 0 or die "citrun-wrap make failed";
 
 # Make sure the instrumentation for Vim is working correctly
 #
