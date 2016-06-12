@@ -25,6 +25,10 @@ LIB_DEPENDS =		graphics/freeglut \
 			graphics/glew
 BUILD_DEPENDS =		devel/jam \
 			devel/llvm
+TEST_DEPENDS =		sysutils/p5-File-Which \
+			devel/p5-Expect \
+			devel/p5-List-MoreUtils \
+			devel/p5-Test-Differences
 
 do-build:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q -j4
