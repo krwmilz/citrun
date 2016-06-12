@@ -11,13 +11,11 @@ license             BSD
 description         Watch your source code execute
 long_description    Citrun adds compile time instrumentation so you can watch your program run
 homepage            http://citrun.com
-master_sites        http://citrun.com/src/
+#master_sites        http://citrun.com/src/
 
-checksums           rmd160  3bfad1d8d64a9dd189be9fc2290d7335427eeca0 \
-                    sha256  b442f9b469dba3abc9f46e48f9b888c7fb5f12fba753c0f70bedeb2097e1732f
-
-#fetch.type          git
-#git.url             http://git.0x30.net/citrun
+fetch.type          git
+git.url             http://git.0x30.net/citrun
+git.branch          origin/master
 
 depends_lib         path:bin/perl:perl5 \
                     port:llvm-3.7 \
