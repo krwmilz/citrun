@@ -47,7 +47,8 @@ if $(OS) = MACOSX {
 	LINKLIBS on citrun-gl += -lc++ -lm ;
 
 	# We must specify that the entry point will be available at runtime
-	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,__citrun_tu_head ;
+	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,citrun_nodes ;
+	LINKFLAGS on libcitrun.$(SHLIB_SUF) += -Wl,-U,citrun_nodes_total ;
 
 	LINKLIBS on citrun-inst =
 		-lc++
