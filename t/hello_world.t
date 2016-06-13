@@ -26,7 +26,7 @@ my $inst_src_good = <<EOF;
 
 int
 main(void)
-{libscv_init();
+{
 	(++_citrun_lines[6], printf("hello, world!"));
 	return (++_citrun_lines[7], 0);
 }

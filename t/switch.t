@@ -30,7 +30,7 @@ $project->compile();
 my $inst_src_good = <<EOF;
 int
 main(void)
-{libscv_init();
+{
 	int i;
 
 	switch ((++_citrun_lines[6], i)) {

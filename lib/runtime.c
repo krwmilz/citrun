@@ -1,21 +1,22 @@
 #include <assert.h>
-#include <err.h>
-#include <limits.h>		// PATH_MAX
-#include <pthread.h>
-#include <stdlib.h>		// getenv
+#include <err.h>		/* err, errx, warnx */
+#include <limits.h>		/* PATH_MAX */
+#include <pthread.h>		/* pthread_create */
+#include <stdlib.h>		/* getenv */
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #if __APPLE__
-#include <sys/types.h>		// read
-#include <sys/uio.h>		// read
+#include <sys/types.h>		/* read */
+#include <sys/uio.h>		/* read */
 #endif
-#include <unistd.h>		// read, getpid, getppid, getpgrp
+#include <unistd.h>		/* read, getpid, getppid, getpgrp */
 
 #include "runtime.h"
 
-/* Entry point into instrumented application */
-extern struct _citrun_node _citrun_tu_head;
+/* Entrance into instrumented application. */
+extern struct citrun_node *citrun_nodes[];
+extern uint64_t citrun_nodes_total;
 
 void send_metadata(int);
 void send_execution_data(int);
@@ -23,19 +24,8 @@ void send_execution_data(int);
 int xread(int d, const void *buf, size_t bytes_total);
 int xwrite(int d, const void *buf, size_t bytes_total);
 
-/*
- * Dummy function to make sure that the instrumented program gets linked against
- * this library.
- * Linux likes to liberally discard -l... flags given when linking.
- */
-void
-libscv_init()
-{
-}
 
-/*
- * Sets up connection to the server socket and drops into an io loop.
- */
+/* Sets up connection to the server socket and drops into an io loop. */
 void *
 control_thread(void *arg)
 {
@@ -75,55 +65,43 @@ control_thread(void *arg)
 	}
 }
 
-/*
- * Walks the translation unit list and writes all of the static information
- * contained in the nodes.
- */
+/* Walk the node array and send all of the static metadata information. */
 void
 send_metadata(int fd)
 {
-	struct _citrun_node walk = _citrun_tu_head;
-	pid_t process_id, parent_process_id, process_group;
-	uint64_t num_tus = 0;
+	struct citrun_node walk;
+	pid_t pids[3];
 	size_t file_name_sz;
+	int i;
 
-	/* Send the total number of translation unit records we'll send later */
-	while (1) {
-		++num_tus;
+	/* Send the total number of instrumented nodes. */
+	xwrite(fd, &citrun_nodes_total, sizeof(citrun_nodes_total));
 
-		if (walk.next == NULL)
-			break;
-		walk = *walk.next;
-	}
-	xwrite(fd, &num_tus, sizeof(num_tus));
-
-	/* Send process id, parent process id and group process id. */
-	process_id = getpid();
-	parent_process_id = getppid();
-	process_group = getpgrp();
+	/* Send process id, parent process id, group process id. */
+	pids[0] = getpid();
+	pids[1] = getppid();
+	pids[2] = getpgrp();
 
 	assert(sizeof(pid_t) == 4);
-	xwrite(fd, &process_id, sizeof(pid_t));
-	xwrite(fd, &parent_process_id, sizeof(pid_t));
-	xwrite(fd, &process_group, sizeof(pid_t));
+	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
+		xwrite(fd, &pids[i], sizeof(pid_t));
 
-	walk = _citrun_tu_head;
-	/* Send translation unit records */
-	while (1) {
-		/* Send file name size and then the file name itself. */
+	/* Send instrumented object file information, consisting of: */
+	for (i = 0; i < citrun_nodes_total; i++) {
+		walk = *citrun_nodes[i];
+
+		/* Length of the original source file name. */
 		file_name_sz = strnlen(walk.file_name, PATH_MAX);
 		xwrite(fd, &file_name_sz, sizeof(file_name_sz));
+
+		/* The original source file name. */
 		xwrite(fd, walk.file_name, file_name_sz);
 
-		/* Send the size of the execution buffers */
+		/* Size of the execution counters. */
 		xwrite(fd, &walk.size, sizeof(walk.size));
 
-		/* Send the total number of instrumentation sites */
+		/* Number of instrumentation sites. */
 		xwrite(fd, &walk.inst_sites, sizeof(walk.size));
-
-		if (walk.next == NULL)
-			break;
-		walk = *walk.next;
 	}
 }
 
@@ -134,15 +112,14 @@ send_metadata(int fd)
 void
 send_execution_data(int fd)
 {
-	struct _citrun_node walk = _citrun_tu_head;
+	struct citrun_node walk;
+	int i;
 
-	while (1) {
+	for (i = 0; i < citrun_nodes_total; i++) {
+		walk = *citrun_nodes[i];
+
 		/* Write execution buffer, one 8 byte counter per source line */
 		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
-
-		if (walk.next == NULL)
-			break;
-		walk = *walk.next;
 	}
 }
 

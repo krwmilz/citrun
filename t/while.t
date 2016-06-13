@@ -28,7 +28,7 @@ $project->compile();
 my $inst_src_good = <<EOF;
 int
 main(void)
-{libscv_init();
+{
 	int i;
 
 	i = 0;

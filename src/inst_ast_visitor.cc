@@ -66,23 +66,6 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	if (f->hasBody() == 0)
 		return true;
 
-	clang::Stmt *FuncBody = f->getBody();
-
-	clang::DeclarationName DeclName = f->getNameInfo().getName();
-	std::string FuncName = DeclName.getAsString();
-
-	if (FuncName.compare("main") != 0)
-		// Function is not main
-		return true;
-
-	std::stringstream ss;
-	// On some platforms we need to depend directly on a symbol provided by
-	// the runtime. Normally this isn't needed because the runtime only
-	// depends on symbols in the isntrumented application.
-	ss << "libscv_init();";
-	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
-	TheRewriter.InsertTextBefore(curly_brace, ss.str());
-
 	return true;
 }
 

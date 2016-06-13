@@ -36,7 +36,7 @@ my $inst_src_good = <<EOF;
 
 int
 main(int argc, char *argv[])
-{libscv_init();
+{
 	if ((++_citrun_lines[6], argc == 1))
 		return (++_citrun_lines[7], 1);
 	else

@@ -41,37 +41,24 @@ get_current_node(std::string file_path)
 	size_t last_slash = file_path.find_last_of('/');
 	std::string fn(file_path.substr(last_slash + 1));
 
-	std::replace(fn.begin(), fn.end(), '.', '_');
-	std::replace(fn.begin(), fn.end(), '-', '_');
+	size_t period = fn.find_first_of('.');
 
-	return fn;
+	return fn.substr(0, period);
 }
 
-std::string
-swap_last_node(std::string curr_node)
+void
+append_curr_node(std::string curr_node)
 {
 	char *cwd = getcwd(NULL, PATH_MAX);
 	if (cwd == NULL)
 		errx(1, "getcwd");
 
-	std::string src_number_filename(cwd);
-	src_number_filename.append("/LAST_NODE");
+	std::string inst_filename(cwd);
+	inst_filename.append("/INSTRUMENTED");
 
-	std::string last_node("NULL");
-
-	if (access(src_number_filename.c_str(), F_OK) == 0) {
-		// LAST_NODE exists, read last_node from file
-		std::ifstream src_number_file(src_number_filename);
-		src_number_file >> last_node;
-		src_number_file.close();
-	}
-
-	// Always write curr_node to file
-	std::ofstream src_number_file(src_number_filename);
-	src_number_file << curr_node;
-	src_number_file.close();
-
-	return last_node;
+	// Append current primary source file to INSTRUMENTED list.
+	std::ofstream inst_ofstream(inst_filename, std::ofstream::app);
+	inst_ofstream << curr_node << std::endl;
 }
 
 void
@@ -89,9 +76,7 @@ InstrumentAction::EndSourceFileAction()
 
 	std::string file_name = getCurrentFile();
 	std::string curr_node = get_current_node(file_name);
-	std::string last_node = swap_last_node(curr_node);
-
-	//std::cerr << "LAST NODE = " << last_node << std::endl;
+	append_curr_node(curr_node);
 
 	std::stringstream ss;
 	// Add preprocessor stuff so that the C runtime library links against
@@ -109,19 +94,12 @@ InstrumentAction::EndSourceFileAction()
 	// Get visitor instance to check how many times it rewrote something
 	RewriteASTVisitor visitor = InstrumentASTConsumer->get_visitor();
 
-	// Let the struct know this definition will be elsewhere
-	ss << "extern struct _citrun_node _citrun_node_" << last_node << ";" << std::endl;
-
 	// Define this translation units main book keeping data structure
-	ss << "struct _citrun_node _citrun_node_" << curr_node << " = {" << std::endl
+	ss << "struct citrun_node citrun_node_" << curr_node << " = {" << std::endl
 		<< "	.lines_ptr = _citrun_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
 		<< "	.inst_sites = " << visitor.GetRewriteCount() << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl;
-	if (last_node.compare("NULL") == 0)
-		ss << "	.next = NULL," << std::endl;
-	else
-		ss << "	.next = &_citrun_node_" << last_node << "," << std::endl;
 	ss << "};" << std::endl;
 
 	// Close extern "C" {

@@ -27,23 +27,19 @@ extern "C" {
 #endif
 #include <stdint.h>
 #include <stddef.h>
-struct _citrun_node {
+struct citrun_node {
 	uint64_t *lines_ptr;
 	uint32_t size;
 	uint32_t inst_sites;
 	const char *file_name;
-	struct _citrun_node *next;
 };
-void libscv_init();
 
 static uint64_t _citrun_lines[6];
-extern struct _citrun_node _citrun_node_NULL;
-struct _citrun_node _citrun_node_source_0_c = {
+struct citrun_node citrun_node_source_0 = {
 	.lines_ptr = _citrun_lines,
 	.size = 6,
 	.inst_sites = 1,
 	.file_name = "$tmp_dir/source_0.c",
-	.next = NULL,
 };
 #ifdef __cplusplus
 }

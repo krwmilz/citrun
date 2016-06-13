@@ -29,7 +29,7 @@ int foo() {
 	return (++_citrun_lines[2], 0);
 }
 
-int main(void) {libscv_init();
+int main(void) {
 	return (++_citrun_lines[6], 10);
 
 	return (++_citrun_lines[8], 10 + 10);

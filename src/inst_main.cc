@@ -21,6 +21,7 @@
 #include <clang/Tooling/Tooling.h>
 
 #include "inst_action.h"
+#include "runtime_h.h"
 
 #define STR_EXPAND(tok) #tok
 #define STR(tok) STR_EXPAND(tok)
@@ -146,6 +147,64 @@ restore_original_src(std::map<std::string, std::string> const &temp_file_map)
 	}
 }
 
+void
+patch_link_command(std::vector<char *> &args)
+{
+	std::string inst_files_list("INSTRUMENTED");
+
+	if (access(inst_files_list.c_str(), F_OK)) {
+		warnx("No instrumented object files found.");
+		if (execvp(args[0], &args[0]))
+			err(1, "execvp");
+	}
+
+	// std::cerr << "Link detected. Arguments are:" << std::endl;
+	// for (auto &arg : args)
+	// 	std::cerr << "  '" << arg << "', " << std::endl;
+
+	std::vector<std::string> instrumented_files;
+	std::ifstream inst_files_ifstream(inst_files_list);
+
+	std::string temp_line;
+	while (std::getline(inst_files_ifstream, temp_line))
+		instrumented_files.push_back(temp_line);
+
+	inst_files_ifstream.close();
+
+	// std::cerr << "Instrumented object files are:" << std::endl;
+	// for (auto &line : instrumented_files)
+	// 	std::cerr << "  '" << line << "', " << std::endl;
+
+	std::ofstream patch_ofstream("citrun_patch.c");
+
+	// Inject the runtime header.
+	patch_ofstream << runtime_h << std::endl;
+
+	for (auto &line : instrumented_files)
+		patch_ofstream << "extern struct citrun_node citrun_node_" << line << ";" << std::endl;
+
+	int num_tus = instrumented_files.size();
+	patch_ofstream << "struct citrun_node *citrun_nodes[";
+	patch_ofstream << num_tus << "] = {" << std::endl;
+
+	for (auto &line : instrumented_files)
+		patch_ofstream << "\t&citrun_node_" << line << ", " << std::endl;
+	patch_ofstream << "};" << std::endl;
+
+	patch_ofstream << "uint64_t citrun_nodes_total = " << num_tus << ";" << std::endl;
+	patch_ofstream.close();
+
+	args.push_back(const_cast<char *>("citrun_patch.c"));
+
+	char *lib_str;
+	if ((lib_str = getenv("CITRUN_LIB")) == NULL)
+		errx(1, "CITRUN_LIB not found in environment.");
+
+	// Add the runtime library and the symbol define hack
+	// automatically to the command line
+	args.push_back(lib_str);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -214,42 +273,8 @@ main(int argc, char *argv[])
 		// gcc -o main main.c fib.c
 		linking = true;
 
-	std::string last_node_path("LAST_NODE");
 	if (linking) {
-		if (access(last_node_path.c_str(), F_OK)) {
-			// Couldn't access the LAST_NODE file, we cannot link
-			// to the runtime library without it.
-			warnx("LAST_NODE file not found.");
-			if (execvp(argv[0], argv))
-				err(1, "execvp");
-		}
-
-		std::ifstream last_node_ifstream(last_node_path);
-		std::string last_node;
-
-		last_node_ifstream >> last_node;
-		last_node_ifstream.close();
-
-		// We need to link the entry point in the runtime to the
-		// instrumented application. OS independent.
-		std::stringstream defsym_arg;
-#ifdef __APPLE__
-		defsym_arg << "-Wl,-alias,__citrun_node_";
-		defsym_arg << last_node;
-		defsym_arg << ",__citrun_tu_head";
-#else
-		defsym_arg << "-Wl,--defsym=_citrun_tu_head=_citrun_node_";
-		defsym_arg << last_node;
-#endif
-
-		char *lib_str;
-		if ((lib_str = getenv("CITRUN_LIB")) == NULL)
-			errx(1, "CITRUN_LIB not found in environment.");
-
-		// Add the runtime library and the symbol define hack
-		// automatically to the command line
-		args.push_back(strdup(defsym_arg.str().c_str()));
-		args.push_back(lib_str);
+		patch_link_command(args);
 	}
 
 	// Instrumentation succeeded. Run the native compiler with a possibly
@@ -271,7 +296,4 @@ main(int argc, char *argv[])
 		err(1, "waitpid");
 
 	restore_original_src(temp_file_map);
-
-	if (linking)
-		unlink(last_node_path.c_str());
 }
