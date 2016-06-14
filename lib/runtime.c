@@ -29,10 +29,10 @@ int xwrite(int d, const void *buf, size_t bytes_total);
 void *
 control_thread(void *arg)
 {
-	int fd;
-	uint8_t response;
 	struct sockaddr_un addr;
 	char *viewer_sock = NULL;
+	int fd;
+	uint8_t response;
 
 	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
