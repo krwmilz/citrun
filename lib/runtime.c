@@ -45,7 +45,7 @@ control_thread(void *arg)
 	/* Connect the socket to the server */
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path) - 1);
+	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
 
 	while (1) {
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {

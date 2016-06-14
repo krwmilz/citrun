@@ -40,7 +40,7 @@ af_unix::set_listen()
 	struct sockaddr_un addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strncpy(addr.sun_path, "/tmp/citrun-gl.socket", sizeof(addr.sun_path) - 1);
+	strlcpy(addr.sun_path, "/tmp/citrun-gl.socket", sizeof(addr.sun_path));
 
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");
