@@ -33,7 +33,7 @@ system("citrun-wrap make -C $srcdir -j8") == 0 or die "citrun-wrap make failed";
 # Make sure the instrumentation for Vim is working correctly
 #
 my $viewer = SCV::Viewer->new();
-$ENV{CITRUN_SOCKET} = getcwd . "/SCV::Viewer.socket";
+$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
 my $exp = Expect->spawn("$srcdir/apps/openssl/openssl");
 $viewer->accept();

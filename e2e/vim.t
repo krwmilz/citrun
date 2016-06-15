@@ -44,7 +44,7 @@ system("resize");
 # Make sure the instrumentation for Vim is working correctly
 #
 my $viewer = SCV::Viewer->new();
-$ENV{CITRUN_SOCKET} = getcwd . "/SCV::Viewer.socket";
+$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
 $exp = Expect->spawn("$srcdir/vim");
 $viewer->accept();
