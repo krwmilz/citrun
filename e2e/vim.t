@@ -6,9 +6,10 @@ use File::Which;
 use Expect;
 use File::Temp qw( tempdir );
 use List::MoreUtils qw ( each_array );
-use SCV::Viewer;
 use Test::More tests => 238;
 use Time::HiRes qw( time );
+
+use Test::Viewer;
 
 #
 # This uses tools installed from a package, not the in tree build!
@@ -43,7 +44,7 @@ system("resize");
 #
 # Make sure the instrumentation for Vim is working correctly
 #
-my $viewer = SCV::Viewer->new();
+my $viewer = Test::Viewer->new();
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
 $exp = Expect->spawn("$srcdir/vim");

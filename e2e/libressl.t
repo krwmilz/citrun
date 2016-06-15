@@ -7,9 +7,10 @@ use Expect;
 use File::Temp qw( tempdir );
 use IPC::Open2;
 use List::MoreUtils qw ( each_array );
-use SCV::Viewer;
 use Test::More tests => 207;
 use Time::HiRes qw( time );
+
+use Test::Viewer;
 
 #
 # Build and test LibReSSL with citrun.
@@ -32,7 +33,7 @@ system("citrun-wrap make -C $srcdir -j8") == 0 or die "citrun-wrap make failed";
 
 # Make sure the instrumentation for Vim is working correctly
 #
-my $viewer = SCV::Viewer->new();
+my $viewer = Test::Viewer->new();
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
 my $exp = Expect->spawn("$srcdir/apps/openssl/openssl");
