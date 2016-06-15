@@ -4,6 +4,8 @@ use strict;
 use IO::Socket::UNIX;
 use Test;
 
+my $viewer_socket_name = "citrun-test.socket";
+
 sub new {
 	my ($class) = @_;
 	my $self = {};
@@ -11,7 +13,7 @@ sub new {
 
 	my $viewer_socket = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM(),
-		Local => "SCV::Viewer.socket",
+		Local => $viewer_socket_name,
 		Listen => 1,
 	);
 	die "socket error: $!\n" unless ($viewer_socket);
@@ -113,7 +115,7 @@ sub DESTROY {
 	my ($self) = @_;
 
 	close($self->{viewer_socket});
-	unlink "SCV::Viewer.socket";
+	unlink $viewer_socket_name;
 }
 
 1;
