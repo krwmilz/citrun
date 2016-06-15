@@ -1,10 +1,12 @@
 use strict;
-use SCV::Project;
-use SCV::Viewer;
+
 use Test::More tests => 11;
 
-my $viewer = SCV::Viewer->new();
-my $project = SCV::Project->new();
+use Test::Project;
+use Test::Viewer;
+
+my $viewer = Test::Viewer->new();
+my $project = Test::Project->new();
 
 $project->add_src(<<EOF);
 int

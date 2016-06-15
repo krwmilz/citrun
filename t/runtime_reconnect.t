@@ -1,9 +1,11 @@
 use strict;
-use SCV::Project;
-use SCV::Viewer;
+
 use Test::More tests => 5;
 
-my $project = SCV::Project->new();
+use Test::Project;
+use Test::Viewer;
+
+my $project = Test::Project->new();
 
 $project->add_src(<<EOF);
 int
@@ -20,7 +22,7 @@ $project->run();
 # Give the runtime a chance to reconnect
 sleep(1);
 
-my $viewer = SCV::Viewer->new();
+my $viewer = Test::Viewer->new();
 $viewer->accept();
 
 # Request and check metadata first

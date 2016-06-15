@@ -1,9 +1,11 @@
 use strict;
-use SCV::Project;
+
 use Test::More tests => 3;
 use Test::Differences;
 
-my $project = SCV::Project->new();
+use Test::Project;
+
+my $project = Test::Project->new();
 unified_diff;
 
 $project->add_src(<<EOF);
