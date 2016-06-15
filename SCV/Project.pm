@@ -129,4 +129,10 @@ sub get_tmpdir {
 	return $self->{tmp_dir};
 }
 
+sub DESTROY {
+	my ($self) = @_;
+
+	$self->kill() if ($self->{pid});
+}
+
 1;
