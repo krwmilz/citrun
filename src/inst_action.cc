@@ -36,7 +36,7 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 }
 
 std::string
-get_current_node(std::string file_path)
+get_current_node(std::string const &file_path)
 {
 	size_t last_slash = file_path.find_last_of('/');
 	std::string fn(file_path.substr(last_slash + 1));

@@ -111,7 +111,7 @@ ends_with(std::string const &value, std::string const &suffix)
 }
 
 void
-copy_file(std::string dst_fn, std::string src_fn)
+copy_file(std::string const &dst_fn, std::string const &src_fn)
 {
 	struct stat sb;
 	struct timeval st_tim[2];
