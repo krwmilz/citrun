@@ -10,7 +10,7 @@ if [ ! -d $uname_lc ]; then
 fi
 
 if [ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ]; then
-	echo Error: package name must be "citrun" or "ccitrunrun"
+	echo Error: package name must be \'citrun\' or \'ccitrunrun\'
 	exit 2;
 fi
 
