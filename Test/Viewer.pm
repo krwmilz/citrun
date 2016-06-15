@@ -1,4 +1,4 @@
-package SCV::Viewer;
+package Test::Viewer;
 use strict;
 
 use IO::Socket::UNIX;

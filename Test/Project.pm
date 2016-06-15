@@ -1,4 +1,4 @@
-package SCV::Project;
+package Test::Project;
 use strict;
 
 use Cwd;
