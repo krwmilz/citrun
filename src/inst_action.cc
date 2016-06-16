@@ -2,7 +2,6 @@
 #include <fcntl.h>	// open
 #include <limits.h>
 #include <sys/stat.h>	// mode flags
-#include <unistd.h>	// getcwd, access
 
 #include <fstream>
 #include <iostream>
@@ -47,17 +46,10 @@ get_current_node(std::string const &file_path)
 }
 
 void
-append_curr_node(std::string curr_node)
+append_curr_node(std::string const &curr_node)
 {
-	char *cwd = getcwd(NULL, PATH_MAX);
-	if (cwd == NULL)
-		errx(1, "getcwd");
-
-	std::string inst_filename(cwd);
-	inst_filename.append("/INSTRUMENTED");
-
 	// Append current primary source file to INSTRUMENTED list.
-	std::ofstream inst_ofstream(inst_filename, std::ofstream::app);
+	std::ofstream inst_ofstream("INSTRUMENTED", std::ofstream::app);
 	inst_ofstream << curr_node << std::endl;
 }
 
