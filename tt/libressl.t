@@ -5,34 +5,30 @@ use Cwd;
 use File::Which;
 use Expect;
 use File::Temp qw( tempdir );
-use IPC::Open2;
 use List::MoreUtils qw ( each_array );
 use Test::More tests => 207;
 use Time::HiRes qw( time );
 
+use Test::Package;
 use Test::Viewer;
 
-#
-# Build and test LibReSSL with citrun.
-#
 
-# Download source, extract, configure and compile
-#
-my $tmpdir = tempdir( CLEANUP => 1 );
+# Download: LibreSSL 2.4.1 from ftp.openbsd.org.
+my $libressl_url = "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/";
+my $package = Test::Package->new("libressl-2.4.1.tar.gz", $libressl_url, "tar xzf");
 
-my $libressl_src = "libressl-2.4.1.tar.gz";
-my $libressl_url = "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/$libressl_src";
+# Dependencies.
+$package->dependencies("citrun");
 
-system("cd $tmpdir && curl -O $libressl_url") == 0 or die "download failed";
-system("cd $tmpdir && tar xzf $libressl_src") == 0 or die "extract failed";
+my $srcdir = $package->dir() . "/libressl-2.4.1";
 
-my $srcdir = "$tmpdir/libressl-2.4.1";
+# Configure.
 system("cd $srcdir && citrun-wrap ./configure") == 0 or die "citrun-wrap ./configure failed";
 
+# Compile.
 system("citrun-wrap make -C $srcdir -j8") == 0 or die "citrun-wrap make failed";
 
-# Make sure the instrumentation for Vim is working correctly
-#
+# Verify: 'openssl' binary has working instrumentation.
 my $viewer = Test::Viewer->new();
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
