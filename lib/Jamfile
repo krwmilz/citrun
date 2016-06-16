@@ -3,4 +3,4 @@ SubDir TOP lib ;
 SubDirCcFlags -pthread ;
 
 Library libcitrun : runtime.c ;
-InstallLib $(PREFIX)/lib : libcitrun ;
+InstallLib $(PREFIX)/lib : libcitrun.a ;
