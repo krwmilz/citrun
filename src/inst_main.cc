@@ -202,7 +202,7 @@ patch_link_command(std::vector<char *> &args)
 
 	// Add the runtime library and the symbol define hack
 	// automatically to the command line
-	args.push_back("-pthread");
+	args.push_back(const_cast<char *>("-pthread"));
 	args.push_back(lib_str);
 }
 
