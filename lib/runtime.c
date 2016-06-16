@@ -20,6 +20,8 @@ extern uint64_t citrun_nodes_total;
 
 void send_metadata(int);
 void send_execution_data(int);
+/* Make sure instrumented programs rely on this library in some way. */
+int needs_to_link_against_libcitrun;
 
 int xread(int d, const void *buf, size_t bytes_total);
 int xwrite(int d, const void *buf, size_t bytes_total);

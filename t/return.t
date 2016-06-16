@@ -27,11 +27,11 @@ EOF
 $project->compile();
 
 my $inst_src_good = <<EOF;
-int foo() {
+int foo() {needs_to_link_against_libcitrun = 0;
 	return (++_citrun_lines[2], 0);
 }
 
-int main(void) {
+int main(void) {needs_to_link_against_libcitrun = 0;
 	return (++_citrun_lines[6], 10);
 
 	return (++_citrun_lines[8], 10 + 10);

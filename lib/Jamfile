@@ -1,8 +1,6 @@
 SubDir TOP lib ;
 
-SubDirCcFlags -pthread -fpic -DPIC ;
+SubDirCcFlags -pthread ;
 
-Main libcitrun.$(SHLIB_SUF) : runtime.c ;
-InstallLib $(PREFIX)/lib : libcitrun.$(SHLIB_SUF) ;
-
-LINKFLAGS on libcitrun.$(SHLIB_SUF) += -shared -fpic -pthread ;
+Library libcitrun : runtime.c ;
+InstallLib $(PREFIX)/lib : libcitrun ;

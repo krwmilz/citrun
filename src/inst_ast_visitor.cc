@@ -66,6 +66,16 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	if (f->hasBody() == 0)
 		return true;
 
+	// We need to depend directly on a symbol provided by libcitrun,
+	// otherwise the library will get discarded at link time.
+	std::stringstream ss;
+	ss << "needs_to_link_against_libcitrun = 0;";
+
+	clang::Stmt *FuncBody = f->getBody();
+	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
+
+	TheRewriter.InsertTextBefore(curly_brace, ss.str());
+
 	return true;
 }
 

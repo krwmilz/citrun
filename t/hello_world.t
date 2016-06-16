@@ -27,7 +27,7 @@ my $inst_src_good = <<EOF;
 
 int
 main(void)
-{
+{needs_to_link_against_libcitrun = 0;
 	(++_citrun_lines[6], printf("hello, world!"));
 	return (++_citrun_lines[7], 0);
 }

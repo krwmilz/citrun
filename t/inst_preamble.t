@@ -34,6 +34,7 @@ struct citrun_node {
 	const char *file_name;
 };
 
+extern int needs_to_link_against_libcitrun;
 static uint64_t _citrun_lines[6];
 struct citrun_node citrun_node_source_0 = {
 	.lines_ptr = _citrun_lines,

@@ -50,7 +50,7 @@ my $inst_src_good = <<EOF;
 
 long long
 fibonacci(long long n)
-{
+{needs_to_link_against_libcitrun = 0;
 	if ((++_citrun_lines[7], n == 0))
 		return (++_citrun_lines[8], 0);
 	else if ((++_citrun_lines[9], n == 1))
@@ -61,7 +61,7 @@ fibonacci(long long n)
 
 int
 main(int argc, char *argv[])
-{
+{needs_to_link_against_libcitrun = 0;
 	long long n;
 
 	if ((++_citrun_lines[20], argc != 2)) {

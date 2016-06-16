@@ -88,6 +88,8 @@ InstrumentAction::EndSourceFileAction()
 	// Embed the header directly in the primary source file.
 	ss << runtime_h << std::endl;
 
+	ss << "extern int needs_to_link_against_libcitrun;" << std::endl;
+
 	// Define storage for coverage data
 	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
 
