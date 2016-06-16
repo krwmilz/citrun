@@ -241,7 +241,7 @@ main(int argc, char *argv[])
 			// Keep track of original source file names
 			source_files.push_back(arg);
 
-			if (getenv("CITRUN_LEAVE_MODIFIED_SRC"))
+			if (getenv("CITRUN_TESTING"))
 				// Don't copy and restore original source files
 				continue;
 
@@ -298,6 +298,7 @@ main(int argc, char *argv[])
 
 	restore_original_src(temp_file_map);
 
-	if (linking)
+	// Leave this behind if we're in testing mode.
+	if (linking && (getenv("CITRUN_TESTING") == NULL))
 		unlink("citrun_patch.c");
 }

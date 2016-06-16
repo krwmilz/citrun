@@ -22,8 +22,8 @@ sub add_src {
 	my ($self, $source) = @_;
 	my $num_src_files = scalar(@{ $self->{src_files} });
 
-	# Tests that use this function want to check the instrumented source
-	$ENV{CITRUN_LEAVE_MODIFIED_SRC} = 1;
+	# Runtime behavior switch. Usually leaves behind changed files.
+	$ENV{CITRUN_TESTING} = 1;
 
 	# Create temporary file name
 	my $src_name = "source_$num_src_files.c";
