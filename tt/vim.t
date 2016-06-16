@@ -9,40 +9,34 @@ use List::MoreUtils qw ( each_array );
 use Test::More tests => 238;
 use Time::HiRes qw( time );
 
+use Test::Package;
 use Test::Viewer;
 
-# Build and test Vim with citrun.
-#
 
-# Download source, extract, configure and compile
-#
-my $tmpdir = tempdir( CLEANUP => 1 );
+# Verify that Vim under citrun tests successfully and then cross check that the
+# data structures instrumented inside Vim are consistent with known good values.
 
-my $vim_src = "vim-7.4.tar.bz2";
-my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/$vim_src";
+# Download: Vim 7.4 from vim.org.
+my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/";
+my $package = Test::Package->new("vim-7.4.tar.bz2", $vim_url, "tar xjf");
 
-system("cd $tmpdir && curl -O $vim_url") == 0 or die "download failed";
-system("cd $tmpdir && tar xjf $vim_src") == 0 or die "extract failed";
+# Dependencies: gtk and curl are needed for consistent builds.
+$package->dependencies("citrun", "gtk", "curl");
 
-my $srcdir = "$tmpdir/vim74/src";
+# Configure.
+my $srcdir = $package->dir() . "/vim74/src";
 system("citrun-wrap make -C $srcdir config") == 0 or die "citrun-wrap make config failed";
-
-# Remove last instrumented node from configure run
 system("rm $srcdir/INSTRUMENTED");
 
+# Compile.
 system("citrun-wrap make -C $srcdir -j8 myself") == 0 or die "citrun-wrap make failed";
 
-# Check that the native test suite can pass, validating that the instrumentation
-# hasn't broken the intent of the program.
-#
+# Test: need to use expect because Vim needs a tty to test correctly.
 my $exp = Expect->spawn("make", "-C", "$srcdir/testdir");
 $exp->expect(undef, ("ALL DONE"));
-
-# Unfuck the terminal after the testsuite is done
 system("resize");
 
-# Make sure the instrumentation for vim and xxd is working correctly
-#
+# Verify: instrumented data structures are consistent.
 my $viewer = Test::Viewer->new();
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
