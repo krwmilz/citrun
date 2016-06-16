@@ -37,18 +37,12 @@ if $(OS) = OPENBSD {
 }
 
 if $(OS) = MACOSX {
-	SHLIB_SUF = dylib ;
-
 	CLANG_INCL = "-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include" ;
 	C++FLAGS = -Wno-deprecated -DLLVM_VER=37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT ;
 	LINKLIBS on citrun-gl += -lc++ -lm ;
-
-	# We must specify that the entry point will be available at runtime
-	LINKFLAGS on libcitrun.$(SHLIB_SUF) = -Wl,-U,_citrun_nodes ;
-	LINKFLAGS on libcitrun.$(SHLIB_SUF) += -Wl,-U,_citrun_nodes_total ;
 
 	LINKLIBS on citrun-inst =
 		-lc++
