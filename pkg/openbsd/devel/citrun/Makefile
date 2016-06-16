@@ -14,8 +14,6 @@ MASTER_SITES =		http://citrun.com/src/
 
 WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
 
-SHARED_LIBS +=		citrun		0.0 # 0.0
-
 # -std=c++11
 MODULES =		gcc4
 MODGCC4_ARCHS =		*

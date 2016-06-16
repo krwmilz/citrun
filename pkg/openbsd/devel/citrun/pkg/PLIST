@@ -2,7 +2,7 @@
 @bin bin/citrun-gl
 @bin bin/citrun-inst
 bin/citrun-wrap
-@lib lib/libcitrun.so.${LIBcitrun_VERSION}
+lib/libcitrun.a
 @man man/man1/citrun-gl.1
 @man man/man1/citrun-inst.1
 @man man/man1/citrun-wrap.1
