@@ -18,17 +18,18 @@
 extern struct citrun_node *citrun_nodes[];
 extern uint64_t citrun_nodes_total;
 
-void send_metadata(int);
-void send_execution_data(int);
 /* Make sure instrumented programs rely on this library in some way. */
 int needs_to_link_against_libcitrun;
 
-int xread(int d, const void *buf, size_t bytes_total);
-int xwrite(int d, const void *buf, size_t bytes_total);
+static void send_metadata(int);
+static void send_execution_data(int);
+
+static int xread(int d, const void *buf, size_t bytes_total);
+static int xwrite(int d, const void *buf, size_t bytes_total);
 
 
 /* Sets up connection to the server socket and drops into an io loop. */
-void *
+static void *
 control_thread(void *arg)
 {
 	struct sockaddr_un addr;
@@ -68,7 +69,7 @@ control_thread(void *arg)
 }
 
 /* Walk the node array and send all of the static metadata information. */
-void
+static void
 send_metadata(int fd)
 {
 	struct citrun_node walk;
@@ -111,7 +112,7 @@ send_metadata(int fd)
  * For each link in the instrumented translation unit chain send the contents
  * of that links execution buffers.
  */
-void
+static void
 send_execution_data(int fd)
 {
 	struct citrun_node walk;
@@ -125,7 +126,7 @@ send_execution_data(int fd)
 	}
 }
 
-int
+static int
 xwrite(int d, const void *buf, size_t bytes_total)
 {
 	int bytes_left = bytes_total;
@@ -145,7 +146,7 @@ xwrite(int d, const void *buf, size_t bytes_total)
 	return bytes_wrote;
 }
 
-int
+static int
 xread(int d, const void *buf, size_t bytes_total)
 {
 	ssize_t bytes_left = bytes_total;
