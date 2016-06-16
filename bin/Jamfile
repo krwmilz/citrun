@@ -8,7 +8,7 @@ rule Generate
 
 actions Generate
 {
-	sed -e s,%PREFIX%,$(PREFIX), -e s,%SHLIB_SUF%,$(SHLIB_SUF), < $(2) > $(1) ;
+	sed -e s,%PREFIX%,$(PREFIX), < $(2) > $(1) ;
 	chmod 644 $(1) ;
 }
 
