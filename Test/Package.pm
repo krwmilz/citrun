@@ -31,13 +31,14 @@ sub dependencies {
 
 	my @installed_pkgs;
 	@installed_pkgs = get_installed_obsd() if ($^O eq "openbsd");
+	@installed_pkgs = get_installed_darwin() if ($^O eq "darwin");
 
 	my @missing_deps;
 	for my $dep (@deps) {
 		my $found = 0;
 
 		for (@installed_pkgs) {
-			if (/^$dep.*$/) {
+			if (/^\s*$dep.*$/) {
 				$found = 1;
 				last;
 			}
@@ -54,6 +55,17 @@ sub dependencies {
 
 sub get_installed_obsd {
 	my $pid = open2(\*CHLD_OUT, undef, 'pkg_info', '-q');
+	waitpid( $pid, 0 );
+	my $pkg_info_exit_code = $? >> 8;
+
+	my @installed_pkgs;
+	push @installed_pkgs, ($_) while (readline \*CHLD_OUT);
+
+	return @installed_pkgs;
+}
+
+sub get_installed_darwin {
+	my $pid = open2(\*CHLD_OUT, undef, 'port', 'installed');
 	waitpid( $pid, 0 );
 	my $pkg_info_exit_code = $? >> 8;
 
