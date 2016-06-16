@@ -169,9 +169,7 @@ xread(int d, const void *buf, size_t bytes_total)
 	return bytes_read;
 }
 
-/*
- * Grab an execution context and start up the control thread.
- */
+/* Grab an execution context and start up the control thread.  */
 __attribute__((constructor))
 static void runtime_init()
 {
