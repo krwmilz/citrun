@@ -53,7 +53,7 @@ EOF
 	my $cwd = getcwd;
 	$ENV{CITRUN_PATH} = "$cwd/share";
 
-	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.so.0.0" if ($^O eq "openbsd");
+	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.a" if ($^O eq "openbsd");
 	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.dylib" if ($^O eq "darwin");
 	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.so" if ($^O eq "linux");
 
@@ -69,7 +69,7 @@ sub instrumented_src {
 	open( my $inst_fh, "<", "$self->{tmp_dir}/source_0.c" );
 
 	# Knock off the instrumentation preamble
-	my $line = <$inst_fh> for (1..22);
+	my $line = <$inst_fh> for (1..23);
 
 	my $inst_src;
 	while (my $line = <$inst_fh>) {
@@ -85,7 +85,7 @@ sub inst_src_preamble {
 	open( my $inst_fh, "<", "$self->{tmp_dir}/source_0.c" );
 
 	my $preamble;
-	for (1..22) {
+	for (1..23) {
 		my $line = <$inst_fh>;
 		$preamble .= $line;
 	}
