@@ -66,8 +66,8 @@ InstrumentAction::EndSourceFileAction()
 	clang::SourceLocation end = sm.getLocForEndOfFile(main_fid);
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
-	std::string file_name = getCurrentFile();
-	std::string curr_node = get_current_node(file_name);
+	std::string const file_name = getCurrentFile();
+	std::string const curr_node = get_current_node(file_name);
 	append_curr_node(curr_node);
 
 	std::stringstream ss;
@@ -85,14 +85,14 @@ InstrumentAction::EndSourceFileAction()
 	// Define storage for coverage data
 	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
 
-	// Get visitor instance to check how many times it rewrote something
-	RewriteASTVisitor visitor = InstrumentASTConsumer->get_visitor();
+	// Keep track of how many sites we instrumented.
+	int rw_count = InstrumentASTConsumer->get_visitor().GetRewriteCount();
 
 	// Define this translation units main book keeping data structure
 	ss << "struct citrun_node citrun_node_" << curr_node << " = {" << std::endl
 		<< "	.lines_ptr = _citrun_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
-		<< "	.inst_sites = " << visitor.GetRewriteCount() << "," << std::endl
+		<< "	.inst_sites = " << rw_count << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl;
 	ss << "};" << std::endl;
 
