@@ -23,10 +23,8 @@ int needs_to_link_against_libcitrun;
 
 static void send_metadata(int);
 static void send_execution_data(int);
-
 static int xread(int d, const void *buf, size_t bytes_total);
 static int xwrite(int d, const void *buf, size_t bytes_total);
-
 
 /* Sets up connection to the server socket and drops into an io loop. */
 static void *
