@@ -40,8 +40,9 @@ get_current_node(std::string const &file_path)
 	size_t last_slash = file_path.find_last_of('/');
 	std::string fn(file_path.substr(last_slash + 1));
 
-	size_t period = fn.find_first_of('.');
+	std::replace(fn.begin(), fn.end(), '-', '_');
 
+	size_t period = fn.find_first_of('.');
 	return fn.substr(0, period);
 }
 
