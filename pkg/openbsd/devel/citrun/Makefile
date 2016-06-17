@@ -10,7 +10,7 @@ HOMEPAGE =		http://citrun.com
 # BSD
 PERMIT_PACKAGE_CDROM =	Yes
 
-MASTER_SITES =		http://citrun.com/src/
+MASTER_SITES =		${HOMEPAGE}/src/
 
 WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
 
@@ -21,12 +21,14 @@ MODGCC4_LANGS =		c++
 
 LIB_DEPENDS =		graphics/freeglut \
 			graphics/glew
+
 BUILD_DEPENDS =		devel/jam \
 			devel/llvm
-TEST_DEPENDS =		sysutils/p5-File-Which \
-			devel/p5-Expect \
+
+TEST_DEPENDS =		devel/p5-Expect \
 			devel/p5-List-MoreUtils \
-			devel/p5-Test-Differences
+			devel/p5-Test-Differences \
+			sysutils/p5-File-Which
 
 do-build:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q -j4
