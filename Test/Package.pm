@@ -1,6 +1,7 @@
 package Test::Package;
 use strict;
 
+use Cwd;
 use IPC::Open2;
 use File::Temp qw( tempdir );
 
@@ -14,9 +15,14 @@ sub new {
 	my $dir = tempdir( CLEANUP => 1 );
 	$self->{dir} = $dir;
 
-	my $dist_url = "$dist_root$dist_name";
-	system("cd $dir && curl -O $dist_url") == 0 or die "download failed";
-	system("cd $dir && $extract_cmd $dist_name") == 0 or die "extract failed";
+	mkdir "distfiles";
+	if (! -e "distfiles/$dist_name") {
+		my $dist_url = "$dist_root$dist_name";
+		system("curl $dist_url -o distfiles/$dist_name") == 0 or die "download failed";
+	}
+
+	my $abs_dist_path = getcwd . "/distfiles/$dist_name";
+	system("cd $dir && $extract_cmd $abs_dist_path") == 0 or die "extract failed";
 
 	return $self;
 }
