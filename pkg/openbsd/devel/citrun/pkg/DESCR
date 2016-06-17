@@ -1,2 +1,4 @@
-C It Run is a suite of tools that lets you watch your source code execute. It
-provides insight into what your program is actually doing.
+Adds instrumentation to your source code at compile time.
+
+When you run your instrumented binaries their execution information can be
+visualized with the included OpenGL viewer.
