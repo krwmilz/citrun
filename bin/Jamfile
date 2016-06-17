@@ -14,5 +14,5 @@ actions Generate
 
 Generate $(TOP)/bin/citrun-wrap : $(TOP)/bin/citrun-wrap.sh ;
 
-InstallBin $(PREFIX)/bin : citrun-wrap ;
+InstallShell $(PREFIX)/bin : citrun-wrap ;
 InstallMan $(PREFIX)/man : citrun-wrap.1 ;
