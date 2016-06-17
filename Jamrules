@@ -1,8 +1,7 @@
 PREFIX ?= `pwd` ;
 
 # Packaging systems like for build systems to respect this.
-CFLAGS = $(CFLAGS) ;
-C++FLAGS = $(CFLAGS) ;
+OPTIM = $(CFLAGS) ;
 
 C++FLAGS += -DCITRUN_LIB=$(PREFIX)/lib/libcitrun.a ;
 
