@@ -198,7 +198,13 @@ patch_link_command(std::vector<char *> &args)
 
 	// libcitrun.a needs pthread but is static and doesn't include it itself
 	args.push_back(const_cast<char *>("-pthread"));
-	args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
+
+	char *lib_str;
+	if ((lib_str = getenv("CITRUN_LIB")) == NULL)
+		// Trap door not found.
+		args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
+	else
+		args.push_back(lib_str);
 }
 
 int
