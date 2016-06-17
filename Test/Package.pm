@@ -47,9 +47,8 @@ sub dependencies {
 		}
 	}
 
-	my $missing_deps = join(' ', @missing_deps);
 	if (@missing_deps) {
-		die "Missing dependencies, install with: 'pkg_add $missing_deps'\n";
+		die "Missing dependencies: '" . join(' ', @missing_deps) . "'\n";
 	}
 }
 
