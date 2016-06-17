@@ -91,3 +91,10 @@ if $(OS) = LINUX {
 		-lstdc++
 		-lbsd ;
 }
+
+actions Test {
+	prove ;
+}
+
+Test test : ;
+Test regress : ;
