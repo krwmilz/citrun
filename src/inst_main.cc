@@ -196,14 +196,9 @@ patch_link_command(std::vector<char *> &args)
 
 	args.push_back(const_cast<char *>("citrun_patch.c"));
 
-	char *lib_str;
-	if ((lib_str = getenv("CITRUN_LIB")) == NULL)
-		errx(1, "CITRUN_LIB not found in environment.");
-
-	// Add the runtime library and the symbol define hack
-	// automatically to the command line
+	// libcitrun.a needs pthread but is static and doesn't include it itself
 	args.push_back(const_cast<char *>("-pthread"));
-	args.push_back(lib_str);
+	args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
 }
 
 int

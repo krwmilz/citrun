@@ -23,13 +23,10 @@ line. Source files are matched on suffix, one of:
 When instrumentation is successful modified source files are compiled with
 the native command line.
 .Pp
-When application link commands are detected the value of
-.Ev CITRUN_LIB
-is appended to the command line.
+When application link commands are detected extra arguments are added to the
+command line for the runtime library libcitrun.
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
-.It Ev CITRUN_LIB
-The arguments necessary to link to the runtime library on this platform.
 .It Ev CITRUN_PATH
 Directory of symlinks named after supported compiler binaries.
 .It Ev PATH
@@ -38,8 +35,8 @@ Must contain
 .El
 .Sh FILES
 .Bl -tag -width Ds
-.It Pa LAST_NODE
-The runtime entry point is linked with the contents of this file.
+.It Pa INSTRUMENTED
+File containing the names of all instrumented object files.
 .El
 .Sh EXIT STATUS
 .Ex -std
