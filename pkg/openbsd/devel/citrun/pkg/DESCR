@@ -1,4 +1,4 @@
 Adds instrumentation to your source code at compile time.
 
-When you run your instrumented binaries their execution information can be
+When your instrumented binaries run their execution information can be
 visualized with the included OpenGL viewer.
