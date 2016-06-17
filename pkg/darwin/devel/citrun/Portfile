@@ -1,4 +1,3 @@
-# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 # $Id$
 
 PortSystem          1.0
@@ -9,19 +8,19 @@ categories          devel
 maintainers         openmaintainer@macports.org
 platforms           darwin
 license             BSD
-description         Watch your source code execute
-long_description    Citrun adds compile time instrumentation so you can watch your program run
+description         see your source code run
+long_description    Adds instrumentation to source code at compile time. When the instrumented binaries are run, execution information can be visualized with an included OpenGL viewer.
 homepage            http://citrun.com
 master_sites        http://citrun.com/src/
 
-# This is easier for continuous integration style builds
+# This is easier for continuous integration style builds.
 fetch.type          git
 git.url             http://git.0x30.net/citrun
 git.branch          origin/master
 
 use_configure       no
 
-# I'm not sure if the Jamfiles are compatible with other jam's
+# I'm using vanilla Jam.
 depends_build       port:pkgconfig \
                     port:jam
 
@@ -42,5 +41,3 @@ destroot.cmd        PREFIX=${destroot}${prefix} jam
 destroot.destdir
 
 test.run            yes
-test.cmd            prove
-test.target
