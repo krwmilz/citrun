@@ -11,6 +11,8 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
+	return $self if (! defined ($dist_name));
+
 	# Create temporary directory for the contents of this package.
 	my $dir = tempdir( CLEANUP => 1 );
 	$self->{dir} = $dir;
