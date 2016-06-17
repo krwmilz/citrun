@@ -53,7 +53,7 @@ sub dependencies {
 }
 
 sub get_installed_obsd {
-	my $pid = open2(\*CHLD_OUT, undef, 'pkg_info');
+	my $pid = open2(\*CHLD_OUT, undef, 'pkg_info', '-q');
 	waitpid( $pid, 0 );
 	my $pkg_info_exit_code = $? >> 8;
 
