@@ -1,16 +1,16 @@
-OPTIM = -O2 ;
-
-# This should be set by the packaging system so that we can make binaries that
-# will find everything they need to.
-# If not, it will build binaries pointing to in-tree versions of everything.
 PREFIX ?= `pwd` ;
+
+# Packaging systems like for build systems to respect this.
+CFLAGS = $(CFLAGS) ;
+C++FLAGS = $(CFLAGS) ;
+
+C++FLAGS += -DCITRUN_LIB=$(PREFIX)/lib/libcitrun.a ;
 
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
-	SHLIB_SUF = so.0.0 ;
 
-	CLANG_INCL = "-I/usr/local/lib/clang/3.5/include" ;
-	C++FLAGS = -DLLVM_VER=34 ;
+	C++FLAGS += -DCLANG_INCL="-I/usr/local/lib/clang/3.5/include" ;
+	C++FLAGS += -DLLVM_VER=34 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
@@ -37,8 +37,8 @@ if $(OS) = OPENBSD {
 }
 
 if $(OS) = MACOSX {
-	CLANG_INCL = "-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include" ;
-	C++FLAGS = -Wno-deprecated -DLLVM_VER=37 ;
+	C++FLAGS += -DCLANG_INCL="-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include" ;
+	C++FLAGS += -Wno-deprecated -DLLVM_VER=37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT ;
@@ -66,8 +66,6 @@ if $(OS) = MACOSX {
 }
 
 if $(OS) = LINUX {
-	SHLIB_SUF = so ;
-
 	C++FLAGS = -DLLVM_VER=35 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
@@ -94,6 +92,3 @@ if $(OS) = LINUX {
 		-lstdc++
 		-lbsd ;
 }
-
-# Set this down here because CLANG_INCL is OS dependent.
-C++FLAGS += -DCLANG_INCL=$(CLANG_INCL) ;
