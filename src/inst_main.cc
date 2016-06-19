@@ -1,6 +1,4 @@
 #include <err.h>
-#include <fcntl.h>		// open
-#include <libgen.h>
 #include <string.h>
 #include <stdlib.h>		// mkstemp, getenv
 #include <stdio.h>		// tmpnam
@@ -8,6 +6,7 @@
 #ifdef __gnu_linux__
  #include <bsd/stdlib.h>	// setprogname
 #endif
+
 #include <sys/stat.h>		// stat
 #include <sys/time.h>		// utimes
 #include <sys/wait.h>		// waitpid
