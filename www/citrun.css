@@ -1,37 +1,25 @@
-/*
- * This was recommended to me once on a website somewhere. It stuck.
- */
+/* This is necessary IMHO. */
 p  { line-height: 1.5em; }
 li { line-height: 1.5em; }
 
-/*
- * Make it about 80 chars width max.
- */
+/* Booorriing. 80 char width monospace.  */
 body {
 	max-width: 80ch;
 	margin: auto;
 	font-family: monospace;
 }
 
-/*
- * For "prompt" style stuff
- */
+/* For "prompt" style stuff */
 .prompt {
 	color: green;
 }
 
-/*
- * This is the link bar just below the main title.
- * Looks good over on the right.
- */
+/* This is for the link bar just below the main title.  */
 .link_bar {
 	text-align: right;
 }
 
-/*
- * Logos displayed next to package download links need to be the same height as
- * the text.
- */
+/* Logos next to text need to be the same size as the text. */
 .inline_logo {
 	height: 1em;
 }
