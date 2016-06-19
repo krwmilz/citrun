@@ -3,14 +3,15 @@
 #include <limits.h>		/* PATH_MAX */
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
+#include <string.h>		/* strlcpy */
+#include <unistd.h>		/* getpid, getppid, getpgrp, read, write */
+
+#include <sys/socket.h>		/* socket */
+#include <sys/un.h>		/* sockaddr_un */
 #if __APPLE__
 #include <sys/types.h>		/* read */
 #include <sys/uio.h>		/* read */
 #endif
-#include <unistd.h>		/* read, getpid, getppid, getpgrp */
 
 #include "runtime.h"
 
@@ -87,7 +88,7 @@ send_metadata(int fd)
 	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
 		xwrite(fd, &pids[i], sizeof(pid_t));
 
-	/* Send instrumented object file information, consisting of: */
+	/* Send instrumented object file information. */
 	for (i = 0; i < citrun_nodes_total; i++) {
 		walk = *citrun_nodes[i];
 
