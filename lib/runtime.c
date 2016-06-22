@@ -22,9 +22,6 @@ extern uint64_t citrun_nodes_total;
 /* Make sure instrumented programs rely on this library in some way. */
 int needs_to_link_against_libcitrun;
 
-static void send_metadata(int);
-static void send_execution_data(int);
-
 static int
 xread(int d, const void *buf, size_t bytes_total)
 {
@@ -66,46 +63,6 @@ xwrite(int d, const void *buf, size_t bytes_total)
 	}
 
 	return bytes_wrote;
-}
-
-/* Sets up connection to the server socket and drops into an io loop. */
-static void *
-control_thread(void *arg)
-{
-	struct sockaddr_un addr;
-	char *viewer_sock = NULL;
-	int fd;
-	uint8_t response;
-
-	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
-		err(1, "socket");
-
-	/* The default socket location can be overridden */
-	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
-		/* There was an error getting the env var, use the default */
-		viewer_sock = "/tmp/citrun-gl.socket";
-
-	/* Connect the socket to the server */
-	memset(&addr, 0, sizeof(addr));
-	addr.sun_family = AF_UNIX;
-	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
-
-	while (1) {
-		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
-			warn("connect");
-			sleep(1);
-			continue;
-		}
-
-		/* Send static information first. */
-		send_metadata(fd);
-
-		while (1) {
-			/* Synchronously send execution data */
-			send_execution_data(fd);
-			xread(fd, &response, 1);
-		}
-	}
 }
 
 /* Walk the node array and send all of the static metadata information. */
@@ -163,6 +120,46 @@ send_execution_data(int fd)
 
 		/* Write execution buffer, one 8 byte counter per source line */
 		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
+	}
+}
+
+/* Sets up connection to the server socket and drops into an io loop. */
+static void *
+control_thread(void *arg)
+{
+	struct sockaddr_un addr;
+	char *viewer_sock = NULL;
+	int fd;
+	uint8_t response;
+
+	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+		err(1, "socket");
+
+	/* The default socket location can be overridden */
+	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
+		/* There was an error getting the env var, use the default */
+		viewer_sock = "/tmp/citrun-gl.socket";
+
+	/* Connect the socket to the server */
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
+
+	while (1) {
+		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
+			warn("connect");
+			sleep(1);
+			continue;
+		}
+
+		/* Send static information first. */
+		send_metadata(fd);
+
+		while (1) {
+			/* Synchronously send execution data */
+			send_execution_data(fd);
+			xread(fd, &response, 1);
+		}
 	}
 }
 
