@@ -7,5 +7,5 @@ use Test::More tests => 1;
 # -nv: turn off extra downloading output
 # -H: span accross hosts
 # -l: recursion level
-my $ret = system( "wget --spider -r -nd -nv -H -l 1 http://citrun.com" );
-is( $ret, 0, "http://citrun.com/ has no broken links" );
+my $ret = system( "wget --spider -r -nd -nv -H -l 1 http://cit.run" );
+is( $ret, 0, "http://cit.run/ has no broken links" );
