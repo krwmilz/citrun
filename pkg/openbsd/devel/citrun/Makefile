@@ -5,7 +5,7 @@ COMMENT =		see your source code run
 DISTNAME =		citrun-0
 CATEGORIES =		devel
 
-HOMEPAGE =		http://citrun.com
+HOMEPAGE =		http://cit.run
 
 # BSD
 PERMIT_PACKAGE_CDROM =	Yes
