@@ -24,8 +24,49 @@ int needs_to_link_against_libcitrun;
 
 static void send_metadata(int);
 static void send_execution_data(int);
-static int xread(int d, const void *buf, size_t bytes_total);
-static int xwrite(int d, const void *buf, size_t bytes_total);
+
+static int
+xread(int d, const void *buf, size_t bytes_total)
+{
+	ssize_t bytes_left = bytes_total;
+	size_t bytes_read = 0;
+	ssize_t n;
+
+	while (bytes_left > 0) {
+		n = read(d, (uint8_t *)buf + bytes_read, bytes_left);
+
+		if (n == 0)
+			/* Disconnect */
+			errx(1, "read 0 bytes on socket");
+		if (n < 0)
+			err(1, "read()");
+
+		bytes_read += n;
+		bytes_left -= n;
+	}
+
+	return bytes_read;
+}
+
+static int
+xwrite(int d, const void *buf, size_t bytes_total)
+{
+	int bytes_left = bytes_total;
+	int bytes_wrote = 0;
+	ssize_t n;
+
+	while (bytes_left > 0) {
+		n = write(d, (uint8_t *)buf + bytes_wrote, bytes_left);
+
+		if (n < 0)
+			err(1, "write()");
+
+		bytes_wrote += n;
+		bytes_left -= n;
+	}
+
+	return bytes_wrote;
+}
 
 /* Sets up connection to the server socket and drops into an io loop. */
 static void *
@@ -123,49 +164,6 @@ send_execution_data(int fd)
 		/* Write execution buffer, one 8 byte counter per source line */
 		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
 	}
-}
-
-static int
-xwrite(int d, const void *buf, size_t bytes_total)
-{
-	int bytes_left = bytes_total;
-	int bytes_wrote = 0;
-	ssize_t n;
-
-	while (bytes_left > 0) {
-		n = write(d, (uint8_t *)buf + bytes_wrote, bytes_left);
-
-		if (n < 0)
-			err(1, "write()");
-
-		bytes_wrote += n;
-		bytes_left -= n;
-	}
-
-	return bytes_wrote;
-}
-
-static int
-xread(int d, const void *buf, size_t bytes_total)
-{
-	ssize_t bytes_left = bytes_total;
-	size_t bytes_read = 0;
-	ssize_t n;
-
-	while (bytes_left > 0) {
-		n = read(d, (uint8_t *)buf + bytes_read, bytes_left);
-
-		if (n == 0)
-			/* Disconnect */
-			errx(1, "read 0 bytes on socket");
-		if (n < 0)
-			err(1, "read()");
-
-		bytes_read += n;
-		bytes_left -= n;
-	}
-
-	return bytes_read;
 }
 
 /* Grab an execution context and start up the control thread.  */
