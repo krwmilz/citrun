@@ -55,10 +55,8 @@ cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"vim pgrp upper bound check" );
 my $tus = $runtime_metadata->{tus};
 my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
 
-# Use this to regenerate:
-# print STDERR "[ \"$_->{filename}\", $_->{lines}, $_->{inst_sites} ],\n" for (@sorted_tus);
-# [ File Name,	Total lines in file,	Number of instrumented sites ];
 my @known_good = (
+	# file name		lines	instrumented sites
 	[ "auto/pathdef.c",	11,	71	],
 	[ "blowfish.c",		708,	117	],
 	[ "buffer.c",		5828,	1368	],
@@ -154,8 +152,8 @@ cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"xxd pgrp upper bound check" );
 $tus = $runtime_metadata->{tus};
 @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
 
-# Use this to regenerate:
 @known_good = (
+	# file name		lines	instrumented sites
 	[ "src/xxd/xxd.c",	851,	277 ],
 );
 

@@ -47,10 +47,8 @@ cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"libressl pgrp upper bound check
 my $tus = $runtime_metadata->{tus};
 my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
 
-# Use this to regenerate:
-#print STDERR "[ \"$_->{filename}\",\t$_->{lines},\t$_->{inst_sites} ],\n" for (@sorted_tus);
-# [ File Name,	Total lines in file,	Number of instrumented sites ];
 my @known_good = (
+	# file name			lines	instrumented sites
 	[ "apps/openssl/apps.c",	2323,   918 ],
 	[ "apps/openssl/apps_posix.c",	165,    18 ],
 	[ "apps/openssl/asn1pars.c",	483,    124 ],
