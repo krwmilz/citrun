@@ -32,7 +32,6 @@ system("citrun-wrap make -C $srcdir -j4") == 0 or die "citrun-wrap make failed";
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
 my $exp = Expect->spawn("$srcdir/apps/openssl/openssl");
-sleep(1);
 
 my $viewer = Test::Viewer->new();
 $viewer->accept();
