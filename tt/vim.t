@@ -26,7 +26,6 @@ $package->dependencies("citrun", "gtk", "curl");
 # Configure.
 my $srcdir = $package->dir() . "/vim74/src";
 system("citrun-wrap make -C $srcdir config") == 0 or die "citrun-wrap make config failed";
-system("rm $srcdir/INSTRUMENTED");
 
 # Compile.
 system("citrun-wrap make -C $srcdir -j8 myself") == 0 or die "citrun-wrap make failed";
@@ -37,10 +36,11 @@ $exp->expect(undef, ("ALL DONE"));
 system("resize");
 
 # Verify: instrumented data structures are consistent.
-my $viewer = Test::Viewer->new();
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
-
 $exp = Expect->spawn("$srcdir/vim");
+sleep(1);
+
+my $viewer = Test::Viewer->new();
 $viewer->accept();
 
 my $runtime_metadata = $viewer->get_metadata();
