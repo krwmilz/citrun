@@ -189,14 +189,15 @@ control_thread(void *arg)
 	addr.sun_family = AF_UNIX;
 	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
 
+	/* Make sure the translation unit linked list is consistent. */
+	settle();
+
 	while (1) {
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
 			warn("connect");
 			sleep(1);
 			continue;
 		}
-
-		settle();
 
 		/* Send static information first. */
 		send_metadata(fd);
