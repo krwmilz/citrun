@@ -251,8 +251,4 @@ main(int argc, char *argv[])
 		err(1, "waitpid");
 
 	restore_original_src(temp_file_map);
-
-	// Leave this behind if we're in testing mode.
-	if (linking && (getenv("CITRUN_TESTING") == NULL))
-		unlink("citrun_patch.c");
 }
