@@ -4,7 +4,7 @@
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
 #include <string.h>		/* strlcpy */
-#include <unistd.h>		/* getpid, getppid, getpgrp, read, write */
+#include <unistd.h>		/* getpid, getppid, getpgrp, read, usleep, write */
 
 #include <sys/socket.h>		/* socket */
 #include <sys/un.h>		/* sockaddr_un */
@@ -142,6 +142,31 @@ send_execution_data(int fd)
 	}
 }
 
+static void
+settle(void)
+{
+	struct citrun_node	*walk;
+	unsigned int		 previous_total;
+	unsigned int		 total = 0;
+	unsigned int		 spun = 0;
+
+	do {
+		usleep(100 * 1000);
+
+		walk = citrun_nodes_head;
+		previous_total = total;
+		total = 0;
+
+		while (walk != NULL) {
+			walk = walk->next;
+			++total;
+		}
+		++spun;
+	} while (previous_total != total);
+
+	warnx("spun %u times", spun);
+}
+
 /* Sets up connection to the server socket and drops into an io loop. */
 static void *
 control_thread(void *arg)
@@ -170,6 +195,8 @@ control_thread(void *arg)
 			sleep(1);
 			continue;
 		}
+
+		settle();
 
 		/* Send static information first. */
 		send_metadata(fd);
