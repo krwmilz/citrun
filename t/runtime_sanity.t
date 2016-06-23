@@ -1,7 +1,7 @@
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 48;
+use Test::More tests => 50;
 use Test::Differences;
 
 use Test::Project;
@@ -70,7 +70,9 @@ my $tus = $runtime_metadata->{tus};
 my ($fn0, $fn1, $fn2) = sort keys %$tus;
 like( $fn0, qr/.*source_0.c/, "runtime filename check 0" );
 is( $tus->{$fn0}->{lines}, 20, "runtime line count check 0" );
-is( $tus->{$fn0}->{inst_sites}, 7, "instrumented site count 0" );
+my $sites0 = $tus->{$fn0}->{inst_sites};
+cmp_ok( $sites0, ">=", 6, "site count 0 lower" );
+cmp_ok( $sites0, "<=", 11, "site count 0 upper" );
 
 like( $fn1, qr/.*source_1.c/, "runtime filename check 1" );
 is( $tus->{$fn1}->{lines}, 11, "runtime line count check 1" );
@@ -78,7 +80,9 @@ is( $tus->{$fn1}->{inst_sites}, 7, "instrumented site count 1" );
 
 like( $fn2, qr/.*source_2.c/, "runtime filename check 2" );
 is( $tus->{$fn2}->{lines}, 9, "runtime line count check 2" );
-is( $tus->{$fn2}->{inst_sites}, 6, "instrumented site count 2" );
+my $sites2 = $tus->{$fn2}->{inst_sites};
+cmp_ok( $sites2, ">=", 5, "site count 2 lower" );
+cmp_ok( $sites2, "<=", 6, "site count 2 upper" );
 
 # Request and check execution data
 my $data = $viewer->get_execution_data($tus_ordered, $tus);
