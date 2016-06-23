@@ -6,5 +6,7 @@ static const char runtime_h[] =
 "	uint32_t size;\n"
 "	uint32_t inst_sites;\n"
 "	const char *file_name;\n"
+"	struct citrun_node *next;\n"
 "};\n"
+"void citrun_node_add(struct citrun_node *);\n"
 ;

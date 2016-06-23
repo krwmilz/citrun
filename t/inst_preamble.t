@@ -32,16 +32,21 @@ struct citrun_node {
 	uint32_t size;
 	uint32_t inst_sites;
 	const char *file_name;
+	struct citrun_node *next;
 };
+void citrun_node_add(struct citrun_node *);
 
-extern int needs_to_link_against_libcitrun;
 static uint64_t _citrun_lines[6];
-struct citrun_node citrun_node_source_0 = {
+static struct citrun_node _citrun_node = {
 	.lines_ptr = _citrun_lines,
 	.size = 6,
 	.inst_sites = 1,
 	.file_name = "$tmp_dir/source_0.c",
 };
+__attribute__((constructor))
+static void citrun_constructor() {
+	citrun_node_add(&_citrun_node);
+}
 #ifdef __cplusplus
 }
 #endif

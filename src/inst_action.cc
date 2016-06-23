@@ -34,26 +34,6 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 #endif
 }
 
-std::string
-get_current_node(std::string const &file_path)
-{
-	size_t last_slash = file_path.find_last_of('/');
-	std::string fn(file_path.substr(last_slash + 1));
-
-	std::replace(fn.begin(), fn.end(), '-', '_');
-
-	size_t period = fn.find_first_of('.');
-	return fn.substr(0, period);
-}
-
-void
-append_curr_node(std::string const &curr_node)
-{
-	// Append current primary source file to INSTRUMENTED list.
-	std::ofstream inst_ofstream("INSTRUMENTED", std::ofstream::app);
-	inst_ofstream << curr_node << std::endl;
-}
-
 void
 InstrumentAction::EndSourceFileAction()
 {
@@ -68,10 +48,8 @@ InstrumentAction::EndSourceFileAction()
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
 	std::string const file_name = getCurrentFile();
-	std::string const curr_node = get_current_node(file_name);
-	append_curr_node(curr_node);
-
 	std::stringstream ss;
+
 	// Add preprocessor stuff so that the C runtime library links against
 	// C++ object code.
 	ss << "#ifdef __cplusplus" << std::endl;
@@ -81,21 +59,24 @@ InstrumentAction::EndSourceFileAction()
 	// Embed the header directly in the primary source file.
 	ss << runtime_h << std::endl;
 
-	ss << "extern int needs_to_link_against_libcitrun;" << std::endl;
-
-	// Define storage for coverage data
+	// Execution data needs to be big because it only increments.
 	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
 
 	// Keep track of how many sites we instrumented.
 	int rw_count = InstrumentASTConsumer->get_visitor().GetRewriteCount();
 
 	// Define this translation units main book keeping data structure
-	ss << "struct citrun_node citrun_node_" << curr_node << " = {" << std::endl
+	ss << "static struct citrun_node _citrun_node = {" << std::endl
 		<< "	.lines_ptr = _citrun_lines," << std::endl
 		<< "	.size = " << num_lines << "," << std::endl
 		<< "	.inst_sites = " << rw_count << "," << std::endl
 		<< "	.file_name = \"" << file_name << "\"," << std::endl;
 	ss << "};" << std::endl;
+
+	ss << "__attribute__((constructor))" << std::endl
+		<< "static void citrun_constructor() {" << std::endl
+		<< "	citrun_node_add(&_citrun_node);" << std::endl
+		<< "}" << std::endl;
 
 	// Close extern "C" {
 	ss << "#ifdef __cplusplus" << std::endl;

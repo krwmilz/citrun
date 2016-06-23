@@ -67,22 +67,22 @@ my $runtime_metadata = $viewer->get_metadata();
 my $tus = $runtime_metadata->{tus};
 
 my ($source_0, $source_1, $source_2) = @$tus;
-like( $source_0->{filename}, qr/.*source_0.c/, "runtime filename check 0" );
-is( $source_0->{lines}, 20, "runtime line count check 0" );
+like( $source_0->{filename}, qr/.*source_2.c/, "runtime filename check 0" );
+is( $source_0->{lines}, 9, "runtime line count check 0" );
 #is( $source_0->{inst_sites}, 7, "instrumented site count 0" );
 
 like( $source_1->{filename}, qr/.*source_1.c/, "runtime filename check 1" );
 is( $source_1->{lines}, 11, "runtime line count check 1" );
 #is( $source_1->{inst_sites}, 7, "instrumented site count 1" );
 
-like( $source_2->{filename}, qr/.*source_2.c/, "runtime filename check 2" );
-is( $source_2->{lines}, 9, "runtime line count check 2" );
+like( $source_2->{filename}, qr/.*source_0.c/, "runtime filename check 2" );
+is( $source_2->{lines}, 20, "runtime line count check 2" );
 #is( $source_2->{inst_sites}, 6, "instrumented site count 2" );
 
 # Request and check execution data
 my $data = $viewer->get_execution_data($tus);
 
-my @lines = @{ $data->[0] };
+my @lines = @{ $data->[2] };
 is     ( $lines[$_], 0, "src 0 line $_ check" ) for (1..11);
 is     ( $lines[12], 1, "src 0 line 14 check" );
 is     ( $lines[$_], 0, "src 0 line $_ check" ) for (13..14);
@@ -96,7 +96,7 @@ is     ( $lines[$_], 0, "src 1 line $_ check" ) for (0..3);
 cmp_ok ( $lines[$_], ">", 10, "src 1 line $_ check" ) for (4..7);
 is     ( $lines[8], 0, "src 1 line 8 check" );
 
-my @lines = @{ $data->[2] };
+my @lines = @{ $data->[0] };
 is     ( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);
 
 $project->kill();

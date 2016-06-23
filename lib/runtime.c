@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <err.h>		/* err, errx, warnx */
+#include <err.h>		/* err, errx, warn */
 #include <limits.h>		/* PATH_MAX */
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
@@ -15,12 +15,22 @@
 
 #include "runtime.h"
 
-/* Entrance into instrumented application. */
-extern struct citrun_node *citrun_nodes[];
-extern uint64_t citrun_nodes_total;
+static struct citrun_node *citrun_nodes_head;
+static struct citrun_node *citrun_nodes_tail;
 
-/* Make sure instrumented programs rely on this library in some way. */
-int needs_to_link_against_libcitrun;
+void
+citrun_node_add(struct citrun_node *node)
+{
+	if (citrun_nodes_head == NULL) {
+		assert(citrun_nodes_tail == NULL);
+		citrun_nodes_head = node;
+		citrun_nodes_tail = node;
+		return;
+	}
+
+	citrun_nodes_tail->next = node;
+	citrun_nodes_tail = node;
+}
 
 static int
 xread(int d, const void *buf, size_t bytes_total)
@@ -65,16 +75,23 @@ xwrite(int d, const void *buf, size_t bytes_total)
 	return bytes_wrote;
 }
 
+
 /* Walk the node array and send all of the static metadata information. */
 static void
 send_metadata(int fd)
 {
-	struct citrun_node walk;
+	struct citrun_node *walk = citrun_nodes_head;
+	struct citrun_node node;
+	uint64_t citrun_nodes_total = 0;
 	pid_t pids[3];
 	size_t file_name_sz;
 	int i;
 
 	/* Send the total number of instrumented nodes. */
+	while (walk != NULL) {
+		walk = walk->next;
+		++citrun_nodes_total;
+	}
 	xwrite(fd, &citrun_nodes_total, sizeof(citrun_nodes_total));
 
 	/* Send process id, parent process id, group process id. */
@@ -87,21 +104,24 @@ send_metadata(int fd)
 		xwrite(fd, &pids[i], sizeof(pid_t));
 
 	/* Send instrumented object file information. */
-	for (i = 0; i < citrun_nodes_total; i++) {
-		walk = *citrun_nodes[i];
+	walk = citrun_nodes_head;
+	while (walk != NULL) {
+		node = *walk;
 
 		/* Length of the original source file name. */
-		file_name_sz = strnlen(walk.file_name, PATH_MAX);
+		file_name_sz = strnlen(node.file_name, PATH_MAX);
 		xwrite(fd, &file_name_sz, sizeof(file_name_sz));
 
 		/* The original source file name. */
-		xwrite(fd, walk.file_name, file_name_sz);
+		xwrite(fd, node.file_name, file_name_sz);
 
 		/* Size of the execution counters. */
-		xwrite(fd, &walk.size, sizeof(walk.size));
+		xwrite(fd, &node.size, sizeof(node.size));
 
 		/* Number of instrumentation sites. */
-		xwrite(fd, &walk.inst_sites, sizeof(walk.size));
+		xwrite(fd, &node.inst_sites, sizeof(node.size));
+
+		walk = walk->next;
 	}
 }
 
@@ -112,14 +132,13 @@ send_metadata(int fd)
 static void
 send_execution_data(int fd)
 {
-	struct citrun_node walk;
+	struct citrun_node *walk = citrun_nodes_head;
 	int i;
 
-	for (i = 0; i < citrun_nodes_total; i++) {
-		walk = *citrun_nodes[i];
-
+	while (walk != NULL) {
 		/* Write execution buffer, one 8 byte counter per source line */
-		xwrite(fd, walk.lines_ptr, walk.size * sizeof(uint64_t));
+		xwrite(fd, walk->lines_ptr, walk->size * sizeof(uint64_t));
+		walk = walk->next;
 	}
 }
 
@@ -163,7 +182,7 @@ control_thread(void *arg)
 	}
 }
 
-/* Grab an execution context and start up the control thread.  */
+/* Grab an execution context and start up the control thread. */
 __attribute__((constructor))
 static void runtime_init()
 {

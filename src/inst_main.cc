@@ -149,52 +149,6 @@ restore_original_src(std::map<std::string, std::string> const &temp_file_map)
 void
 patch_link_command(std::vector<char *> &args)
 {
-	std::string inst_files_list("INSTRUMENTED");
-
-	if (access(inst_files_list.c_str(), F_OK)) {
-		warnx("No instrumented object files found.");
-		if (execvp(args[0], &args[0]))
-			err(1, "execvp");
-	}
-
-	// std::cerr << "Link detected. Arguments are:" << std::endl;
-	// for (auto &arg : args)
-	// 	std::cerr << "  '" << arg << "', " << std::endl;
-
-	std::vector<std::string> instrumented_files;
-	std::ifstream inst_files_ifstream(inst_files_list);
-
-	std::string temp_line;
-	while (std::getline(inst_files_ifstream, temp_line))
-		instrumented_files.push_back(temp_line);
-
-	inst_files_ifstream.close();
-
-	// std::cerr << "Instrumented object files are:" << std::endl;
-	// for (auto &line : instrumented_files)
-	// 	std::cerr << "  '" << line << "', " << std::endl;
-
-	std::ofstream patch_ofstream("citrun_patch.c");
-
-	// Inject the runtime header.
-	patch_ofstream << runtime_h << std::endl;
-
-	for (auto &line : instrumented_files)
-		patch_ofstream << "extern struct citrun_node citrun_node_" << line << ";" << std::endl;
-
-	int num_tus = instrumented_files.size();
-	patch_ofstream << "struct citrun_node *citrun_nodes[";
-	patch_ofstream << num_tus << "] = {" << std::endl;
-
-	for (auto &line : instrumented_files)
-		patch_ofstream << "\t&citrun_node_" << line << ", " << std::endl;
-	patch_ofstream << "};" << std::endl;
-
-	patch_ofstream << "uint64_t citrun_nodes_total = " << num_tus << ";" << std::endl;
-	patch_ofstream.close();
-
-	args.push_back(const_cast<char *>("citrun_patch.c"));
-
 	// libcitrun.a needs pthread but is static and doesn't include it itself
 	args.push_back(const_cast<char *>("-pthread"));
 
