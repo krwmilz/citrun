@@ -38,7 +38,6 @@ system("resize");
 # Verify: instrumented data structures are consistent.
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 $exp = Expect->spawn("$srcdir/vim");
-sleep(1);
 
 my $viewer = Test::Viewer->new();
 $viewer->accept();
