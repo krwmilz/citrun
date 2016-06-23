@@ -164,7 +164,7 @@ settle(void)
 		++spun;
 	} while (previous_total != total);
 
-	warnx("spun %u times", spun);
+	warnx("spun %u times, settled on %u nodes", spun, total);
 }
 
 /* Sets up connection to the server socket and drops into an io loop. */
