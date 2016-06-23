@@ -29,11 +29,11 @@ $viewer->accept();
 my $runtime_metadata = $viewer->get_metadata();
 
 my $tus = $runtime_metadata->{tus};
-is ( scalar(@$tus), 1, "translation unit count" );
-my $tu = $tus->[0];
+is ( scalar(keys %$tus), 1, "translation unit count" );
 
-like( $tu->{filename}, qr/.*source_0.c/, "filename check" );
-is( $tu->{lines}, 7, "line count check" );
+my ($file_name) = keys %$tus;
+like( $file_name, qr/.*source_0.c/, "filename check" );
+is( $tus->{$file_name}->{lines}, 7, "line count check" );
 
 $project->kill();
 my ($ret, $err) = $project->wait();

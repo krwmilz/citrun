@@ -48,17 +48,18 @@ $project->run(45);
 # Accept the runtime's connection
 $viewer->accept();
 my $runtime_metadata = $viewer->get_metadata();
+my $tus_ordered = $runtime_metadata->{tus_ordered};
 my $tus = $runtime_metadata->{tus};
 
-my $source_0 = $tus->[0];
-like ($source_0->{filename}, qr/.*source_0\.c/, "runtime filename check");
-is( $source_0->{lines}, 28, "runtime lines count" );
+my ($file_name) = keys %$tus;
+like ($file_name, qr/.*source_0\.c/, "runtime filename check");
+is( $tus->{$file_name}->{lines}, 28, "runtime lines count" );
 
-my $data = $viewer->get_execution_data($tus);
-my @exec_lines1 = @{ $data->[0] };
+my $data = $viewer->get_execution_data($tus_ordered, $tus);
+my @exec_lines1 = @{ $data->{$file_name} };
 
-my $data = $viewer->get_execution_data($tus);
-my @exec_lines2 = @{ $data->[0] };
+my $data = $viewer->get_execution_data($tus_ordered, $tus);
+my @exec_lines2 = @{ $data->{$file_name} };
 
 # Only lines 8 - 12 in the source code above are executing
 for (8..12) {

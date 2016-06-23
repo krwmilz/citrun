@@ -48,7 +48,8 @@ sub get_metadata {
 		pgrp => $pgrp,
 	};
 
-	my @tus;
+	my @tus_ordered;
+	my %tus;
 	for (1..$num_tus) {
 		my $buf = read_all($client, 8);
 		my $file_name_sz = unpack("Q", $buf);
@@ -61,31 +62,33 @@ sub get_metadata {
 		$buf = read_all($client, 4);
 		my $inst_sites = unpack("L", $buf);
 
-		push @tus, { filename => $file_name, lines => $num_lines, inst_sites => $inst_sites };
+		push @tus_ordered, $file_name;
+		$tus{$file_name} = { lines => $num_lines, inst_sites => $inst_sites };
 	}
-	$runtime_metadata->{tus} = \@tus;
+	$runtime_metadata->{tus_ordered} = \@tus_ordered;
+	$runtime_metadata->{tus} = \%tus;
 
 	return $runtime_metadata;
 }
 
 sub get_execution_data {
-	my ($self, $tus) = @_;
+	my ($self, $tus_ordered, $tus) = @_;
 	my $client = $self->{client_socket};
 
-	my @data;
-	for (@$tus) {
-		my $num_lines = $_->{lines};
+	my %data;
+	for my $file_name (@$tus_ordered) {
+		my $num_lines = $tus->{$file_name}->{lines};
 
 		my $buf = read_all($client, 8 * $num_lines);
 		my @data_tmp = unpack("Q$num_lines", $buf);
 
-		push @data, [@data_tmp];
+		$data{$file_name} = \@data_tmp;
 	}
 
 	# Send an 'ok' response
 	$client->syswrite("\x01", 1);
 
-	return \@data;
+	return \%data;
 }
 
 sub read_all {

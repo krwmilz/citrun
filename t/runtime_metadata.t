@@ -39,11 +39,11 @@ cmp_ok( $ppid, "<", 100 * 1000, "ppid is a reasonable value" );
 cmp_ok( $pgrp, "<", 100 * 1000, "pgrp is a reasonable value" );
 
 my $tus = $runtime_metadata->{tus};
-is ( scalar(@$tus), 1, "translation unit count" );
-my $tu = $tus->[0];
+is ( scalar(keys %$tus), 1, "translation unit count" );
 
-like( $tu->{filename}, qr/.*source_0.c/, "filename check" );
-is( $tu->{lines}, 8, "line count check" );
+my ($file_name) = keys %$tus;
+like( $file_name, qr/.*source_0.c/, "filename check" );
+is( $tus->{$file_name}->{lines}, 8, "line count check" );
 
 $project->kill();
 my ($ret, $err) = $project->wait();

@@ -1,7 +1,7 @@
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 45;
+use Test::More tests => 48;
 use Test::Differences;
 
 use Test::Project;
@@ -64,40 +64,41 @@ $viewer->accept();
 
 # Request and check metadata first
 my $runtime_metadata = $viewer->get_metadata();
+my $tus_ordered = $runtime_metadata->{tus_ordered};
 my $tus = $runtime_metadata->{tus};
 
-my ($source_0, $source_1, $source_2) = @$tus;
-like( $source_0->{filename}, qr/.*source_2.c/, "runtime filename check 0" );
-is( $source_0->{lines}, 9, "runtime line count check 0" );
-#is( $source_0->{inst_sites}, 7, "instrumented site count 0" );
+my ($fn0, $fn1, $fn2) = sort keys %$tus;
+like( $fn0, qr/.*source_0.c/, "runtime filename check 0" );
+is( $tus->{$fn0}->{lines}, 20, "runtime line count check 0" );
+is( $tus->{$fn0}->{inst_sites}, 7, "instrumented site count 0" );
 
-like( $source_1->{filename}, qr/.*source_1.c/, "runtime filename check 1" );
-is( $source_1->{lines}, 11, "runtime line count check 1" );
-#is( $source_1->{inst_sites}, 7, "instrumented site count 1" );
+like( $fn1, qr/.*source_1.c/, "runtime filename check 1" );
+is( $tus->{$fn1}->{lines}, 11, "runtime line count check 1" );
+is( $tus->{$fn1}->{inst_sites}, 7, "instrumented site count 1" );
 
-like( $source_2->{filename}, qr/.*source_0.c/, "runtime filename check 2" );
-is( $source_2->{lines}, 20, "runtime line count check 2" );
-#is( $source_2->{inst_sites}, 6, "instrumented site count 2" );
+like( $fn2, qr/.*source_2.c/, "runtime filename check 2" );
+is( $tus->{$fn2}->{lines}, 9, "runtime line count check 2" );
+is( $tus->{$fn2}->{inst_sites}, 6, "instrumented site count 2" );
 
 # Request and check execution data
-my $data = $viewer->get_execution_data($tus);
+my $data = $viewer->get_execution_data($tus_ordered, $tus);
 
-my @lines = @{ $data->[2] };
-is     ( $lines[$_], 0, "src 0 line $_ check" ) for (1..11);
-is     ( $lines[12], 1, "src 0 line 14 check" );
-is     ( $lines[$_], 0, "src 0 line $_ check" ) for (13..14);
-is     ( $lines[15], 1, "src 0 line 15 check" );
-is     ( $lines[16], 0, "src 0 line 16 check" );
-is     ( $lines[17], 2, "src 0 line 17 check" );
-is     ( $lines[$_], 0, "src 0 line $_ check" ) for (18..19);
+my @lines = @{ $data->{$fn0} };
+is( $lines[$_], 0, "src 0 line $_ check" ) for (1..11);
+is( $lines[12], 1, "src 0 line 14 check" );
+is( $lines[$_], 0, "src 0 line $_ check" ) for (13..14);
+is( $lines[15], 1, "src 0 line 15 check" );
+is( $lines[16], 0, "src 0 line 16 check" );
+is( $lines[17], 2, "src 0 line 17 check" );
+is( $lines[$_], 0, "src 0 line $_ check" ) for (18..19);
 
-my @lines = @{ $data->[1] };
-is     ( $lines[$_], 0, "src 1 line $_ check" ) for (0..3);
+my @lines = @{ $data->{$fn1} };
+is( $lines[$_], 0, "src 1 line $_ check" ) for (0..3);
 cmp_ok ( $lines[$_], ">", 10, "src 1 line $_ check" ) for (4..7);
-is     ( $lines[8], 0, "src 1 line 8 check" );
+is( $lines[8], 0, "src 1 line 8 check" );
 
-my @lines = @{ $data->[0] };
-is     ( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);
+my @lines = @{ $data->{$fn2} };
+is( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);
 
 $project->kill();
 my ($ret, $err) = $project->wait();
