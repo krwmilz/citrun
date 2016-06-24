@@ -1,6 +1,6 @@
 #include <err.h>
 #include <string.h>
-#include <stdlib.h>		// mkstemp, getenv
+#include <stdlib.h>		// getenv
 #include <stdio.h>		// tmpnam
 #include <unistd.h>		// fork
 #ifdef __gnu_linux__
