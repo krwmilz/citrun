@@ -35,6 +35,7 @@ struct citrun_node {
 	struct citrun_node *next;
 };
 void citrun_node_add(struct citrun_node *);
+void citrun_start();
 
 static uint64_t _citrun_lines[6];
 static struct citrun_node _citrun_node = {
