@@ -12,7 +12,7 @@ actions Generate
 	chmod 755 $(1) ;
 }
 
-Generate $(TOP)/bin/citrun-wrap : $(TOP)/bin/citrun-wrap.sh ;
+Generate $(TOP)/bin/citrun-wrap : $(TOP)/bin/citrun-wrap.in ;
 
 InstallShell $(PREFIX)/bin : citrun-wrap ;
 InstallMan $(PREFIX)/man : citrun-wrap.1 ;
