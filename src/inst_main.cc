@@ -251,4 +251,8 @@ main(int argc, char *argv[])
 		err(1, "waitpid");
 
 	restore_original_src(temp_file_map);
+
+	// Use the same return code as the native compiler.
+	if (WIFEXITED(status))
+		exit(WEXITSTATUS(status));
 }
