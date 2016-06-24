@@ -31,7 +31,7 @@ int foo() {
 	return (++_citrun_lines[2], 0);
 }
 
-int main(void) {
+int main(void) {citrun_start();
 	return (++_citrun_lines[6], 10);
 
 	return (++_citrun_lines[8], 10 + 10);

@@ -32,7 +32,7 @@ $project->compile();
 my $inst_src_good = <<EOF;
 int
 main(void)
-{
+{citrun_start();
 	int i;
 
 	switch ((++_citrun_lines[6], i)) {

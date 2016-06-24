@@ -62,6 +62,24 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 bool
 RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 {
+	// Only function definitions (with bodies), not declarations.
+	if (f->hasBody() == 0)
+		return true;
+
+	clang::Stmt *FuncBody = f->getBody();
+
+	clang::DeclarationName DeclName = f->getNameInfo().getName();
+	std::string FuncName = DeclName.getAsString();
+
+	if (FuncName.compare("main") != 0)
+		// Function is not main
+		return true;
+
+	std::string start_function("citrun_start();");
+
+	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
+	TheRewriter.InsertTextBefore(curly_brace, start_function);
+
 	return true;
 }
 

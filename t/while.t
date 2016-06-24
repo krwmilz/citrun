@@ -30,7 +30,7 @@ $project->compile();
 my $inst_src_good = <<EOF;
 int
 main(void)
-{
+{citrun_start();
 	int i;
 
 	i = 0;

@@ -18,6 +18,12 @@
 static struct citrun_node *citrun_nodes_head;
 static struct citrun_node *citrun_nodes_tail;
 
+static void *control_thread(void *);
+
+/*
+ * Public interface.
+ */
+
 void
 citrun_node_add(struct citrun_node *node)
 {
@@ -31,6 +37,17 @@ citrun_node_add(struct citrun_node *node)
 	citrun_nodes_tail->next = node;
 	citrun_nodes_tail = node;
 }
+
+void
+citrun_start()
+{
+	pthread_t tid;
+	pthread_create(&tid, NULL, control_thread, NULL);
+}
+
+/*
+ * Private interface.
+ */
 
 static int
 xread(int d, const void *buf, size_t bytes_total)
@@ -142,31 +159,6 @@ send_execution_data(int fd)
 	}
 }
 
-static void
-settle(void)
-{
-	struct citrun_node	*walk;
-	unsigned int		 previous_total;
-	unsigned int		 total = 0;
-	unsigned int		 spun = 0;
-
-	do {
-		usleep(100 * 1000);
-
-		walk = citrun_nodes_head;
-		previous_total = total;
-		total = 0;
-
-		while (walk != NULL) {
-			walk = walk->next;
-			++total;
-		}
-		++spun;
-	} while (previous_total != total);
-
-	warnx("spun %u times, settled on %u nodes", spun, total);
-}
-
 /* Sets up connection to the server socket and drops into an io loop. */
 static void *
 control_thread(void *arg)
@@ -181,16 +173,13 @@ control_thread(void *arg)
 
 	/* The default socket location can be overridden */
 	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
-		/* There was an error getting the env var, use the default */
+		/* Error, use the default */
 		viewer_sock = "/tmp/citrun-gl.socket";
 
 	/* Connect the socket to the server */
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
-
-	/* Make sure the translation unit linked list is consistent. */
-	settle();
 
 	while (1) {
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
@@ -208,12 +197,4 @@ control_thread(void *arg)
 			xread(fd, &response, 1);
 		}
 	}
-}
-
-/* Grab an execution context and start up the control thread. */
-__attribute__((constructor))
-static void runtime_init()
-{
-	pthread_t tid;
-	pthread_create(&tid, NULL, control_thread, NULL);
 }

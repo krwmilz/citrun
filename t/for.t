@@ -28,7 +28,7 @@ $project->compile();
 my $inst_src_good = <<EOF;
 int
 main(void)
-{
+{citrun_start();
 	int i;
 
 	for (i = 0; (++_citrun_lines[6], i < 19); i++) {
