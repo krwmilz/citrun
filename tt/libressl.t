@@ -26,7 +26,7 @@ my $srcdir = $package->dir() . "/libressl-2.4.1";
 system("cd $srcdir && citrun-wrap ./configure") == 0 or die "citrun-wrap ./configure failed";
 
 # Compile.
-system("citrun-wrap make -C $srcdir -j4") == 0 or die "citrun-wrap make failed";
+system("citrun-wrap make -C $srcdir -j8") == 0 or die "citrun-wrap make failed";
 
 # Verify: 'openssl' binary has working instrumentation.
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
