@@ -7,3 +7,4 @@ struct citrun_node {
 	struct citrun_node *next;
 };
 void citrun_node_add(struct citrun_node *);
+void citrun_start();

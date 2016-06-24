@@ -4,7 +4,7 @@
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
 #include <string.h>		/* strlcpy */
-#include <unistd.h>		/* getpid, getppid, getpgrp, read, usleep, write */
+#include <unistd.h>		/* getpid, getppid, getpgrp, read, write */
 
 #include <sys/socket.h>		/* socket */
 #include <sys/un.h>		/* sockaddr_un */

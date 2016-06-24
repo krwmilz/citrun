@@ -9,4 +9,5 @@ static const char runtime_h[] =
 "	struct citrun_node *next;\n"
 "};\n"
 "void citrun_node_add(struct citrun_node *);\n"
+"void citrun_start();\n"
 ;
