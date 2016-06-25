@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use Cwd;
-use File::Which;
 use Expect;
 use File::Temp qw( tempdir );
+use File::Which;
 use List::MoreUtils qw ( each_array );
 use Test::More tests => 2491;
 use Time::HiRes qw( time );
@@ -46,9 +46,6 @@ cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"ppid lower bound check" );
 cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"ppid upper bound check" );
 cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"pgrp lower bound check" );
 cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"pgrp upper bound check" );
-
-my $tus = $runtime_metadata->{tus};
-my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
 
 #print STDERR "[ \"$_->{filename}\",$_->{lines},$_->{inst_sites} ],\n" for (@sorted_tus);
 my @known_good = (
@@ -676,11 +673,16 @@ my @known_good = (
 	[ "ssl/t1_srvr.c",239,21 ],
 );
 
+my $tus = $runtime_metadata->{tus};
+my @sorted_tus = sort keys %$tus;
+
 # Walk two lists at the same time
 # http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
 my $it = each_array( @known_good, @sorted_tus );
-while ( my ($x, $y) = $it->() ) {
-	like( $y->{filename},	qr/.*$x->[0]/,	"libressl $x->[0]: filename check" );
+while ( my ($x, $key) = $it->() ) {
+	my $y = $tus->{$key};
+
+	like( $key,	qr/.*$x->[0]/,	"libressl $x->[0]: filename check" );
 	is ( $y->{lines},	$x->[1],	"libressl $x->[0]: total lines check" );
 
 	# Check instrumented sites as a range
