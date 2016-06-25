@@ -37,13 +37,15 @@ my $viewer = Test::Viewer->new();
 $viewer->accept();
 
 my $runtime_metadata = $viewer->get_metadata();
-is( $runtime_metadata->{num_tus}, 621,		"libressl translation unit count" );
-cmp_ok( $runtime_metadata->{pid}, ">", 1,	"libressl pid lower bound check" );
-cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"libressl pid upper bound check" );
-cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"libressl ppid lower bound check" );
-cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"libressl ppid upper bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"libressl pgrp lower bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"libressl pgrp upper bound check" );
+cmp_ok( $runtime_metadata->{num_tus}, ">", 615,	"tu count lower bound" );
+cmp_ok( $runtime_metadata->{num_tus}, "<", 629,	"tu count upper bound" );
+
+cmp_ok( $runtime_metadata->{pid}, ">", 1,	"pid lower bound check" );
+cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"pid upper bound check" );
+cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"ppid lower bound check" );
+cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"ppid upper bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"pgrp lower bound check" );
+cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"pgrp upper bound check" );
 
 my $tus = $runtime_metadata->{tus};
 my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
