@@ -15,8 +15,9 @@
 
 #include "runtime.h"
 
-static struct citrun_node *citrun_nodes_head;
-static struct citrun_node *citrun_nodes_tail;
+static struct citrun_node *nodes_head;
+static struct citrun_node *nodes_tail;
+static uint64_t nodes_total;
 
 static void *control_thread(void *);
 
@@ -25,22 +26,32 @@ static void *control_thread(void *);
  */
 
 void
-citrun_node_add(struct citrun_node *node)
+citrun_node_add(struct citrun_node *n)
 {
-	if (citrun_nodes_head == NULL) {
-		assert(citrun_nodes_tail == NULL);
-		citrun_nodes_head = node;
-		citrun_nodes_tail = node;
+	if (nodes_head == NULL) {
+		assert(nodes_tail == NULL);
+		nodes_head = n;
+		nodes_tail = n;
 		return;
 	}
 
-	citrun_nodes_tail->next = node;
-	citrun_nodes_tail = node;
+	nodes_tail->next = n;
+	nodes_tail = n;
 }
 
 void
 citrun_start()
 {
+	struct citrun_node	*w;
+	nodes_total = 0;
+
+	/*
+	 * Count nodes once. Changing this after program start is not supported
+	 * at the moment.
+	 */
+	for (w = nodes_head; w != NULL; w = w->next)
+		++nodes_total;
+
 	pthread_t tid;
 	pthread_create(&tid, NULL, control_thread, NULL);
 }
@@ -52,9 +63,9 @@ citrun_start()
 static int
 xread(int d, const void *buf, size_t bytes_total)
 {
-	ssize_t bytes_left = bytes_total;
-	size_t bytes_read = 0;
-	ssize_t n;
+	ssize_t	 bytes_left = bytes_total;
+	size_t	 bytes_read = 0;
+	ssize_t	 n;
 
 	while (bytes_left > 0) {
 		n = read(d, (uint8_t *)buf + bytes_read, bytes_left);
@@ -75,9 +86,9 @@ xread(int d, const void *buf, size_t bytes_total)
 static int
 xwrite(int d, const void *buf, size_t bytes_total)
 {
-	int bytes_left = bytes_total;
-	int bytes_wrote = 0;
-	ssize_t n;
+	int	 bytes_left = bytes_total;
+	int	 bytes_wrote = 0;
+	ssize_t	 n;
 
 	while (bytes_left > 0) {
 		n = write(d, (uint8_t *)buf + bytes_wrote, bytes_left);
@@ -97,19 +108,14 @@ xwrite(int d, const void *buf, size_t bytes_total)
 static void
 send_metadata(int fd)
 {
-	struct citrun_node *walk = citrun_nodes_head;
-	struct citrun_node node;
-	uint64_t citrun_nodes_total = 0;
-	pid_t pids[3];
-	size_t file_name_sz;
-	int i;
+	struct citrun_node	*w;
+	struct citrun_node	 node;
+	pid_t			 pids[3];
+	size_t			 file_name_sz;
+	int			 i;
 
-	/* Send the total number of instrumented nodes. */
-	while (walk != NULL) {
-		walk = walk->next;
-		++citrun_nodes_total;
-	}
-	xwrite(fd, &citrun_nodes_total, sizeof(citrun_nodes_total));
+	/* Send the total number of translation units. */
+	xwrite(fd, &nodes_total, sizeof(nodes_total));
 
 	/* Send process id, parent process id, group process id. */
 	pids[0] = getpid();
@@ -120,10 +126,9 @@ send_metadata(int fd)
 	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
 		xwrite(fd, &pids[i], sizeof(pid_t));
 
-	/* Send instrumented object file information. */
-	walk = citrun_nodes_head;
-	while (walk != NULL) {
-		node = *walk;
+	/* Send static object file information. */
+	for (i = 0, w = nodes_head; i < nodes_total, w != NULL; i++, w = w->next) {
+		node = *w;
 
 		/* Length of the original source file name. */
 		file_name_sz = strnlen(node.file_name, PATH_MAX);
@@ -137,9 +142,12 @@ send_metadata(int fd)
 
 		/* Number of instrumentation sites. */
 		xwrite(fd, &node.inst_sites, sizeof(node.size));
-
-		walk = walk->next;
 	}
+
+	if (i != nodes_total)
+		warnx("tu chain inconsistent: %i vs %i", i, nodes_total);
+	if (w != NULL)
+		warnx("tu chain is longer than before");
 }
 
 /*
@@ -149,34 +157,34 @@ send_metadata(int fd)
 static void
 send_execution_data(int fd)
 {
-	struct citrun_node *walk = citrun_nodes_head;
-	int i;
+	struct citrun_node	*w;
+	int			 i;
 
-	while (walk != NULL) {
-		/* Write execution buffer, one 8 byte counter per source line */
-		xwrite(fd, walk->lines_ptr, walk->size * sizeof(uint64_t));
-		walk = walk->next;
-	}
+	/* Write execution buffers (one 8 byte counter per source line). */
+	for (i = 0, w = nodes_head; i < nodes_total, w != NULL; i++, w = w->next)
+		xwrite(fd, w->lines_ptr, w->size * sizeof(uint64_t));
+
+	if (i != nodes_total)
+		warnx("tu chain inconsistent: %i vs %i", i, nodes_total);
+	if (w != NULL)
+		warnx("tu chain is longer than before");
 }
 
 /* Sets up connection to the server socket and drops into an io loop. */
 static void *
 control_thread(void *arg)
 {
-	struct sockaddr_un addr;
-	char *viewer_sock = NULL;
-	int fd;
-	uint8_t response;
+	struct sockaddr_un	 addr;
+	char			*viewer_sock = NULL;
+	int			 fd;
+	uint8_t			 response;
 
 	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
 
-	/* The default socket location can be overridden */
 	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
-		/* Error, use the default */
 		viewer_sock = "/tmp/citrun-gl.socket";
 
-	/* Connect the socket to the server */
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
 	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
