@@ -19,12 +19,11 @@ static struct citrun_node *nodes_head;
 static struct citrun_node *nodes_tail;
 static uint64_t nodes_total;
 
-static void *control_thread(void *);
+static void *relay_thread(void *);
 
 /*
- * Public interface.
+ * Add a node to the end of the list. Public interface.
  */
-
 void
 citrun_node_add(struct citrun_node *n)
 {
@@ -39,27 +38,29 @@ citrun_node_add(struct citrun_node *n)
 	nodes_tail = n;
 }
 
+/*
+ * Usually called from main(), starts the relay thread. Public interface.
+ */
 void
 citrun_start()
 {
 	struct citrun_node	*w;
-	nodes_total = 0;
+	pthread_t tid;
 
 	/*
 	 * Count nodes once. Changing this after program start is not supported
-	 * at the moment.
+	 * at the moment (dlopen(), dlclose() of instrumented libs).
 	 */
+	nodes_total = 0;
 	for (w = nodes_head; w != NULL; w = w->next)
 		++nodes_total;
 
-	pthread_t tid;
-	pthread_create(&tid, NULL, control_thread, NULL);
+	pthread_create(&tid, NULL, relay_thread, NULL);
 }
 
 /*
- * Private interface.
+ * Read an exact amount of bytes. Returns number of bytes read.
  */
-
 static int
 xread(int d, const void *buf, size_t bytes_total)
 {
@@ -83,6 +84,9 @@ xread(int d, const void *buf, size_t bytes_total)
 	return bytes_read;
 }
 
+/*
+ * Write an exact amount of bytes. Returns number of bytes written.
+ */
 static int
 xwrite(int d, const void *buf, size_t bytes_total)
 {
@@ -103,14 +107,15 @@ xwrite(int d, const void *buf, size_t bytes_total)
 	return bytes_wrote;
 }
 
-
-/* Walk the node array and send all of the static metadata information. */
+/*
+ * For each node in the chain send the static node data.
+ */
 static void
-send_metadata(int fd)
+send_static(int fd)
 {
-	struct citrun_node	*w;
 	struct citrun_node	 node;
 	pid_t			 pids[3];
+	struct citrun_node	*w;
 	size_t			 file_name_sz;
 	int			 i;
 
@@ -151,11 +156,10 @@ send_metadata(int fd)
 }
 
 /*
- * For each link in the instrumented translation unit chain send the contents
- * of that links execution buffers.
+ * For each node in the chain send the dynamic line count data.
  */
 static void
-send_execution_data(int fd)
+send_dynamic(int fd)
 {
 	struct citrun_node	*w;
 	int			 i;
@@ -170,9 +174,11 @@ send_execution_data(int fd)
 		warnx("tu chain is longer than before");
 }
 
-/* Sets up connection to the server socket and drops into an io loop. */
+/*
+ * Relays line count data over a Unix domain socket.
+ */
 static void *
-control_thread(void *arg)
+relay_thread(void *arg)
 {
 	struct sockaddr_un	 addr;
 	char			*viewer_sock = NULL;
@@ -197,11 +203,11 @@ control_thread(void *arg)
 		}
 
 		/* Send static information first. */
-		send_metadata(fd);
+		send_static(fd);
 
 		while (1) {
-			/* Synchronously send execution data */
-			send_execution_data(fd);
+			/* Synchronously send changing data. */
+			send_dynamic(fd);
 			xread(fd, &response, 1);
 		}
 	}
