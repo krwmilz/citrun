@@ -30,12 +30,12 @@ static llvm::cl::OptionCategory ToolingCategory("instrument options");
 void
 clean_path()
 {
-	char *scv_path = getenv("CITRUN_PATH");
-	char *path = getenv("PATH");
-	if (scv_path == NULL)
-		errx(1, "CITRUN_PATH not found in environment, not running "
-			"native compiler");
-	else if (path == NULL)
+	char *citrun_path;
+	char *path;
+
+	if ((citrun_path = getenv("CITRUN_PATH")) == NULL)
+		errx(1, "CITRUN_PATH not found in environment, exiting.");
+	else if ((path = getenv("PATH")) == NULL)
 		errx(1, "PATH not set, your build system needs to use "
 			"the PATH for this tool to be useful.");
 
@@ -46,7 +46,7 @@ clean_path()
 	bool first_component = 1;
 
 	while (std::getline(path_ss, component, ':')) {
-		if (component.compare(scv_path) == 0)
+		if (component.compare(citrun_path) == 0)
 			continue;
 
 		if (first_component == 0)
