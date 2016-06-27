@@ -26,6 +26,9 @@ sub new {
 	my $abs_dist_path = getcwd . "/distfiles/$dist_name";
 	system("cd $dir && $extract_cmd $abs_dist_path") == 0 or die "extract failed";
 
+	# Always set this so we never try to connect to a real viewer.
+	$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
+
 	return $self;
 }
 

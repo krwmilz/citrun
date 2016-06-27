@@ -1,9 +1,7 @@
 use strict;
 use warnings;
 
-use Cwd;
 use Expect;
-use File::Which;
 use List::MoreUtils qw( each_array );
 use Test::More tests => 238;
 use Time::HiRes qw( time );
@@ -14,10 +12,7 @@ use Test::Viewer;
 # Verify that Vim under citrun tests successfully and then cross check that the
 # data structures instrumented inside Vim are consistent with known good values.
 
-# Declare this early. Instrumented binaries will try connecting w/o issuing warn
-my $viewer = Test::Viewer->new();
-
-# Download: Vim 7.4 from vim.org.
+# Download: Vim 7.4.
 my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/";
 my $package = Test::Package->new("vim-7.4.tar.bz2", $vim_url, "tar xjf");
 
@@ -37,14 +32,14 @@ my @scalar_desc = ("configure time (sec)", "compile time (sec)", "vim size (b)",
 my @scalar_vanilla;
 my @scalar_citrun;
 
-my $srcdir = $package->dir() . "/vim74/src";
+my $srcdir = $package->set_srcdir("/vim74/src");
 
 # Vanilla configure.
-$scalar_vanilla[0] = $package->configure("make -C $srcdir config");
+$scalar_vanilla[0] = $package->configure("make config");
 #$package->copy_file("auto/config.log", "config.log.vanilla");
 
 # Vanilla compile.
-$scalar_vanilla[1] = $package->compile("make -C $srcdir -j8 all");
+$scalar_vanilla[1] = $package->compile("make -j8 all");
 
 $scalar_vanilla[2] = ((stat "$srcdir/vim")[7]);
 $scalar_vanilla[3] = ((stat "$srcdir/xxd/xxd")[7]);
@@ -68,7 +63,7 @@ $scalar_citrun[3] = ((stat "$srcdir/xxd/xxd")[7]);
 $scalar_citrun[4] = time_expect("make", "-C", "$srcdir/testdir");
 
 # Verify: instrumented data structures are consistent.
-$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
+my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/vim");
 
 $viewer->accept();
@@ -158,11 +153,10 @@ $viewer->cmp_static_data(\@known_good);
 
 $exp->hard_close();
 
-
 my @scalar_diff;
 my $it = each_array( @scalar_vanilla, @scalar_citrun );
 while ( my ($x, $y) = $it->() ) {
-	push @scalar_diff, $y * 100.0 / $x - 100.0;
+       push @scalar_diff, $y * 100.0 / $x - 100.0;
 }
 
 # Write report.
@@ -175,14 +169,14 @@ VIM E2E REPORT
      @<<<<<<<<<<<<<< @##.## sec
 "60 data calls:", $data_call_dur
 
-SCALAR COMPARISONS:
+SCALAR COMPARISONS
                                       @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
 "vanilla", "citrun", "diff (%)"
      ---------------------------------------------------------------------
 ~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
 shift(@scalar_desc), shift(@scalar_vanilla), shift(@scalar_citrun), shift(@scalar_diff)
 
-DIFF COMPARISONS:
+DIFF COMPARISONS
 
 .
 
