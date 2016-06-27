@@ -76,6 +76,18 @@ sub parse_output {
 	return @pkgs;
 }
 
+sub get_file_size {
+	my ($self, $file) = @_;
+	return ((stat "$self->{srcdir}/$file")[7]);
+}
+
+sub clean {
+	my ($self, $clean_cmd) = @_;
+
+	$self->{clean_cmd} = $clean_cmd;
+	$self->time_system($clean_cmd);
+}
+
 sub configure {
 	my ($self, $config_cmd) = @_;
 

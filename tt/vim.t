@@ -41,14 +41,14 @@ $scalar_vanilla[0] = $package->configure("make config");
 # Vanilla compile.
 $scalar_vanilla[1] = $package->compile("make -j8 all");
 
-$scalar_vanilla[2] = ((stat "$srcdir/vim")[7]);
-$scalar_vanilla[3] = ((stat "$srcdir/xxd/xxd")[7]);
+$scalar_vanilla[2] = $package->get_file_size("/vim");
+$scalar_vanilla[3] = $package->get_file_size("/xxd/xxd");
 
 # Vanilla test.
 $scalar_vanilla[4] = time_expect("make", "-C", "$srcdir/testdir");
 
 # Clean up before rebuild.
-system("make -C $srcdir distclean");
+$package->clean("make distclean");
 
 # Instrumented configure.
 $scalar_citrun[0] = $package->inst_configure();
@@ -56,8 +56,8 @@ $scalar_citrun[0] = $package->inst_configure();
 # Instrumented compile.
 $scalar_citrun[1] = $package->inst_compile();
 
-$scalar_citrun[2] = ((stat "$srcdir/vim")[7]);
-$scalar_citrun[3] = ((stat "$srcdir/xxd/xxd")[7]);
+$scalar_citrun[2] = $package->get_file_size("/vim");
+$scalar_citrun[3] = $package->get_file_size("/xxd/xxd");
 
 # Instrumented test.
 $scalar_citrun[4] = time_expect("make", "-C", "$srcdir/testdir");
