@@ -1,0 +1,12 @@
+diff -ur vim74/src/os_unix.c vim74_a/src/os_unix.c
+--- a/src/os_unix.c	2013-07-03 08:32:32.000000000 -0600
++++ b/src/os_unix.c	2016-03-23 20:11:27.000000000 -0600
+@@ -827,7 +827,7 @@
+ 		|| MAC_OS_X_VERSION_MAX_ALLOWED <= 1040)
+ 	/* missing prototype.  Adding it to osdef?.h.in doesn't work, because
+ 	 * "struct sigaltstack" needs to be declared. */
+-	extern int sigaltstack __ARGS((const struct sigaltstack *ss, struct sigaltstack *oss));
++	//extern int sigaltstack __ARGS((const struct sigaltstack *ss, struct sigaltstack *oss));
+ #  endif
+ 
+ #  ifdef HAVE_SS_BASE

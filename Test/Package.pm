@@ -76,6 +76,11 @@ sub parse_output {
 	return @pkgs;
 }
 
+sub patch {
+	my ($self, $patch_cmd) = @_;
+	system("cd $self->{srcdir} && $patch_cmd") == 0 or die "patching failed";
+}
+
 sub get_file_size {
 	my ($self, $file) = @_;
 

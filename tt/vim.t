@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Cwd;
 use Expect;
 use List::MoreUtils qw( each_array );
 use Test::More tests => 238;
@@ -29,6 +30,10 @@ my @scalar_vanilla;
 my @scalar_citrun;
 
 my $srcdir = $package->set_srcdir("/vim74/src");
+
+# Patch: Vim doesn't compile natively on OSX.
+my $cwd = getcwd;
+$package->patch("patch -p2 < $cwd/tt/patches/vim_osx.diff") if ($^O eq "darwin");
 
 # Vanilla configure.
 $scalar_vanilla[0] = $package->configure("make config");
