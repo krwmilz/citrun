@@ -121,7 +121,6 @@ $viewer->get_dynamic_data() for (1..60);
 my $data_call_dur = time - $start;
 
 $exp->hard_close();
-$viewer->close();
 
 
 # Write report.
