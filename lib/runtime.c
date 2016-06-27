@@ -132,7 +132,7 @@ send_static(int fd)
 		xwrite(fd, &pids[i], sizeof(pid_t));
 
 	/* Send static object file information. */
-	for (i = 0, w = nodes_head; i < nodes_total, w != NULL; i++, w = w->next) {
+	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next) {
 		node = *w;
 
 		/* Length of the original source file name. */
@@ -150,7 +150,7 @@ send_static(int fd)
 	}
 
 	if (i != nodes_total)
-		warnx("tu chain inconsistent: %i vs %i", i, nodes_total);
+		warnx("tu chain inconsistent: %i vs %llu", i, nodes_total);
 	if (w != NULL)
 		warnx("tu chain is longer than before");
 }
@@ -165,11 +165,11 @@ send_dynamic(int fd)
 	int			 i;
 
 	/* Write execution buffers (one 8 byte counter per source line). */
-	for (i = 0, w = nodes_head; i < nodes_total, w != NULL; i++, w = w->next)
+	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next)
 		xwrite(fd, w->lines_ptr, w->size * sizeof(uint64_t));
 
 	if (i != nodes_total)
-		warnx("tu chain inconsistent: %i vs %i", i, nodes_total);
+		warnx("tu chain inconsistent: %i vs %llu", i, nodes_total);
 	if (w != NULL)
 		warnx("tu chain is longer than before");
 }
