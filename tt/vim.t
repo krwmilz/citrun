@@ -44,7 +44,7 @@ $scalar_vanilla[0] = $package->configure("make -C $srcdir config");
 #$package->copy_file("auto/config.log", "config.log.vanilla");
 
 # Vanilla compile.
-$scalar_vanilla[1] = $package->compile("make -C $srcdir -j4 all");
+$scalar_vanilla[1] = $package->compile("make -C $srcdir -j8 all");
 
 $scalar_vanilla[2] = ((stat "$srcdir/vim")[7]);
 $scalar_vanilla[3] = ((stat "$srcdir/xxd/xxd")[7]);
