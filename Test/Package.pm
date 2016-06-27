@@ -78,7 +78,9 @@ sub parse_output {
 
 sub get_file_size {
 	my ($self, $file) = @_;
-	return ((stat "$self->{srcdir}/$file")[7]);
+
+	die "file '$file' does not exist." unless (-f "$self->{srcdir}$file");
+	return ((stat "$self->{srcdir}$file")[7]);
 }
 
 sub clean {
