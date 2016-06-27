@@ -1,12 +1,9 @@
 use strict;
 use warnings;
 
-use Cwd;
 use Expect;
-use File::Temp qw( tempdir );
-use File::Which;
 use List::MoreUtils qw ( each_array );
-use Test::More tests => 2491;
+use Test::More tests => 2492;
 use Time::HiRes qw( time );
 
 use Test::Package;
@@ -19,35 +16,37 @@ my $package = Test::Package->new("libressl-2.4.1.tar.gz", $libressl_url, "tar xz
 
 # Dependencies.
 $package->dependencies("citrun");
+my (@vanilla, @citrun);
+my @desc = ("configure time (sec)", "compile time (sec)", "openssl size (b)",
+	"libcrypto.so size (b)");
 
-my $srcdir = $package->dir() . "/libressl-2.4.1";
+my $srcdir = $package->set_srcdir("/libressl-2.4.1");
 
-# Configure.
-system("cd $srcdir && citrun-wrap ./configure") == 0 or die "citrun-wrap ./configure failed";
+# Vanilla configure and compile.
+$vanilla[0] = $package->configure("./configure");
+$vanilla[1] = $package->compile("make -j4");
 
-# Compile.
-system("citrun-wrap make -C $srcdir -j8") == 0 or die "citrun-wrap make failed";
+$vanilla[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
+$vanilla[3] = $package->get_file_size("/crypto/.libs/libcrypto.so.38.0");
+
+# Reset.
+$package->clean("make distclean" );
+
+# Instrumented configure and compile.
+$citrun[0] = $package->inst_configure();
+$citrun[1] = $package->inst_compile();
+
+$citrun[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
+$citrun[3] = $package->get_file_size("/crypto/.libs/libcrypto.so.38.0");
 
 # Verify: 'openssl' binary has working instrumentation.
-$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
-
+my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/apps/openssl/openssl");
 
-my $viewer = Test::Viewer->new();
 $viewer->accept();
+cmp_ok( $viewer->{num_tus}, ">", 615,	"tu count lower bound" );
+cmp_ok( $viewer->{num_tus}, "<", 629,	"tu count upper bound" );
 
-my $runtime_metadata = $viewer->get_metadata();
-cmp_ok( $runtime_metadata->{num_tus}, ">", 615,	"tu count lower bound" );
-cmp_ok( $runtime_metadata->{num_tus}, "<", 629,	"tu count upper bound" );
-
-cmp_ok( $runtime_metadata->{pid}, ">", 1,	"pid lower bound check" );
-cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"pid upper bound check" );
-cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"ppid lower bound check" );
-cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"ppid upper bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"pgrp lower bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"pgrp upper bound check" );
-
-#print STDERR "[ \"$_->{filename}\",$_->{lines},$_->{inst_sites} ],\n" for (@sorted_tus);
 my @known_good = (
 	# file name			lines	instrumented sites
 	[ "apps/openssl/apps.c",	2323,   918 ],
@@ -672,22 +671,32 @@ my @known_good = (
 	[ "ssl/t1_reneg.c",287,52 ],
 	[ "ssl/t1_srvr.c",239,21 ],
 );
-
-my $tus = $runtime_metadata->{tus};
-my @sorted_tus = sort keys %$tus;
-
-# Walk two lists at the same time
-# http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
-my $it = each_array( @known_good, @sorted_tus );
-while ( my ($x, $key) = $it->() ) {
-	my $y = $tus->{$key};
-
-	like( $key,	qr/.*$x->[0]/,	"libressl $x->[0]: filename check" );
-	is ( $y->{lines},	$x->[1],	"libressl $x->[0]: total lines check" );
-
-	# Check instrumented sites as a range
-	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "libressl $x->[0]: instrumented sites check lower" );
-	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "libressl $x->[0]: instrumented sites check upper" );
-}
+$viewer->cmp_static_data(\@known_good);
 
 $exp->hard_close();
+
+my @diff;
+my $it = each_array( @vanilla, @citrun );
+while ( my ($x, $y) = $it->() ) {
+	push @diff, $y * 100.0 / $x - 100.0;
+}
+
+# Write report.
+#
+format STDOUT =
+
+LIBRESSL E2E REPORT
+===================
+
+SCALAR COMPARISONS
+                                      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
+"vanilla", "citrun", "diff (%)"
+     ---------------------------------------------------------------------
+~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
+shift(@desc), shift(@vanilla), shift(@citrun), shift(@diff)
+
+DIFF COMPARISONS
+
+.
+
+write;
