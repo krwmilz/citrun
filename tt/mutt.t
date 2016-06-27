@@ -59,7 +59,7 @@ my @known_good = (
 	[ "/copy.c",		962,	403 ],
 	[ "/crypt-mod.c",	59,	32 ],
 	[ "/crypt.c",		1121,	461 ],
-	[ "/cryptglue.c",	396,	107 ],
+	[ "/cryptglue.c",	396,	100 ],
 	[ "/curs_lib.c",	1046,	323 ],
 	[ "/curs_main.c",	2349,	545 ],
 	[ "/date.c",		191,	59 ],
