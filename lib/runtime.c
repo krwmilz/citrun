@@ -45,7 +45,7 @@ void
 citrun_start()
 {
 	struct citrun_node	*w;
-	pthread_t tid;
+	pthread_t		 tid;
 
 	/*
 	 * Count nodes once. Changing this after program start is not supported
