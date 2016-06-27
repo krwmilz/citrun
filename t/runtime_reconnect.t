@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 5;
+use Test::More tests => 13;
 
 use Test::Project;
 use Test::Viewer;
@@ -24,16 +24,8 @@ sleep(1);
 
 my $viewer = Test::Viewer->new();
 $viewer->accept();
-
-# Request and check metadata first
-my $runtime_metadata = $viewer->get_metadata();
-
-my $tus = $runtime_metadata->{tus};
-is ( scalar(keys %$tus), 1, "translation unit count" );
-
-my ($file_name) = keys %$tus;
-like( $file_name, qr/.*source_0.c/, "filename check" );
-is( $tus->{$file_name}->{lines}, 7, "line count check" );
+is( $viewer->{num_tus}, 1, "num tus check" );
+$viewer->cmp_static_data([ [ "source_0.c", 7, 2 ] ]);
 
 $project->kill();
 my ($ret, $err) = $project->wait();

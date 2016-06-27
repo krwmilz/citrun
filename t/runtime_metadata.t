@@ -1,6 +1,6 @@
 use strict;
 
-use Test::More tests => 11;
+use Test::More tests => 13;
 
 use Test::Project;
 use Test::Viewer;
@@ -22,28 +22,10 @@ $project->compile();
 $project->run();
 
 $viewer->accept();
+is( $viewer->{num_tus}, 1, "translation unit count" );
 
-# Request and check metadata first
-my $runtime_metadata = $viewer->get_metadata();
-
-my $pid = $runtime_metadata->{pid};
-my $ppid = $runtime_metadata->{ppid};
-my $pgrp = $runtime_metadata->{pgrp};
-
-cmp_ok( $pid,  ">", 1, "pid is positive" );
-cmp_ok( $ppid, ">", 1, "ppid is positive" );
-cmp_ok( $pgrp, ">", 1, "pgrp is positive" );
-
-cmp_ok( $pid,  "<", 100 * 1000, "pid is a reasonable value" );
-cmp_ok( $ppid, "<", 100 * 1000, "ppid is a reasonable value" );
-cmp_ok( $pgrp, "<", 100 * 1000, "pgrp is a reasonable value" );
-
-my $tus = $runtime_metadata->{tus};
-is ( scalar(keys %$tus), 1, "translation unit count" );
-
-my ($file_name) = keys %$tus;
-like( $file_name, qr/.*source_0.c/, "filename check" );
-is( $tus->{$file_name}->{lines}, 8, "line count check" );
+my @known_good = [ [ "source_0.c", 8, 2 ] ];
+$viewer->cmp_static_data(@known_good);
 
 $project->kill();
 my ($ret, $err) = $project->wait();

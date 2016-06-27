@@ -1,7 +1,7 @@
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 50;
+use Test::More tests => 58;
 use Test::Differences;
 
 use Test::Project;
@@ -61,33 +61,24 @@ $project->compile();
 $project->run(45);
 
 $viewer->accept();
+is( $viewer->{num_tus}, 3, "translation unit count" );
 
-# Request and check metadata first
-my $runtime_metadata = $viewer->get_metadata();
-my $tus_ordered = $runtime_metadata->{tus_ordered};
-my $tus = $runtime_metadata->{tus};
+# Check static data.
+my @known_good = [
+	# filename	lines	inst sites
+	[ "source_0.c",	20,	9 ],
+	[ "source_1.c",	11,	7 ],
+	[ "source_2.c",	9,	6 ],
+];
+$viewer->cmp_static_data(@known_good);
 
-my ($fn0, $fn1, $fn2) = sort keys %$tus;
-like( $fn0, qr/.*source_0.c/, "runtime filename check 0" );
-is( $tus->{$fn0}->{lines}, 20, "runtime line count check 0" );
-my $sites0 = $tus->{$fn0}->{inst_sites};
-cmp_ok( $sites0, ">=", 6, "site count 0 lower" );
-cmp_ok( $sites0, "<=", 11, "site count 0 upper" );
+# Request and check execution data.
+my $data = $viewer->get_dynamic_data();
 
-like( $fn1, qr/.*source_1.c/, "runtime filename check 1" );
-is( $tus->{$fn1}->{lines}, 11, "runtime line count check 1" );
-is( $tus->{$fn1}->{inst_sites}, 7, "instrumented site count 1" );
+# The nodes can be in any order.
+my ($s0, $s1, $s2) = sort keys %$data;
 
-like( $fn2, qr/.*source_2.c/, "runtime filename check 2" );
-is( $tus->{$fn2}->{lines}, 9, "runtime line count check 2" );
-my $sites2 = $tus->{$fn2}->{inst_sites};
-cmp_ok( $sites2, ">=", 5, "site count 2 lower" );
-cmp_ok( $sites2, "<=", 6, "site count 2 upper" );
-
-# Request and check execution data
-my $data = $viewer->get_execution_data($tus_ordered, $tus);
-
-my @lines = @{ $data->{$fn0} };
+my @lines = @{ $data->{$s0} };
 is( $lines[$_], 0, "src 0 line $_ check" ) for (1..11);
 is( $lines[12], 1, "src 0 line 14 check" );
 is( $lines[$_], 0, "src 0 line $_ check" ) for (13..14);
@@ -96,12 +87,12 @@ is( $lines[16], 0, "src 0 line 16 check" );
 is( $lines[17], 2, "src 0 line 17 check" );
 is( $lines[$_], 0, "src 0 line $_ check" ) for (18..19);
 
-my @lines = @{ $data->{$fn1} };
+my @lines = @{ $data->{$s1} };
 is( $lines[$_], 0, "src 1 line $_ check" ) for (0..3);
 cmp_ok ( $lines[$_], ">", 10, "src 1 line $_ check" ) for (4..7);
 is( $lines[8], 0, "src 1 line 8 check" );
 
-my @lines = @{ $data->{$fn2} };
+my @lines = @{ $data->{$s2} };
 is( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);
 
 $project->kill();

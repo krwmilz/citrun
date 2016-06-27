@@ -1,6 +1,7 @@
 use strict;
 
-use Test::More tests => 14;
+use Data::Dumper;
+use Test::More tests => 25;
 use Test::Differences;
 
 use Test::Project;
@@ -40,32 +41,28 @@ main(int argc, char *argv[])
 }
 EOF
 
-# Compile the above inefficient program and have it compute the input 40, which
-# takes a few seconds
+# Compile above inefficient program and let it run for a few seconds.
 $project->compile();
 $project->run(45);
 
-# Accept the runtime's connection
+# Accept the runtime connection and check a few things.
 $viewer->accept();
-my $runtime_metadata = $viewer->get_metadata();
-my $tus_ordered = $runtime_metadata->{tus_ordered};
-my $tus = $runtime_metadata->{tus};
+is( $viewer->{num_tus}, 1, "num tus check" );
+$viewer->cmp_static_data([ [ "source_0.c", 28, 18 ] ]);
 
-my ($file_name) = keys %$tus;
-like ($file_name, qr/.*source_0\.c/, "runtime filename check");
-is( $tus->{$file_name}->{lines}, 28, "runtime lines count" );
+my $data = $viewer->get_dynamic_data();
+ok( keys %$data == 1, "single dynamic data key" );
+my ($exec_lines1) = values %$data;
 
-my $data = $viewer->get_execution_data($tus_ordered, $tus);
-my @exec_lines1 = @{ $data->{$file_name} };
-
-my $data = $viewer->get_execution_data($tus_ordered, $tus);
-my @exec_lines2 = @{ $data->{$file_name} };
+my $data = $viewer->get_dynamic_data();
+ok( keys %$data == 1, "single dynamic data key" );
+my ($exec_lines2) = values %$data;
 
 # Only lines 8 - 12 in the source code above are executing
 for (8..12) {
-	cmp_ok( $exec_lines1[$_], ">", 0, "line $_ executed nonzero times" );
+	cmp_ok( $exec_lines1->[$_], ">", 0, "line $_ executed nonzero times" );
 	# Make sure the second time we queried the execution counts they were higher
-	cmp_ok( $exec_lines2[$_], ">=", $exec_lines1[$_], "line $_ after > before" );
+	cmp_ok( $exec_lines2->[$_], ">=", $exec_lines1->[$_], "line $_ after > before" );
 }
 
 $project->kill();
