@@ -2,19 +2,20 @@ use strict;
 use warnings;
 
 use Cwd;
-use File::Which;
 use Expect;
-use File::Temp qw( tempdir );
-use List::MoreUtils qw ( each_array );
+use File::Which;
+use List::MoreUtils qw( each_array );
 use Test::More tests => 238;
 use Time::HiRes qw( time );
 
 use Test::Package;
 use Test::Viewer;
 
-
 # Verify that Vim under citrun tests successfully and then cross check that the
 # data structures instrumented inside Vim are consistent with known good values.
+
+# Declare this early. Instrumented binaries will try connecting w/o issuing warn
+my $viewer = Test::Viewer->new();
 
 # Download: Vim 7.4 from vim.org.
 my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/";
@@ -23,36 +24,55 @@ my $package = Test::Package->new("vim-7.4.tar.bz2", $vim_url, "tar xjf");
 # Dependencies: gtk and curl are needed for consistent builds.
 $package->dependencies("citrun", "gtk", "curl");
 
-# Configure.
+sub time_expect {
+	my $start = time;
+	my $exp = Expect->spawn(@_);
+	$exp->expect(undef, ("ALL DONE"));
+	system("resize");
+	return time - $start;
+}
+
+my @scalar_desc = ("configure time (sec)", "compile time (sec)", "vim size (b)",
+	"xxd size (b)", "test time (sec)");
+my @scalar_vanilla;
+my @scalar_citrun;
+
 my $srcdir = $package->dir() . "/vim74/src";
-system("citrun-wrap make -C $srcdir config") == 0 or die "citrun-wrap make config failed";
 
-# Compile.
-system("citrun-wrap make -C $srcdir -j8 myself") == 0 or die "citrun-wrap make failed";
+# Vanilla configure.
+$scalar_vanilla[0] = $package->configure("make -C $srcdir config");
+#$package->copy_file("auto/config.log", "config.log.vanilla");
 
-# Test: need to use expect because Vim needs a tty to test correctly.
-my $exp = Expect->spawn("make", "-C", "$srcdir/testdir");
-$exp->expect(undef, ("ALL DONE"));
-system("resize");
+# Vanilla compile.
+$scalar_vanilla[1] = $package->compile("make -C $srcdir -j4 all");
+
+$scalar_vanilla[2] = ((stat "$srcdir/vim")[7]);
+$scalar_vanilla[3] = ((stat "$srcdir/xxd/xxd")[7]);
+
+# Vanilla test.
+$scalar_vanilla[4] = time_expect("make", "-C", "$srcdir/testdir");
+
+# Clean up before rebuild.
+system("make -C $srcdir distclean");
+
+# Instrumented configure.
+$scalar_citrun[0] = $package->inst_configure();
+
+# Instrumented compile.
+$scalar_citrun[1] = $package->inst_compile();
+
+$scalar_citrun[2] = ((stat "$srcdir/vim")[7]);
+$scalar_citrun[3] = ((stat "$srcdir/xxd/xxd")[7]);
+
+# Instrumented test.
+$scalar_citrun[4] = time_expect("make", "-C", "$srcdir/testdir");
 
 # Verify: instrumented data structures are consistent.
 $ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
-$exp = Expect->spawn("$srcdir/vim");
+my $exp = Expect->spawn("$srcdir/vim");
 
-my $viewer = Test::Viewer->new();
 $viewer->accept();
-
-my $runtime_metadata = $viewer->get_metadata();
-is( $runtime_metadata->{num_tus}, 55,		"vim translation unit count" );
-cmp_ok( $runtime_metadata->{pid}, ">", 1,	"vim pid lower bound check" );
-cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"vim pid upper bound check" );
-cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"vim ppid lower bound check" );
-cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"vim ppid upper bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"vim pgrp lower bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"vim pgrp upper bound check" );
-
-my $tus = $runtime_metadata->{tus};
-my @sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
+is( $viewer->{num_tus}, 55, "translation unit count" );
 
 my @known_good = (
 	# file name		lines	instrumented sites
@@ -112,58 +132,58 @@ my @known_good = (
 	[ "version.c",		1405,	196	],
 	[ "window.c",		6993,	1525	],
 );
+$viewer->cmp_static_data(\@known_good);
 
-# Walk two lists at the same time
-# http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
-my $it = each_array( @known_good, @sorted_tus );
-while ( my ($x, $y) = $it->() ) {
-	like( $y->{filename},	qr/.*$x->[0]/,	"vim $x->[0]: filename check" );
-	is ( $y->{lines},	$x->[1],	"vim $x->[0]: total lines check" );
-
-	# Check instrumented sites as a range
-	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "vim $x->[0]: instrumented sites check lower" );
-	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "vim $x->[0]: instrumented sites check upper" );
-}
-
-print STDERR ">>> START\n";
-# Lets see how long it takes to do 60 data calls
-for (1..60) {
-	my $data1 = $viewer->get_execution_data($tus);
-	print STDERR ">>> LOOP\n";
-}
-print STDERR ">>> END\n";
+my $start = time;
+$viewer->get_dynamic_data() for (1..60);
+my $data_call_dur = time - $start;
 
 $exp->hard_close();
 $viewer->close();
 
+#
+# xxd
+#
+
 $exp = Expect->spawn("$srcdir/xxd/xxd");
+
 $viewer->accept();
-
-$runtime_metadata = $viewer->get_metadata();
-is( $runtime_metadata->{num_tus}, 1,		"xxd translation unit count" );
-cmp_ok( $runtime_metadata->{pid}, ">", 1,	"xxd pid lower bound check" );
-cmp_ok( $runtime_metadata->{pid}, "<", 100000,	"xxd pid upper bound check" );
-cmp_ok( $runtime_metadata->{ppid}, ">", 1,	"xxd ppid lower bound check" );
-cmp_ok( $runtime_metadata->{ppid}, "<", 100000,	"xxd ppid upper bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, ">", 1,	"xxd pgrp lower bound check" );
-cmp_ok( $runtime_metadata->{pgrp}, "<", 100000,	"xxd pgrp upper bound check" );
-
-$tus = $runtime_metadata->{tus};
-@sorted_tus = sort { $a->{filename} cmp $b->{filename} } @$tus;
+is( $viewer->{num_tus}, 1, "xxd translation unit count" );
 
 @known_good = (
 	# file name		lines	instrumented sites
 	[ "src/xxd/xxd.c",	851,	277 ],
 );
-
-$it = each_array( @known_good, @sorted_tus );
-while ( my ($x, $y) = $it->() ) {
-	like( $y->{filename},	qr/.*$x->[0]/,	"xxd $x->[0]: filename check" );
-	is ( $y->{lines},	$x->[1],	"xxd $x->[0]: total lines check" );
-
-	# Check instrumented sites as a range
-	cmp_ok ( $y->{inst_sites}, ">", $x->[2] - 5, "xxd $x->[0]: instrumented sites check lower" );
-	cmp_ok ( $y->{inst_sites}, "<", $x->[2] + 5, "xxd $x->[0]: instrumented sites check upper" );
-}
+$viewer->cmp_static_data(\@known_good);
 
 $exp->hard_close();
+
+
+my @scalar_diff;
+my $it = each_array( @scalar_vanilla, @scalar_citrun );
+while ( my ($x, $y) = $it->() ) {
+	push @scalar_diff, $y * 100.0 / $x - 100.0;
+}
+
+# Write report.
+#
+format STDOUT =
+
+VIM E2E REPORT
+==============
+
+     @<<<<<<<<<<<<<< @##.## sec
+"60 data calls:", $data_call_dur
+
+SCALAR COMPARISONS:
+                                      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
+"vanilla", "citrun", "diff (%)"
+     ---------------------------------------------------------------------
+~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
+shift(@scalar_desc), shift(@scalar_vanilla), shift(@scalar_citrun), shift(@scalar_diff)
+
+DIFF COMPARISONS:
+
+.
+
+write;
