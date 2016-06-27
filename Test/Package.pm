@@ -29,10 +29,11 @@ sub new {
 	return $self;
 }
 
-sub dir {
-	my ($self) = @_;
-	return $self->{dir};
-}
+sub set_srcdir {
+	my ($self, $srcdir) = @_;
+	$self->{srcdir} = $self->{dir} . $srcdir;
+	return $self->{srcdir};
+};
 
 sub dependencies {
 	my ($self, @deps) = @_;
@@ -70,6 +71,42 @@ sub parse_output {
 	my @pkgs;
 	push @pkgs, ($_) while (readline \*CHLD_OUT);
 	return @pkgs;
+}
+
+sub configure {
+	my ($self, $config_cmd) = @_;
+
+	$self->{config_cmd} = $config_cmd;
+	return $self->time_system($config_cmd);
+}
+
+sub compile {
+	my ($self, $compile_cmd) = @_;
+
+	$self->{compile_cmd} = $compile_cmd;
+	return $self->time_system($compile_cmd);
+}
+
+sub inst_configure {
+	my ($self) = @_;
+
+	die "configure() was not called" unless (exists $self->{config_cmd});
+	return $self->time_system("citrun-wrap $self->{config_cmd}");
+}
+
+sub inst_compile {
+	my ($self) = @_;
+
+	die "compile() was not called" unless (exists $self->{compile_cmd});
+	return $self->time_system("citrun-wrap $self->{compile_cmd}");
+}
+
+sub time_system {
+	my ($self, $cmd) = @_;
+
+	my $start = time;
+	system("cd $self->{srcdir} && $cmd") == 0 or die "'$cmd'\n";
+	return time - $start;
 }
 
 1;
