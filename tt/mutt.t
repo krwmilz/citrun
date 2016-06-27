@@ -3,7 +3,7 @@ use warnings;
 
 use Expect;
 use List::MoreUtils qw( each_array );
-use Test::More tests => 391;
+use Test::More tests => 287;
 use Time::HiRes qw( time );
 
 use Test::Package;
@@ -20,8 +20,8 @@ my (@vanilla, @citrun);
 my $srcdir = $package->set_srcdir("/mutt-1.6.1");
 
 # Vanilla configure and compile.
-$vanilla[0] = $package->configure("./configure");
-$vanilla[1] = $package->compile("make -j4 all");
+$vanilla[0] = $package->configure("./configure --disable-pgp --disable-smime --disable-nls --disable-iconv");
+$vanilla[1] = $package->compile("make -j8 all");
 
 $vanilla[2] = $package->get_file_size("/mutt");
 
@@ -39,7 +39,7 @@ my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/mutt");
 
 $viewer->accept();
-is( $viewer->{num_tus}, 96, "translation unit count" );
+is( $viewer->{num_tus}, 70, "translation unit count" );
 
 my @known_good = (
 	# file name		lines	instrumented sites
@@ -55,10 +55,8 @@ my @known_good = (
 	[ "/commands.c",	1018,	358 ],
 	[ "/complete.c",	199,	70 ],
 	[ "/compose.c",		1345,	375 ],
-	[ "/conststrings.c",	32,	0 ],
+	[ "/conststrings.c",	37,	0 ],
 	[ "/copy.c",		962,	403 ],
-	[ "/crypt-mod-pgp-classic.c",	138,56 ],
-	[ "/crypt-mod-smime-classic.c",	119,49 ],
 	[ "/crypt-mod.c",	59,	32 ],
 	[ "/crypt.c",		1121,	461 ],
 	[ "/cryptglue.c",	396,	107 ],
@@ -73,7 +71,6 @@ my @known_good = (
 	[ "/flags.c",		384,	129 ],
 	[ "/from.c",		199,	138 ],
 	[ "/getdomain.c",	70,	40 ],
-	[ "/gnupgparse.c",	446,	149 ],
 	[ "/group.c",		209,	117 ],
 	[ "/handler.c",		1845,	612 ],
 	[ "/hash.c",		179,	83 ],
@@ -83,22 +80,6 @@ my @known_good = (
 	[ "/history.c",		320,	122 ],
 	[ "/hook.c",		545,	186 ],
 	[ "/init.c",		3285,	1161 ],
-	[ "/intl/bindtextdom.c",370,	54 ],
-	[ "/intl/dcgettext.c",	59,	1 ],
-	[ "/intl/dcigettext.c",	1260,	133 ],
-	[ "/intl/dcngettext.c",	61,	1 ],
-	[ "/intl/dgettext.c",	60,	1 ],
-	[ "/intl/dngettext.c",	62,	1 ],
-	[ "/intl/explodename.c",193,	28 ],
-	[ "/intl/finddomain.c",	199,	38 ],
-	[ "/intl/gettext.c",	65,	2 ],
-	[ "/intl/intl-compat.c",167,	19 ],
-	[ "/intl/l10nflist.c",	406,	100 ],
-	[ "/intl/loadmsgcat.c",	568,	61 ],
-	[ "/intl/localealias.c",405,	84 ],
-	[ "/intl/ngettext.c",	69,	2 ],
-	[ "/intl/plural.c",	414,	83 ],
-	[ "/intl/textdomain.c",	143,	14 ],
 	[ "/keymap.c",		1146,	387 ],
 	[ "/lib.c",		1086,	360 ],
 	[ "/main.c",		1225,	353 ],
@@ -112,12 +93,6 @@ my @known_good = (
 	[ "/parse.c",		1648,	588 ],
 	[ "/patchlist.c",	12,	28 ],
 	[ "/pattern.c",		1546,	549 ],
-	[ "/pgp.c",		1866,	722 ],
-	[ "/pgpinvoke.c",	358,	116 ],
-	[ "/pgpkey.c",		1045,	393 ],
-	[ "/pgplib.c",		253,	71 ],
-	[ "/pgpmicalg.c",	212,	102 ],
-	[ "/pgppacket.c",	232,	75 ],
 	[ "/postpone.c",	748,	232 ],
 	[ "/query.c",		543,	223 ],
 	[ "/recvattach.c",	1274,	428 ],
@@ -133,7 +108,6 @@ my @known_good = (
 	[ "/send.c",		1953,	660 ],
 	[ "/sendlib.c",		2890,	972 ],
 	[ "/signal.c",		254,	85 ],
-	[ "/smime.c",		2280,	802 ],
 	[ "/sort.c",		343,	133 ],
 	[ "/status.c",		309,	148 ],
 	[ "/system.c",		142,	65 ],
