@@ -9,14 +9,10 @@ use Time::HiRes qw( time );
 use Test::Package;
 use Test::Viewer;
 
-# Verify that Vim under citrun tests successfully and then cross check that the
-# data structures instrumented inside Vim are consistent with known good values.
-
-# Download: Vim 7.4.
+# Download: Vim 7.4, depends on gtk and curl for consistent builds.
 my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/";
 my $package = Test::Package->new("vim-7.4.tar.bz2", $vim_url, "tar xjf");
 
-# Dependencies: gtk and curl are needed for consistent builds.
 $package->dependencies("citrun", "gtk", "curl");
 
 sub time_expect {
