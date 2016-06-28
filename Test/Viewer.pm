@@ -106,8 +106,8 @@ sub cmp_static_data {
 		is ( $y->[1],	$x->[1],	"$x->[0]: total lines check" );
 
 		# Check instrumented sites ranges
-		cmp_ok ( $y->[2], ">", $x->[2] - 5, "$x->[0]: instr sites check lower" );
-		cmp_ok ( $y->[2], "<", $x->[2] + 5, "$x->[0]: instr sites check upper" );
+		cmp_ok ( $y->[2], ">", $x->[2] - 25, "$x->[0]: instr sites check lower" );
+		cmp_ok ( $y->[2], "<", $x->[2] + 25, "$x->[0]: instr sites check upper" );
 	}
 }
 
