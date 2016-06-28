@@ -10,11 +10,10 @@ use Time::HiRes qw( time );
 use Test::Package;
 use Test::Viewer;
 
-# Download: Vim 7.4, depends on gtk and curl for consistent builds.
+# Download: Vim 7.4.
 my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/";
 my $package = Test::Package->new("vim-7.4.tar.bz2", $vim_url, "tar xjf");
-
-$package->dependencies("citrun", "gtk", "curl");
+$package->dependencies("citrun");
 
 sub time_expect {
 	my $start = time;
@@ -36,7 +35,7 @@ my $cwd = getcwd;
 $package->patch("patch -p2 < $cwd/tt/patches/vim_osx.diff") if ($^O eq "darwin");
 
 # Vanilla configure.
-$scalar_vanilla[0] = $package->configure("make config");
+$scalar_vanilla[0] = $package->configure("./configure --enable-gui=no");
 #$package->copy_file("auto/config.log", "config.log.vanilla");
 
 # Vanilla compile.
@@ -68,65 +67,59 @@ my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/vim");
 
 $viewer->accept();
-is( $viewer->{num_tus}, 55, "translation unit count" );
+is( $viewer->{num_tus}, 49, "translation unit count" );
 
 my @known_good = (
 	# file name		lines	instrumented sites
-	[ "auto/pathdef.c",	11,	71	],
-	[ "blowfish.c",		708,	117	],
-	[ "buffer.c",		5828,	1368	],
-	[ "charset.c",		2046,	462	],
-	[ "diff.c",		2658,	660	],
-	[ "digraph.c",		2540,	152	],
-	[ "edit.c",		10246,	2363	],
-	[ "eval.c",		24360,	5000	],
-	[ "ex_cmds.c",		7682,	1734	],
-	[ "ex_cmds2.c",		4415,	798	],
-	[ "ex_docmd.c",		11511,	2320	],
-	[ "ex_eval.c",		2296,	423	],
-	[ "ex_getln.c",		6644,	1498	],
-	[ "fileio.c",		10479,	1846	],
-	[ "fold.c",		3458,	664	],
-	[ "getchar.c",		5317,	982	],
-	[ "gui.c",		5539,	1045	],
-	[ "gui_beval.c",	1344,	237	],
-	[ "gui_gtk.c",		1962,	531	],
-	[ "gui_gtk_f.c",	845,	189	],
-	[ "gui_gtk_x11.c",	6058,	1103	],
-	[ "hardcopy.c",		3682,	800	],
-	[ "hashtab.c",		504,	126	],
-	[ "if_cscope.c",	2611,	71	],
-	[ "if_xcmdsrv.c",	1493,	413	],
-	[ "main.c",		4156,	840	],
-	[ "mark.c",		1832,	455	],
-	[ "mbyte.c",		6315,	841	],
-	[ "memfile.c",		1571,	304	],
-	[ "memline.c",		5308,	1005	],
-	[ "menu.c",		2574,	533	],
-	[ "message.c",		4945,	950	],
-	[ "misc1.c",		10939,	2319	],
-	[ "misc2.c",		6644,	990	],
-	[ "move.c",		2922,	585	],
-	[ "netbeans.c",		3942,	837	],
-	[ "normal.c",		9623,	2141	],
-	[ "ops.c",		6794,	1564	],
-	[ "option.c",		11844,	2012	],
-	[ "os_unix.c",		7365,	1124	],
-	[ "popupmnu.c",		730,	183	],
-	[ "pty.c",		426,	89	],
-	[ "quickfix.c",		4251,	1016	],
-	[ "regexp.c",		8091,	2272	],
-	[ "screen.c",		10474,	1859	],
-	[ "search.c",		5608,	1332	],
-	[ "sha256.c",		440,	122	],
-	[ "spell.c",		16088,	3150	],
-	[ "syntax.c",		9809,	1822	],
-	[ "tag.c",		3940,	721	],
-	[ "term.c",		6013,	832	],
-	[ "ui.c",		3289,	718	],
-	[ "undo.c",		3366,	777	],
-	[ "version.c",		1405,	196	],
-	[ "window.c",		6993,	1525	],
+	[ "auto/pathdef.c",	11,	41	],
+	[ "blowfish.c",		708,	84	],
+	[ "buffer.c",		5828,	1328	],
+	[ "charset.c",		2046,	429	],
+	[ "diff.c",		2658,	625	],
+	[ "digraph.c",		2540,	122	],
+	[ "edit.c",		10246,	2276	],
+	[ "eval.c",		24360,	4926	],
+	[ "ex_cmds.c",		7682,	1674	],
+	[ "ex_cmds2.c",		4415,	752	],
+	[ "ex_docmd.c",		11511,	2234	],
+	[ "ex_eval.c",		2296,	393	],
+	[ "ex_getln.c",		6644,	1418	],
+	[ "fileio.c",		10479,	1801	],
+	[ "fold.c",		3458,	631	],
+	[ "getchar.c",		5317,	925	],
+	[ "hardcopy.c",		3682,	765	],
+	[ "hashtab.c",		504,	95	],
+	[ "if_cscope.c",	2611,	41	],
+	[ "if_xcmdsrv.c",	1493,	371	],
+	[ "main.c",		4156,	718	],
+	[ "mark.c",		1832,	424	],
+	[ "mbyte.c",		6315,	630	],
+	[ "memfile.c",		1571,	274	],
+	[ "memline.c",		5308,	972	],
+	[ "menu.c",		2574,	415	],
+	[ "message.c",		4945,	852	],
+	[ "misc1.c",		10939,	2284	],
+	[ "misc2.c",		6644,	917	],
+	[ "move.c",		2922,	551	],
+	[ "netbeans.c",		3942,	736	],
+	[ "normal.c",		9623,	2037	],
+	[ "ops.c",		6794,	1528	],
+	[ "option.c",		11844,	1889	],
+	[ "os_unix.c",		7365,	1029	],
+	[ "popupmnu.c",		730,	153	],
+	[ "quickfix.c",		4251,	981	],
+	[ "regexp.c",		8091,	2241	],
+	[ "screen.c",		10474,	1749	],
+	[ "search.c",		5608,	1299	],
+	[ "sha256.c",		440,	92	],
+	[ "spell.c",		16088,	3120	],
+	[ "syntax.c",		9809,	1674	],
+	[ "tag.c",		3940,	689	],
+	[ "term.c",		6013,	730	],
+	[ "ui.c",		3289,	565	],
+	[ "undo.c",		3366,	742	],
+	[ "version.c",		1405,	153	],
+	[ "window.c",		6993,	1458	],
 );
 $viewer->cmp_static_data(\@known_good);
 
