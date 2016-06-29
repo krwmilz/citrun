@@ -7,8 +7,8 @@ use List::MoreUtils qw( each_array );
 use Test::More;
 use Time::HiRes qw( time );
 
-my $num_tests = 333;
-$num_tests = 337 if ($^O eq "darwin");
+my $num_tests = 329;
+$num_tests = 333 if ($^O eq "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
