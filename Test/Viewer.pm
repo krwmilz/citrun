@@ -15,7 +15,7 @@ sub new {
 	my $viewer_socket = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM(),
 		Local => $viewer_socket_name,
-		Listen => 1,
+		Listen => 1
 	);
 	die "socket error: $!\n" unless ($viewer_socket);
 
@@ -106,8 +106,8 @@ sub cmp_static_data {
 		is ( $y->[1],	$x->[1],	"$x->[0]: total lines check" );
 
 		# Check instrumented sites ranges
-		cmp_ok ( $y->[2], ">", $x->[2] - 25, "$x->[0]: instr sites check lower" );
-		cmp_ok ( $y->[2], "<", $x->[2] + 25, "$x->[0]: instr sites check upper" );
+		cmp_ok ( $y->[2], ">", $x->[2] - 100, "$x->[0]: instr sites check lower" );
+		cmp_ok ( $y->[2], "<", $x->[2] + 100, "$x->[0]: instr sites check upper" );
 	}
 }
 
