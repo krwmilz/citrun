@@ -6,7 +6,7 @@ use List::MoreUtils qw ( each_array );
 use Test::More;
 use Time::HiRes qw( time );
 
-my $num_tests = 2551;
+my $num_tests = 2550;
 $num_tests = 2530 if ($^O eq "darwin");
 plan tests => $num_tests;
 
