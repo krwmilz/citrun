@@ -87,7 +87,7 @@ my @known_good = (
 	[ "hardcopy.c",		3682,	765	],
 	[ "hashtab.c",		504,	95	],
 	[ "if_cscope.c",	2611,	41	],
-	[ "if_xcmdsrv.c",	1493,	108	],
+	[ "if_xcmdsrv.c",	1493,	272	],
 	[ "main.c",		4156,	718	],
 	[ "mark.c",		1832,	424	],
 	[ "mbyte.c",		6315,	670	],
@@ -130,9 +130,9 @@ if ($^O eq "darwin") {
 	}
 }
 
+$viewer->accept();
 is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
 
-$viewer->accept();
 $viewer->cmp_static_data(\@known_good);
 
 my ($data, $old_data) = (undef, undef);
