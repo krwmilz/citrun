@@ -43,9 +43,6 @@ if $(OS) = MACOSX {
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT ;
 	LINKLIBS on citrun-gl += -lc++ -lm ;
 
-	# This is a dirty hack.
-	RANLIB = ranlib -c ;
-
 	LINKLIBS on citrun-inst =
 		-lc++
 		-lclangAST
