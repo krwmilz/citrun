@@ -149,8 +149,10 @@ restore_original_src(std::map<std::string, std::string> const &temp_file_map)
 void
 patch_link_command(std::vector<char *> &args)
 {
-	// libcitrun.a needs pthread but is static and doesn't include it itself
+	// libcitrun.a uses pthread so we must link it here, except osx.
+#ifndef __APPLE__
 	args.push_back(const_cast<char *>("-pthread"));
+#endif
 
 	char *lib_str;
 	if ((lib_str = getenv("CITRUN_LIB")) == NULL)
