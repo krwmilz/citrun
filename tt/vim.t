@@ -4,7 +4,7 @@ use warnings;
 use Cwd;
 use Expect;
 use List::MoreUtils qw( each_array );
-use Test::More tests => 238;
+use Test::More tests => 333;
 use Time::HiRes qw( time );
 
 use Test::Package;
@@ -34,15 +34,13 @@ my $srcdir = $package->set_srcdir("/vim74/src");
 my $cwd = getcwd;
 $package->patch("patch -p2 < $cwd/tt/patches/vim_osx.diff") if ($^O eq "darwin");
 
-# Vanilla configure.
+# Vanilla configure and compile.
 $scalar_vanilla[0] = $package->configure("./configure --enable-gui=no");
-#$package->copy_file("auto/config.log", "config.log.vanilla");
-
-# Vanilla compile.
 $scalar_vanilla[1] = $package->compile("make -j8 all");
 
 $scalar_vanilla[2] = $package->get_file_size("/vim");
 $scalar_vanilla[3] = $package->get_file_size("/xxd/xxd");
+#$package->copy_file("auto/config.log", "config.log.vanilla");
 
 # Vanilla test.
 $scalar_vanilla[4] = time_expect("make", "-C", "$srcdir/testdir");
@@ -50,10 +48,8 @@ $scalar_vanilla[4] = time_expect("make", "-C", "$srcdir/testdir");
 # Clean up before rebuild.
 $package->clean("make distclean");
 
-# Instrumented configure.
+# Instrumented configure and compile.
 $scalar_citrun[0] = $package->inst_configure();
-
-# Instrumented compile.
 $scalar_citrun[1] = $package->inst_compile();
 
 $scalar_citrun[2] = $package->get_file_size("/vim");
@@ -123,9 +119,11 @@ my @known_good = (
 );
 $viewer->cmp_static_data(\@known_good);
 
-my $start = time;
-$viewer->get_dynamic_data() for (1..60);
-my $data_call_dur = time - $start;
+my ($data, $old_data) = (undef, undef);
+for (1..60) {
+	$old_data = $data;
+	$data = $viewer->cmp_dynamic_data($old_data);
+}
 
 $exp->hard_close();
 $viewer->close();
@@ -134,7 +132,7 @@ $viewer->close();
 # xxd
 #
 
-$exp = Expect->spawn("$srcdir/xxd/xxd");
+$exp = Expect->spawn("$srcdir/xxd/xxd", "distfiles/vim-7.4.tar.bz2");
 
 $viewer->accept();
 is( $viewer->{num_tus}, 1, "xxd translation unit count" );
@@ -144,6 +142,11 @@ is( $viewer->{num_tus}, 1, "xxd translation unit count" );
 	[ "src/xxd/xxd.c",	851,	277 ],
 );
 $viewer->cmp_static_data(\@known_good);
+
+for (1..60) {
+	$old_data = $data;
+	$data = $viewer->cmp_dynamic_data($old_data);
+}
 
 $exp->hard_close();
 
@@ -160,14 +163,11 @@ format STDOUT =
 VIM E2E REPORT
 ==============
 
-     @<<<<<<<<<<<<<< @##.## sec
-"60 data calls:", $data_call_dur
-
 SCALAR COMPARISONS
                                       @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
 "vanilla", "citrun", "diff (%)"
      ---------------------------------------------------------------------
-~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
+~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>        @>>>>
 shift(@scalar_desc), shift(@scalar_vanilla), shift(@scalar_citrun), shift(@scalar_diff)
 
 DIFF COMPARISONS
