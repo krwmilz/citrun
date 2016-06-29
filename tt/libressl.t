@@ -3,12 +3,15 @@ use warnings;
 
 use Expect;
 use List::MoreUtils qw ( each_array );
-use Test::More tests => 2551;
+use Test::More;
 use Time::HiRes qw( time );
+
+my $num_tests = 2551;
+$num_tests = 2530 if ($^O eq "darwin");
+plan tests => $num_tests;
 
 use Test::Package;
 use Test::Viewer;
-
 
 # Download: LibreSSL 2.4.1 from ftp.openbsd.org.
 my $libressl_url = "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/";
@@ -42,10 +45,6 @@ $citrun[3] = $package->get_file_size("/crypto/.libs/libcrypto.a");
 # Verify: 'openssl' binary has working instrumentation.
 my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/apps/openssl/openssl");
-
-$viewer->accept();
-cmp_ok( $viewer->{num_tus}, ">", 615,	"tu count lower bound" );
-cmp_ok( $viewer->{num_tus}, "<", 629,	"tu count upper bound" );
 
 my @known_good = (
 	# file name			lines	instrumented sites
@@ -671,6 +670,39 @@ my @known_good = (
 	[ "ssl/t1_reneg.c",287,52 ],
 	[ "ssl/t1_srvr.c",239,21 ],
 );
+
+my @insert_list;
+if ($^O eq "darwin") {
+	@insert_list = (
+		[ "apps/openssl/compat/strtonum.c", 66, 14 ],
+		[ "crypto/compat/reallocarray.c",39,9 ],
+	);
+}
+else {
+	@insert_list = (
+		[ "crypto/evp/e_aes_cbc_hmac_sha1.c",605,101 ],
+		[ "crypto/evp/e_chacha20poly1305.c",325,82 ],
+		[ "crypto/gost/gost89imit_ameth.c",89,9 ],
+		[ "crypto/gost/gost89imit_pmeth.c",253,70 ],
+		[ "crypto/gost/gostr341001_ameth.c",738,332 ],
+		[ "crypto/gost/gostr341001_params.c",133,16 ],
+		[ "crypto/gost/gostr341001_pmeth.c",720,286 ],
+	);
+}
+
+my $to_insert = shift @insert_list;
+for my $i (0..(scalar @known_good - 1)) {
+	next if ($known_good[$i]->[0] lt $to_insert->[0]);
+
+	splice @known_good, $i, 0, ($to_insert);
+	last if (scalar @insert_list == 0);
+
+	$to_insert = shift @insert_list;
+}
+
+$viewer->accept();
+is( $viewer->{num_tus}, @known_good, "translation unit count" );
+
 $viewer->cmp_static_data(\@known_good);
 
 my ($data, $old_data) = (undef, undef);
