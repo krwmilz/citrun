@@ -24,7 +24,7 @@ my $srcdir = $package->set_srcdir("/libressl-2.4.1");
 
 # Vanilla configure and compile.
 $vanilla[0] = $package->configure("./configure");
-$vanilla[1] = $package->compile("make -j4");
+$vanilla[1] = $package->compile("make -j8");
 
 $vanilla[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
 $vanilla[3] = $package->get_file_size("/crypto/.libs/libcrypto.a");
