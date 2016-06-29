@@ -4,8 +4,12 @@ use warnings;
 use Cwd;
 use Expect;
 use List::MoreUtils qw( each_array );
-use Test::More tests => 333;
+use Test::More;
 use Time::HiRes qw( time );
+
+my $num_tests = 333;
+$num_tests = 337 if ($^O eq "darwin");
+plan tests => $num_tests;
 
 use Test::Package;
 use Test::Viewer;
@@ -62,9 +66,6 @@ $scalar_citrun[4] = time_expect("make", "-C", "$srcdir/testdir");
 my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/vim");
 
-$viewer->accept();
-is( $viewer->{num_tus}, 49, "translation unit count" );
-
 my @known_good = (
 	# file name		lines	instrumented sites
 	[ "auto/pathdef.c",	11,	41	],
@@ -76,20 +77,20 @@ my @known_good = (
 	[ "edit.c",		10246,	2276	],
 	[ "eval.c",		24360,	4926	],
 	[ "ex_cmds.c",		7682,	1674	],
-	[ "ex_cmds2.c",		4415,	752	],
+	[ "ex_cmds2.c",		4415,	799	],
 	[ "ex_docmd.c",		11511,	2234	],
 	[ "ex_eval.c",		2296,	393	],
 	[ "ex_getln.c",		6644,	1418	],
-	[ "fileio.c",		10479,	1801	],
+	[ "fileio.c",		10479,	1850	],
 	[ "fold.c",		3458,	631	],
 	[ "getchar.c",		5317,	925	],
 	[ "hardcopy.c",		3682,	765	],
 	[ "hashtab.c",		504,	95	],
 	[ "if_cscope.c",	2611,	41	],
-	[ "if_xcmdsrv.c",	1493,	371	],
+	[ "if_xcmdsrv.c",	1493,	108	],
 	[ "main.c",		4156,	718	],
 	[ "mark.c",		1832,	424	],
-	[ "mbyte.c",		6315,	630	],
+	[ "mbyte.c",		6315,	670	],
 	[ "memfile.c",		1571,	274	],
 	[ "memline.c",		5308,	972	],
 	[ "menu.c",		2574,	415	],
@@ -101,14 +102,14 @@ my @known_good = (
 	[ "normal.c",		9623,	2037	],
 	[ "ops.c",		6794,	1528	],
 	[ "option.c",		11844,	1889	],
-	[ "os_unix.c",		7365,	1029	],
+	[ "os_unix.c",		7365,	930	],
 	[ "popupmnu.c",		730,	153	],
 	[ "quickfix.c",		4251,	981	],
 	[ "regexp.c",		8091,	2241	],
 	[ "screen.c",		10474,	1749	],
 	[ "search.c",		5608,	1299	],
 	[ "sha256.c",		440,	92	],
-	[ "spell.c",		16088,	3120	],
+	[ "spell.c",		16088,	3190	],
 	[ "syntax.c",		9809,	1674	],
 	[ "tag.c",		3940,	689	],
 	[ "term.c",		6013,	730	],
@@ -117,6 +118,21 @@ my @known_good = (
 	[ "version.c",		1405,	153	],
 	[ "window.c",		6993,	1458	],
 );
+
+if ($^O eq "darwin") {
+	my $to_insert = [ "os_mac_conv.c", 592, 1004 ];
+
+	for my $i (0..(scalar @known_good - 1)) {
+		next if ($known_good[$i]->[0] lt $to_insert->[0]);
+
+		splice @known_good, $i, 0, ($to_insert);
+		last;
+	}
+}
+
+is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
+
+$viewer->accept();
 $viewer->cmp_static_data(\@known_good);
 
 my ($data, $old_data) = (undef, undef);
