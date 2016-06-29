@@ -3,8 +3,12 @@ use warnings;
 
 use Expect;
 use List::MoreUtils qw( each_array );
-use Test::More tests => 287;
+use Test::More;
 use Time::HiRes qw( time );
+
+my $num_tests = 283;
+$num_tests = 287 if ($^O ne "darwin");
+plan tests => $num_tests;
 
 use Test::Package;
 use Test::Viewer;
@@ -38,9 +42,6 @@ $citrun[2] = $package->get_file_size("/mutt");
 my $viewer = Test::Viewer->new();
 my $exp = Expect->spawn("$srcdir/mutt");
 
-$viewer->accept();
-is( $viewer->{num_tus}, 70, "translation unit count" );
-
 my @known_good = (
 	# file name		lines	instrumented sites
 	[ "/addrbook.c",	246,	102 ],
@@ -63,7 +64,6 @@ my @known_good = (
 	[ "/curs_lib.c",	1046,	323 ],
 	[ "/curs_main.c",	2349,	545 ],
 	[ "/date.c",		191,	59 ],
-	[ "/dotlock.c",		759,	139 ],
 	[ "/edit.c",		491,	212 ],
 	[ "/editmsg.c",		235,	97 ],
 	[ "/enter.c",		772,	267 ],
@@ -79,7 +79,7 @@ my @known_good = (
 	[ "/help.c",		380,	187 ],
 	[ "/history.c",		320,	122 ],
 	[ "/hook.c",		545,	186 ],
-	[ "/init.c",		3285,	1161 ],
+	[ "/init.c",		3285,	1120 ],
 	[ "/keymap.c",		1146,	387 ],
 	[ "/lib.c",		1086,	360 ],
 	[ "/main.c",		1225,	353 ],
@@ -114,6 +114,21 @@ my @known_good = (
 	[ "/thread.c",		1431,	386 ],
 	[ "/url.c",		325,	164 ],
 );
+
+if ($^O ne "darwin") {
+	my $to_insert = [ "/dotlock.c",		759,	139 ];
+
+	for my $i (0..(scalar @known_good - 1)) {
+		next if ($known_good[$i]->[0] lt $to_insert->[0]);
+
+		splice @known_good, $i, 0, ($to_insert);
+		last;
+	}
+}
+
+$viewer->accept();
+is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
+
 $viewer->cmp_static_data(\@known_good);
 
 my $start = time;
