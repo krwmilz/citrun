@@ -3,7 +3,7 @@ use warnings;
 
 use Expect;
 use List::MoreUtils qw ( each_array );
-use Test::More tests => 2492;
+use Test::More tests => 2551;
 use Time::HiRes qw( time );
 
 use Test::Package;
@@ -18,7 +18,7 @@ my $package = Test::Package->new("libressl-2.4.1.tar.gz", $libressl_url, "tar xz
 $package->dependencies("citrun");
 my (@vanilla, @citrun);
 my @desc = ("configure time (sec)", "compile time (sec)", "openssl size (b)",
-	"libcrypto.so size (b)");
+	"libcrypto.a size (b)");
 
 my $srcdir = $package->set_srcdir("/libressl-2.4.1");
 
@@ -27,7 +27,7 @@ $vanilla[0] = $package->configure("./configure");
 $vanilla[1] = $package->compile("make -j4");
 
 $vanilla[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
-$vanilla[3] = $package->get_file_size("/crypto/.libs/libcrypto.so.38.0");
+$vanilla[3] = $package->get_file_size("/crypto/.libs/libcrypto.a");
 
 # Reset.
 $package->clean("make distclean" );
@@ -37,7 +37,7 @@ $citrun[0] = $package->inst_configure();
 $citrun[1] = $package->inst_compile();
 
 $citrun[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
-$citrun[3] = $package->get_file_size("/crypto/.libs/libcrypto.so.38.0");
+$citrun[3] = $package->get_file_size("/crypto/.libs/libcrypto.a");
 
 # Verify: 'openssl' binary has working instrumentation.
 my $viewer = Test::Viewer->new();
@@ -672,6 +672,12 @@ my @known_good = (
 	[ "ssl/t1_srvr.c",239,21 ],
 );
 $viewer->cmp_static_data(\@known_good);
+
+my ($data, $old_data) = (undef, undef);
+for (1..60) {
+	$old_data = $data;
+	$data = $viewer->cmp_dynamic_data($old_data);
+}
 
 $exp->hard_close();
 
