@@ -7,10 +7,10 @@
 .Sh DESCRIPTION
 Warning:
 .Nm
-is not meant to be invoked directly. Instead, it is called automatically from
+is not meant to be invoked directly. Instead, it is invoked automatically from
 .Xr citrun-wrap 1 .
 .Pp
-Instrumentation will be attempted on any C/C++ source files found on the command
+Instrumentation is attempted on any C or C++ source files found on the command
 line. Source files are matched on suffix, one of:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
@@ -22,9 +22,6 @@ line. Source files are matched on suffix, one of:
 .Pp
 When instrumentation is successful modified source files are compiled with
 the native command line.
-.Pp
-When application link commands are detected extra arguments are added to the
-command line for the runtime library libcitrun.
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
 .It Ev CITRUN_PATH
