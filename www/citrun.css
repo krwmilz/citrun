@@ -23,3 +23,7 @@ body {
 .inline_logo {
 	height: 1em;
 }
+
+.stale {
+	color: red;
+}
