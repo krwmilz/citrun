@@ -6,8 +6,8 @@ use List::MoreUtils qw( each_array );
 use Test::More;
 use Time::HiRes qw( time );
 
-my $num_tests = 279;
-$num_tests = 283 if ($^O ne "darwin");
+my $num_tests = 338;
+$num_tests = 342 if ($^O ne "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
@@ -132,7 +132,11 @@ is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
 $viewer->cmp_static_data(\@known_good);
 
 my $start = time;
-$viewer->get_dynamic_data() for (1..60);
+my ($data, $old_data) = (undef, undef);
+for (1..60) {
+	$old_data = $data;
+	$data = $viewer->cmp_dynamic_data($old_data);
+}
 my $data_call_dur = time - $start;
 
 $exp->hard_close();
