@@ -1,11 +1,11 @@
 SubDir TOP src ;
 
-INSTRUMENT_SRCS =
+INST_SRCS =
 	inst_main.cc
 	inst_action.cc
 	inst_ast_visitor.cc ;
 
-CITRUN_SRCS =
+GL_SRCS =
 	gl_main.cc
 	gl_runtime_conn.cc
 	af_unix.cc
@@ -18,25 +18,22 @@ CITRUN_SRCS =
 	matrix4x4.c
 	trackball.c ;
 
-# libglyphy won't compile with c++11 right now so we have to special case here
-ObjectC++Flags $(INSTRUMENT_SRCS) $(CITRUN_SRCS) : -std=c++11 ;
+ObjectC++Flags $(INST_SRCS) $(GL_SRCS) : -std=c++11 ;
 
-# Instrument uses clang/llvm to do its job
-ObjectC++Flags $(INSTRUMENT_SRCS) : `llvm-config --cxxflags` ;
-ObjectC++Flags $(CITRUN_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
-ObjectC++Flags $(CITRUN_SRCS) : -I/usr/local/include ;
+ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
+ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
+ObjectC++Flags $(GL_SRCS) : -I/usr/local/include ;
 
-# Common link libraries on all platforms
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
-LLVM_LIBS = bitreader mcparser transformutils option ;
 
+LLVM_LIBS = bitreader mcparser transformutils option ;
 LINKLIBS on citrun-inst += `llvm-config --libs $(LLVM_LIBS) --system-libs` ;
 LINKLIBS on citrun-gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
 
-Main citrun-inst : $(INSTRUMENT_SRCS) ;
-Main citrun-gl : $(CITRUN_SRCS) ;
-
 LinkLibraries citrun-gl : libglyphy ;
+
+Main citrun-inst : $(INST_SRCS) ;
+Main citrun-gl : $(GL_SRCS) ;
 
 InstallBin $(PREFIX)/bin : citrun-inst citrun-gl ;
 InstallMan $(PREFIX)/man : citrun-inst.1 citrun-gl.1 ;
