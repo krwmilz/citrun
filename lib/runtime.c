@@ -4,7 +4,7 @@
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
 #include <string.h>		/* strlcpy */
-#include <unistd.h>		/* getpid, getppid, getpgrp, read, write */
+#include <unistd.h>		/* access, get{pid,ppid,pgrp}, read, write */
 
 #include <sys/socket.h>		/* socket */
 #include <sys/un.h>		/* sockaddr_un */
@@ -174,6 +174,20 @@ send_dynamic(int fd)
 		warnx("tu chain is longer than before");
 }
 
+static void
+fork_viewer()
+{
+	pid_t 		 pid;
+
+	pid = fork();
+	if (pid < 0)
+		err(1, "fork");
+	else if (pid == 0)
+		execlp("citrun-gl", "citrun-gl", NULL);
+	else
+		warnx("socket not found, forking viewer");
+}
+
 /*
  * Relays line count data over a Unix domain socket.
  */
@@ -188,8 +202,13 @@ relay_thread(void *arg)
 	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
 
-	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL)
+	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL) {
 		viewer_sock = "/tmp/citrun-gl.socket";
+
+		/* Fork a viewer if the default socket path doesn't exist */
+		if (access(viewer_sock, F_OK) < 0)
+			fork_viewer();
+	}
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
