@@ -8,10 +8,11 @@
 .Nm
 .Ar make | jam | gcc | cmake | ...
 .Sh DESCRIPTION
-Adds instrumentation to a native build command by modifying C/C++ source files
-found on any descendant compiler command lines.
+Adds instrumentation to a build command by intercepting compiler executions and
+redirecting them to
+.Xr citrun-inst 1 .
 .Pp
-The following compiler binary names are supported:
+The following compiler file names are intercepted:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It c++
@@ -24,27 +25,20 @@ The following compiler binary names are supported:
 .It gcc
 .El
 .Sh EXAMPLES
-Given a Makefile for
-.Qq program :
-.Bd -literal -offset indent
-PROG = program
-SRCS = main.c
-
-\&.include <bsd.prog.mk>
-.Ed
-.Pp
-Prepare
+Let's say that
 .Qq program
-by prepending
+is built by a Make based build system. To see
+.Qq program
+run prepend
 .Nm
-to the native build command:
+to the build command:
 .Pp
 .Dl $ citrun-wrap make
 .Pp
-And then see
+After that finishes
 .Qq program
-run:
-.Dl $ citrun-gl &
+is ready for viewing:
+.Pp
 .Dl $ ./program
 .Sh SEE ALSO
 .Xr citrun-gl 1 ,
