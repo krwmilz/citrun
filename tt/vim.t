@@ -148,6 +148,7 @@ $viewer->close();
 # xxd
 #
 
+# Let xxd process its own source so it's busy doing something.
 $exp = Expect->spawn("$srcdir/xxd/xxd", "distfiles/vim-7.4.tar.bz2");
 
 $viewer->accept();
