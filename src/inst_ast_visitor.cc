@@ -15,8 +15,6 @@ RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 bool
 RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
-	std::stringstream ss;
-	unsigned line = SM.getPresumedLineNumber(s->getLocStart());
 	clang::Stmt *stmt_to_inst = NULL;
 
 	if (clang::isa<clang::IfStmt>(s)) {
@@ -48,7 +46,10 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 	if (stmt_to_inst == NULL)
 		return true;
 
-	ss << "(++_citrun_lines[" << line << "], ";
+	std::stringstream ss;
+	ss << "(++_citrun_lines["
+		<< SM.getPresumedLineNumber(s->getLocStart())
+		<< "], ";
 	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
 		return true;
