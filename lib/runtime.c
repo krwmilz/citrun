@@ -108,7 +108,14 @@ xwrite(int d, const void *buf, size_t bytes_total)
 }
 
 /*
- * For each node in the chain send the static node data.
+ * Send static information contained in each instrumented node.
+ * Sent fields:
+ * - total number of translation units
+ * - process id, parent process id, group process id
+ * - length of the original source file name
+ * - source file name
+ * - size of the execution counters
+ * - number of instrumentation sites.
  */
 static void
 send_static(int fd)
@@ -119,33 +126,22 @@ send_static(int fd)
 	size_t			 file_name_sz;
 	int			 i;
 
-	/* Send the total number of translation units. */
 	xwrite(fd, &nodes_total, sizeof(nodes_total));
 
-	/* Send process id, parent process id, group process id. */
 	pids[0] = getpid();
 	pids[1] = getppid();
 	pids[2] = getpgrp();
-
 	assert(sizeof(pid_t) == 4);
 	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
 		xwrite(fd, &pids[i], sizeof(pid_t));
 
-	/* Send static object file information. */
 	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next) {
 		node = *w;
 
-		/* Length of the original source file name. */
 		file_name_sz = strnlen(node.file_name, PATH_MAX);
 		xwrite(fd, &file_name_sz, sizeof(file_name_sz));
-
-		/* The original source file name. */
 		xwrite(fd, node.file_name, file_name_sz);
-
-		/* Size of the execution counters. */
 		xwrite(fd, &node.size, sizeof(node.size));
-
-		/* Number of instrumentation sites. */
 		xwrite(fd, &node.inst_sites, sizeof(node.size));
 	}
 
