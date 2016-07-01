@@ -102,7 +102,8 @@ sub cmp_static_data {
 	# http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
 	my $it = each_array( @$known_good, @sorted_tus );
 	while ( my ($x, $y) = $it->() ) {
-		next if ($x->[0] eq "if_xcmdsrv.c");
+		# For Vim and Mutt respectively.
+		next if ($x->[0] eq "if_xcmdsrv.c" || $x->[0] eq "/conststrings.c");
 
 		like( $y->[0],	qr/.*$x->[0]/,	"$x->[0]: filename check" );
 		is ( $y->[1],	$x->[1],	"$x->[0]: total lines check" );
