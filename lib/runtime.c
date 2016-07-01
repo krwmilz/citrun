@@ -216,7 +216,7 @@ relay_thread(void *arg)
 
 	while (1) {
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
-			warn("connect");
+			/* warn("connect"); */
 			sleep(1);
 			continue;
 		}
