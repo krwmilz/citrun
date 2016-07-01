@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Expect;
-use List::MoreUtils qw( each_array );
 use Test::More;
 use Time::HiRes qw( time );
 
@@ -11,6 +10,7 @@ $num_tests = 342 if ($^O ne "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
+use Test::Report;
 use Test::Viewer;
 
 # Download: Mutt 1.6.1, depends on nothing (?).
@@ -18,25 +18,28 @@ my $mutt_url = "ftp://ftp.mutt.org/pub/mutt/";
 my $package = Test::Package->new("mutt-1.6.1.tar.gz", $mutt_url, "tar xzf");
 $package->dependencies("citrun");
 
-my @desc = ("configure time (sec)", "compile time (sec)", "mutt size (b)");
-my (@vanilla, @citrun);
+# New end to end report.
+my $report = Test::Report->new($package->dist_name());
+$report->add("desc", "configure time (sec)");
+$report->add("desc", "compile time (sec)");
+$report->add("desc", "mutt size (b)");
 
 my $srcdir = $package->set_srcdir("/mutt-1.6.1");
 
 # Vanilla configure and compile.
-$vanilla[0] = $package->configure("./configure --disable-pgp --disable-smime --disable-nls --disable-iconv");
-$vanilla[1] = $package->compile("make -j8 all");
+$report->add("vanilla", $package->configure("./configure --disable-pgp --disable-smime --disable-nls --disable-iconv"));
+$report->add("vanilla", $package->compile("make -j8 all"));
 
-$vanilla[2] = $package->get_file_size("/mutt");
+$report->add("vanilla", $package->get_file_size("/mutt"));
 
 # Clean up before rebuild.
 $package->clean("make distclean");
 
 # Instrumented configure and compile.
-$citrun[0] = $package->inst_configure();
-$citrun[1] = $package->inst_compile();
+$report->add("citrun", $package->inst_configure());
+$report->add("citrun", $package->inst_compile());
 
-$citrun[2] = $package->get_file_size("/mutt");
+$report->add("citrun", $package->get_file_size("/mutt"));
 
 # Verify: instrumented data structures are consistent.
 my $viewer = Test::Viewer->new();
@@ -140,34 +143,3 @@ for (1..60) {
 my $data_call_dur = time - $start;
 
 $exp->hard_close();
-
-
-# Write report.
-#
-
-my @diff;
-my $it = each_array( @vanilla, @citrun );
-while ( my ($x, $y) = $it->() ) {
-	push @diff, $y * 100.0 / $x - 100.0;
-}
-
-format STDOUT =
-
-MUTT E2E REPORT
-===============
-
-     @<<<<<<<<<<<<<< @##.## sec
-"60 data calls:", $data_call_dur
-
-SCALAR COMPARISONS
-                                      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
-"vanilla", "citrun", "diff (%)"
-     ---------------------------------------------------------------------
-~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
-shift(@desc), shift(@vanilla), shift(@citrun), shift(@diff)
-
-DIFF COMPARISONS
-
-.
-
-write;

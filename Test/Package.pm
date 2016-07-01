@@ -12,6 +12,7 @@ sub new {
 	bless($self, $class);
 
 	return $self if (! defined ($dist_name));
+	$self->{dist_name} = $dist_name;
 
 	# Create temporary directory for the contents of this package.
 	my $dir = tempdir( CLEANUP => 1 );
@@ -30,6 +31,11 @@ sub new {
 	$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
 
 	return $self;
+}
+
+sub dist_name {
+	my ($self) = @_;
+	return $self->{dist_name};
 }
 
 sub set_srcdir {

@@ -2,45 +2,46 @@ use strict;
 use warnings;
 
 use Expect;
-use List::MoreUtils qw ( each_array );
 use Test::More;
-use Time::HiRes qw( time );
 
 my $num_tests = 2550;
 $num_tests = 2530 if ($^O eq "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
+use Test::Report;
 use Test::Viewer;
 
 # Download: LibreSSL 2.4.1 from ftp.openbsd.org.
 my $libressl_url = "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/";
 my $package = Test::Package->new("libressl-2.4.1.tar.gz", $libressl_url, "tar xzf");
-
-# Dependencies.
 $package->dependencies("citrun");
-my (@vanilla, @citrun);
-my @desc = ("configure time (sec)", "compile time (sec)", "openssl size (b)",
-	"libcrypto.a size (b)");
+
+# New end to end report.
+my $report = Test::Report->new($package->dist_name());
+$report->add("desc", "configure time (sec)");
+$report->add("desc", "compile time (sec)");
+$report->add("desc", "openssl size (b)");
+$report->add("desc", "libcrypto.a size (b)");
 
 my $srcdir = $package->set_srcdir("/libressl-2.4.1");
 
 # Vanilla configure and compile.
-$vanilla[0] = $package->configure("./configure");
-$vanilla[1] = $package->compile("make -j8");
+$report->add("vanilla", $package->configure("./configure"));
+$report->add("vanilla", $package->compile("make -j8"));
 
-$vanilla[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
-$vanilla[3] = $package->get_file_size("/crypto/.libs/libcrypto.a");
+$report->add("vanilla", $package->get_file_size("/apps/openssl/.libs/openssl"));
+$report->add("vanilla", $package->get_file_size("/crypto/.libs/libcrypto.a"));
 
 # Reset.
 $package->clean("make distclean" );
 
 # Instrumented configure and compile.
-$citrun[0] = $package->inst_configure();
-$citrun[1] = $package->inst_compile();
+$report->add("citrun", $package->inst_configure());
+$report->add("citrun", $package->inst_compile());
 
-$citrun[2] = $package->get_file_size("/apps/openssl/.libs/openssl");
-$citrun[3] = $package->get_file_size("/crypto/.libs/libcrypto.a");
+$report->add("citrun", $package->get_file_size("/apps/openssl/.libs/openssl"));
+$report->add("citrun", $package->get_file_size("/crypto/.libs/libcrypto.a"));
 
 # Verify: 'openssl' binary has working instrumentation.
 my $viewer = Test::Viewer->new();
@@ -705,29 +706,3 @@ for (1..60) {
 }
 
 $exp->hard_close();
-
-my @diff;
-my $it = each_array( @vanilla, @citrun );
-while ( my ($x, $y) = $it->() ) {
-	push @diff, $y * 100.0 / $x - 100.0;
-}
-
-# Write report.
-#
-format STDOUT =
-
-LIBRESSL E2E REPORT
-===================
-
-SCALAR COMPARISONS
-                                      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
-"vanilla", "citrun", "diff (%)"
-     ---------------------------------------------------------------------
-~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
-shift(@desc), shift(@vanilla), shift(@citrun), shift(@diff)
-
-DIFF COMPARISONS
-
-.
-
-write;

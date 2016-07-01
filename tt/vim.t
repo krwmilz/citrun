@@ -3,7 +3,6 @@ use warnings;
 
 use Cwd;
 use Expect;
-use List::MoreUtils qw( each_array );
 use Test::More;
 use Time::HiRes qw( time );
 
@@ -12,6 +11,7 @@ $num_tests = 333 if ($^O eq "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
+use Test::Report;
 use Test::Viewer;
 
 # Download: Vim 7.4.
@@ -27,10 +27,13 @@ sub time_expect {
 	return time - $start;
 }
 
-my @scalar_desc = ("configure time (sec)", "compile time (sec)", "vim size (b)",
-	"xxd size (b)", "test time (sec)");
-my @scalar_vanilla;
-my @scalar_citrun;
+# New end to end report.
+my $report = Test::Report->new($package->dist_name());
+$report->add("desc", "configure time (sec)");
+$report->add("desc", "compile time (sec)");
+$report->add("desc", "vim size (b)");
+$report->add("desc", "xxd size (b)");
+$report->add("desc", "test time (sec)");
 
 my $srcdir = $package->set_srcdir("/vim74/src");
 
@@ -39,28 +42,28 @@ my $cwd = getcwd;
 $package->patch("patch -p2 < $cwd/tt/patches/vim_osx.diff") if ($^O eq "darwin");
 
 # Vanilla configure and compile.
-$scalar_vanilla[0] = $package->configure("./configure --enable-gui=no");
-$scalar_vanilla[1] = $package->compile("make -j8 all");
+$report->add("vanilla", $package->configure("./configure --enable-gui=no"));
+$report->add("vanilla", $package->compile("make -j8 all"));
 
-$scalar_vanilla[2] = $package->get_file_size("/vim");
-$scalar_vanilla[3] = $package->get_file_size("/xxd/xxd");
+$report->add("vanilla", $package->get_file_size("/vim"));
+$report->add("vanilla", $package->get_file_size("/xxd/xxd"));
 #$package->copy_file("auto/config.log", "config.log.vanilla");
 
 # Vanilla test.
-$scalar_vanilla[4] = time_expect("make", "-C", "$srcdir/testdir");
+$report->add("vanilla", time_expect("make", "-C", "$srcdir/testdir"));
 
 # Clean up before rebuild.
 $package->clean("make distclean");
 
 # Instrumented configure and compile.
-$scalar_citrun[0] = $package->inst_configure();
-$scalar_citrun[1] = $package->inst_compile();
+$report->add("citrun", $package->inst_configure());
+$report->add("citrun", $package->inst_compile());
 
-$scalar_citrun[2] = $package->get_file_size("/vim");
-$scalar_citrun[3] = $package->get_file_size("/xxd/xxd");
+$report->add("citrun", $package->get_file_size("/vim"));
+$report->add("citrun", $package->get_file_size("/xxd/xxd"));
 
 # Instrumented test.
-$scalar_citrun[4] = time_expect("make", "-C", "$srcdir/testdir");
+$report->add("citrun", time_expect("make", "-C", "$srcdir/testdir"));
 
 # Verify: instrumented data structures are consistent.
 my $viewer = Test::Viewer->new();
@@ -166,29 +169,3 @@ for (1..60) {
 }
 
 $exp->hard_close();
-
-my @scalar_diff;
-my $it = each_array( @scalar_vanilla, @scalar_citrun );
-while ( my ($x, $y) = $it->() ) {
-       push @scalar_diff, $y * 100.0 / $x - 100.0;
-}
-
-# Write report.
-#
-format STDOUT =
-
-VIM E2E REPORT
-==============
-
-SCALAR COMPARISONS
-                                      @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
-"vanilla", "citrun", "diff (%)"
-     ---------------------------------------------------------------------
-~~   @<<<<<<<<<<<<<<<<<<<<<<<<<<      @>>>>>>>>>   @>>>>>>>>>        @>>>>
-shift(@scalar_desc), shift(@scalar_vanilla), shift(@scalar_citrun), shift(@scalar_diff)
-
-DIFF COMPARISONS
-
-.
-
-write;
