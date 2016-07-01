@@ -23,3 +23,4 @@ make -C devel/$portname test
 make -C devel/$portname package
 
 doas pkg_add -Dunsigned -r $pkg_path
+rm -f ../../e2e_report.txt
