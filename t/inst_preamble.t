@@ -26,7 +26,6 @@ my $preamble_good = <<EOF;
 extern "C" {
 #endif
 #include <stdint.h>
-#include <stddef.h>
 struct citrun_node {
 	uint64_t *lines_ptr;
 	uint32_t size;

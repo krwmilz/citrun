@@ -1,6 +1,5 @@
 static const char runtime_h[] =
 "#include <stdint.h>\n"
-"#include <stddef.h>\n"
 "struct citrun_node {\n"
 "	uint64_t *lines_ptr;\n"
 "	uint32_t size;\n"
