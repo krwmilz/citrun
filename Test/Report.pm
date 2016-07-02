@@ -4,7 +4,7 @@ use strict;
 use List::MoreUtils qw( each_array );
 
 sub new {
-	my ($class, $name) = @_;
+	my ($class, $name, $num_tests) = @_;
 
 	my $self = {};
 	bless($self, $class);
@@ -14,6 +14,9 @@ sub new {
 	$self->{vanilla} = [];
 	$self->{citrun} = [];
 
+	$self->{start_time} = time;
+	$self->{num_tests} = $num_tests;
+
 	return $self;
 }
 
@@ -21,6 +24,35 @@ sub add {
 	my ($self, $field, $desc) = @_;
 
 	push @{ $self->{$field} }, ($desc);
+}
+
+sub write_header {
+
+	open (E2E_HEADER, ">", "e2e_report.txt") or die "$!";
+
+	format E2E_HEADER =
+END TO END TEST REPORT
+======================
+
+SYSTEM INFO
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+"started at:", `date`
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
+"host:", `uname -n`
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
+"os:", `uname -s`
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
+"version:", `uname -r`
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
+"arch:", `uname -m`
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
+"user:", `logname`
+     @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
+"citrun version:", `citrun-wrap -v`
+
+.
+	write E2E_HEADER;
+	close E2E_HEADER;
 }
 
 sub DESTROY {
@@ -36,16 +68,21 @@ sub DESTROY {
 		push @diff, $y * 100.0 / $x - 100.0;
 	}
 
+	if (! -e "e2e_report.txt") {
+		write_header();
+	}
+
 	open (E2E_REPORT, ">>", "e2e_report.txt") or die "$!";
 
 	format E2E_REPORT =
-@>>>>>>>>>>>>>>>>>>>>
-$self->{name}
-======================
-#      @<<<<<<<<<<<<<<<<<<<  @##.##
-# "60 data calls (s):", $data_call_dur
-#      @<<<<<<<<<<<<<<<<<<<  @#####
-# "tests ok:", $num_tests
+@<<<<<<<<<<<<<<<<<<<<<<<<<<
+"$self->{name}:"
+
+     @<<<<<<<<<<<<<<  @#### s
+"duration:", time - $self->{start_time}
+     @<<<<<<<<<<<<<< @#####
+"tests planned:", $self->{num_tests}
+
                                       @>>>>>>>>>   @>>>>>>>>>     @>>>>>>>
 "vanilla", "citrun", "diff (%)"
      ---------------------------------------------------------------------

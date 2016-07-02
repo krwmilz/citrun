@@ -28,7 +28,7 @@ sub time_expect {
 }
 
 # New end to end report.
-my $report = Test::Report->new($package->dist_name());
+my $report = Test::Report->new($package->dist_name(), $num_tests);
 $report->add("desc", "configure time (sec)");
 $report->add("desc", "compile time (sec)");
 $report->add("desc", "vim size (b)");
