@@ -109,9 +109,10 @@ xwrite(int d, const void *buf, size_t bytes_total)
 
 /*
  * Send static information contained in each instrumented node.
- * Sent fields:
+ * Sent program wide values:
  * - total number of translation units
  * - process id, parent process id, group process id
+ * Sent for each instrumented translation unit:
  * - length of the original source file name
  * - source file name
  * - size of the execution counters
