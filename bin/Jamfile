@@ -8,7 +8,7 @@ rule Generate
 
 actions Generate
 {
-	sed -e s,%PREFIX%,$(PREFIX), < $(2) > $(1) ;
+	sed -e s,%PREFIX%,$(PREFIX), -e s,%GIT_HASH%,`git rev-parse --short HEAD`, < $(2) > $(1) ;
 	chmod 755 $(1) ;
 }
 

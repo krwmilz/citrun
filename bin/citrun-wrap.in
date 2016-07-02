@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "${1}" = "-v" ]; then
+	echo %GIT_HASH%
+	exit 0
+fi
+
 export CITRUN_PATH="%PREFIX%/share/citrun"
 export PATH="$CITRUN_PATH:$PATH"
 
