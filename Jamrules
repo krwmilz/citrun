@@ -1,3 +1,4 @@
+VERSION = 0 ;
 PREFIX ?= `pwd` ;
 
 # Packaging systems like for build systems to respect this.
