@@ -63,10 +63,9 @@ if $(OS) = MACOSX {
 }
 
 if $(OS) = LINUX {
-	C++FLAGS = -DLLVM_VER=35 ;
+	C++FLAGS += -DLLVM_VER=35 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
-	# Link directly against libestdc++ from ports
 	LINKLIBS on citrun-gl = -lbsd -lstdc++ -lm -lglut ;
 
 	LINKLIBS on citrun-inst =
