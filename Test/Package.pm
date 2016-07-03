@@ -33,11 +33,6 @@ sub new {
 	return $self;
 }
 
-sub dist_name {
-	my ($self) = @_;
-	return $self->{dist_name};
-}
-
 sub set_srcdir {
 	my ($self, $srcdir) = @_;
 	$self->{srcdir} = $self->{dir} . $srcdir;
