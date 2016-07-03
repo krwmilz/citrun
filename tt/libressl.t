@@ -18,7 +18,7 @@ my $package = Test::Package->new("libressl-2.4.1.tar.gz", $libressl_url, "tar xz
 $package->dependencies("citrun");
 
 # New end to end report.
-my $report = Test::Report->new("LIBRESSL, $num_tests);
+my $report = Test::Report->new("LIBRESSL", $num_tests);
 $report->add("desc", "configure time (sec)");
 $report->add("desc", "compile time (sec)");
 $report->add("desc", "openssl size (b)");
