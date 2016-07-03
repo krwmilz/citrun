@@ -1,6 +1,6 @@
 SubDir TOP lib ;
 
-SubDirCcFlags -pthread ;
+SubDirCcFlags -fPIC -pthread ;
 
 Library libcitrun : runtime.c ;
 InstallLib $(PREFIX)/lib : libcitrun.a ;
