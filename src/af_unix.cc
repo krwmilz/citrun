@@ -1,7 +1,10 @@
+#if __gnu_linux__
+#include <bsd/string.h>		// strlcpy
+#endif
 #include <err.h>		// err
 #include <errno.h>		// EWOULDBLOCK
 #include <fcntl.h>
-#include <string.h>		// memset
+#include <string.h>		// memset, strlcpy
 #include <sys/socket.h>		// socket
 #include <sys/un.h>		// sockaddr_un
 #include <unistd.h>		// close

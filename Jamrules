@@ -67,7 +67,7 @@ if $(OS) = LINUX {
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
-	LINKLIBS on citrun-gl = -lstdc++ -lm -lglut ;
+	LINKLIBS on citrun-gl = -lbsd -lstdc++ -lm -lglut ;
 
 	LINKLIBS on citrun-inst =
 		-Wl,--start-group
