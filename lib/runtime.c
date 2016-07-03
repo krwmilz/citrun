@@ -147,7 +147,7 @@ send_static(int fd)
 	}
 
 	if (i != nodes_total)
-		warnx("tu chain inconsistent: %i vs %llu", i, nodes_total);
+		warnx("tu chain inconsistent: %i vs %j", i, nodes_total);
 	if (w != NULL)
 		warnx("tu chain is longer than before");
 }
@@ -166,7 +166,7 @@ send_dynamic(int fd)
 		xwrite(fd, w->lines_ptr, w->size * sizeof(uint64_t));
 
 	if (i != nodes_total)
-		warnx("tu chain inconsistent: %i vs %llu", i, nodes_total);
+		warnx("tu chain inconsistent: %i vs %j", i, nodes_total);
 	if (w != NULL)
 		warnx("tu chain is longer than before");
 }
