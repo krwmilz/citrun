@@ -25,5 +25,9 @@ body {
 }
 
 .stale {
-	color: red;
+	color: maroon;
+}
+
+.right {
+	float: right;
 }
