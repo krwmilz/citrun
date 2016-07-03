@@ -45,6 +45,7 @@ sub dependencies {
 	my @installed_pkgs;
 	@installed_pkgs = parse_output('pkg_info', '-q') if ($^O eq "openbsd");
 	@installed_pkgs = parse_output('port', 'installed') if ($^O eq "darwin");
+	@installed_pkgs = parse_output('apt-mark', 'showmanual') if ($^O eq "linux");
 
 	my @missing_deps;
 	for my $dep (@deps) {
