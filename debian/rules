@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_build:
+	PREFIX=/usr jam -j2
+
+override_dh_install:
+	DESTDIR=$$(pwd)/debian/citrun PREFIX=$$(pwd)/debian/citrun/usr jam install

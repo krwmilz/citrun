@@ -1,0 +1,12 @@
+Source: citrun
+Maintainer: Kyle Milz <kyle@0x30.net>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+
+Package: citrun
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: watch source code run
+ c it run is a set of tools to watch source code execute.
