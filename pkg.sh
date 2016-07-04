@@ -32,6 +32,7 @@ if [ "$uname" = "OpenBSD" ]; then
 	make -C openbsd/devel/$portname package
 
 	doas pkg_add -Dunsigned -r $pkg_path
+	cp $pkg_path .
 
 elif [ "$uname" = "Darwin" ]; then
 	sudo port uninstall $portname
@@ -39,6 +40,8 @@ elif [ "$uname" = "Darwin" ]; then
 	sudo port -v -D darwin/devel/citrun clean
 	sudo port -v -D darwin/devel/citrun test
 	sudo port -v -D darwin/devel/citrun install
+
+	cp /opt/local/var/macports/software/citrun/citrun-0_0.darwin_15.x86_64.tbz2 .
 
 elif [ "$uname" = "Linux" ]; then
 	sudo dpkg -r $portname || true
