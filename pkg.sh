@@ -41,7 +41,18 @@ elif [ "$uname" = "Darwin" ]; then
 	sudo port -v -D darwin/devel/citrun install
 
 elif [ "$uname" = "Linux" ]; then
-	echo ""
+	sudo dpkg -r $portname || true
+
+	tmpdir=`mktemp -d`
+	trap "rm -rf $tmpdir" EXIT
+
+	curl -o $tmpdir/citrun_0.orig.tar.gz http://cit.run/src/citrun-0.tar.gz
+	(cd $tmpdir && tar xzf citrun_0.orig.tar.gz)
+
+	(cd $tmpdir/citrun-0 && debuild -us -uc)
+
+	sudo dpkg -i $tmpdir/citrun_0-1_amd64.deb
+	cp $tmpdir/citrun_0-1_amd64.deb .
 
 else
 	echo Error: Can\'t package for unknown system \"$uname\"
