@@ -28,7 +28,7 @@ sub add {
 
 sub write_header {
 
-	open (E2E_HEADER, ">", "e2e_report.txt") or die "$!";
+	open (E2E_HEADER, ">", "tt/report.txt") or die "$!";
 
 	format E2E_HEADER =
 E2E TEST REPORT
@@ -68,11 +68,11 @@ sub DESTROY {
 		push @diff, $y * 100.0 / $x - 100.0;
 	}
 
-	if (! -e "e2e_report.txt") {
+	if (! -e "tt/report.txt") {
 		write_header();
 	}
 
-	open (E2E_REPORT, ">>", "e2e_report.txt") or die "$!";
+	open (E2E_REPORT, ">>", "tt/report.txt") or die "$!";
 
 	format E2E_REPORT =
 @<<<<<<<<<<<<<<<<<<<<<<<<<<
