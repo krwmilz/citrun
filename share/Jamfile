@@ -18,8 +18,8 @@ actions InstallCompilerSyms
 }
 
 # These are used for in-tree testing
-SoftLink $(TOP)/share/cc :  $(PREFIX)/src/citrun-inst ;
-SoftLink $(TOP)/share/gcc : $(PREFIX)/src/citrun-inst ;
+#SoftLink $(TOP)/share/cc :  $(PREFIX)/src/citrun-inst ;
+#SoftLink $(TOP)/share/gcc : $(PREFIX)/src/citrun-inst ;
 
 # This is a completely different set generated at install time
 InstallCompilerSyms $(PREFIX)/share/citrun : cc gcc ;
