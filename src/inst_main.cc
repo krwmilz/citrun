@@ -146,17 +146,12 @@ restore_original_src(std::map<std::string, std::string> const &temp_file_map)
 void
 patch_link_command(std::vector<char *> &args)
 {
-	// libcitrun.a uses pthread so we must link it here, except osx.
+	// libcitrun.a uses pthread so we must link it here.
 #ifndef __APPLE__
+	// Except Mac OS, who always links this.
 	args.push_back(const_cast<char *>("-pthread"));
 #endif
-
-	char *lib_str;
-	if ((lib_str = getenv("CITRUN_LIB")) == NULL)
-		// Trap door not found.
-		args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
-	else
-		args.push_back(lib_str);
+	args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
 }
 
 int

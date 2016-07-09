@@ -50,9 +50,7 @@ EOF
 	close( $jamfile_fh );
 
 	# Use the tools in this source tree
-	my $cwd = getcwd;
-	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.a";
-	$ENV{PATH} = "$cwd/share:$ENV{PATH}";
+	$ENV{PATH} = getcwd . "/share:$ENV{PATH}";
 
 	my $ret = system( "cd $tmp_dir && jam" );
 	die "make failed: $ret\n" if ($ret);
