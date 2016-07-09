@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2016 Kyle Milz <kyle@0x30.net>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 #include <err.h>
 #include <string.h>
 #include <stdlib.h>		// getenv
@@ -157,8 +172,10 @@ patch_link_command(std::vector<char *> &args)
 int
 main(int argc, char *argv[])
 {
-	// Set a better name than the symlink that was used to find this program
-	setprogname("citrun-inst");
+	bool is_citrun_inst = ends_with(argv[0], "citrun-inst");
+	if (! is_citrun_inst)
+		setprogname("citrun-inst");
+
 	clean_path();
 
 	std::vector<char *> args(argv, argv + argc);
@@ -173,6 +190,9 @@ main(int argc, char *argv[])
 
 	for (auto &arg : args) {
 		if (strcmp(arg, "-E") == 0) {
+			if (is_citrun_inst)
+				errx(1, "citrun-inst -E not supported");
+
 			// Preprocessing argument found, exec native command
 			if (execvp(argv[0], argv))
 				err(1, "execvp");
@@ -203,13 +223,21 @@ main(int argc, char *argv[])
 	}
 
 	if (instrument(argc, argv, source_files)) {
-		warnx("Instrumentation failed, compiling unmodified code.");
-
-		// It seems necessary right now to do this.
+		// Instrumentation failed.
 		restore_original_src(temp_file_map);
 
+		if (is_citrun_inst)
+			errx(1, "instrumentation failed");
+
+		warnx("Instrumentation failed, compiling unmodified code.");
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
+	}
+
+	if (is_citrun_inst) {
+		// Ran directly and instrumentation (if any) didn't fail.
+		restore_original_src(temp_file_map);
+		return 0;
 	}
 
 	bool linking = false;
