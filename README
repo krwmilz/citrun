@@ -1,0 +1,18 @@
+░█▀▀░░░▀█▀░▀█▀░░░█▀▄░█░█░█▀█
+░█░░░░░░█░░░█░░░░█▀▄░█░█░█░█
+░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░▀░▀
+
+Build dependencies:
+- C++11 capable compiler
+- DejaVu Sans Mono
+- freeglut and glew
+- FreeType2
+- Jam
+- LLVM and Clang > 3.4
+- OpenGLES >= 2.0
+
+Use Jam to compile:
+$ jam
+
+Run the tests with prove:
+$ prove
