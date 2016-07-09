@@ -5,8 +5,8 @@ use Expect;
 use Test::More;
 use Time::HiRes qw( time usleep );
 
-my $num_tests = 284;
-$num_tests = 288 if ($^O ne "darwin");
+my $num_tests = 280;
+$num_tests = 284 if ($^O ne "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
