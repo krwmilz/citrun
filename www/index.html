@@ -14,10 +14,10 @@
 	<h1>C It Run</h1>
 	<hr />
 	<div class="link_bar">
-		<a href="http://www.0x30.net">..</a>
 		<a href="http://0x30.net:8010">bb</a>
 		<a href="pkg/">pkg</a>
 		<a href="src/">src</a>
+		<a href="http://www.0x30.net">home<a>
 	</div>
 
 	<p><b>C It Run</b> is a set of tools to watch source code execute.
@@ -28,33 +28,20 @@
 	<p>Current packages are available for these platforms/architectures:
 	</p>
 	<ul>
-		<li>Darwin 15
-			amd64/<a href="/pkg/amd64/citrun-0_0.darwin_15.x86_64.tbz2">citrun-0_0.darwin_15.x86_64.tbz2</a>
+		<li>Darwin 15/amd64
+			<a href="/pkg/amd64/citrun-0_0.darwin_15.x86_64.tbz2"
+				>citrun-0_0.darwin_15.x86_64.tbz2</a>
 			<img class="inline_logo" src="apple.png" alt="OS X Logo" />
-			<span class="right">
-				<a href="/pkg/amd64/citrun-0_0.darwin_15.x86_64.txt">report</a>
-				<span class="stale darwin">(stale)</span>
-			</span>
 		</li>
-		<li>Debian 8.4
-			amd64/<a href="/pkg/amd64/citrun_0-1_amd64.deb">citrun_0-1_amd64.deb</a>
-			<img class="inline_logo" src="debian.png" alt="Debian logo"/>
-		</li>
-		<li>OpenBSD 5.9
-			amd64/<a href="/pkg/amd64/citrun-0.tgz">citrun-0.tgz</a>
+		<li>OpenBSD 5.9/amd64
+			<a href="/pkg/amd64/citrun-0.tgz"
+				>citrun-0.tgz</a>
 			<img class="inline_logo" src="puffy.png" alt="OpenBSD Logo"/>
-			<span class="right">
-				<a href="/pkg/amd64/citrun-0.txt">report</a>
-				<span class="stale obsd_amd64">(stale)</span>
-			</span>
 		</li>
-		<li>OpenBSD 5.9
-			sparc64/<a href="/pkg/sparc64/citrun-0.tgz">citrun-0.tgz</a>
+		<li>OpenBSD 5.9/sparc64
+			<a href="/pkg/sparc64/citrun-0.tgz"
+				>citrun-0.tgz</a>
 			<img class="inline_logo" src="puffy.png" alt="OpenBSD Logo" />
-			<span class="right">
-				<a href="/pkg/sparc64/citrun-0.txt">report</a>
-				<span class="stale obsd_sparc64">(stale)</span>
-			</span>
 		</li>
 	</ul>
 
@@ -72,16 +59,16 @@
 		<li>Distribution archive
 			<a href="/src/citrun-0.tar.gz">citrun-0.tar.gz</a>
 		</li>
-		<li>Read only repository at http://git.0x30.net/citrun</li>
+		<li>Repository at http://git.0x30.net/citrun</li>
 	</ul>
 
 	<h2>Documentation</h2>
-	<p>This is the wrapper to use around build systems:
+	<p>This is where you want to start out:
 	</p>
 	<ul>
 		<li><a href="man/citrun-wrap.1.html">citrun-wrap(1)</a>
 	</ul>
-	<p>These are lower level manuals:
+	<p>These are the other manuals:
 	</p>
 	<ul>
 		<li><a href="man/citrun-gl.1.html">citrun-gl(1)</a>
@@ -89,22 +76,8 @@
 	</ul>
 
 	<h2>Building</h2>
-	<h3>Dependencies</h3>
-	<ul>
-		<li>C++11 capable compiler</li>
-		<li>DejaVu Sans Mono</li>
-		<li>freeglut and glew</li>
-		<li>FreeType2</li>
-		<li>Jam</li>
-		<li>LLVM and Clang > 3.4</li>
-		<li>OpenGLES >= 2.0</li>
-	</ul>
-	<p>Unpack the distribution, cd into the created directory and jam:
+	<p>See the <b>README</b> file in the distribution.
 	</p>
-	<pre> <span class="prompt">$</span> jam</pre>
-	<p> Run the tests with prove:
-	</p>
-	<pre> <span class="prompt">$</span> prove</pre>
 </body>
 
 </html>
