@@ -51,9 +51,8 @@ EOF
 
 	# Use the tools in this source tree
 	my $cwd = getcwd;
-	$ENV{CITRUN_PATH} = "$cwd/share";
 	$ENV{CITRUN_LIB} = "$cwd/lib/libcitrun.a";
-	$ENV{PATH} = "$ENV{CITRUN_PATH}:$ENV{PATH}";
+	$ENV{PATH} = "$cwd/share:$ENV{PATH}";
 
 	my $ret = system( "cd $tmp_dir && jam" );
 	die "make failed: $ret\n" if ($ret);

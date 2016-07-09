@@ -48,7 +48,7 @@ SYSTEM INFO
      @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
 "user:", `logname`
      @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<
-"citrun version:", `citrun-wrap -v`
+"citrun version:", 0
 
 .
 	write E2E_HEADER;
