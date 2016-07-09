@@ -4,7 +4,7 @@ PREFIX ?= `pwd` ;
 # Packaging systems like for build systems to respect this.
 OPTIM = $(CFLAGS) ;
 
-C++FLAGS += -DCITRUN_LIB=$(PREFIX)/lib/libcitrun.a ;
+C++FLAGS += -DCITRUN_LIB=$(PREFIX)/lib/libcitrun.a -DCITRUN_PATH=$(PREFIX)/share/citrun ;
 
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
