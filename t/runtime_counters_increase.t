@@ -1,7 +1,7 @@
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 25;
+use Test::More tests => 19;
 use Test::Differences;
 
 use Test::Project;
@@ -54,15 +54,10 @@ my $data = $viewer->get_dynamic_data();
 ok( keys %$data == 1, "single dynamic data key" );
 my ($exec_lines1) = values %$data;
 
-my $data = $viewer->get_dynamic_data();
-ok( keys %$data == 1, "single dynamic data key" );
-my ($exec_lines2) = values %$data;
-
 # Only lines 8 - 12 in the source code above are executing
 for (8..12) {
+	# Runtime sends execution differences.
 	cmp_ok( $exec_lines1->[$_], ">", 0, "line $_ executed nonzero times" );
-	# Make sure the second time we queried the execution counts they were higher
-	cmp_ok( $exec_lines2->[$_], ">=", $exec_lines1->[$_], "line $_ after > before" );
 }
 
 $project->kill();

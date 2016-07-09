@@ -32,6 +32,7 @@ struct citrun_node {
 	uint32_t inst_sites;
 	const char *file_name;
 	struct citrun_node *next;
+	uint64_t	*old_lines;
 };
 void citrun_node_add(struct citrun_node *);
 void citrun_start();

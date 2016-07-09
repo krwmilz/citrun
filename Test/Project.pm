@@ -62,7 +62,7 @@ sub instrumented_src {
 	open( my $inst_fh, "<", "$self->{tmp_dir}/source_0.c" );
 
 	# Knock off the instrumentation preamble
-	my $line = <$inst_fh> for (1..28);
+	my $line = <$inst_fh> for (1..29);
 
 	my $inst_src;
 	while (my $line = <$inst_fh>) {
@@ -78,7 +78,7 @@ sub inst_src_preamble {
 	open( my $inst_fh, "<", "$self->{tmp_dir}/source_0.c" );
 
 	my $preamble;
-	for (1..28) {
+	for (1..29) {
 		my $line = <$inst_fh>;
 		$preamble .= $line;
 	}

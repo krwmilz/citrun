@@ -27,6 +27,11 @@ static void *relay_thread(void *);
 void
 citrun_node_add(struct citrun_node *n)
 {
+	/* Used for double buffering line counts. */
+	n->old_lines = calloc(n->size, sizeof(uint64_t));
+	if (n->old_lines == NULL)
+		err(1, "calloc");
+
 	if (nodes_head == NULL) {
 		assert(nodes_tail == NULL);
 		nodes_head = n;
@@ -159,11 +164,23 @@ static void
 send_dynamic(int fd)
 {
 	struct citrun_node	*w;
+	uint64_t		*lines_ptr;
+	uint64_t		*old_lines_ptr;
 	int			 i;
+	int			 line;
 
 	/* Write execution buffers (one 8 byte counter per source line). */
-	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next)
-		xwrite(fd, w->lines_ptr, w->size * sizeof(uint64_t));
+	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next) {
+
+		lines_ptr = w->lines_ptr;
+		old_lines_ptr = w->old_lines;
+		for (line = 0; line < w->size; line++) {
+			uint64_t diff = lines_ptr[line] - old_lines_ptr[line];
+			/* Let's try incremental updating of old_lines. */
+			old_lines_ptr[line] = lines_ptr[line];
+			xwrite(fd, &diff, sizeof(uint64_t));
+		}
+	}
 
 	if (i != nodes_total)
 		warnx("tu chain inconsistent: %i vs %j", i, nodes_total);
