@@ -11,8 +11,8 @@ Build dependencies:
 - LLVM and Clang > 3.4
 - OpenGLES >= 2.0
 
-Use Jam to compile:
+Compile:
 $ jam
 
-Run the tests with prove:
+Run tests:
 $ prove
