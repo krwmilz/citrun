@@ -28,7 +28,7 @@ if [ "$uname" = "OpenBSD" ]; then
 
 	# The 'test' target will do a full build first
 	make -C openbsd/devel/$portname clean=all
-	make -C openbsd/devel/$portname test
+	make -C openbsd/devel/$portname build
 	make -C openbsd/devel/$portname package
 
 	doas pkg_add -Dunsigned -r $pkg_path
