@@ -1,10 +1,19 @@
-VERSION = 0 ;
-PREFIX ?= `pwd` ;
+if ! $(PREFIX) {
+	# No PREFIX means an in tree build. Use absolute paths to local copies.
+	PWD = `pwd` ;
+	CITRUN_LIB = $(PWD)/lib/libcitrun.a ;
+	CITRUN_PATH = $(PWD)/share ;
+}
+else {
+	# PREFIX was set, use absolute install paths.
+	CITRUN_LIB = $(PREFIX)/lib/libcitrun.a ;
+	CITRUN_PATH = $(PREFIX)/share/citrun ;
+}
 
 # Packaging systems like for build systems to respect this.
 OPTIM = $(CFLAGS) ;
 
-C++FLAGS += -DCITRUN_LIB=$(PREFIX)/lib/libcitrun.a -DCITRUN_PATH=$(PREFIX)/share/citrun ;
+C++FLAGS += -DCITRUN_LIB=$(CITRUN_LIB) -DCITRUN_PATH=$(CITRUN_PATH) ;
 
 if $(OS) = OPENBSD {
 	C++ = eg++ ;

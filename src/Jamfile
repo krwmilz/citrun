@@ -9,7 +9,7 @@ rule MkCitrunWrap
 
 actions MkCitrunWrap
 {
-	sed -e s,%PREFIX%,$(PREFIX), < $(2) > $(1) ;
+	sed -e s,%CITRUN_PATH%,$(CITRUN_PATH), < $(2) > $(1) ;
 	chmod 755 $(1) ;
 }
 
