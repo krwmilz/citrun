@@ -31,8 +31,8 @@ sub write_header {
 	open (E2E_HEADER, ">", "e2e_report.txt") or die "$!";
 
 	format E2E_HEADER =
-END TO END TEST REPORT
-======================
+E2E TEST REPORT
+===============
 
 SYSTEM INFO
      @<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<
