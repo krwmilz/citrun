@@ -4,8 +4,8 @@ use warnings;
 use Expect;
 use Test::More;
 
-my $num_tests = 2550;
-$num_tests = 2530 if ($^O eq "darwin");
+my $num_tests = 2492;
+$num_tests = 2472 if ($^O eq "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
@@ -698,11 +698,6 @@ $viewer->accept();
 is( $viewer->{num_tus}, @known_good, "translation unit count" );
 
 $viewer->cmp_static_data(\@known_good);
-
-my ($data, $old_data) = (undef, undef);
-for (1..60) {
-	$old_data = $data;
-	$data = $viewer->cmp_dynamic_data($old_data);
-}
+$viewer->cmp_dynamic_data();
 
 $exp->hard_close();

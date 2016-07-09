@@ -3,10 +3,10 @@ use warnings;
 
 use Expect;
 use Test::More;
-use Time::HiRes qw( time );
+use Time::HiRes qw( time usleep );
 
-my $num_tests = 338;
-$num_tests = 342 if ($^O ne "darwin");
+my $num_tests = 284;
+$num_tests = 288 if ($^O ne "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
@@ -133,13 +133,6 @@ $viewer->accept();
 is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
 
 $viewer->cmp_static_data(\@known_good);
-
-my $start = time;
-my ($data, $old_data) = (undef, undef);
-for (1..60) {
-	$old_data = $data;
-	$data = $viewer->cmp_dynamic_data($old_data);
-}
-my $data_call_dur = time - $start;
+$viewer->cmp_dynamic_data();
 
 $exp->hard_close();

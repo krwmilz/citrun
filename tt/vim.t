@@ -4,10 +4,10 @@ use warnings;
 use Cwd;
 use Expect;
 use Test::More;
-use Time::HiRes qw( time );
+use Time::HiRes qw( time usleep );
 
-my $num_tests = 329;
-$num_tests = 333 if ($^O eq "darwin");
+my $num_tests = 271;
+$num_tests = 275 if ($^O eq "darwin");
 plan tests => $num_tests;
 
 use Test::Package;
@@ -138,11 +138,8 @@ is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
 
 $viewer->cmp_static_data(\@known_good);
 
-my ($data, $old_data) = (undef, undef);
-for (1..60) {
-	$old_data = $data;
-	$data = $viewer->cmp_dynamic_data($old_data);
-}
+# Check that at least something has executed.
+$viewer->cmp_dynamic_data();
 
 $exp->hard_close();
 $viewer->close();
@@ -151,8 +148,8 @@ $viewer->close();
 # xxd
 #
 
-# Let xxd process its own source so it's busy doing something.
-$exp = Expect->spawn("$srcdir/xxd/xxd", "tt/distfiles/vim-7.4.tar.bz2");
+# Let xxd process something infinite.
+$exp = Expect->spawn("$srcdir/xxd/xxd", "/dev/random", "/dev/null");
 
 $viewer->accept();
 is( $viewer->{num_tus}, 1, "xxd translation unit count" );
@@ -164,8 +161,8 @@ is( $viewer->{num_tus}, 1, "xxd translation unit count" );
 $viewer->cmp_static_data(\@known_good);
 
 for (1..60) {
-	$old_data = $data;
-	$data = $viewer->cmp_dynamic_data($old_data);
+	usleep(1000);
+	$viewer->cmp_dynamic_data();
 }
 
 $exp->hard_close();

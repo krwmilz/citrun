@@ -115,24 +115,20 @@ sub cmp_static_data {
 }
 
 sub cmp_dynamic_data {
-	my ($self, $old_data) = @_;
+	my ($self) = @_;
 
 	my $data = $self->get_dynamic_data();
 
-	# Don't compare if given nothing to compare to.
-	return $data unless (defined $old_data);
-
-	my $bad = 0;
+	# Check that at least a single execution has taken place.
+	my $good = 0;
 	for my $key (sort keys %$data) {
-		my $old_data_tmp = $old_data->{$key};
 		my $data_tmp = $data->{$key};
 
-		my $it = each_array( @$old_data_tmp, @$data_tmp );
-		while ( my ($x, $y) = $it->() ) {
-			$bad = 1 if ($x > $y);
+		for (@$data_tmp) {
+			$good++ if ($_ > 0);
 		}
 	}
-	is( $bad, 0, "forward progress" );
+	cmp_ok( $good, ">", 0, "a single application execution took place" );
 
 	return $data;
 }
