@@ -152,7 +152,7 @@ $viewer->close();
 #
 
 # Let xxd process its own source so it's busy doing something.
-$exp = Expect->spawn("$srcdir/xxd/xxd", "distfiles/vim-7.4.tar.bz2");
+$exp = Expect->spawn("$srcdir/xxd/xxd", "tt/distfiles/vim-7.4.tar.bz2");
 
 $viewer->accept();
 is( $viewer->{num_tus}, 1, "xxd translation unit count" );
