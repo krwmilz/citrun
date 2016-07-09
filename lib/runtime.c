@@ -3,7 +3,7 @@
 #include <limits.h>		/* PATH_MAX */
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
-#include <string.h>		/* strncpy */
+#include <string.h>		/* strlcpy */
 #include <unistd.h>		/* access, get{pid,ppid,pgrp}, read, write */
 
 #include <sys/socket.h>		/* socket */
@@ -209,9 +209,7 @@ relay_thread(void *arg)
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	/* Avoid strlcpy here because Linux needs -lbsd in that case. */
-	strncpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
-	addr.sun_path[sizeof(addr.sun_path) - 1] = '\0';
+	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
 
 	while (1) {
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
