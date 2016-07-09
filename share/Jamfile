@@ -1,9 +1,12 @@
 SubDir TOP share ;
 
+rule InstallCompilerSyms {
+	Depends install : $(1) ;
+}
+
 actions InstallCompilerSyms
 {
-	mkdir $(PREFIX)/share
-	mkdir $(PREFIX)/share/citrun
+	mkdir -p $(PREFIX)/share/citrun
 	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/cc
 	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/gcc
 	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/egcc
@@ -14,4 +17,9 @@ actions InstallCompilerSyms
 	ln -s ../../bin/citrun-inst $(PREFIX)/share/citrun/clang++
 }
 
-InstallCompilerSyms install : ;
+# These are used for in-tree testing
+SoftLink $(TOP)/share/cc :  $(PREFIX)/src/citrun-inst ;
+SoftLink $(TOP)/share/gcc : $(PREFIX)/src/citrun-inst ;
+
+# This is a completely different set generated at install time
+InstallCompilerSyms $(PREFIX)/share/citrun : cc gcc ;
