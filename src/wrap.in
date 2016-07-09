@@ -1,4 +1,4 @@
 #!/bin/sh
 
-export PATH="%PREFIX%/share:$PATH"
+export PATH="%PREFIX%/share/citrun:$PATH"
 exec $@
