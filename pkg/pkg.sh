@@ -63,4 +63,4 @@ else
 fi
 
 # Reset end to end report when new packages are installed.
-rm -f e2e_report.txt
+rm -f ../e2e_report.txt
