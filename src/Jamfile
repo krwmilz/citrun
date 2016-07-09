@@ -1,5 +1,20 @@
 SubDir TOP src ;
 
+rule MkCitrunWrap
+{
+	Depends $(1) : $(2) ;
+	Depends all : $(1) ;
+	Clean clean : $(1) ;
+}
+
+actions MkCitrunWrap
+{
+	sed -e s,%PREFIX%,$(PREFIX), < $(2) > $(1) ;
+	chmod 755 $(1) ;
+}
+
+MkCitrunWrap $(TOP)/src/citrun-wrap : $(TOP)/src/wrap.in ;
+
 INST_SRCS =
 	inst_main.cc
 	inst_action.cc
@@ -35,7 +50,7 @@ LinkLibraries citrun-gl : libglyphy ;
 Main citrun-inst : $(INST_SRCS) ;
 Main citrun-gl : $(GL_SRCS) ;
 
+InstallShell $(PREFIX)/bin : citrun-wrap ;
 InstallBin $(PREFIX)/bin : citrun-inst citrun-gl ;
-InstallMan $(PREFIX)/man : citrun-inst.1 citrun-gl.1 ;
 
 SubInclude TOP src glyphy ;
