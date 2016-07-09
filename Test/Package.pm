@@ -21,13 +21,13 @@ sub new {
 	my $dir = tempdir( CLEANUP => 1 );
 	$self->{dir} = $dir;
 
-	mkdir "distfiles";
-	if (! -e "distfiles/$dist_name") {
+	mkdir "tt/distfiles";
+	if (! -e "tt/distfiles/$dist_name") {
 		my $dist_url = "$dist_root$dist_name";
-		system("curl $dist_url -o distfiles/$dist_name") == 0 or die "download failed";
+		system("curl $dist_url -o tt/distfiles/$dist_name") == 0 or die "download failed";
 	}
 
-	my $abs_dist_path = getcwd . "/distfiles/$dist_name";
+	my $abs_dist_path = getcwd . "/tt/distfiles/$dist_name";
 	system("cd $dir && $extract_cmd $abs_dist_path") == 0 or die "extract failed";
 
 	return $self;
