@@ -38,7 +38,7 @@ elif [ "$uname" = "Darwin" ]; then
 	sudo port uninstall $portname
 
 	sudo port -v -D darwin/devel/citrun clean
-	sudo port -v -D darwin/devel/citrun
+	sudo port -v -D darwin/devel/citrun build
 	sudo port -v -D darwin/devel/citrun install
 
 	cp /opt/local/var/macports/software/citrun/citrun-0_0.darwin_15.x86_64.tbz2 .
