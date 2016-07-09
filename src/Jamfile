@@ -1,19 +1,19 @@
 SubDir TOP src ;
 
-rule MkCitrunWrap
+rule MkWrap
 {
 	Depends $(1) : $(2) ;
 	Depends all : $(1) ;
 	Clean clean : $(1) ;
 }
 
-actions MkCitrunWrap
+actions MkWrap
 {
 	sed -e s,%CITRUN_PATH%,$(CITRUN_PATH), < $(2) > $(1) ;
 	chmod 755 $(1) ;
 }
 
-MkCitrunWrap $(TOP)/src/citrun-wrap : $(TOP)/src/wrap.in ;
+MkWrap $(TOP)/src/citrun-wrap : $(TOP)/src/wrap.in ;
 
 INST_SRCS =
 	inst_main.cc
