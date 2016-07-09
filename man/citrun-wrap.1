@@ -1,45 +1,64 @@
-.Dd April 10, 2016
+.\"
+.\" Copyright (c) 2016 Kyle Milz <kyle@0x30.net>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: April 10 2016 $
 .Dt CITRUN-WRAP 1
 .Os
 .Sh NAME
 .Nm citrun-wrap
-.Nd prepare to see it run
+.Nd instrument a build command
 .Sh SYNOPSIS
 .Nm
 .Ar make | jam | gcc | cmake | ...
 .Sh DESCRIPTION
-Adds instrumentation to a build command by intercepting compiler executions and
-redirecting them to
-.Xr citrun-inst 1 .
+Add instrumentation to any source files compiled during a build command.
 .Pp
-Warning: The build command must not use absolute paths to compilers.
+The build command must search
+.Ev PATH
+when finding compiler executables, which must be one of the following:
 .Pp
-The following compiler names are intercepted:
-.Pp
-.Bl -tag -width Ds -offset indent -compact
-.It c++
-.It cc
-.It clang
-.It clang++
-.It eg++
-.It egcc
-.It g++
-.It gcc
+.Bl -bullet -offset indent -compact
+.It
+c++
+.It
+cc
+.It
+clang
+.It
+clang++
+.It
+eg++
+.It
+egcc
+.It
+g++
+.It
+gcc
 .El
 .Sh EXAMPLES
-Let's say that
+Let
 .Qq program
-is written in C, compiled with clang, and built by Make. Then to see
-.Qq program
-run prepend
+be written in C, compiled with GCC and built by Make. Prepending
 .Nm
-to the build command:
+to the build command adds instrumentation:
 .Pp
 .Dl $ citrun-wrap make
 .Pp
-After that finishes
+Now see
 .Qq program
-is ready for viewing:
+run:
 .Pp
 .Dl $ ./program
 .Sh SEE ALSO
