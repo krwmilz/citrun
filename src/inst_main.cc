@@ -48,18 +48,20 @@ clean_path()
 	char *path;
 
 	if ((path = getenv("PATH")) == NULL)
-		errx(1, "PATH not set, your build system needs to use "
-			"the PATH for this tool to be useful.");
+		errx(1, "PATH must be set");
 
 	// Filter CITRUN_PATH out of PATH
 	std::stringstream path_ss(path);
 	std::ostringstream new_path;
 	std::string component;
 	bool first_component = 1;
+	bool found_citrun_path = 0;
 
 	while (std::getline(path_ss, component, ':')) {
-		if (component.compare(STR(CITRUN_PATH)) == 0)
+		if (component.compare(STR(CITRUN_PATH)) == 0) {
+			found_citrun_path = 1;
 			continue;
+		}
 
 		if (first_component == 0)
 			new_path << ":";
@@ -68,6 +70,9 @@ clean_path()
 		new_path << component;
 		first_component = 0;
 	}
+
+	if (!found_citrun_path)
+		errx(1, "did not find '%s' in PATH", STR(CITRUN_PATH));
 
 	// Set new $PATH
 	setenv("PATH", new_path.str().c_str(), 1);
