@@ -33,11 +33,10 @@ GL_SRCS =
 	matrix4x4.c
 	trackball.c ;
 
-ObjectC++Flags $(INST_SRCS) $(GL_SRCS) : -std=c++11 ;
-
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
+
+ObjectC++Flags $(GL_SRCS) : -std=c++11 ;
 ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
-ObjectC++Flags $(GL_SRCS) : -I/usr/local/include ;
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 

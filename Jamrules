@@ -1,12 +1,12 @@
 if $(PREFIX) {
 	# PREFIX was set, use absolute install paths.
-	CITRUN_LIB = $(PREFIX)/lib/libcitrun.a ;
+	CITRUN_LIB =  $(PREFIX)/lib/libcitrun.a ;
 	CITRUN_PATH = $(PREFIX)/share/citrun ;
 }
 else {
 	# No PREFIX means an in tree build. Use absolute paths to local copies.
 	PWD = `pwd` ;
-	CITRUN_LIB = $(PWD)/lib/libcitrun.a ;
+	CITRUN_LIB =  $(PWD)/lib/libcitrun.a ;
 	CITRUN_PATH = $(PWD)/share ;
 }
 
