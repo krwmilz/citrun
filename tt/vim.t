@@ -161,7 +161,7 @@ is( $viewer->{num_tus}, 1, "xxd translation unit count" );
 $viewer->cmp_static_data(\@known_good);
 
 for (1..60) {
-	usleep(1000);
+	usleep(10 * 1000);
 	$viewer->cmp_dynamic_data();
 }
 
