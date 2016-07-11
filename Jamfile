@@ -2,5 +2,4 @@ SubDir TOP ;
 
 SubInclude TOP lib ;
 SubInclude TOP man ;
-SubInclude TOP share ;
 SubInclude TOP src ;

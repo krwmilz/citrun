@@ -50,7 +50,7 @@ EOF
 	close( $jamfile_fh );
 
 	# Use the tools in this source tree
-	$ENV{PATH} = cwd . "/share:$ENV{PATH}";
+	$ENV{PATH} = cwd . "/src:$ENV{PATH}";
 
 	my $ret = system( "cd $tmp_dir && jam" );
 	die "make failed: $ret\n" if ($ret);
