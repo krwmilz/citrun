@@ -90,6 +90,6 @@ InstLink eg++ : citrun-inst ;
 
 CP = cp -PR ;
 FILEMODE = 755 ;
-InstallInto $(PREFIX)/share/citrun : $(COMPILERS) ;
+InstallFile $(PREFIX)/share/citrun : $(COMPILERS) ;
 
 SubInclude TOP src glyphy ;
