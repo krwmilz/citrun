@@ -107,3 +107,8 @@ actions Test {
 
 Test test : ;
 Test regress : ;
+
+echo ...build citrun ($(OS))... ;
+echo "   C++=		$(C++)" ;
+echo "   CITRUN_LIB=	$(CITRUN_LIB)" ;
+echo "   CITRUN_PATH=	$(CITRUN_PATH)" ;
