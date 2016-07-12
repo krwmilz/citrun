@@ -54,7 +54,8 @@ INST_SRCS =
 	inst_action.cc
 	inst_ast_visitor.cc ;
 
-ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
+# Older llvm-config doesn't add -std=c++11
+ObjectC++Flags $(INST_SRCS) : -std=c++11 `llvm-config --cxxflags` ;
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 LLVM_LIBS = bitreader mcparser transformutils option ;
