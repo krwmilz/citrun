@@ -10,15 +10,11 @@ body {
 	font-family: monospace;
 }
 
-.link_bar {
-	float: right;
-}
-
 .inline_logo {
 	/* Logos next to text need to be the same size as the text. */
 	height: 1em;
 }
 
-h2 {
+h1, h2 {
 	font-weight: normal;
 }
