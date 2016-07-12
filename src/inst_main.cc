@@ -177,10 +177,8 @@ patch_link_command(std::vector<char *> &args)
 int
 main(int argc, char *argv[])
 {
-	bool is_citrun_inst = ends_with(argv[0], "citrun-inst");
-	if (! is_citrun_inst)
-		setprogname("citrun-inst");
-
+	// We probably didn't call citrun-inst directly.
+	setprogname("citrun-inst");
 	clean_path();
 
 	std::vector<char *> args(argv, argv + argc);
@@ -195,9 +193,6 @@ main(int argc, char *argv[])
 
 	for (auto &arg : args) {
 		if (strcmp(arg, "-E") == 0) {
-			if (is_citrun_inst)
-				errx(1, "citrun-inst -E not supported");
-
 			// Preprocessing argument found, exec native command
 			if (execvp(argv[0], argv))
 				err(1, "execvp");
@@ -228,21 +223,11 @@ main(int argc, char *argv[])
 	}
 
 	if (instrument(argc, argv, source_files)) {
-		// Instrumentation failed.
 		restore_original_src(temp_file_map);
-
-		if (is_citrun_inst)
-			errx(1, "instrumentation failed");
 
 		warnx("Instrumentation failed, compiling unmodified code.");
 		if (execvp(argv[0], argv))
 			err(1, "execvp");
-	}
-
-	if (is_citrun_inst) {
-		// Ran directly and instrumentation (if any) didn't fail.
-		restore_original_src(temp_file_map);
-		return 0;
 	}
 
 	bool linking = false;
