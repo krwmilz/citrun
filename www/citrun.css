@@ -10,17 +10,15 @@ body {
 	font-family: monospace;
 }
 
-/* For "prompt" style stuff */
-.prompt {
-	color: green;
-}
-
-/* This is for the link bar just below the main title.  */
 .link_bar {
-	text-align: right;
+	float: right;
 }
 
-/* Logos next to text need to be the same size as the text. */
 .inline_logo {
+	/* Logos next to text need to be the same size as the text. */
 	height: 1em;
+}
+
+h2 {
+	font-weight: normal;
 }
