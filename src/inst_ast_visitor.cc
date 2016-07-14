@@ -13,11 +13,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <sstream>
-#include <string>
-
 #include <clang/AST/AST.h>
 #include <clang/Lex/Lexer.h>
+#include <sstream>
+#include <string>
 
 #include "inst_ast_visitor.h"
 
