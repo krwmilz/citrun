@@ -13,11 +13,6 @@ else {
 # Packaging systems like for build systems to respect this.
 OPTIM = $(CFLAGS) ;
 
-# These get baked into citrun-inst because it needs to know:
-# - the exact location of the runtime library
-# - the PATH component it came from, so it can remove itself
-C++FLAGS += -DCITRUN_LIB=$(CITRUN_LIB) -DCITRUN_PATH=$(CITRUN_PATH) ;
-
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
