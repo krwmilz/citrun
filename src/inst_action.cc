@@ -13,21 +13,15 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#include <clang/Frontend/CompilerInstance.h>
 #include <err.h>
-#include <fcntl.h>	// open
-#include <limits.h>
-#include <sys/stat.h>	// mode flags
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include <clang/Frontend/CompilerInstance.h>
-
 #include "inst_action.h"
 #include "runtime_h.h"
-
 
 #if LLVM_VER > 35
 std::unique_ptr<clang::ASTConsumer>
@@ -100,10 +94,9 @@ InstrumentAction::EndSourceFileAction()
 
 	TheRewriter.InsertTextAfter(start, ss.str());
 
-	int fd = open(file_name.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
-	if (fd < 0)
-		err(1, "open");
-	llvm::raw_fd_ostream output(fd, /* close */ 1);
+	llvm::StringRef file_ref(file_name);
+	std::error_code ec;
+	llvm::raw_fd_ostream output(file_ref, ec, llvm::sys::fs::F_None);
 
 	// Write the instrumented source file
 	TheRewriter.getEditBuffer(main_fid).write(output);
