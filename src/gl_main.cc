@@ -10,6 +10,13 @@
 #include "gl_buffer.h"
 #include "demo-font.h"
 
+#if defined(__OpenBSD__)
+#define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
+#elif defined(__APPLE__)
+#define FONT_PATH "/Library/Fonts/Andale Mono.ttf"
+#elif defined(__gnu_linux__)
+#define FONT_PATH "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+#endif
 
 class window {
 public:
@@ -77,16 +84,8 @@ window::window(int argc, char *argv[])
 
 	FT_Init_FreeType(&ft_library);
 
-#if defined(__OpenBSD__)
-	const char *font_path = "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf";
-#elif defined(__APPLE__)
-	const char *font_path = "/Library/Fonts/Andale Mono.ttf";
-#elif defined(__gnu_linux__)
-	// Assuming Debian here
-	const char *font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf";
-#endif
 	ft_face = NULL;
-	FT_New_Face(ft_library, font_path, /* face_index */ 0, &ft_face);
+	FT_New_Face(ft_library, FONT_PATH, /* face_index */ 0, &ft_face);
 
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
 
