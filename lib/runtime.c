@@ -13,6 +13,13 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#include <sys/socket.h>		/* socket */
+#include <sys/un.h>		/* sockaddr_un */
+#if __APPLE__
+#include <sys/types.h>		/* read */
+#include <sys/uio.h>		/* read */
+#endif
+
 #include <assert.h>
 #include <err.h>		/* err, errx, warn */
 #include <limits.h>		/* PATH_MAX */
@@ -20,13 +27,6 @@
 #include <stdlib.h>		/* getenv */
 #include <string.h>		/* strlcpy */
 #include <unistd.h>		/* access, get{pid,ppid,pgrp}, read, write */
-
-#include <sys/socket.h>		/* socket */
-#include <sys/un.h>		/* sockaddr_un */
-#if __APPLE__
-#include <sys/types.h>		/* read */
-#include <sys/uio.h>		/* read */
-#endif
 
 #include "runtime.h"
 
