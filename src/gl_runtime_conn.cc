@@ -30,10 +30,10 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, ss.str().c_str(), font, 1);
+	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
 
 	for (auto &current_unit : translation_units) {
-		top_left.y = 4;
+		top_left.y = 8;
 
 		uint64_t file_name_sz;
 		socket->read_all(file_name_sz);
