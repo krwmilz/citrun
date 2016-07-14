@@ -1,14 +1,12 @@
 #include <err.h>
-
 #include <iostream>
 #include <vector>
 
 #include "af_unix.h"
+#include "demo-font.h"
+#include "gl_buffer.h"
 #include "gl_runtime_conn.h"
 #include "gl_view.h"
-
-#include "gl_buffer.h"
-#include "demo-font.h"
 
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
