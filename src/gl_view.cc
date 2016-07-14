@@ -474,8 +474,8 @@ View::advance_frame(long dtime)
 {
 	if (animate) {
 		float dquat[4];
-		axis_to_quat (rot_axis, rot_speed * dtime, dquat);
-		add_quats (dquat, quat, quat);
+		//axis_to_quat (rot_axis, rot_speed * dtime, dquat);
+		//add_quats (dquat, quat, quat);
 		num_frames++;
 	}
 }
