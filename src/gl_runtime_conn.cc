@@ -45,7 +45,7 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 		top_left.x += 50;
 
 		socket->read_all(current_unit.num_lines);
-		current_unit.execution_counts.resize(current_unit.num_lines);
+		current_unit.execution_counts.resize(current_unit.num_lines, 0);
 
 		socket->read_all(current_unit.inst_sites);
 	}
@@ -57,26 +57,28 @@ void
 RuntimeProcess::read_file(std::string file_name, glyphy_point_t top_left)
 {
 	std::string line;
-	std::ifstream file_stream(file_name);
+	std::ifstream src_file(file_name, std::ios::binary);
 
-	if (file_stream.is_open() == 0)
-		errx(1, "ifstream.open()");
+	if (! src_file)
+		errx(1, "src_file.open()");
 
-	while (std::getline(file_stream, line)) {
-		size_t tab_pos = 0;
-		// Find and replace replace all tabs with spaces
-		while ((tab_pos = line.find('\t')) != std::string::npos) {
-			int rem = tab_pos % 8;
-			line.erase(tab_pos, 1);
-			line.insert(tab_pos, std::string(8 - rem, ' '));
-		}
+	src_file.seekg(0, src_file.end);
+	int length = src_file.tellg();
+	src_file.seekg(0, src_file.beg);
 
-		demo_buffer_move_to(buffer, &top_left);
-		demo_buffer_add_text(buffer, line.c_str(), font, 1);
-		++top_left.y;
-	}
+	char *src_buffer = new char [length + 1];
 
-	file_stream.close();
+	src_file.read(src_buffer, length);
+	src_buffer[length] = '\0';
+
+	if (! src_file)
+		errx(1, "src_file.read()");
+	src_file.close();
+
+	demo_buffer_move_to(buffer, &top_left);
+	demo_buffer_add_text(buffer, src_buffer, font, 1);
+
+	delete[] src_buffer;
 }
 
 void
@@ -87,9 +89,16 @@ RuntimeProcess::draw()
 void
 RuntimeProcess::idle()
 {
-	for (auto &trans_unit : translation_units) {
-		size_t bytes_total = trans_unit.num_lines * sizeof(uint64_t);
-		assert(socket->read_all((uint8_t *)&trans_unit.execution_counts[0], bytes_total) == bytes_total);
+	for (auto &t : translation_units) {
+		size_t bytes_total = t.num_lines * sizeof(uint64_t);
+
+		socket->read_all((uint8_t *)&t.execution_counts[0], bytes_total);
+
+		int execs = 0;
+		for (int i = 0; i < t.num_lines; i++)
+			execs += t.execution_counts[i];
+
+		std::cout << t.file_name << ": " << execs << std::endl;
 	}
 
 	// Send response back

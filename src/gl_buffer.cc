@@ -107,6 +107,8 @@ demo_buffer_add_text (demo_buffer_t        *buffer,
 	glyphy_point_t top_left = buffer->cursor;
 	buffer->cursor.y += font_size /* * font->ascent */;
 	unsigned int unicode;
+	unsigned int col = 0;
+
 	for (const unsigned char *p = (const unsigned char *) utf8; *p; p++) {
 		if (*p < 128) {
 			unicode = *p;
@@ -132,12 +134,21 @@ demo_buffer_add_text (demo_buffer_t        *buffer,
 		if (unicode == '\n') {
 			buffer->cursor.y += font_size;
 			buffer->cursor.x = top_left.x;
+			col = 0;
 			continue;
 		}
 
 		unsigned int glyph_index = FT_Get_Char_Index (face, unicode);
 		glyph_info_t gi;
 		demo_font_lookup_glyph (font, glyph_index, &gi);
+
+		/* Let tab operate like it does in editors, 8 spaces. */
+		if (unicode == '\t') {
+			int nspaces = 8 - (col % 8);
+			buffer->cursor.x += font_size * gi.advance * nspaces;
+			col += nspaces;
+			continue;
+		}
 
 		/* Update ink extents */
 		glyphy_extents_t ink_extents;
@@ -154,6 +165,9 @@ demo_buffer_add_text (demo_buffer_t        *buffer,
 		glyphy_extents_add (&buffer->logical_extents, &corner);
 
 		buffer->cursor.x += font_size * gi.advance;
+
+		/* Hack; Not all characters are a single column wide. */
+		col++;
 	}
 
 	buffer->dirty = true;
