@@ -13,29 +13,23 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <err.h>
-#include <string.h>
-#include <stdlib.h>		// getenv
-#include <stdio.h>		// tmpnam
-#include <unistd.h>		// fork
-#ifdef __gnu_linux__
- #include <bsd/stdlib.h>	// setprogname
-#endif
-
 #include <sys/stat.h>		// stat
 #include <sys/time.h>		// utimes
 #include <sys/wait.h>		// waitpid
 
+#include <clang/Tooling/CommonOptionsParser.h>
+#include <clang/Tooling/Tooling.h>
+#include <cstdio>		// tmpnam
+#include <cstdlib>		// getenv
+#include <cstring>		// strcmp
+#include <err.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include <clang/Tooling/CommonOptionsParser.h>
-#include <clang/Tooling/Tooling.h>
+#include <unistd.h>		// execvp, fork, unlink
 
 #include "inst_action.h"
-#include "runtime_h.h"
 
 #define STR_EXPAND(tok) #tok
 #define STR(tok) STR_EXPAND(tok)
@@ -47,7 +41,7 @@ clean_path()
 {
 	char *path;
 
-	if ((path = getenv("PATH")) == NULL)
+	if ((path = std::getenv("PATH")) == NULL)
 		errx(1, "PATH must be set");
 
 	// Filter CITRUN_PATH out of PATH
@@ -72,7 +66,7 @@ clean_path()
 	}
 
 	if (!found_citrun_path)
-		errx(1, "did not find '%s' in PATH", STR(CITRUN_PATH));
+		errx(1, "'%s' not in PATH", STR(CITRUN_PATH));
 
 	// Set new $PATH
 	setenv("PATH", new_path.str().c_str(), 1);
@@ -192,14 +186,14 @@ main(int argc, char *argv[])
 	argv[argc] = NULL;
 
 	for (auto &arg : args) {
-		if (strcmp(arg, "-E") == 0) {
+		if (std::strcmp(arg, "-E") == 0) {
 			// Preprocessing argument found, exec native command
 			if (execvp(argv[0], argv))
 				err(1, "execvp");
 		}
-		else if (strcmp(arg, "-o") == 0)
+		else if (std::strcmp(arg, "-o") == 0)
 			object_arg = true;
-		else if (strcmp(arg, "-c") == 0)
+		else if (std::strcmp(arg, "-c") == 0)
 			compile_arg = true;
 
 		// Find source files
@@ -209,12 +203,12 @@ main(int argc, char *argv[])
 			// Keep track of original source file names
 			source_files.push_back(arg);
 
-			if (getenv("CITRUN_TESTING"))
+			if (std::getenv("CITRUN_TESTING"))
 				// Don't copy and restore original source files
 				continue;
 
 			char *dst_fn;
-			if ((dst_fn = tmpnam(NULL)) == NULL)
+			if ((dst_fn = std::tmpnam(NULL)) == NULL)
 				err(1, "tmpnam");
 
 			copy_file(dst_fn, arg);
@@ -244,8 +238,7 @@ main(int argc, char *argv[])
 		patch_link_command(args);
 	}
 
-	// Instrumentation succeeded. Run the native compiler with a possibly
-	// modified command line.
+	// Instrumentation succeeded. Fork the native compiler.
 	args.push_back(NULL);
 
 	pid_t child_pid;
