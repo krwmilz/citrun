@@ -1,15 +1,12 @@
-#if __gnu_linux__
-#include <bsd/string.h>		// strlcpy
-#endif
-#include <err.h>		// err
-#include <errno.h>		// EWOULDBLOCK
-#include <fcntl.h>
-#include <string.h>		// memset, strlcpy
-#include <sys/socket.h>		// socket
+#include <sys/socket.h>		// accept, socket
 #include <sys/un.h>		// sockaddr_un
-#include <unistd.h>		// close
 
+#include <err.h>		// err
+#include <cerrno>		// EWOULDBLOCK
+#include <cstring>		// memset, strcpy
+#include <fcntl.h>		// fcntl, F_GETFL
 #include <iostream>
+#include <unistd.h>		// close
 
 #include "af_unix.h"
 
@@ -41,14 +38,14 @@ af_unix::set_listen()
 #endif
 
 	struct sockaddr_un addr;
-	memset(&addr, 0, sizeof(addr));
+	std::memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	strlcpy(addr.sun_path, "/tmp/citrun-gl.socket", sizeof(addr.sun_path));
+	std::strcpy(addr.sun_path, "/tmp/citrun-gl.socket");
 
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");
 
-	/* Size 1024 backlog */
+	// Size 1024 backlog
 	if (listen(fd, 1024))
 		err(1, "listen");
 }
