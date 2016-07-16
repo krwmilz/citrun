@@ -30,9 +30,8 @@
 
 #include "runtime.h"
 
-static struct citrun_node *nodes_head;
-static struct citrun_node *nodes_tail;
-static uint64_t nodes_total;
+static struct citrun_node	*nodes_head;
+static uint64_t			 nodes_total;
 
 static void *relay_thread(void *);
 
@@ -42,20 +41,29 @@ static void *relay_thread(void *);
 void
 citrun_node_add(struct citrun_node *n)
 {
+	struct citrun_node *walk = nodes_head;
+
 	/* Used for double buffering line counts. */
 	n->old_lines = calloc(n->size, sizeof(uint64_t));
 	if (n->old_lines == NULL)
 		err(1, "calloc");
 
-	if (nodes_head == NULL) {
-		assert(nodes_tail == NULL);
+	nodes_total++;
+
+	/* If the list is empty or we need to replace the list head */
+	if (nodes_head == NULL || nodes_head->size >= n->size) {
+		n->next = nodes_head;
 		nodes_head = n;
-		nodes_tail = n;
 		return;
 	}
 
-	nodes_tail->next = n;
-	nodes_tail = n;
+	/* Search for a next element that n->size is greater than */
+	while (walk->next != NULL && walk->next->size < n->size)
+		walk = walk->next;
+
+	/* Splice in the new element */
+	n->next = walk->next;
+	walk->next = n;
 }
 
 /*
@@ -64,17 +72,7 @@ citrun_node_add(struct citrun_node *n)
 void
 citrun_start()
 {
-	struct citrun_node	*w;
 	pthread_t		 tid;
-
-	/*
-	 * Count nodes once. Changing this after program start is not supported
-	 * at the moment (dlopen(), dlclose() of instrumented libs).
-	 */
-	nodes_total = 0;
-	for (w = nodes_head; w != NULL; w = w->next)
-		++nodes_total;
-
 	pthread_create(&tid, NULL, relay_thread, NULL);
 }
 
