@@ -23,17 +23,23 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 	socket->read_all(process_group);
 
 	std::stringstream ss;
-	ss << "Translation Units: " << num_tus << std::endl;
-	ss << "Process ID: " << process_id << std::endl;
-	ss << "Parent Process ID: " << parent_process_id << std::endl;
-	ss << "Process Group: " << process_group << std::endl;
+	ss << "program name:\t" << "prog" << std::endl;
+	ss << "trnsltn units:\t" << num_tus << std::endl;
+	ss << "process id:\t" << process_id << std::endl;
+	ss << "parent pid:\t" << parent_process_id << std::endl;
+	ss << "process group:\t" << process_group << std::endl;
 
-	glyphy_point_t top_left = { 0, 0 };
-	demo_buffer_move_to(buffer, &top_left);
+	glyphy_point_t cur_pos = { 0, 0 };
+	demo_buffer_move_to(buffer, &cur_pos);
+
 	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
 
+	demo_buffer_current_point(buffer, &cur_pos);
+	double y_margin = cur_pos.y;
+
+	cur_pos.x = 0;
 	for (auto &current_unit : translation_units) {
-		top_left.y = 8;
+		cur_pos.y = y_margin;
 
 		uint64_t file_name_sz;
 		socket->read_all(file_name_sz);
@@ -41,8 +47,8 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 		current_unit.file_name.resize(file_name_sz);
 		socket->read_all((uint8_t *)&current_unit.file_name[0], file_name_sz);
 
-		read_file(current_unit.file_name, top_left);
-		top_left.x += 50;
+		read_file(current_unit.file_name, cur_pos);
+		cur_pos.x += 50;
 
 		socket->read_all(current_unit.num_lines);
 		current_unit.execution_counts.resize(current_unit.num_lines, 0);
@@ -98,7 +104,7 @@ RuntimeProcess::idle()
 		for (int i = 0; i < t.num_lines; i++)
 			execs += t.execution_counts[i];
 
-		std::cout << t.file_name << ": " << execs << std::endl;
+		// std::cout << t.file_name << ": " << execs << std::endl;
 	}
 
 	// Send response back

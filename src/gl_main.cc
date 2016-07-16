@@ -92,6 +92,10 @@ window::window(int argc, char *argv[])
 	socket.set_listen();
 
 	static_vu->toggle_animation();
+
+	glyphy_point_t top_left = { 0, 0 };
+	demo_buffer_move_to(buffer, &top_left);
+	demo_buffer_add_text(buffer, "waiting...", font, 1);
 }
 
 void
@@ -148,8 +152,10 @@ void
 window::next_frame(View *vu)
 {
 	af_unix *temp_socket = window::socket.accept();
-	if (temp_socket)
+	if (temp_socket) {
+		demo_buffer_clear(buffer);
 		window::drawables.push_back(new RuntimeProcess(temp_socket, buffer, font));
+	}
 
 	for (auto &i : window::drawables)
 		i->idle();
