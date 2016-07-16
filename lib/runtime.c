@@ -32,6 +32,7 @@
 
 static struct citrun_node	*nodes_head;
 static uint64_t			 nodes_total;
+static uint64_t			 lines_total;
 
 static void *relay_thread(void *);
 
@@ -49,6 +50,7 @@ citrun_node_add(struct citrun_node *n)
 		err(1, "calloc");
 
 	nodes_total++;
+	lines_total += n->size;
 
 	/* If the list is empty or we need to replace the list head */
 	if (nodes_head == NULL || nodes_head->size >= n->size) {
@@ -128,10 +130,13 @@ xwrite(int d, const void *buf, size_t bytes_total)
 /*
  * Send static information contained in each instrumented node.
  * Sent program wide values:
+ * - length of program name
+ * - program name
  * - total number of translation units
+ * - total number of lines in program
  * - process id, parent process id, group process id
  * Sent for each instrumented translation unit:
- * - length of the original source file name
+ * - length of source file name
  * - source file name
  * - size of the execution counters
  * - number of instrumentation sites.
@@ -142,10 +147,17 @@ send_static(int fd)
 	struct citrun_node	 node;
 	pid_t			 pids[3];
 	struct citrun_node	*w;
-	size_t			 file_name_sz;
+	const char		*progname;
+	size_t			 sz;
 	int			 i;
 
+	progname = getprogname();
+	sz = strlen(progname);
+
+	xwrite(fd, &sz, sizeof(sz));
+	xwrite(fd, progname, sz);
 	xwrite(fd, &nodes_total, sizeof(nodes_total));
+	xwrite(fd, &lines_total, sizeof(lines_total));
 
 	pids[0] = getpid();
 	pids[1] = getppid();
@@ -156,10 +168,10 @@ send_static(int fd)
 
 	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next) {
 		node = *w;
+		sz = strnlen(node.file_name, PATH_MAX);
 
-		file_name_sz = strnlen(node.file_name, PATH_MAX);
-		xwrite(fd, &file_name_sz, sizeof(file_name_sz));
-		xwrite(fd, node.file_name, file_name_sz);
+		xwrite(fd, &sz, sizeof(sz));
+		xwrite(fd, node.file_name, sz);
 		xwrite(fd, &node.size, sizeof(node.size));
 		xwrite(fd, &node.inst_sites, sizeof(node.size));
 	}

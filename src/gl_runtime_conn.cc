@@ -13,9 +13,16 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 	buffer(buf),
 	font(f)
 {
+	uint64_t sz;
+	socket->read_all(sz);
+	program_name.resize(sz);
+	socket->read_all((uint8_t *)&program_name[0], sz);
+
 	uint64_t num_tus;
 	socket->read_all(num_tus);
 	translation_units.resize(num_tus);
+
+	socket->read_all(lines_total);
 
 	assert(sizeof(pid_t) == 4);
 	socket->read_all(process_id);
@@ -23,7 +30,8 @@ RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f
 	socket->read_all(process_group);
 
 	std::stringstream ss;
-	ss << "program name:\t" << "prog" << std::endl;
+	ss << "program name:\t" << program_name << std::endl;
+	ss << "code lines:\t" << lines_total << std::endl;
 	ss << "trnsltn units:\t" << num_tus << std::endl;
 	ss << "process id:\t" << process_id << std::endl;
 	ss << "parent pid:\t" << parent_process_id << std::endl;

@@ -32,9 +32,18 @@ sub accept {
 	my $client = $socket->accept();
 	$self->{client_socket} = $client;
 
+	# Read arbitrarily sized program name string
+	my $buf = read_all($client, 8);
+	my $progname_sz = unpack("Q", $buf);
+	my $progname = read_all($client, $progname_sz);
+
 	# Read the total number of instrumented translation units.
 	my $buf = read_all($client, 8);
 	$self->{num_tus} = unpack("Q", $buf);
+
+	# Read total code lines in program.
+	$buf = read_all($client, 8);
+	$self->{lines_total} = unpack("Q", $buf);
 
 	# Read three 4 byte pid_t's
 	$buf = read_all($client, 12);
@@ -52,7 +61,7 @@ sub accept {
 	my @tus;
 	for (1..$self->{num_tus}) {
 		# Size of absolute file path.
-		my $buf = read_all($client, 8);
+		$buf = read_all($client, 8);
 		my $file_name_sz = unpack("Q", $buf);
 
 		# Absolute file path.

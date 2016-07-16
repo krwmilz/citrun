@@ -26,6 +26,8 @@ public:
 private:
 	void read_file(std::string, glyphy_point_t);
 
+	std::string program_name;
+	uint64_t lines_total;
 	pid_t process_id;
 	pid_t parent_process_id;
 	pid_t process_group;
