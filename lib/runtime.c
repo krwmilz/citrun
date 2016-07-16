@@ -37,7 +37,7 @@ static uint64_t			 lines_total;
 static void *relay_thread(void *);
 
 /*
- * Add a node to the end of the list. Public interface.
+ * Public interface: Insert a node into the sorted translation unit list.
  */
 void
 citrun_node_add(struct citrun_node *n)
@@ -63,13 +63,13 @@ citrun_node_add(struct citrun_node *n)
 	while (walk->next != NULL && walk->next->size < n->size)
 		walk = walk->next;
 
-	/* Splice in the new element */
+	/* Splice in the new element after walk but before walk->next */
 	n->next = walk->next;
 	walk->next = n;
 }
 
 /*
- * Usually called from main(), starts the relay thread. Public interface.
+ * Public interface: Called from instrumented main(), starts the relay thread.
  */
 void
 citrun_start()
@@ -166,7 +166,7 @@ send_static(int fd)
 	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
 		xwrite(fd, &pids[i], sizeof(pid_t));
 
-	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next) {
+	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 		node = *w;
 		sz = strnlen(node.file_name, PATH_MAX);
 
@@ -175,11 +175,8 @@ send_static(int fd)
 		xwrite(fd, &node.size, sizeof(node.size));
 		xwrite(fd, &node.inst_sites, sizeof(node.size));
 	}
-
-	if (i != nodes_total)
-		warnx("tu chain inconsistent: %i vs %j", i, nodes_total);
-	if (w != NULL)
-		warnx("tu chain is longer than before");
+	assert(i == nodes_total);
+	assert(w == NULL);
 }
 
 /*
@@ -195,7 +192,7 @@ send_dynamic(int fd)
 	int			 line;
 
 	/* Write execution buffers (one 8 byte counter per source line). */
-	for (i = 0, w = nodes_head; i < nodes_total && w != NULL; i++, w = w->next) {
+	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 
 		lines_ptr = w->lines_ptr;
 		old_lines_ptr = w->old_lines;
@@ -208,11 +205,8 @@ send_dynamic(int fd)
 			xwrite(fd, &diff, sizeof(uint64_t));
 		}
 	}
-
-	if (i != nodes_total)
-		warnx("tu chain inconsistent: %i vs %j", i, nodes_total);
-	if (w != NULL)
-		warnx("tu chain is longer than before");
+	assert(i == nodes_total);
+	assert(w == NULL);
 }
 
 static void
