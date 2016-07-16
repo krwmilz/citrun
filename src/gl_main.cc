@@ -78,7 +78,6 @@ window::window(int argc, char *argv[])
 	buffer = demo_buffer_create();
 
 	static_vu = new View(st, buffer);
-	static_vu->print_help();
 
 	FT_Init_FreeType(&ft_library);
 

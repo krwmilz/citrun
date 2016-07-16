@@ -464,12 +464,6 @@ View::motion_func(int x, int y)
 }
 
 void
-View::print_help()
-{
-	LOGI ("Welcome to GLyphy demo\n");
-}
-
-void
 View::advance_frame(long dtime)
 {
 	if (animate) {
