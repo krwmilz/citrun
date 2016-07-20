@@ -5,12 +5,12 @@ if $(PREFIX) {
 }
 else {
 	# No PREFIX means an in tree build. Use absolute paths to local copies.
-	PWD = `pwd` ;
-	CITRUN_LIB =  $(PWD)/lib/libcitrun.a ;
-	CITRUN_PATH = $(PWD)/src ;
+	ROOT = "`readlink -f $(TOP)`" ;
+	CITRUN_LIB =  $(ROOT)/lib/libcitrun.a ;
+	CITRUN_PATH = $(ROOT)/src ;
 }
 
-# Packaging systems like for build systems to respect this.
+# Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
 
 if $(OS) = OPENBSD {
