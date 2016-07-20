@@ -3,21 +3,6 @@ SubDir TOP src ;
 #
 # citrun-wrap
 #
-rule MkWrap
-{
-	Depends $(1) : $(2) ;
-	Depends exe : $(1) ;
-	Clean clean : $(1) ;
-}
-
-actions MkWrap
-{
-	sed -e s,%CITRUN_PATH%,$(CITRUN_PATH), < $(2) > $(1) ;
-	chmod 755 $(1) ;
-}
-
-LOCATE on citrun-wrap = $(LOCATE_TARGET) ;
-SEARCH on wrap.in = $(SEARCH_SOURCE) ;
 MkWrap citrun-wrap : wrap.in ;
 InstallShell $(PREFIX)/bin : citrun-wrap ;
 
@@ -88,22 +73,9 @@ LINKLIBS on citrun-inst += `llvm-config --libs $(LLVM_LIBS) --system-libs` ;
 Main citrun-inst : $(INST_SRCS) ;
 InstallBin $(PREFIX)/share/citrun : citrun-inst ;
 
-# Compiler symlinks
-COMPILERS = cc gcc clang clang++ g++ c++ egcc eg++ ;
-LOCATE on $(COMPILERS) = $(LOCATE_TARGET) ;
-
-rule InstLink
-{
-	Depends files : $(<) ;
-	Depends $(<) : $(>) ;
-	Clean clean : $(<) ;
-}
-
-actions InstLink
-{
-	$(RM) $(<) && $(LN) -s citrun-inst $(<) ;
-}
-
+#
+# citrun-inst symlinks
+#
 InstLink cc : citrun-inst ;
 InstLink gcc : citrun-inst ;
 InstLink clang : citrun-inst ;
@@ -115,6 +87,6 @@ InstLink eg++ : citrun-inst ;
 
 CP = cp -PR ;
 FILEMODE = 755 ;
-InstallFile $(PREFIX)/share/citrun : $(COMPILERS) ;
+InstallFile $(PREFIX)/share/citrun : cc gcc clang clang++ g++ c++ egcc eg++ ;
 
 SubInclude TOP src glyphy ;

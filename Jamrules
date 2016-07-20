@@ -61,6 +61,35 @@ actions Stringize
 	$(TOP)/src/stringize "static const char *$(1:B)" $(2) > $(1) ;
 }
 
+rule MkWrap
+{
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	Depends $(1) : $(2) ;
+	Depends exe : $(1) ;
+	Clean clean : $(1) ;
+}
+
+actions MkWrap
+{
+	sed -e s,%CITRUN_PATH%,$(CITRUN_PATH), < $(2) > $(1) ;
+	chmod 755 $(1) ;
+}
+
+rule InstLink
+{
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	Depends files : $(<) ;
+	Depends $(<) : $(>) ;
+	Clean clean : $(<) ;
+}
+
+actions InstLink
+{
+	$(RM) $(<) && $(LN) -s citrun-inst $(<) ;
+}
+
 echo ...build citrun ($(OS))... ;
 echo "   C++=		$(C++)" ;
 echo "   CITRUN_LIB=	$(CITRUN_LIB)" ;
