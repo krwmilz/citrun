@@ -8,7 +8,7 @@ Build dependencies:
 - freeglut and glew
 - FreeType2
 - Jam
-- LLVM and Clang > 3.4
+- LLVM and Clang > 3.7
 - OpenGLES >= 2.0
 
 Compile:
