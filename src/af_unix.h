@@ -1,6 +1,7 @@
 #ifndef AF_UNIX_H
 #define AF_UNIX_H
 
+#include <err.h>		// err
 #include <unistd.h>		// read
 #include <vector>
 
@@ -11,6 +12,8 @@ public:
 	~af_unix();
 
 	void set_listen();
+	void set_block();
+	void set_nonblock();
 	af_unix *accept();
 
 	// Makes sure reads don't overflow or underflow types
@@ -40,6 +43,7 @@ public:
 	int write_all(uint8_t *, size_t);
 private:
 	int fd;
+	int m_bound;
 };
 
 #endif

@@ -88,7 +88,7 @@ window::window(int argc, char *argv[])
 
 	static_vu->setup();
 
-	// This creates the socket with SOCK_NONBLOCK
+	socket.set_nonblock();
 	socket.set_listen();
 
 	static_vu->toggle_animation();
@@ -153,6 +153,7 @@ window::next_frame(View *vu)
 {
 	af_unix *temp_socket = window::socket.accept();
 	if (temp_socket) {
+		temp_socket->set_block();
 		demo_buffer_clear(buffer);
 		window::drawables.push_back(new RuntimeProcess(temp_socket, buffer, font));
 	}
