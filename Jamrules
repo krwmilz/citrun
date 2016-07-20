@@ -16,8 +16,8 @@ OPTIM = $(CFLAGS) ;
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
-	C++FLAGS += -DCLANG_INCL="-I/usr/local/lib/clang/3.5/include" ;
-	C++FLAGS += -DLLVM_VER=34 ;
+	C++FLAGS += -DCLANG_INCL="-I/usr/local/lib/clang/3.8.0/include" ;
+	C++FLAGS += -DLLVM_VER=38 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	# Link directly against libestdc++ from ports
@@ -35,7 +35,7 @@ if $(OS) = OPENBSD {
 		-lclangFrontendTool
 		-lclangLex
 		-lclangParse
-		-lclangRewriteCore
+		-lclangRewrite
 		-lclangRewriteFrontend
 		-lclangSema
 		-lclangSerialization
