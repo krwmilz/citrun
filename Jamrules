@@ -20,27 +20,8 @@ if $(OS) = OPENBSD {
 	C++FLAGS += -DLLVM_VER=38 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
-	# Link directly against libestdc++ from ports
 	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
-
-	LINKLIBS on citrun-inst =
-		-lestdc++
-		-Wl,--start-group
-		-lclangAST
-		-lclangAnalysis
-		-lclangBasic
-		-lclangDriver
-		-lclangEdit
-		-lclangFrontend
-		-lclangFrontendTool
-		-lclangLex
-		-lclangParse
-		-lclangRewrite
-		-lclangRewriteFrontend
-		-lclangSema
-		-lclangSerialization
-		-lclangTooling
-		-Wl,--end-group ;
+	LINKLIBS on citrun-inst = -lestdc++ ;
 }
 
 if $(OS) = MACOSX {
@@ -48,25 +29,8 @@ if $(OS) = MACOSX {
 	C++FLAGS += -Wno-deprecated -DLLVM_VER=37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
-	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT ;
-	LINKLIBS on citrun-gl += -lc++ -lm ;
-
-	LINKLIBS on citrun-inst =
-		-lc++
-		-lclangAST
-		-lclangAnalysis
-		-lclangBasic
-		-lclangDriver
-		-lclangEdit
-		-lclangFrontend
-		-lclangFrontendTool
-		-lclangLex
-		-lclangParse
-		-lclangRewrite
-		-lclangRewriteFrontend
-		-lclangSema
-		-lclangSerialization
-		-lclangTooling ;
+	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lc++ -lm ;
+	LINKLIBS on citrun-inst = -lc++ ;
 }
 
 if $(OS) = LINUX {
@@ -74,26 +38,7 @@ if $(OS) = LINUX {
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lbsd -lstdc++ -lm -lglut ;
-
-	LINKLIBS on citrun-inst =
-		-Wl,--start-group
-		-lclangAST
-		-lclangAnalysis
-		-lclangBasic
-		-lclangDriver
-		-lclangEdit
-		-lclangFrontend
-		-lclangFrontendTool
-		-lclangLex
-		-lclangParse
-		-lclangRewrite
-		-lclangRewriteFrontend
-		-lclangSema
-		-lclangSerialization
-		-lclangTooling
-		-Wl,--end-group
-		-lstdc++
-		-lbsd ;
+	LINKLIBS on citrun-inst = -lstdc++ -lbsd ;
 }
 
 actions Test {
