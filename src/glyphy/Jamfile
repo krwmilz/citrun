@@ -10,3 +10,6 @@ Library libglyphy : glyphy-arc.cc
 	glyphy-outline.cc
 	glyphy-sdf.cc
 	glyphy-shaders.cc ;
+
+Stringize glyphy_common_glsl.h : glyphy-common.glsl ;
+Stringize glyphy_sdf_glsl.h : glyphy-sdf.glsl ;

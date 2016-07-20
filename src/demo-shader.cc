@@ -18,9 +18,9 @@
 
 #include "demo-shader.h"
 
-#include "demo-atlas-glsl.h"
-#include "demo-vshader-glsl.h"
-#include "demo-fshader-glsl.h"
+#include "demo_atlas_glsl.h"
+#include "demo_vshader_glsl.h"
+#include "demo_fshader_glsl.h"
 
 
 

@@ -29,8 +29,8 @@
 /* TODO path separator */
 #define SHADER_PATH(File) PKGDATADIR "/" File
 
-#include "glyphy-common-glsl.h"
-#include "glyphy-sdf-glsl.h"
+#include "glyphy_common_glsl.h"
+#include "glyphy_sdf_glsl.h"
 
 const char * glyphy_common_shader_source (void) { return glyphy_common_glsl; }
 const char * glyphy_sdf_shader_source (void) { return glyphy_sdf_glsl; }

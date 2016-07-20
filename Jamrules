@@ -103,6 +103,19 @@ actions Test {
 Test test : ;
 Test regress : ;
 
+rule Stringize
+{
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	Depends $(1) : $(2) ;
+	Clean clean : $(1) ;
+}
+
+actions Stringize
+{
+	$(TOP)/src/stringize "static const char *$(1:B)" $(2) > $(1) ;
+}
+
 echo ...build citrun ($(OS))... ;
 echo "   C++=		$(C++)" ;
 echo "   CITRUN_LIB=	$(CITRUN_LIB)" ;
