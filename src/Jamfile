@@ -22,6 +22,10 @@ GL_SRCS =
 	matrix4x4.c
 	trackball.c ;
 
+Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
+Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
+Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
+
 ObjectC++Flags $(GL_SRCS) : -std=c++11 ;
 ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
 
@@ -39,9 +43,7 @@ INST_SRCS =
 	inst_action.cc
 	inst_ast_visitor.cc ;
 
-Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
-Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
-Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
+Stringize runtime_h.h : $(TOP)/lib/runtime.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
 ObjectC++Flags $(INST_SRCS) : -DCITRUN_LIB=$(CITRUN_LIB) -DCITRUN_PATH=$(CITRUN_PATH) ;
