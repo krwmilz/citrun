@@ -1,12 +1,14 @@
+#include <cmath>
 #include <err.h>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include "af_unix.h"
 #include "demo-font.h"
 #include "gl_buffer.h"
-#include "gl_runtime_conn.h"
 #include "gl_view.h"
+#include "runtime_conn.h"
 
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
@@ -33,7 +35,7 @@ public:
 
 	static View *static_vu;
 	static af_unix socket;
-	static std::vector<drawable*> drawables;
+	static std::vector<RuntimeProcess*> drawables;
 private:
 	static void display();
 	static void reshape_func(int, int);
@@ -45,7 +47,7 @@ private:
 	demo_glstate_t *st;
 };
 
-std::vector<drawable*> window::drawables;
+std::vector<RuntimeProcess*> window::drawables;
 af_unix window::socket;
 View *window::static_vu;
 
@@ -151,15 +153,69 @@ current_time(void)
 void
 window::next_frame(View *vu)
 {
+	// First update everything that's already known.
+	for (auto &rp : window::drawables) {
+
+		rp->read_executions();
+
+		glyphy_point_t tmp;
+		for (auto &t : rp->translation_units) {
+			size_t bytes_total = t.num_lines * sizeof(uint64_t);
+
+			for (int i = 0; i < t.num_lines; i++) {
+				if (t.execution_counts[i] == 0)
+					continue;
+
+				// demo_buffer_add_text(buffer, ">>", font, 1);
+			}
+		}
+		std::cout << "tick" << std::endl;
+	}
+
+	// Now check if there's any new connections pending.
 	af_unix *temp_socket = window::socket.accept();
 	if (temp_socket) {
 		temp_socket->set_block();
 		demo_buffer_clear(buffer);
-		window::drawables.push_back(new RuntimeProcess(temp_socket, buffer, font));
-	}
+		RuntimeProcess *conn = new RuntimeProcess(*temp_socket);
+		window::drawables.push_back(conn);
 
-	for (auto &i : window::drawables)
-		i->idle();
+		std::stringstream ss;
+		ss << "program name:\t" << conn->program_name << std::endl;
+		ss << "code lines:\t" << conn->lines_total << std::endl;
+		ss << "trnsltn units:\t" << conn->num_tus << std::endl;
+		ss << "process id:\t" << conn->process_id << std::endl;
+		ss << "parent pid:\t" << conn->parent_process_id << std::endl;
+		ss << "process group:\t" << conn->process_group << std::endl;
+
+		glyphy_point_t cur_pos = { 0, 0 };
+		demo_buffer_move_to(buffer, &cur_pos);
+
+		demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
+
+		demo_buffer_current_point(buffer, &cur_pos);
+		double y_margin = cur_pos.y;
+
+		/*
+		 * T: total lines, known
+		 * W: number of 80 char columns
+		 * H: number of rows
+		 *
+		 * (1 ) W * 80 * H = T
+		 * (2 ) W * 80 = H
+		 * (2a) W = H / 80
+		 * (1a) (H / 80) * 80 * H = T
+		 * (1b) H^2 = T
+		 * (1c) H = sqrt(T)
+		 */
+		// int rows_per_col = std::sqrt(lines_total) * 4;
+
+		cur_pos.x = 0;
+		glyphy_point_t tmp;
+		for (auto &t : conn->translation_units) {
+			demo_buffer_add_text(buffer, t.file_name.c_str(), font, 1);
+		}
+	}
 
 	glutPostRedisplay ();
 }

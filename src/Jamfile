@@ -42,7 +42,7 @@ ObjectC++Flags $(GL_SRCS) : -std=c++11 ;
 ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
 
 LINKLIBS on citrun-gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
-LinkLibraries citrun-gl : libglyphy ;
+LinkLibraries citrun-gl : libglyphy utils ;
 
 Main citrun-gl : $(GL_SRCS) ;
 InstallBin $(PREFIX)/bin : citrun-gl ;
