@@ -16,8 +16,8 @@ OPTIM = $(CFLAGS) ;
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
-	C++FLAGS += -DCLANG_INCL="-I/usr/local/lib/clang/3.8.0/include" ;
-	C++FLAGS += -DLLVM_VER=38 ;
+	CLANG_INCL = "-I/usr/local/lib/clang/3.8.0/include" ;
+	LLVM_VER = 38 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
