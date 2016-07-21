@@ -7,12 +7,24 @@ MkWrap citrun-wrap : wrap.in ;
 InstallShell $(PREFIX)/bin : citrun-wrap ;
 
 #
+# utils.a
+#
+ObjectC++Flags af_unix.cc runtime_conn.cc : -std=c++11 ;
+Library utils : af_unix.cc runtime_conn.cc ;
+
+#
+# citrun-term
+#
+LINKLIBS on citrun-term += -lcurses -L/usr/local/lib -lestdc++ ;
+
+LinkLibraries citrun-term : utils ;
+Main citrun-term : term_main.cc ;
+
+#
 # citrun-gl
 #
 GL_SRCS =
 	gl_main.cc
-	gl_runtime_conn.cc
-	af_unix.cc
 	gl_view.cc
 	demo-atlas.cc
 	gl_buffer.cc

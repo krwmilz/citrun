@@ -1,121 +1,78 @@
-#include <err.h>
-
+//
+// Copyright (c) 2016 Kyle Milz <kyle@0x30.net>
+//
+// Permission to use, copy, modify, and distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+//
 #include <cassert>
+#include <err.h>
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
 
-#include "gl_runtime_conn.h"
+#include "runtime_conn.h"
 
-RuntimeProcess::RuntimeProcess(af_unix *sock, demo_buffer_t *buf, demo_font_t *f) :
-	socket(sock),
-	buffer(buf),
-	font(f)
+RuntimeProcess::RuntimeProcess(af_unix &sock) :
+	socket(sock)
 {
 	uint64_t sz;
-	socket->read_all(sz);
-	program_name.resize(sz);
-	socket->read_all((uint8_t *)&program_name[0], sz);
-
 	uint64_t num_tus;
-	socket->read_all(num_tus);
-	translation_units.resize(num_tus);
-
-	socket->read_all(lines_total);
-
+	uint64_t file_name_sz;
 	assert(sizeof(pid_t) == 4);
-	socket->read_all(process_id);
-	socket->read_all(parent_process_id);
-	socket->read_all(process_group);
 
-	std::stringstream ss;
-	ss << "program name:\t" << program_name << std::endl;
-	ss << "code lines:\t" << lines_total << std::endl;
-	ss << "trnsltn units:\t" << num_tus << std::endl;
-	ss << "process id:\t" << process_id << std::endl;
-	ss << "parent pid:\t" << parent_process_id << std::endl;
-	ss << "process group:\t" << process_group << std::endl;
+	socket.read_all(sz);
+	program_name.resize(sz);
+	socket.read_all((uint8_t *)&program_name[0], sz);
+	socket.read_all(num_tus);
+	socket.read_all(lines_total);
+	socket.read_all(process_id);
+	socket.read_all(parent_process_id);
+	socket.read_all(process_group);
 
-	glyphy_point_t cur_pos = { 0, 0 };
-	demo_buffer_move_to(buffer, &cur_pos);
+	translation_units.resize(num_tus);
+	for (auto &t : translation_units) {
+		socket.read_all(file_name_sz);
+		t.file_name.resize(file_name_sz);
+		socket.read_all((uint8_t *)&t.file_name[0], file_name_sz);
+		socket.read_all(t.num_lines);
+		socket.read_all(t.inst_sites);
 
-	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
-
-	demo_buffer_current_point(buffer, &cur_pos);
-	double y_margin = cur_pos.y;
-
-	cur_pos.x = 0;
-	for (auto &current_unit : translation_units) {
-		cur_pos.y = y_margin;
-
-		uint64_t file_name_sz;
-		socket->read_all(file_name_sz);
-
-		current_unit.file_name.resize(file_name_sz);
-		socket->read_all((uint8_t *)&current_unit.file_name[0], file_name_sz);
-
-		read_file(current_unit.file_name, cur_pos);
-		cur_pos.x += 50;
-
-		socket->read_all(current_unit.num_lines);
-		current_unit.execution_counts.resize(current_unit.num_lines, 0);
-
-		socket->read_all(current_unit.inst_sites);
+		t.execution_counts.resize(t.num_lines, 0);
+		t.source.resize(t.num_lines);
+		read_source(t);
 	}
-
-	demo_font_print_stats(font);
 }
 
 void
-RuntimeProcess::read_file(std::string file_name, glyphy_point_t top_left)
+RuntimeProcess::read_source(struct TranslationUnit &t)
 {
 	std::string line;
-	std::ifstream src_file(file_name, std::ios::binary);
+	std::ifstream file_stream(t.file_name);
 
-	if (! src_file)
-		errx(1, "src_file.open()");
+	if (file_stream.is_open() == 0)
+		errx(1, "ifstream.open()");
 
-	src_file.seekg(0, src_file.end);
-	int length = src_file.tellg();
-	src_file.seekg(0, src_file.beg);
-
-	char *src_buffer = new char [length + 1];
-
-	src_file.read(src_buffer, length);
-	src_buffer[length] = '\0';
-
-	if (! src_file)
-		errx(1, "src_file.read()");
-	src_file.close();
-
-	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, src_buffer, font, 1);
-
-	delete[] src_buffer;
+	for (auto &l : t.source)
+		std::getline(file_stream, l);
 }
 
 void
-RuntimeProcess::draw()
-{
-}
-
-void
-RuntimeProcess::idle()
+RuntimeProcess::read_executions()
 {
 	for (auto &t : translation_units) {
 		size_t bytes_total = t.num_lines * sizeof(uint64_t);
-
-		socket->read_all((uint8_t *)&t.execution_counts[0], bytes_total);
-
-		int execs = 0;
-		for (int i = 0; i < t.num_lines; i++)
-			execs += t.execution_counts[i];
-
-		// std::cout << t.file_name << ": " << execs << std::endl;
+		socket.read_all((uint8_t *)&t.execution_counts[0], bytes_total);
 	}
 
 	// Send response back
 	uint8_t msg_type = 1;
-	assert(socket->write_all(&msg_type, 1) == 1);
+	assert(socket.write_all(&msg_type, 1) == 1);
 }
