@@ -24,8 +24,6 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	socket(sock)
 {
 	uint64_t sz;
-	uint64_t num_tus;
-	uint64_t file_name_sz;
 	assert(sizeof(pid_t) == 4);
 
 	socket.read_all(sz);
@@ -39,9 +37,9 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 
 	translation_units.resize(num_tus);
 	for (auto &t : translation_units) {
-		socket.read_all(file_name_sz);
-		t.file_name.resize(file_name_sz);
-		socket.read_all((uint8_t *)&t.file_name[0], file_name_sz);
+		socket.read_all(sz);
+		t.file_name.resize(sz);
+		socket.read_all((uint8_t *)&t.file_name[0], sz);
 		socket.read_all(t.num_lines);
 		socket.read_all(t.inst_sites);
 
