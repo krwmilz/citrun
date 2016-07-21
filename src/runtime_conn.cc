@@ -66,7 +66,7 @@ void
 RuntimeProcess::read_executions()
 {
 	for (auto &t : translation_units) {
-		size_t bytes_total = t.num_lines * sizeof(uint64_t);
+		size_t bytes_total = t.num_lines * sizeof(uint32_t);
 		socket.read_all((uint8_t *)&t.execution_counts[0], bytes_total);
 	}
 

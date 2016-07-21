@@ -89,8 +89,8 @@ sub get_dynamic_data {
 
 	for my $tu (@{ $self->{tus} }) {
 		my $num_lines = $tu->[1];
-		my $buf = read_all($client, 8 * $num_lines);
-		my @data_tmp = unpack("Q$num_lines", $buf);
+		my $buf = read_all($client, 4 * $num_lines);
+		my @data_tmp = unpack("L$num_lines", $buf);
 
 		$data{$tu->[0]} = \@data_tmp;
 	}

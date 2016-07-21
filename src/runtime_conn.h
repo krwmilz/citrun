@@ -9,7 +9,7 @@ struct TranslationUnit {
 	std::string file_name;
 	uint32_t num_lines;
 	uint32_t inst_sites;
-	std::vector<uint64_t> execution_counts;
+	std::vector<uint32_t> execution_counts;
 	std::vector<std::string> source;
 };
 

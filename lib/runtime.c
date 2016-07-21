@@ -188,21 +188,28 @@ send_dynamic(int fd)
 	struct citrun_node	*w;
 	uint64_t		*lines_ptr;
 	uint64_t		*old_lines_ptr;
+	uint64_t		 diff64;
+	uint32_t		 diff;
 	int			 i;
 	int			 line;
 
-	/* Write execution buffers (one 8 byte counter per source line). */
+	/* Write execution buffers. */
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
+		lines_ptr =	w->lines_ptr;
+		old_lines_ptr =	w->old_lines;
 
-		lines_ptr = w->lines_ptr;
-		old_lines_ptr = w->old_lines;
 		for (line = 0; line < w->size; line++) {
 			assert(lines_ptr[line] >= old_lines_ptr[line]);
+			diff64 = lines_ptr[line] - old_lines_ptr[line];
 
-			uint64_t diff = lines_ptr[line] - old_lines_ptr[line];
+			if (diff > UINT32_MAX)
+				diff = UINT32_MAX;
+			else
+				diff = diff64;
+			xwrite(fd, &diff, sizeof(uint32_t));
+
 			/* Let's try incremental updating of old_lines. */
-			old_lines_ptr[line] = lines_ptr[line];
-			xwrite(fd, &diff, sizeof(uint64_t));
+			old_lines_ptr[line] += diff64;
 		}
 	}
 	assert(i == nodes_total);
