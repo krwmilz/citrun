@@ -21,7 +21,11 @@
 .Nd instrument a build command
 .Sh SYNOPSIS
 .Nm
-.Ar make | jam | gcc | cmake | ...
+.Ar make |
+.Ar jam |
+.Ar gcc |
+.Ar cmake |
+.Ar ...
 .Sh DESCRIPTION
 Add instrumentation to any C/C++ source files compiled during a build command.
 .Pp
@@ -29,28 +33,28 @@ The build command must search
 .Ev PATH
 when finding compiler executables, which must be one of the following:
 .Pp
-.Bl -bullet -offset indent -compact
-.It
-c++
-.It
-cc
-.It
-clang
-.It
-clang++
-.It
-eg++
-.It
-egcc
-.It
-g++
-.It
-gcc
+.Bl -tag -offset indent -compact
+.It - c++
+.It - cc
+.It - clang
+.It - clang++
+.It - eg++
+.It - egcc
+.It - g++
+.It - gcc
 .El
 .Sh EXAMPLES
 Let
 .Qq program
-be written in C, compiled with GCC and built by Make. Prepending
+exist. It is:
+.Pp
+.Bl -tag -offset indent -compact
+.It - written in C
+.It - compiled with gcc
+.It - built with make and make searches PATH for gcc
+.El
+.Pp
+Prepending
 .Nm
 to the build command adds instrumentation:
 .Pp
@@ -63,4 +67,4 @@ run:
 .Dl $ ./program
 .Sh SEE ALSO
 .Xr citrun-gl 1 ,
-.Xr citrun-inst 1
+.Xr citrun-term 1
