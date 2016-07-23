@@ -98,7 +98,6 @@ af_unix::accept()
 		return NULL;
 	}
 
-	std::cerr << "accepted new connection" << std::endl;
 	return new af_unix(new_fd);
 }
 
