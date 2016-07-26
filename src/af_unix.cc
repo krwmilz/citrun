@@ -34,7 +34,7 @@ af_unix::~af_unix()
 {
 	close(fd);
 	if (m_bound)
-		unlink("/tmp/citrun-gl.socket");
+		unlink("/tmp/citrun.socket");
 }
 
 af_unix::af_unix(int f) :
@@ -70,7 +70,7 @@ af_unix::set_listen()
 	struct sockaddr_un addr;
 	std::memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	std::strcpy(addr.sun_path, "/tmp/citrun-gl.socket");
+	std::strcpy(addr.sun_path, "/tmp/citrun.socket");
 
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");

@@ -245,7 +245,7 @@ relay_thread(void *arg)
 		err(1, "socket");
 
 	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL) {
-		viewer_sock = "/tmp/citrun-gl.socket";
+		viewer_sock = "/tmp/citrun.socket";
 
 		/* Fork a viewer if the default socket path doesn't exist */
 		if (access(viewer_sock, F_OK) < 0)
