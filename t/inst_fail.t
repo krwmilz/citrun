@@ -10,13 +10,8 @@ echo "int main(void) { return 0; " > $tmpfile
 export PATH="`pwd`/src:${PATH}"
 gcc -c $tmpfile 2> $logfile
 
-if [ $? -eq 1 ]; then
-	echo ok 1
-fi
-
-if grep -q "Instrumentation failed!" $logfile; then
-	echo ok 2
-fi
+[ $? -eq 1 ] && echo ok 1
+grep -q "error: expected" $logfile && echo ok 2
 
 rm $tmpfile
 rm $logfile

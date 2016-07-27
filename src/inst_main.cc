@@ -169,6 +169,33 @@ patch_link_command(std::vector<char *> &args)
 }
 
 int
+fork_compiler(std::vector<char *> &args)
+{
+	// args must be NULL terminated for exec*() functions.
+	args.push_back(NULL);
+
+	pid_t child_pid;
+	if ((child_pid = fork()) < 0)
+		err(1, "fork");
+
+	if (child_pid == 0) {
+		// In child
+		if (execvp(args[0], &args[0]))
+			err(1, "execvp");
+	}
+
+	int status;
+	if (waitpid(child_pid, &status, 0) < 0)
+		err(1, "waitpid");
+
+	// Return the exit code of the native compiler.
+	if (WIFEXITED(status))
+		return WEXITSTATUS(status);
+
+	return -1;
+}
+
+int
 main(int argc, char *argv[])
 {
 	// We probably didn't call citrun-inst directly.
@@ -217,10 +244,21 @@ main(int argc, char *argv[])
 	}
 
 	if (instrument(argc, argv, source_files)) {
+		// Instrumentation failed.
 		restore_original_src(temp_file_map);
 
-		warnx("Instrumentation failed!");
-		errx(1, "If this code compiles natively, I want to know about it.");
+		// Try compile with native compiler.
+		int ret = fork_compiler(args);
+
+		// This is bad.
+		if (ret == 0) {
+			warnx("citrun instrumentation failed, but the native"
+				"compile succeeded!");
+			return 0;
+		}
+
+		// Native compiler failed too. That's okay.
+		return ret;
 	}
 
 	bool linking = false;
@@ -233,30 +271,11 @@ main(int argc, char *argv[])
 		// gcc -o main main.c fib.c
 		linking = true;
 
-	if (linking) {
+	if (linking)
 		patch_link_command(args);
-	}
 
-	// Instrumentation succeeded. Fork the native compiler.
-	args.push_back(NULL);
-
-	pid_t child_pid;
-	if ((child_pid = fork()) < 0)
-		err(1, "fork");
-
-	if (child_pid == 0) {
-		// In child
-		if (execvp(args[0], &args[0]))
-			err(1, "execvp");
-	}
-
-	int status;
-	if (waitpid(child_pid, &status, 0) < 0)
-		err(1, "waitpid");
-
+	int ret = fork_compiler(args);
 	restore_original_src(temp_file_map);
 
-	// Use the same return code as the native compiler.
-	if (WIFEXITED(status))
-		exit(WEXITSTATUS(status));
+	return ret;
 }
