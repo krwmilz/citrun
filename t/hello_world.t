@@ -27,7 +27,7 @@ my $inst_src_good = <<EOF;
 
 int
 main(void)
-{citrun_start();
+{citrun_start();++_citrun_lines[3];++_citrun_lines[4];++_citrun_lines[5];
 	(++_citrun_lines[6], printf("hello, world!"));
 	return (++_citrun_lines[7], 0);
 }

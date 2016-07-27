@@ -81,19 +81,24 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	if (f->hasBody() == 0)
 		return true;
 
-	clang::Stmt *FuncBody = f->getBody();
+	std::stringstream rewrite_text;
 
+	// main() is a special case because it must start the runtime thread.
 	clang::DeclarationName DeclName = f->getNameInfo().getName();
-	std::string FuncName = DeclName.getAsString();
+	if (DeclName.getAsString() == "main")
+		rewrite_text << "citrun_start();";
 
-	if (FuncName.compare("main") != 0)
-		// Function is not main
-		return true;
-
-	std::string start_function("citrun_start();");
-
+	clang::Stmt *FuncBody = f->getBody();
 	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
-	TheRewriter.InsertTextBefore(curly_brace, start_function);
+
+	// Animate function calls by firing the entire declaration.
+	int decl_start = SM.getPresumedLineNumber(f->getLocStart());
+	int decl_end = SM.getPresumedLineNumber(curly_brace);
+	for (int i = decl_start; i <= decl_end; i++)
+		rewrite_text << "++_citrun_lines[" << i << "];";
+
+	// Rewrite the function source right after the beginning curly brace.
+	TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
 
 	return true;
 }

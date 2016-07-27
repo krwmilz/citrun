@@ -38,7 +38,7 @@ my $inst_src_good = <<EOF;
 
 int
 main(int argc, char *argv[])
-{citrun_start();
+{citrun_start();++_citrun_lines[3];++_citrun_lines[4];++_citrun_lines[5];
 	if ((++_citrun_lines[6], argc == 1))
 		return (++_citrun_lines[7], 1);
 	else

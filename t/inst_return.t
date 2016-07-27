@@ -27,11 +27,11 @@ EOF
 $project->compile();
 
 my $inst_src_good = <<EOF;
-int foo() {
+int foo() {++_citrun_lines[1];
 	return (++_citrun_lines[2], 0);
 }
 
-int main(void) {citrun_start();
+int main(void) {citrun_start();++_citrun_lines[5];
 	return (++_citrun_lines[6], 10);
 
 	return (++_citrun_lines[8], 10 + 10);
