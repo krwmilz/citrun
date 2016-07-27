@@ -6,13 +6,19 @@ li { line-height: 1.5em; }
 body {
 	max-width: 80ch;
 	margin: auto;
-	font-size: 1.142em ;
+	font-size: 2em ;
 	font-family: monospace;
 }
 
 .inline_logo {
 	/* Logos next to text need to be the same size as the text. */
 	height: 1em;
+}
+
+.screenshot {
+	width: 50%;
+	float: right;
+	border: 1px dotted black;
 }
 
 h1, h2 {
