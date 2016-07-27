@@ -219,9 +219,8 @@ main(int argc, char *argv[])
 	if (instrument(argc, argv, source_files)) {
 		restore_original_src(temp_file_map);
 
-		warnx("Instrumentation failed, compiling unmodified code.");
-		if (execvp(argv[0], argv))
-			err(1, "execvp");
+		warnx("Instrumentation failed!");
+		errx(1, "If this code compiles natively, I want to know about it.");
 	}
 
 	bool linking = false;
