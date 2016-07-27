@@ -63,19 +63,21 @@ main(int argc, char *argv[])
 
 			total_executions += e;
 
+			int color = 0;
 			if (e > 10 * 1000)
-				attron(COLOR_PAIR(1));
+				color = 1;
 			else if (e > 1 * 1000)
-				attron(COLOR_PAIR(2));
+				color = 2;
 			else if (e > 0)
-				attron(COLOR_PAIR(3));
+				color = 3;
+
+			if (color != 0)
+				attron(COLOR_PAIR(color));
+
 			printw("%s\n", l.c_str());
-			if (e > 10 * 1000)
-				attroff(COLOR_PAIR(1));
-			else if (e > 1 * 1000)
-				attroff(COLOR_PAIR(2));
-			else if (e > 0)
-				attroff(COLOR_PAIR(3));
+
+			if (color != 0)
+				attroff(COLOR_PAIR(color));
 		}
 
 		move(size_y - 1, 0);
