@@ -1,6 +1,7 @@
 //
 // Original idea from Max Zunti.
 //
+#include <cassert>
 #include <iostream>
 #include <ncurses.h>
 #include <queue>
@@ -43,20 +44,34 @@ main(int argc, char *argv[])
 	int size_y, size_x;
 	getmaxyx(stdscr, size_y, size_x);
 
-	struct timespec floating_avg;
+	struct timespec floating_avg = { 1, 0 };
+	uint64_t exec_floating_avg = 0;
 	struct timespec last_frame;
 
+	uint64_t total_executions = 0;
+	std::queue<uint64_t> execution_history;
+
+	struct timespec sleep = { 0, 1 * 1000 * 1000 * 1000 / 50 };
 	std::queue<struct timespec> frame_deltas;
-	struct timespec sleep = { 0, 1 * 1000 * 1000 * 1000 / 60 };
+
+	for (int i = 0; i < 50; i++) {
+		frame_deltas.push(sleep);
+		execution_history.push(0);
+	}
+
+	sleep = { 0, 1 * 1000 * 1000 * 1000 / 100 };
 
 	clock_gettime(CLOCK_UPTIME, &last_frame);
-	uint64_t total_executions = 0;
 
 	while (1) {
+		assert(frame_deltas.size() == 50);
+		assert(execution_history.size() == 50);
+
 		erase();
 		conn.read_executions();
 
 		auto &t = conn.translation_units[0];
+		total_executions = 0;
 		for (int i = offset; i < (size_y - 2); i++) {
 			uint32_t e = t.execution_counts[i + 1];
 			std::string l = t.source[i];
@@ -88,30 +103,43 @@ main(int argc, char *argv[])
 		refresh();
 
 		struct timespec tmp, delta;
-		clock_gettime(CLOCK_UPTIME, &tmp);
 
-		// Find out how long last frame took
+		// Add the newest delta to the floating average.
+		clock_gettime(CLOCK_UPTIME, &tmp);
 		timespecsub(&tmp, &last_frame, &delta);
+		timespecadd(&floating_avg, &delta, &floating_avg);
+
 		last_frame = tmp;
 
-		timespecadd(&floating_avg, &delta, &floating_avg);
+		// Get and pop oldest delta and push the new delta on.
 		frame_deltas.push(delta);
+		tmp = frame_deltas.front();
+		frame_deltas.pop();
 
-		if (frame_deltas.size() > 60) {
-			tmp = frame_deltas.front();
-			frame_deltas.pop();
-			timespecsub(&floating_avg, &tmp, &floating_avg);
-		}
+		// Delete the oldest delta from the floating average.
+		timespecsub(&floating_avg, &tmp, &floating_avg);
 
-		fps = 60 * 1000 / (floating_avg.tv_sec * 1000 + floating_avg.tv_nsec / (1000 * 1000));
-		// eps = total_executions * 1000 / delta_ms;
-		// total_executions = 0;
+		// Add the newest execution count to the floating average.
+		exec_floating_avg += total_executions;
+
+		// Push on new data and pop old data off. Subtracts the oldest
+		// execution count from the floating average.
+		execution_history.push(total_executions);
+		exec_floating_avg -= execution_history.front();
+		execution_history.pop();
+
+		fps = 50 * 1000 / (floating_avg.tv_sec * 1000 + floating_avg.tv_nsec / (1000 * 1000));
+		eps = exec_floating_avg / 50;
 
 		struct timespec one = { 1, 0 };
-		struct timespec shift = { 0, 1000 * 1000 };
+		struct timespec zero = { 0, 0 };
+		struct timespec shift = { 0, 1000 * 10 };
 		if (timespeccmp(&floating_avg, &one, <))
+			// We're executing too fast. Increase sleep.
 			timespecadd(&sleep, &shift, &sleep);
-		else
+		else if (timespeccmp(&floating_avg, &shift, >))
+			// Executing slow but we can still subtract at least
+			// shift.
 			timespecsub(&sleep, &shift, &sleep);
 
 		nanosleep(&sleep, NULL);
