@@ -3,7 +3,7 @@
 bin/citrun-wrap
 lib/libcitrun.a
 @man man/man1/citrun-gl.1
-@man man/man1/citrun-inst.1
+@man man/man1/citrun-term.1
 @man man/man1/citrun-wrap.1
 share/citrun/
 share/citrun/c++
