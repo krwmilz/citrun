@@ -45,11 +45,7 @@ public:
 	InstrumentAction() {};
 
 	void EndSourceFileAction() override;
-#if LLVM_VER > 35
 	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
-#else
-	clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
-#endif
 
 private:
 	clang::Rewriter TheRewriter;

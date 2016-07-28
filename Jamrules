@@ -18,24 +18,19 @@ C++FLAGS += -std=c++11 ;
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
-	LLVM_VER = 38 ;
-
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
 	LINKLIBS on citrun-inst = -lestdc++ ;
 }
 
 if $(OS) = MACOSX {
-	LLVM_VER = 37 ;
-
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lc++ -lm ;
 	LINKLIBS on citrun-inst = -lc++ ;
 }
 
 if $(OS) = LINUX {
-	LLVM_VER = 35 ;
-
+	# llvm version is 3.5 on Debian, which is too old.
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lbsd -lstdc++ -lm -lglut ;
 	LINKLIBS on citrun-inst = -lstdc++ -lbsd ;
