@@ -88,9 +88,12 @@ instrument(int argc, char *argv[], std::vector<std::string> const &source_files)
 	// Append original command line verbatim
 	clang_argv.insert(clang_argv.end(), argv, argv + argc);
 
-	// When instrumenting certain code clang sometimes needs its own include
-	// files. These are defined globally per platform.
-	clang_argv.push_back(STR(CLANG_INCL));
+	// We should be able to get this programmatically, but I don't know how.
+#if defined(__OpenBSD__)
+	clang_argv.push_back("-I/usr/local/lib/clang/3.8.0/include");
+#elif defined(__APPLE__)
+	clang_argv.push_back("-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include");
+#endif
 
 	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();

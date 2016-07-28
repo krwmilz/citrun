@@ -16,7 +16,6 @@ OPTIM = $(CFLAGS) ;
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
-	CLANG_INCL = "-I/usr/local/lib/clang/3.8.0/include" ;
 	LLVM_VER = 38 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
@@ -25,8 +24,7 @@ if $(OS) = OPENBSD {
 }
 
 if $(OS) = MACOSX {
-	C++FLAGS += -DCLANG_INCL="-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include" ;
-	C++FLAGS += -Wno-deprecated -DLLVM_VER=37 ;
+	LLVM_VER = 37 ;
 
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lc++ -lm ;
@@ -34,7 +32,7 @@ if $(OS) = MACOSX {
 }
 
 if $(OS) = LINUX {
-	C++FLAGS += -DLLVM_VER=35 ;
+	LLVM_VER = 35 ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lbsd -lstdc++ -lm -lglut ;
