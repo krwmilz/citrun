@@ -13,6 +13,8 @@ else {
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
 
+C++FLAGS += -std=c++11 ;
+
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
