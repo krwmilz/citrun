@@ -21,12 +21,14 @@ if $(OS) = OPENBSD {
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
 	LINKLIBS on citrun-inst = -lestdc++ ;
+	LINKLIBS on citrun-term = -lestdc++ ;
 }
 
 if $(OS) = MACOSX {
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lc++ -lm ;
 	LINKLIBS on citrun-inst = -lc++ ;
+	LINKLIBS on citrun-term = -lc++ ;
 }
 
 if $(OS) = LINUX {

@@ -14,7 +14,7 @@ Library utils : af_unix.cc runtime_conn.cc ;
 #
 # citrun-term
 #
-LINKLIBS on citrun-term += -lcurses -L/usr/local/lib -lestdc++ ;
+LINKLIBS on citrun-term += -lcurses -L/usr/local/lib ;
 
 LinkLibraries citrun-term : utils ;
 Main citrun-term : term_main.cc ;
