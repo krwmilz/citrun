@@ -11,33 +11,9 @@
 #include "af_unix.h"
 #include "runtime_conn.h"
 
-int
-main(int argc, char *argv[])
+void
+draw_source(RuntimeProcess &conn)
 {
-	af_unix listen_sock;
-	listen_sock.set_listen();
-
-	initscr();
-	if (has_colors() == FALSE) {
-		endwin();
-		printf("Your terminal does not support color\n");
-		exit(1);
-	}
-	start_color();
-	init_pair(1, COLOR_RED, COLOR_BLACK);
-	init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-	init_pair(3, COLOR_GREEN, COLOR_BLACK);
-	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
-
-	printw("Waiting for connection on /tmp/citrun.socket\n");
-	refresh();
-
-	af_unix *client = listen_sock.accept();
-	if (client == NULL)
-		errx(1, "client was NULL");
-
-	RuntimeProcess conn(*client);
 
 	int fps = 0.;
 	int eps = 0;
@@ -166,6 +142,37 @@ main(int argc, char *argv[])
 
 		nanosleep(&sleep, NULL);
 	}
+
+}
+
+int
+main(int argc, char *argv[])
+{
+	af_unix listen_sock;
+	listen_sock.set_listen();
+
+	initscr();
+	if (has_colors() == FALSE) {
+		endwin();
+		printf("Your terminal does not support color\n");
+		exit(1);
+	}
+	start_color();
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(3, COLOR_GREEN, COLOR_BLACK);
+	init_pair(4, COLOR_CYAN, COLOR_BLACK);
+	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+
+	printw("Waiting for connection on /tmp/citrun.socket\n");
+	refresh();
+
+	af_unix *client = listen_sock.accept();
+	if (client == NULL)
+		errx(1, "client was NULL");
+
+	RuntimeProcess conn(*client);
+	draw_source(conn);
 
 	endwin();
 
