@@ -18,6 +18,7 @@ draw_source(RuntimeProcess &conn)
 	int fps = 0.;
 	int eps = 0;
 
+	int tu = 0;
 	int offset = 0;
 	int size_y, size_x;
 	getmaxyx(stdscr, size_y, size_x);
@@ -51,9 +52,9 @@ draw_source(RuntimeProcess &conn)
 		erase();
 		conn.read_executions();
 
-		auto &t = conn.translation_units[0];
+		auto &t = conn.translation_units[tu];
 		total_executions = 0;
-		for (int i = offset; i < (size_y - 2 + offset); i++) {
+		for (int i = offset; i < (size_y - 2 + offset) && i < t.num_lines; i++) {
 			uint32_t e = t.execution_counts[i + 1];
 			std::string l = t.source[i];
 
@@ -86,6 +87,10 @@ draw_source(RuntimeProcess &conn)
 			offset++;
 		else if (ch == 'k' && offset > 0)
 			offset--;
+		else if (ch == 'l' && tu < conn.num_tus)
+			tu++;
+		else if (ch == 'h' && tu > 0)
+			tu--;
 
 		move(size_y - 1, 0);
 		clrtoeol();
@@ -131,18 +136,19 @@ draw_source(RuntimeProcess &conn)
 
 		struct timespec one = { 1, 0 };
 		struct timespec zero = { 0, 0 };
-		struct timespec shift = { 0, 1000 * 10 };
+		struct timespec shift = { 0, 1000 * 1000 };
 		if (timespeccmp(&floating_avg, &one, <))
 			// We're executing too fast. Increase sleep.
 			timespecadd(&sleep, &shift, &sleep);
-		else if (timespeccmp(&floating_avg, &shift, >))
-			// Executing slow but we can still subtract at least
-			// shift.
+		else if (timespeccmp(&floating_avg, &one, !=) && timespeccmp(&sleep, &shift, >))
+			// Floating avg is > 1.0 but we can still subtract at
+			// least shift.
 			timespecsub(&sleep, &shift, &sleep);
+
+		eps = sleep.tv_nsec;
 
 		nanosleep(&sleep, NULL);
 	}
-
 }
 
 int
