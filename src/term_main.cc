@@ -60,13 +60,13 @@ draw_source(RuntimeProcess &conn)
 			total_executions += e;
 
 			int color = 0;
-			if (e > 1000 * 1000)
+			if (e > 100000 )
 				color = 5;
-			else if (e > 100 * 1000)
+			else if (e > 10000)
 				color = 4;
-			else if (e > 10 * 1000)
+			else if (e > 1000 )
 				color = 3;
-			else if (e > 1 * 1000)
+			else if (e > 100)
 				color = 2;
 			else if (e > 0)
 				color = 1;
@@ -87,12 +87,12 @@ draw_source(RuntimeProcess &conn)
 		else if (ch == 'k' && offset > 0)
 			offset--;
 
-
 		move(size_y - 1, 0);
 		clrtoeol();
 
-		printw("%s: [%i tus] [%i fps] [%i execs/s] ",
-			conn.program_name.c_str(), conn.num_tus, fps, eps);
+		printw("%s (%i): [%s] [%i fps] [%ik execs/s] ",
+			conn.program_name.c_str(), conn.num_tus,
+			t.file_name.c_str(), fps, eps / 1000);
 		for (int i = 1; i <= 5; i++) {
 			attron(COLOR_PAIR(i));
 			printw("<<");
