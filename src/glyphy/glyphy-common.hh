@@ -21,6 +21,7 @@
 
 #include <glyphy.h>
 
+#include <cmath>
 #include <math.h>
 #include <string.h>
 #include <assert.h>
