@@ -202,7 +202,7 @@ send_dynamic(int fd)
 			assert(lines_ptr[line] >= old_lines_ptr[line]);
 			diff64 = lines_ptr[line] - old_lines_ptr[line];
 
-			if (diff > UINT32_MAX)
+			if (diff64 > UINT32_MAX)
 				diff = UINT32_MAX;
 			else
 				diff = diff64;
