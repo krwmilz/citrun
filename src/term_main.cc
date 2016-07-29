@@ -24,9 +24,11 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 	start_color();
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
 	init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-	init_pair(3, COLOR_RED, COLOR_BLACK);
+	init_pair(3, COLOR_GREEN, COLOR_BLACK);
+	init_pair(4, COLOR_CYAN, COLOR_BLACK);
+	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
 
 	printw("Waiting for connection on /tmp/citrun.socket\n");
 	refresh();
@@ -63,28 +65,43 @@ main(int argc, char *argv[])
 
 	clock_gettime(CLOCK_UPTIME, &last_frame);
 
+	// Make getch() non-blocking.
+	nodelay(stdscr, true);
+
 	while (1) {
 		assert(frame_deltas.size() == 50);
 		assert(execution_history.size() == 50);
+
+		struct timeval nowait = { 0, 0 };
+		// Non-blocking due to nodelay() above.
+		int ch = getch();
+		if (ch == 'j')
+			offset++;
+		else if (ch == 'k' && offset > 0)
+			offset--;
 
 		erase();
 		conn.read_executions();
 
 		auto &t = conn.translation_units[0];
 		total_executions = 0;
-		for (int i = offset; i < (size_y - 2); i++) {
+		for (int i = offset; i < (size_y - 2 + offset); i++) {
 			uint32_t e = t.execution_counts[i + 1];
 			std::string l = t.source[i];
 
 			total_executions += e;
 
 			int color = 0;
-			if (e > 10 * 1000)
-				color = 1;
+			if (e > 1000 * 1000)
+				color = 5;
+			else if (e > 100 * 1000)
+				color = 4;
+			else if (e > 10 * 1000)
+				color = 3;
 			else if (e > 1 * 1000)
 				color = 2;
 			else if (e > 0)
-				color = 3;
+				color = 1;
 
 			if (color != 0)
 				attron(COLOR_PAIR(color));
@@ -98,8 +115,14 @@ main(int argc, char *argv[])
 		move(size_y - 1, 0);
 		clrtoeol();
 
-		printw("%s: [%i tus] [%i fps] [%i execs/s]\n",
+		printw("%s: [%i tus] [%i fps] [%i execs/s] ",
 			conn.program_name.c_str(), conn.num_tus, fps, eps);
+		for (int i = 1; i <= 5; i++) {
+			attron(COLOR_PAIR(i));
+			printw("<<");
+			attroff(COLOR_PAIR(i));
+		}
+		printw("\n");
 		refresh();
 
 		struct timespec tmp, delta;
