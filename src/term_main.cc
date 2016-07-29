@@ -72,13 +72,6 @@ main(int argc, char *argv[])
 		assert(frame_deltas.size() == 50);
 		assert(execution_history.size() == 50);
 
-		// Non-blocking due to nodelay() above.
-		int ch = getch();
-		if (ch == 'j')
-			offset++;
-		else if (ch == 'k' && offset > 0)
-			offset--;
-
 		erase();
 		conn.read_executions();
 
@@ -110,6 +103,14 @@ main(int argc, char *argv[])
 			if (color != 0)
 				attroff(COLOR_PAIR(color));
 		}
+
+		// Non-blocking due to nodelay() above.
+		int ch = getch();
+		if (ch == 'j' && offset < (t.num_lines - size_y - 1))
+			offset++;
+		else if (ch == 'k' && offset > 0)
+			offset--;
+
 
 		move(size_y - 1, 0);
 		clrtoeol();
