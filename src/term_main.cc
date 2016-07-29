@@ -72,7 +72,6 @@ main(int argc, char *argv[])
 		assert(frame_deltas.size() == 50);
 		assert(execution_history.size() == 50);
 
-		struct timeval nowait = { 0, 0 };
 		// Non-blocking due to nodelay() above.
 		int ch = getch();
 		if (ch == 'j')
@@ -127,20 +126,19 @@ main(int argc, char *argv[])
 
 		struct timespec tmp, delta;
 
-		// Add the newest delta to the floating average.
+		// Get last frames duration and update last_frame time.
 		clock_gettime(CLOCK_UPTIME, &tmp);
 		timespecsub(&tmp, &last_frame, &delta);
-		timespecadd(&floating_avg, &delta, &floating_avg);
-
 		last_frame = tmp;
 
-		// Get and pop oldest delta and push the new delta on.
+		// Pop oldest off and push newest on to frame_delta's queue.
 		frame_deltas.push(delta);
 		tmp = frame_deltas.front();
 		frame_deltas.pop();
 
-		// Delete the oldest delta from the floating average.
+		// Remove oldest time and add newest time to floating_avg.
 		timespecsub(&floating_avg, &tmp, &floating_avg);
+		timespecadd(&floating_avg, &delta, &floating_avg);
 
 		// Add the newest execution count to the floating average.
 		exec_floating_avg += total_executions;
