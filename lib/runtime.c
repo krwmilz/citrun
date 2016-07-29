@@ -91,9 +91,11 @@ xread(int d, const void *buf, size_t bytes_total)
 	while (bytes_left > 0) {
 		n = read(d, (uint8_t *)buf + bytes_read, bytes_left);
 
-		if (n == 0)
+		if (n == 0) {
 			/* Disconnect */
-			errx(1, "read 0 bytes on socket");
+			warnx("citrun: viewer disconnected, reconnecting..");
+			return 0;
+		}
 		if (n < 0)
 			err(1, "read()");
 
@@ -241,9 +243,6 @@ relay_thread(void *arg)
 	int			 fd;
 	uint8_t			 response;
 
-	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
-		err(1, "socket");
-
 	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL) {
 		viewer_sock = "/tmp/citrun.socket";
 
@@ -252,11 +251,14 @@ relay_thread(void *arg)
 			fork_viewer();
 	}
 
-	memset(&addr, 0, sizeof(addr));
-	addr.sun_family = AF_UNIX;
-	strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
-
 	while (1) {
+		if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+			err(1, "socket");
+
+		memset(&addr, 0, sizeof(addr));
+		addr.sun_family = AF_UNIX;
+		strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
+
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
 			/* warn("connect"); */
 			sleep(1);
@@ -266,10 +268,15 @@ relay_thread(void *arg)
 		/* Send static information first. */
 		send_static(fd);
 
+		/* Synchronously send changing data. */
 		while (1) {
-			/* Synchronously send changing data. */
 			send_dynamic(fd);
-			xread(fd, &response, 1);
+			if (xread(fd, &response, 1) == 0)
+				/* Viewer disconnected, go back to connect. */
+				break;
 		}
+
+		shutdown(fd, SHUT_RDWR);
+		close(fd);
 	}
 }
