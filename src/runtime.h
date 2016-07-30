@@ -31,7 +31,6 @@ public:
 private:
 	void read_source(struct TranslationUnit &);
 
-	double y_margin;
 	af_unix socket;
 };
 
