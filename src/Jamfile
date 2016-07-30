@@ -9,7 +9,7 @@ InstallShell $(PREFIX)/bin : citrun-wrap ;
 #
 # utils.a
 #
-Library utils : af_unix.cc runtime_conn.cc ;
+Library utils : af_unix.cc runtime.cc ;
 
 #
 # citrun-term

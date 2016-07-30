@@ -9,7 +9,7 @@
 #include <time.h>	// clock_gettime, nanosleep
 
 #include "af_unix.h"
-#include "runtime_conn.h"
+#include "runtime.h"
 
 void
 draw_source(RuntimeProcess &conn)
