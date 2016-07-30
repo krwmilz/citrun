@@ -35,14 +35,14 @@ sub accept {
 	# Protocol defined in lib/runtime.c function send_static().
 	#
 	my $buf = read_all($client, 1 + 4 + 4 + 12);
-	($self->{ver}, $self->{num_tus}, $self->{lines_total}, $self->{pid}, $self->{ppid}, $self->{pgrp})
-		= unpack("CL5", $buf);
+	($self->{ver}, $self->{num_tus}, $self->{lines_total}, $self->{pid},
+		$self->{ppid}, $self->{pgrp}) = unpack("CL5", $buf);
 
 	my $progname_sz = unpack("S", read_all($client, 2));
-	my $progname = read_all($client, $progname_sz);
+	$self->{progname} = read_all($client, $progname_sz);
 
 	my $cwd_sz = unpack("S", read_all($client, 2));
-	my $cwd = read_all($client, $cwd_sz);
+	$self->{cwd} = read_all($client, $cwd_sz);
 
 	# Always sanity check these.
 	cmp_ok( $self->{pid},	">",	1,	"pid lower bound check" );

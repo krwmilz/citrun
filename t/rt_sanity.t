@@ -1,7 +1,7 @@
 use strict;
 
-use Data::Dumper;
-use Test::More tests => 58;
+use Cwd;
+use Test::More tests => 60;
 use Test::Differences;
 
 use Test::Project;
@@ -62,6 +62,8 @@ $project->run(45);
 
 $viewer->accept();
 is( $viewer->{num_tus}, 3, "translation unit count" );
+is( $viewer->{progname}, "program", "program name" );
+is( $viewer->{cwd}, getcwd, "current working dir" );
 
 # Check static data.
 my @known_good = [
