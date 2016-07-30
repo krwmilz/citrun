@@ -57,20 +57,14 @@ sub accept {
 	# Read the static translation unit information.
 	my @tus;
 	for (1..$self->{num_tus}) {
-		# Size of absolute file path.
+		# Absolute file path.
 		$buf = read_all($client, 2);
 		my $file_name_sz = unpack("S", $buf);
-
-		# Absolute file path.
 		my $file_name = read_all($client, $file_name_sz);
 
-		# Total number of lines in primary source file.
-		$buf = read_all($client, 4);
-		my $num_lines = unpack("L", $buf);
-
-		# Number of instrumentation sites in primary source file.
-		$buf = read_all($client, 4);
-		my $inst_sites = unpack("L", $buf);
+		# Total number of lines and number of instrumented sites.
+		$buf = read_all($client, 4 + 4);
+		my ($num_lines, $inst_sites) = unpack("L2", $buf);
 
 		# Keep this in order so it's easy to fetch dynamic data.
 		push @tus, [ $file_name, $num_lines, $inst_sites ];
