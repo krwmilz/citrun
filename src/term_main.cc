@@ -52,10 +52,10 @@ draw_source(RuntimeProcess &conn)
 		erase();
 		conn.read_executions();
 
-		auto &t = conn.translation_units[tu];
+		auto &t = conn.m_tus[tu];
 		total_executions = 0;
 		for (int i = offset; i < (size_y - 2 + offset) && i < t.num_lines; i++) {
-			uint32_t e = t.execution_counts[i + 1];
+			uint32_t e = t.exec_diffs[i + 1];
 			std::string l = t.source[i];
 
 			total_executions += e;
@@ -87,7 +87,7 @@ draw_source(RuntimeProcess &conn)
 			offset++;
 		else if (ch == 'k' && offset > 0)
 			offset--;
-		else if (ch == 'l' && tu < conn.num_tus)
+		else if (ch == 'l' && tu < conn.m_num_tus)
 			tu++;
 		else if (ch == 'h' && tu > 0)
 			tu--;
@@ -96,7 +96,7 @@ draw_source(RuntimeProcess &conn)
 		clrtoeol();
 
 		printw("%s (%i): [%s] [%i fps] [%ik execs/s] ",
-			conn.program_name.c_str(), conn.num_tus,
+			conn.m_progname.c_str(), conn.m_num_tus,
 			t.file_name.c_str(), fps, eps / 1000);
 		for (int i = 1; i <= 5; i++) {
 			attron(COLOR_PAIR(i));

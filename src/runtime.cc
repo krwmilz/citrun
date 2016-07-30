@@ -21,37 +21,37 @@
 #include "runtime.h"
 
 RuntimeProcess::RuntimeProcess(af_unix &sock) :
-	socket(sock)
+	m_socket(sock)
 {
 	uint16_t sz;
 	assert(sizeof(pid_t) == 4);
 
 	// Protocol defined in lib/runtime.c send_static().
 	// This is the receive side of things.
-	socket.read_all(m_ver);
-	socket.read_all(num_tus);
-	socket.read_all(lines_total);
-	socket.read_all(process_id);
-	socket.read_all(parent_process_id);
-	socket.read_all(process_group);
+	m_socket.read_all(m_ver);
+	m_socket.read_all(m_num_tus);
+	m_socket.read_all(m_lines_total);
+	m_socket.read_all(m_pid);
+	m_socket.read_all(m_ppid);
+	m_socket.read_all(m_pgrp);
 
-	socket.read_all(sz);
-	program_name.resize(sz);
-	socket.read_all((uint8_t *)&program_name[0], sz);
+	m_socket.read_all(sz);
+	m_progname.resize(sz);
+	m_socket.read_all((uint8_t *)&m_progname[0], sz);
 
-	socket.read_all(sz);
+	m_socket.read_all(sz);
 	m_cwd.resize(sz);
-	socket.read_all((uint8_t *)&m_cwd[0], sz);
+	m_socket.read_all((uint8_t *)&m_cwd[0], sz);
 
-	translation_units.resize(num_tus);
-	for (auto &t : translation_units) {
-		socket.read_all(sz);
+	m_tus.resize(m_num_tus);
+	for (auto &t : m_tus) {
+		m_socket.read_all(sz);
 		t.file_name.resize(sz);
-		socket.read_all((uint8_t *)&t.file_name[0], sz);
-		socket.read_all(t.num_lines);
-		socket.read_all(t.inst_sites);
+		m_socket.read_all((uint8_t *)&t.file_name[0], sz);
+		m_socket.read_all(t.num_lines);
+		m_socket.read_all(t.inst_sites);
 
-		t.execution_counts.resize(t.num_lines, 0);
+		t.exec_diffs.resize(t.num_lines, 0);
 		t.source.resize(t.num_lines);
 		read_source(t);
 	}
@@ -73,20 +73,20 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 void
 RuntimeProcess::read_executions()
 {
-	for (auto &t : translation_units) {
+	for (auto &t : m_tus) {
 		uint8_t flag = 0;
-		socket.read_all(flag);
+		m_socket.read_all(flag);
 
 		if (flag == 0) {
-			std::fill(t.execution_counts.begin(), t.execution_counts.end(), 0);
+			std::fill(t.exec_diffs.begin(), t.exec_diffs.end(), 0);
 			continue;
 		}
 
 		size_t bytes_total = t.num_lines * sizeof(uint32_t);
-		socket.read_all((uint8_t *)&t.execution_counts[0], bytes_total);
+		m_socket.read_all((uint8_t *)&t.exec_diffs[0], bytes_total);
 	}
 
 	// Send response back
 	uint8_t msg_type = 1;
-	assert(socket.write_all(&msg_type, 1) == 1);
+	assert(m_socket.write_all(&msg_type, 1) == 1);
 }
