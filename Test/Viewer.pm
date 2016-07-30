@@ -85,9 +85,21 @@ sub get_dynamic_data {
 	my %data;
 
 	for my $tu (@{ $self->{tus} }) {
+		# Check if there's any update.
+		my $buf = read_all($client, 1);
+		my $has_data = unpack("C", $buf);
+
 		my $num_lines = $tu->[1];
-		my $buf = read_all($client, 4 * $num_lines);
-		my @data_tmp = unpack("L$num_lines", $buf);
+
+		my @data_tmp;
+		if ($has_data == 0) {
+			# print STDERR "no data for tu $_\n";
+			@data_tmp = (0) x $num_lines;
+		}
+		else {
+			$buf = read_all($client, 4 * $num_lines);
+			@data_tmp = unpack("L$num_lines", $buf);
+		}
 
 		$data{$tu->[0]} = \@data_tmp;
 	}

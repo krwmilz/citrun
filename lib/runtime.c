@@ -180,6 +180,7 @@ send_static(int fd)
 	sz = strnlen(cwd_buf, PATH_MAX);
 	xwrite(fd, &sz, sizeof(sz));
 	xwrite(fd, cwd_buf, sz);
+	free(cwd_buf);
 
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 		node = *w;
@@ -204,14 +205,18 @@ send_dynamic(int fd)
 	uint64_t		*lines_ptr;
 	uint64_t		*old_lines_ptr;
 	uint64_t		 diff64;
+	uint32_t		*tmp_space;
 	uint32_t		 diff;
 	int			 i;
 	int			 line;
+	uint8_t			 flag;
 
 	/* Write execution buffers. */
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 		lines_ptr =	w->lines_ptr;
 		old_lines_ptr =	w->old_lines;
+		tmp_space = malloc(w->size * sizeof(diff));
+		flag = 0;
 
 		for (line = 0; line < w->size; line++) {
 			assert(lines_ptr[line] >= old_lines_ptr[line]);
@@ -221,11 +226,19 @@ send_dynamic(int fd)
 				diff = UINT32_MAX;
 			else
 				diff = diff64;
-			xwrite(fd, &diff, sizeof(uint32_t));
+
+			tmp_space[line] = diff;
+			if (diff > 0)
+				flag = 1;
 
 			/* Let's try incremental updating of old_lines. */
 			old_lines_ptr[line] += diff64;
 		}
+
+		xwrite(fd, &flag, sizeof(flag));
+		if (flag == 1)
+			xwrite(fd, tmp_space, w->size * sizeof(diff));
+		free(tmp_space);
 	}
 	assert(i == nodes_total);
 	assert(w == NULL);
