@@ -32,22 +32,19 @@ sub accept {
 	my $client = $socket->accept();
 	$self->{client_socket} = $client;
 
-	# Read arbitrarily sized program name string
-	my $buf = read_all($client, 8);
-	my $progname_sz = unpack("Q", $buf);
+	# Protocol defined in lib/runtime.c function send_static().
+	#
+	my $buf = read_all($client, 1 + 4 + 4 + 12);
+	($self->{ver}, $self->{num_tus}, $self->{lines_total}, $self->{pid}, $self->{ppid}, $self->{pgrp})
+		= unpack("CL5", $buf);
+
+	my $buf = read_all($client, 2);
+	my $progname_sz = unpack("S", $buf);
 	my $progname = read_all($client, $progname_sz);
 
-	# Read the total number of instrumented translation units.
-	my $buf = read_all($client, 8);
-	$self->{num_tus} = unpack("Q", $buf);
-
-	# Read total code lines in program.
-	$buf = read_all($client, 8);
-	$self->{lines_total} = unpack("Q", $buf);
-
-	# Read three 4 byte pid_t's
-	$buf = read_all($client, 12);
-	($self->{pid}, $self->{ppid}, $self->{pgrp}) = unpack("L3", $buf);
+	my $buf = read_all($client, 2);
+	my $cwd_sz = unpack("S", $buf);
+	my $cwd = read_all($client, $cwd_sz);
 
 	# Always sanity check these.
 	cmp_ok( $self->{pid},	">",	1,	"pid lower bound check" );
@@ -61,8 +58,8 @@ sub accept {
 	my @tus;
 	for (1..$self->{num_tus}) {
 		# Size of absolute file path.
-		$buf = read_all($client, 8);
-		my $file_name_sz = unpack("Q", $buf);
+		$buf = read_all($client, 2);
+		my $file_name_sz = unpack("S", $buf);
 
 		# Absolute file path.
 		my $file_name = read_all($client, $file_name_sz);

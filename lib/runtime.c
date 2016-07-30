@@ -25,14 +25,14 @@
 #include <limits.h>		/* PATH_MAX */
 #include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
-#include <string.h>		/* strlcpy */
-#include <unistd.h>		/* access, get{pid,ppid,pgrp}, read, write */
+#include <string.h>		/* strlcpy, strnlen */
+#include <unistd.h>		/* access, get{cwd,pid,ppid,pgrp}, read, write */
 
 #include "runtime.h"
 
 static struct citrun_node	*nodes_head;
-static uint64_t			 nodes_total;
-static uint64_t			 lines_total;
+static uint32_t			 nodes_total;
+static uint32_t			 lines_total;
 
 static void *relay_thread(void *);
 
@@ -132,11 +132,14 @@ xwrite(int d, const void *buf, size_t bytes_total)
 /*
  * Send static information contained in each instrumented node.
  * Sent program wide values:
- * - length of program name
- * - program name
+ * - version
  * - total number of translation units
  * - total number of lines in program
  * - process id, parent process id, group process id
+ * - length of program name
+ * - program name
+ * - length of current working directory
+ * - current working directory
  * Sent for each instrumented translation unit:
  * - length of source file name
  * - source file name
@@ -150,23 +153,33 @@ send_static(int fd)
 	pid_t			 pids[3];
 	struct citrun_node	*w;
 	const char		*progname;
-	size_t			 sz;
+	char			*cwd_buf;
+	uint16_t		 sz;
+	uint8_t			 ver = 0;
 	int			 i;
 
-	progname = getprogname();
-	sz = strlen(progname);
+	assert(sizeof(pid_t) == 4);
 
-	xwrite(fd, &sz, sizeof(sz));
-	xwrite(fd, progname, sz);
+	xwrite(fd, &ver, sizeof(ver));
 	xwrite(fd, &nodes_total, sizeof(nodes_total));
 	xwrite(fd, &lines_total, sizeof(lines_total));
 
 	pids[0] = getpid();
 	pids[1] = getppid();
 	pids[2] = getpgrp();
-	assert(sizeof(pid_t) == 4);
 	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
 		xwrite(fd, &pids[i], sizeof(pid_t));
+
+	progname = getprogname();
+	sz = strnlen(progname, PATH_MAX);
+	xwrite(fd, &sz, sizeof(sz));
+	xwrite(fd, progname, sz);
+
+	if ((cwd_buf = getcwd(NULL, 0)) == NULL)
+		err(1, "getcwd");
+	sz = strnlen(cwd_buf, PATH_MAX);
+	xwrite(fd, &sz, sizeof(sz));
+	xwrite(fd, cwd_buf, sz);
 
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 		node = *w;
