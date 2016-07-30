@@ -18,9 +18,12 @@ public:
 	RuntimeProcess(af_unix &);
 	void read_executions();
 
+	// Protocol defined in lib/runtime.c send_static().
+	uint8_t		m_ver;
 	std::string program_name;
-	uint64_t num_tus;
-	uint64_t lines_total;
+	std::string	m_cwd;
+	uint32_t num_tus;
+	uint32_t lines_total;
 	pid_t process_id;
 	pid_t parent_process_id;
 	pid_t process_group;

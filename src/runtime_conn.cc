@@ -23,17 +23,25 @@
 RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	socket(sock)
 {
-	uint64_t sz;
+	uint16_t sz;
 	assert(sizeof(pid_t) == 4);
 
-	socket.read_all(sz);
-	program_name.resize(sz);
-	socket.read_all((uint8_t *)&program_name[0], sz);
+	// Protocol defined in lib/runtime.c send_static().
+	// This is the receive side of things.
+	socket.read_all(m_ver);
 	socket.read_all(num_tus);
 	socket.read_all(lines_total);
 	socket.read_all(process_id);
 	socket.read_all(parent_process_id);
 	socket.read_all(process_group);
+
+	socket.read_all(sz);
+	program_name.resize(sz);
+	socket.read_all((uint8_t *)&program_name[0], sz);
+
+	socket.read_all(sz);
+	m_cwd.resize(sz);
+	socket.read_all((uint8_t *)&m_cwd[0], sz);
 
 	translation_units.resize(num_tus);
 	for (auto &t : translation_units) {
@@ -66,6 +74,14 @@ void
 RuntimeProcess::read_executions()
 {
 	for (auto &t : translation_units) {
+		uint8_t flag = 0;
+		socket.read_all(flag);
+
+		if (flag == 0) {
+			std::fill(t.execution_counts.begin(), t.execution_counts.end(), 0);
+			continue;
+		}
+
 		size_t bytes_total = t.num_lines * sizeof(uint32_t);
 		socket.read_all((uint8_t *)&t.execution_counts[0], bytes_total);
 	}
