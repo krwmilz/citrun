@@ -9,7 +9,7 @@
 #include <time.h>	// clock_gettime, nanosleep
 
 #include "af_unix.h"
-#include "runtime.h"
+#include "runtime.hh"
 
 void
 draw_source(RuntimeProcess &conn)
@@ -87,7 +87,7 @@ draw_source(RuntimeProcess &conn)
 			offset++;
 		else if (ch == 'k' && offset > 0)
 			offset--;
-		else if (ch == 'l' && tu < conn.m_num_tus)
+		else if (ch == 'l' && tu < (conn.m_num_tus - 1))
 			tu++;
 		else if (ch == 'h' && tu > 0)
 			tu--;
@@ -95,9 +95,10 @@ draw_source(RuntimeProcess &conn)
 		move(size_y - 1, 0);
 		clrtoeol();
 
-		printw("%s (%i): [%s] [%i fps] [%ik execs/s] ",
-			conn.m_progname.c_str(), conn.m_num_tus,
-			t.file_name.c_str(), fps, eps / 1000);
+		printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s] [%i us]",
+			conn.m_progname.c_str(), t.file_name.c_str(),
+			tu + 1, conn.m_num_tus, fps, eps / 1000,
+			sleep.tv_sec + sleep.tv_nsec / 1000);
 		for (int i = 1; i <= 5; i++) {
 			attron(COLOR_PAIR(i));
 			printw("<<");
@@ -136,7 +137,7 @@ draw_source(RuntimeProcess &conn)
 
 		struct timespec one = { 1, 0 };
 		struct timespec zero = { 0, 0 };
-		struct timespec shift = { 0, 1000 * 1000 };
+		struct timespec shift = { 0, 100 * 1000 };
 		if (timespeccmp(&floating_avg, &one, <))
 			// We're executing too fast. Increase sleep.
 			timespecadd(&sleep, &shift, &sleep);
@@ -144,8 +145,6 @@ draw_source(RuntimeProcess &conn)
 			// Floating avg is > 1.0 but we can still subtract at
 			// least shift.
 			timespecsub(&sleep, &shift, &sleep);
-
-		eps = sleep.tv_nsec;
 
 		nanosleep(&sleep, NULL);
 	}

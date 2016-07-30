@@ -18,7 +18,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "runtime.h"
+#include "runtime.hh"
 
 RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	m_socket(sock)
