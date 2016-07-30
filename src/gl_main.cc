@@ -159,11 +159,11 @@ window::next_frame(View *vu)
 		rp->read_executions();
 
 		glyphy_point_t tmp;
-		for (auto &t : rp->translation_units) {
+		for (auto &t : rp->m_tus) {
 			size_t bytes_total = t.num_lines * sizeof(uint64_t);
 
 			for (int i = 0; i < t.num_lines; i++) {
-				if (t.execution_counts[i] == 0)
+				if (t.exec_diffs[i] == 0)
 					continue;
 
 				// demo_buffer_add_text(buffer, ">>", font, 1);
@@ -181,12 +181,12 @@ window::next_frame(View *vu)
 		window::drawables.push_back(conn);
 
 		std::stringstream ss;
-		ss << "program name:\t" << conn->program_name << std::endl;
-		ss << "code lines:\t" << conn->lines_total << std::endl;
-		ss << "trnsltn units:\t" << conn->num_tus << std::endl;
-		ss << "process id:\t" << conn->process_id << std::endl;
-		ss << "parent pid:\t" << conn->parent_process_id << std::endl;
-		ss << "process group:\t" << conn->process_group << std::endl;
+		ss << "program name:\t" << conn->m_progname << std::endl;
+		ss << "code lines:\t" << conn->m_lines_total << std::endl;
+		ss << "trnsltn units:\t" << conn->m_num_tus << std::endl;
+		ss << "process id:\t" << conn->m_pid << std::endl;
+		ss << "parent pid:\t" << conn->m_ppid << std::endl;
+		ss << "process group:\t" << conn->m_pgrp << std::endl;
 
 		glyphy_point_t cur_pos = { 0, 0 };
 		demo_buffer_move_to(buffer, &cur_pos);
@@ -212,7 +212,7 @@ window::next_frame(View *vu)
 
 		cur_pos.x = 0;
 		glyphy_point_t tmp;
-		for (auto &t : conn->translation_units) {
+		for (auto &t : conn->m_tus) {
 			demo_buffer_add_text(buffer, t.file_name.c_str(), font, 1);
 		}
 	}
