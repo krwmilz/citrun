@@ -29,6 +29,7 @@ public:
 	pid_t		m_ppid;
 	pid_t		m_pgrp;
 	std::vector<TranslationUnit> m_tus;
+	int		m_tus_with_execs;
 private:
 	void read_source(struct TranslationUnit &);
 

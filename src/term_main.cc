@@ -11,147 +11,206 @@
 #include "af_unix.h"
 #include "runtime.hh"
 
-void
-draw_source(RuntimeProcess &conn)
+
+class CursesViewer : public RuntimeProcess {
+public:
+	CursesViewer(af_unix &socket);
+	void loop();
+
+private:
+	void get_keyboard();
+	void draw();
+	void print_statusbar();
+	void update_execs();
+	void update_sleep();
+
+	std::queue<uint64_t> m_execution_history;
+	std::queue<struct timespec> m_frame_deltas;
+	TranslationUnit	 m_cur_tu;
+	struct timespec	 m_floating_avg;
+	struct timespec	 m_last_frame;
+	struct timespec	 m_sleep;
+	uint64_t	 m_exec_floating_avg;
+	uint64_t	 m_total_executions;
+	int		 m_fps;
+	int		 m_eps;
+	int		 m_tu;
+	int		 m_offset;
+	int		 m_size_y;
+	int		 m_size_x;
+};
+
+CursesViewer::CursesViewer(af_unix &socket) :
+	RuntimeProcess(socket),
+	m_fps(0),
+	m_eps(0),
+	m_tu(0),
+	m_offset(0),
+	m_floating_avg({ 1, 0 }),
+	m_exec_floating_avg(0),
+	m_sleep({ 0, 1 * 1000 * 1000 * 1000 / 100 }),
+	m_total_executions(0)
 {
+	getmaxyx(stdscr, m_size_y, m_size_x);
 
-	int fps = 0.;
-	int eps = 0;
-
-	int tu = 0;
-	int offset = 0;
-	int size_y, size_x;
-	getmaxyx(stdscr, size_y, size_x);
-
-	struct timespec floating_avg = { 1, 0 };
-	uint64_t exec_floating_avg = 0;
-	struct timespec last_frame;
-
-	uint64_t total_executions = 0;
-	std::queue<uint64_t> execution_history;
-
-	struct timespec sleep = { 0, 1 * 1000 * 1000 * 1000 / 50 };
-	std::queue<struct timespec> frame_deltas;
+	m_cur_tu = m_tus[0];
 
 	for (int i = 0; i < 50; i++) {
-		frame_deltas.push(sleep);
-		execution_history.push(0);
+		m_frame_deltas.push(m_sleep);
+		m_execution_history.push(0);
 	}
+}
 
-	sleep = { 0, 1 * 1000 * 1000 * 1000 / 100 };
-
-	clock_gettime(CLOCK_UPTIME, &last_frame);
+void
+CursesViewer::loop()
+{
+	clock_gettime(CLOCK_UPTIME, &m_last_frame);
 
 	// Make getch() non-blocking.
 	nodelay(stdscr, true);
 
 	while (1) {
-		assert(frame_deltas.size() == 50);
-		assert(execution_history.size() == 50);
+		assert(m_frame_deltas.size() == 50);
+		assert(m_execution_history.size() == 50);
 
 		erase();
-		conn.read_executions();
-
-		int tus_with_execs = 0;
-		for (auto &t : conn.m_tus)
-			tus_with_execs += t.has_execs;
-
-		auto &t = conn.m_tus[tu];
-		total_executions = 0;
-		for (int i = offset; i < (size_y - 2 + offset) && i < t.num_lines; i++) {
-			uint32_t e = t.exec_diffs[i + 1];
-			std::string l = t.source[i];
-
-			total_executions += e;
-
-			int color = 0;
-			if (e > 100000 )
-				color = 5;
-			else if (e > 10000)
-				color = 4;
-			else if (e > 1000 )
-				color = 3;
-			else if (e > 100)
-				color = 2;
-			else if (e > 0)
-				color = 1;
-
-			if (color != 0)
-				attron(COLOR_PAIR(color));
-
-			printw("%s\n", l.c_str());
-
-			if (color != 0)
-				attroff(COLOR_PAIR(color));
-		}
-
-		// Non-blocking due to nodelay() above.
-		int ch = getch();
-		if (ch == 'j' && offset < (t.num_lines - size_y - 1))
-			offset++;
-		else if (ch == 'k' && offset > 0)
-			offset--;
-		else if (ch == 'l' && tu < (conn.m_num_tus - 1))
-			tu++;
-		else if (ch == 'h' && tu > 0)
-			tu--;
-
-		move(size_y - 1, 0);
-		clrtoeol();
-
-		printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s (%i)] [%i us]",
-			conn.m_progname.c_str(), "", //t.file_name.c_str(),
-			tu + 1, conn.m_num_tus, fps, eps / 1000, tus_with_execs,
-			sleep.tv_sec + sleep.tv_nsec / 1000);
-		for (int i = 1; i <= 5; i++) {
-			attron(COLOR_PAIR(i));
-			printw("<<");
-			attroff(COLOR_PAIR(i));
-		}
-		printw("\n");
-		refresh();
-
-		struct timespec tmp, delta;
-
-		// Get last frames duration and update last_frame time.
-		clock_gettime(CLOCK_UPTIME, &tmp);
-		timespecsub(&tmp, &last_frame, &delta);
-		last_frame = tmp;
-
-		// Pop oldest off and push newest on to frame_delta's queue.
-		frame_deltas.push(delta);
-		tmp = frame_deltas.front();
-		frame_deltas.pop();
-
-		// Remove oldest time and add newest time to floating_avg.
-		timespecsub(&floating_avg, &tmp, &floating_avg);
-		timespecadd(&floating_avg, &delta, &floating_avg);
-
-		// Add the newest execution count to the floating average.
-		exec_floating_avg += total_executions;
-
-		// Push on new data and pop old data off. Subtracts the oldest
-		// execution count from the floating average.
-		execution_history.push(total_executions);
-		exec_floating_avg -= execution_history.front();
-		execution_history.pop();
-
-		fps = 50 * 1000 / (floating_avg.tv_sec * 1000 + floating_avg.tv_nsec / (1000 * 1000));
-		eps = exec_floating_avg / 50;
-
-		struct timespec one = { 1, 0 };
-		struct timespec zero = { 0, 0 };
-		struct timespec shift = { 0, 50 * 1000 };
-		if (timespeccmp(&floating_avg, &one, <))
-			// We're executing too fast. Increase sleep.
-			timespecadd(&sleep, &shift, &sleep);
-		else if (timespeccmp(&floating_avg, &one, !=) && timespeccmp(&sleep, &shift, >=))
-			// Floating avg is > 1.0 but we can still subtract at
-			// least shift.
-			timespecsub(&sleep, &shift, &sleep);
-
-		nanosleep(&sleep, NULL);
+		read_executions();
+		get_keyboard();
+		draw();
+		update_execs();
+		update_sleep();
 	}
+}
+
+void
+CursesViewer::get_keyboard()
+{
+	// Non-blocking due to nodelay().
+	int ch = getch();
+
+	if (ch == 'q')
+		exit(0);
+	else if (ch == 'l' && m_tu < (m_num_tus - 1))
+		m_tu++;
+	else if (ch == 'h' && m_tu > 0)
+		m_tu--;
+
+	m_cur_tu = m_tus[m_tu];
+
+	if (ch == 'j' && m_offset < (m_cur_tu.num_lines - m_size_y - 1))
+		m_offset++;
+	else if (ch == 'k' && m_offset > 0)
+		m_offset--;
+}
+
+void
+CursesViewer::draw()
+{
+	int upper_bound = m_size_y - 2 + m_offset;
+
+	for (int i = m_offset; i < upper_bound && i < m_cur_tu.num_lines; i++) {
+		uint32_t e = m_cur_tu.exec_diffs[i + 1];
+		std::string l = m_cur_tu.source[i];
+
+		m_total_executions += e;
+
+		int color = 0;
+		if (e > 100000 )
+			color = 5;
+		else if (e > 10000)
+			color = 4;
+		else if (e > 1000 )
+			color = 3;
+		else if (e > 100)
+			color = 2;
+		else if (e > 0)
+			color = 1;
+
+		if (color != 0)
+			attron(COLOR_PAIR(color));
+
+		printw("%s\n", l.c_str());
+
+		if (color != 0)
+			attroff(COLOR_PAIR(color));
+	}
+
+	print_statusbar();
+	refresh();
+}
+
+void
+CursesViewer::print_statusbar()
+{
+	move(m_size_y - 1, 0);
+	clrtoeol();
+
+	printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s (%i)] [%i us]",
+		m_progname.c_str(),
+		m_cur_tu.file_name.c_str(),
+		m_tu + 1, m_num_tus,
+		m_fps,
+		m_eps / 1000, m_tus_with_execs,
+		m_sleep.tv_sec + m_sleep.tv_nsec / 1000);
+
+	for (int i = 1; i <= 5; i++) {
+		attron(COLOR_PAIR(i));
+		printw("<<");
+		attroff(COLOR_PAIR(i));
+	}
+
+	printw("\n");
+}
+
+void
+CursesViewer::update_execs()
+{
+	// Add the newest execution count to the floating average.
+	m_exec_floating_avg += m_total_executions;
+
+	// Push on new data and pop old data off. Subtracts the oldest
+	// execution count from the floating average.
+	m_execution_history.push(m_total_executions);
+	m_exec_floating_avg -= m_execution_history.front();
+	m_execution_history.pop();
+
+	m_eps = m_exec_floating_avg / 50;
+	m_total_executions = 0;
+}
+
+void
+CursesViewer::update_sleep()
+{
+	struct timespec tmp, delta;
+	struct timespec one = { 1, 0 };
+	struct timespec zero = { 0, 0 };
+	struct timespec shift = { 0, 50 * 1000 };
+
+	// Get last frames duration and update last_frame time.
+	clock_gettime(CLOCK_UPTIME, &tmp);
+	timespecsub(&tmp, &m_last_frame, &delta);
+	m_last_frame = tmp;
+
+	// Pop oldest off and push newest on to frame_delta's queue.
+	m_frame_deltas.push(delta);
+	tmp = m_frame_deltas.front();
+	m_frame_deltas.pop();
+
+	// Remove oldest time and add newest time to floating_avg.
+	timespecsub(&m_floating_avg, &tmp, &m_floating_avg);
+	timespecadd(&m_floating_avg, &delta, &m_floating_avg);
+
+	m_fps = 50 * 1000 / (m_floating_avg.tv_sec * 1000 + m_floating_avg.tv_nsec / (1000 * 1000));
+
+	if (timespeccmp(&m_floating_avg, &one, <))
+		// We're executing too fast. Increase sleep.
+		timespecadd(&m_sleep, &shift, &m_sleep);
+	else if (timespeccmp(&m_floating_avg, &one, !=) && timespeccmp(&m_sleep, &shift, >))
+		// Floating avg is > 1.0 but we can still subtract at
+		// least shift.
+		timespecsub(&m_sleep, &shift, &m_sleep);
+
+	nanosleep(&m_sleep, NULL);
 }
 
 int
@@ -180,8 +239,8 @@ main(int argc, char *argv[])
 	if (client == NULL)
 		errx(1, "client was NULL");
 
-	RuntimeProcess conn(*client);
-	draw_source(conn);
+	CursesViewer conn(*client);
+	conn.loop();
 
 	endwin();
 

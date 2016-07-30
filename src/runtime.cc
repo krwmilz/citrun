@@ -21,7 +21,8 @@
 #include "runtime.hh"
 
 RuntimeProcess::RuntimeProcess(af_unix &sock) :
-	m_socket(sock)
+	m_socket(sock),
+	m_tus_with_execs(0)
 {
 	uint16_t sz;
 	assert(sizeof(pid_t) == 4);
@@ -73,6 +74,8 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 void
 RuntimeProcess::read_executions()
 {
+	m_tus_with_execs = 0;
+
 	for (auto &t : m_tus) {
 		m_socket.read_all(t.has_execs);
 
@@ -81,6 +84,7 @@ RuntimeProcess::read_executions()
 			continue;
 		}
 
+		m_tus_with_execs += 1;
 		size_t bytes_total = t.num_lines * sizeof(uint32_t);
 		m_socket.read_all((uint8_t *)&t.exec_diffs[0], bytes_total);
 	}
