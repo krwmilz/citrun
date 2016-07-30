@@ -38,12 +38,10 @@ sub accept {
 	($self->{ver}, $self->{num_tus}, $self->{lines_total}, $self->{pid}, $self->{ppid}, $self->{pgrp})
 		= unpack("CL5", $buf);
 
-	my $buf = read_all($client, 2);
-	my $progname_sz = unpack("S", $buf);
+	my $progname_sz = unpack("S", read_all($client, 2));
 	my $progname = read_all($client, $progname_sz);
 
-	my $buf = read_all($client, 2);
-	my $cwd_sz = unpack("S", $buf);
+	my $cwd_sz = unpack("S", read_all($client, 2));
 	my $cwd = read_all($client, $cwd_sz);
 
 	# Always sanity check these.
@@ -58,8 +56,7 @@ sub accept {
 	my @tus;
 	for (1..$self->{num_tus}) {
 		# Absolute file path.
-		$buf = read_all($client, 2);
-		my $file_name_sz = unpack("S", $buf);
+		my $file_name_sz = unpack("S", read_all($client, 2));
 		my $file_name = read_all($client, $file_name_sz);
 
 		# Total number of lines and number of instrumented sites.
