@@ -74,10 +74,9 @@ void
 RuntimeProcess::read_executions()
 {
 	for (auto &t : m_tus) {
-		uint8_t flag = 0;
-		m_socket.read_all(flag);
+		m_socket.read_all(t.has_execs);
 
-		if (flag == 0) {
+		if (t.has_execs == 0) {
 			std::fill(t.exec_diffs.begin(), t.exec_diffs.end(), 0);
 			continue;
 		}

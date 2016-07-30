@@ -52,6 +52,10 @@ draw_source(RuntimeProcess &conn)
 		erase();
 		conn.read_executions();
 
+		int tus_with_execs = 0;
+		for (auto &t : conn.m_tus)
+			tus_with_execs += t.has_execs;
+
 		auto &t = conn.m_tus[tu];
 		total_executions = 0;
 		for (int i = offset; i < (size_y - 2 + offset) && i < t.num_lines; i++) {
@@ -95,9 +99,9 @@ draw_source(RuntimeProcess &conn)
 		move(size_y - 1, 0);
 		clrtoeol();
 
-		printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s] [%i us]",
-			conn.m_progname.c_str(), t.file_name.c_str(),
-			tu + 1, conn.m_num_tus, fps, eps / 1000,
+		printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s (%i)] [%i us]",
+			conn.m_progname.c_str(), "", //t.file_name.c_str(),
+			tu + 1, conn.m_num_tus, fps, eps / 1000, tus_with_execs,
 			sleep.tv_sec + sleep.tv_nsec / 1000);
 		for (int i = 1; i <= 5; i++) {
 			attron(COLOR_PAIR(i));
@@ -137,11 +141,11 @@ draw_source(RuntimeProcess &conn)
 
 		struct timespec one = { 1, 0 };
 		struct timespec zero = { 0, 0 };
-		struct timespec shift = { 0, 100 * 1000 };
+		struct timespec shift = { 0, 50 * 1000 };
 		if (timespeccmp(&floating_avg, &one, <))
 			// We're executing too fast. Increase sleep.
 			timespecadd(&sleep, &shift, &sleep);
-		else if (timespeccmp(&floating_avg, &one, !=) && timespeccmp(&sleep, &shift, >))
+		else if (timespeccmp(&floating_avg, &one, !=) && timespeccmp(&sleep, &shift, >=))
 			// Floating avg is > 1.0 but we can still subtract at
 			// least shift.
 			timespecsub(&sleep, &shift, &sleep);
