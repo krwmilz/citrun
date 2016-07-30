@@ -44,10 +44,20 @@ citrun_node_add(struct citrun_node *n)
 {
 	struct citrun_node *walk = nodes_head;
 
-	/* Used for double buffering line counts. */
+	/* Zeroed memory for double buffering line counts. */
 	n->old_lines = calloc(n->size, sizeof(uint64_t));
 	if (n->old_lines == NULL)
 		err(1, "calloc");
+
+	/* Memory for buffering current line counts. */
+	n->tmp_lines = malloc(n->size * sizeof(uint64_t));
+	if (n->tmp_lines == NULL)
+		err(1, "malloc");
+
+	/* Memory staging area for line differences. */
+	n->diffs = malloc(n->size * sizeof(uint32_t));
+	if (n->diffs == NULL)
+		err(1, "malloc");
 
 	nodes_total++;
 	lines_total += n->size;
@@ -202,10 +212,10 @@ static void
 send_dynamic(int fd)
 {
 	struct citrun_node	*w;
-	uint64_t		*lines_ptr;
+	uint64_t		*tmp_lines;
 	uint64_t		*old_lines_ptr;
 	uint64_t		 diff64;
-	uint32_t		*tmp_space;
+	uint32_t		*diffs;
 	uint32_t		 diff;
 	int			 i;
 	int			 line;
@@ -213,32 +223,41 @@ send_dynamic(int fd)
 
 	/* Write execution buffers. */
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
-		lines_ptr =	w->lines_ptr;
-		old_lines_ptr =	w->old_lines;
-		tmp_space = malloc(w->size * sizeof(diff));
-		flag = 0;
 
+		/* These get dereferenced a lot so hold onto them. */
+		tmp_lines =	w->tmp_lines;
+		old_lines_ptr =	w->old_lines;
+		diffs =		w->diffs;
+
+		/* Snapshot execution buffers and copy them to storage. */
+		memcpy(tmp_lines, w->lines_ptr, w->size * 8);
+
+		/* Find execution differences line at a time. */
+		flag = 0;
 		for (line = 0; line < w->size; line++) {
-			assert(lines_ptr[line] >= old_lines_ptr[line]);
-			diff64 = lines_ptr[line] - old_lines_ptr[line];
+			assert(tmp_lines[line] >= old_lines_ptr[line]);
+			diff64 = tmp_lines[line] - old_lines_ptr[line];
 
 			if (diff64 > UINT32_MAX)
 				diff = UINT32_MAX;
 			else
 				diff = diff64;
 
-			tmp_space[line] = diff;
+			/* Store diffs so we can send a big buffer later. */
+			diffs[line] = diff;
 			if (diff > 0)
 				flag = 1;
-
-			/* Let's try incremental updating of old_lines. */
-			old_lines_ptr[line] += diff64;
 		}
 
+		/* Always write the has_execs flag. */
 		xwrite(fd, &flag, sizeof(flag));
+
+		/* Sometimes write the diffs buffer. */
 		if (flag == 1)
-			xwrite(fd, tmp_space, w->size * sizeof(diff));
-		free(tmp_space);
+			xwrite(fd, diffs, w->size * sizeof(diff));
+
+		/* Replace old execution storage with snapshot. */
+		memcpy(old_lines_ptr, tmp_lines, w->size * 8);
 	}
 	assert(i == nodes_total);
 	assert(w == NULL);
