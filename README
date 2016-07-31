@@ -10,6 +10,7 @@ Build dependencies:
 - Jam
 - LLVM and Clang > 3.7
 - OpenGLES >= 2.0
+- Curses
 
 Compile:
 $ jam
