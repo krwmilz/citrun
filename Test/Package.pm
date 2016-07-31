@@ -11,9 +11,6 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
-	# Always set this so we never try to connect to a real viewer.
-	$ENV{CITRUN_SOCKET} = getcwd . "/citrun-test.socket";
-
 	return $self if (! defined ($dist_name));
 	$self->{dist_name} = $dist_name;
 

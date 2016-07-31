@@ -17,6 +17,8 @@ my $libressl_url = "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/";
 my $package = Test::Package->new("libressl-2.4.1.tar.gz", $libressl_url, "tar xzf");
 $package->dependencies("citrun");
 
+$ENV{CITRUN_SOCKET} = $package->{dir} . "/test.socket";
+
 # New end to end report.
 my $report = Test::Report->new("LIBRESSL", $num_tests);
 $report->add("desc", "configure time (sec)");

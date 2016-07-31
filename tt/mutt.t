@@ -18,6 +18,8 @@ my $mutt_url = "ftp://ftp.mutt.org/pub/mutt/";
 my $package = Test::Package->new("mutt-1.6.1.tar.gz", $mutt_url, "tar xzf");
 $package->dependencies("citrun");
 
+$ENV{CITRUN_SOCKET} = $package->{dir} . "/test.socket";
+
 # New end to end report.
 my $report = Test::Report->new("MUTT", $num_tests);
 $report->add("desc", "configure time (sec)");

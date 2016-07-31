@@ -19,6 +19,8 @@ my $vim_url = "ftp://ftp.vim.org/pub/vim/unix/";
 my $package = Test::Package->new("vim-7.4.tar.bz2", $vim_url, "tar xjf");
 $package->dependencies("citrun");
 
+$ENV{CITRUN_SOCKET} = $package->{dir} . "/test.socket";
+
 sub time_expect {
 	my $start = time;
 	my $exp = Expect->spawn(@_);
