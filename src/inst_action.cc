@@ -40,50 +40,35 @@ InstrumentAction::EndSourceFileAction()
 {
 	clang::SourceManager &sm = m_TheRewriter.getSourceMgr();
 	const clang::FileID main_fid = sm.getMainFileID();
-	// llvm::errs() << "** EndSourceFileAction for: "
-	// 	<< sm.getFileEntryForID(main_fid)->getName()
-	// 	<< "\n";
+	std::stringstream ss;
 
 	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
 	clang::SourceLocation end = sm.getLocForEndOfFile(main_fid);
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
-	std::string const file_name = getCurrentFile();
-	std::stringstream ss;
-
-	// Add preprocessor stuff so that the C runtime library links against
-	// C++ object code.
-	ss << "#ifdef __cplusplus" << std::endl;
-	ss << "extern \"C\" {" << std::endl;
-	ss << "#endif" << std::endl;
-
-	// Embed the runtime header directly in the primary source file.
-	ss << runtime_h << std::endl;
-
-	// Execution data needs to be big because it only increments.
-	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
-
-	// Keep track of how many sites we instrumented.
 	int rw_count = m_InstrumentASTConsumer->get_visitor().GetRewriteCount();
+	std::string const file_name = getCurrentFile();
 
-	// Define this translation units main book keeping data structure
+	// Write instrumentation preamble. Includes runtime header, per tu
+	// citrun_node and static constructor for runtime initialization.
+	ss << "#ifdef __cplusplus" << std::endl
+		<< "extern \"C\" {" << std::endl
+		<< "#endif" << std::endl;
+	ss << runtime_h << std::endl;
+	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
 	ss << "static struct citrun_node _citrun_node = {" << std::endl
-		<< "	.lines_ptr = _citrun_lines," << std::endl
-		<< "	.size = " << num_lines << "," << std::endl
-		<< "	.inst_sites = " << rw_count << "," << std::endl
-		<< "	.file_name = \"" << file_name << "\"," << std::endl;
+		<< "	_citrun_lines," << std::endl
+		<< "	" << num_lines << "," << std::endl
+		<< "	" << rw_count << "," << std::endl
+		<< "	\"" << file_name << "\"," << std::endl;
 	ss << "};" << std::endl;
-
 	ss << "__attribute__((constructor))" << std::endl
 		<< "static void citrun_constructor() {" << std::endl
 		<< "	citrun_node_add(&_citrun_node);" << std::endl
 		<< "}" << std::endl;
-
-	// Close extern "C" {
-	ss << "#ifdef __cplusplus" << std::endl;
-	ss << "}" << std::endl;
-	ss << "#endif" << std::endl;
-
+	ss << "#ifdef __cplusplus" << std::endl
+		<< "}" << std::endl
+		<< "#endif" << std::endl;
 	m_TheRewriter.InsertTextAfter(start, ss.str());
 
 	llvm::StringRef file_ref(file_name);

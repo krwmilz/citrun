@@ -41,10 +41,10 @@ void citrun_start();
 
 static uint64_t _citrun_lines[6];
 static struct citrun_node _citrun_node = {
-	.lines_ptr = _citrun_lines,
-	.size = 6,
-	.inst_sites = 1,
-	.file_name = "$tmp_dir/source_0.c",
+	_citrun_lines,
+	6,
+	1,
+	"$tmp_dir/source_0.c",
 };
 __attribute__((constructor))
 static void citrun_constructor() {
