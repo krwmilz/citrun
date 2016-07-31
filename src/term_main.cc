@@ -4,6 +4,7 @@
 #include <cassert>
 #include <csignal>	// sigaction
 #include <cstdlib>	// exit
+#include <err.h>	// errx
 #include <iostream>
 #include <ncurses.h>
 #include <queue>
@@ -218,7 +219,7 @@ int
 main(int argc, char *argv[])
 {
 	af_unix listen_sock;
-	listen_sock.set_listen();
+	std::string socket_path = listen_sock.set_listen();
 
 	initscr();
 	if (has_colors() == FALSE) {
@@ -233,7 +234,7 @@ main(int argc, char *argv[])
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
 
-	printw("Waiting for connection on /tmp/citrun.socket\n");
+	printw("Waiting for connection on %s\n", socket_path.c_str());
 	refresh();
 
 	// Block SIGPIPE so that write() will generate errors.

@@ -17,15 +17,17 @@
 #include <sys/un.h>		// sockaddr_un
 
 #include <cerrno>		// EWOULDBLOCK
-#include <cstring>		// memset, strcpy
+#include <err.h>		// err
+#include <cstring>		// memset, strlcpy
 #include <fcntl.h>		// fcntl, F_GETFL
 #include <iostream>
 #include <stdexcept>
-#include <unistd.h>		// close
+#include <unistd.h>		// close, read
 
 #include "af_unix.h"
 
-af_unix::af_unix()
+af_unix::af_unix() :
+	m_socket_path("/tmp/citrun.socket")
 {
 	if ((m_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
@@ -35,7 +37,7 @@ af_unix::~af_unix()
 {
 	close(m_fd);
 	if (m_bound)
-		unlink("/tmp/citrun.socket");
+		unlink(m_socket_path.c_str());
 }
 
 af_unix::af_unix(int f) :
@@ -65,13 +67,18 @@ af_unix::set_block()
 		err(1, "fcntl(F_SETFL)");
 }
 
-void
+std::string
 af_unix::set_listen()
 {
 	struct sockaddr_un addr;
 	std::memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	std::strcpy(addr.sun_path, "/tmp/citrun.socket");
+
+	char *viewer_sock;
+	if ((viewer_sock = std::getenv("CITRUN_SOCKET")) != NULL)
+		m_socket_path = viewer_sock;
+
+	strlcpy(addr.sun_path, m_socket_path.c_str(), sizeof(addr.sun_path));
 
 	if (bind(m_fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");
@@ -81,6 +88,8 @@ af_unix::set_listen()
 	// Size 1024 backlog
 	if (listen(m_fd, 1024))
 		err(1, "listen");
+
+	return m_socket_path;
 }
 
 af_unix *
