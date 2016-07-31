@@ -22,6 +22,7 @@
 #include <fcntl.h>		// fcntl, F_GETFL
 #include <iostream>
 #include <stdexcept>
+#include <system_error>		// system_error
 #include <unistd.h>		// close, read
 
 #include "af_unix.h"
@@ -122,7 +123,7 @@ af_unix::write_all(uint8_t *buf, size_t bytes_total)
 		n = write(m_fd, buf + bytes_wrote, bytes_left);
 
 		if (n < 0)
-			throw std::runtime_error("write failed");
+			throw std::system_error(errno, std::system_category());
 
 		bytes_wrote += n;
 		bytes_left -= n;
@@ -142,7 +143,7 @@ af_unix::read_all(uint8_t *buf, size_t bytes_total)
 		n = read(m_fd, buf + bytes_read, bytes_left);
 
 		if (n == 0)
-			errx(1, "read(): read 0 bytes on socket");
+			throw std::runtime_error("read 0 bytes on socket");
 		if (n < 0)
 			err(1, "read()");
 
