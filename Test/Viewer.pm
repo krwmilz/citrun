@@ -5,16 +5,15 @@ use IO::Socket::UNIX;
 use List::MoreUtils qw( each_array );
 use Test::More;
 
-my $viewer_socket_name = "citrun-test.socket";
-
 sub new {
 	my ($class) = @_;
 	my $self = {};
 	bless ($self, $class);
 
+	$self->{viewer_socket_name} = $ENV{CITRUN_SOCKET};
 	my $viewer_socket = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM(),
-		Local => $viewer_socket_name,
+		Local => $self->{viewer_socket_name},
 		Listen => 1
 	);
 	die "socket error: $!\n" unless ($viewer_socket);
@@ -169,7 +168,7 @@ sub DESTROY {
 	my ($self) = @_;
 
 	close($self->{viewer_socket});
-	unlink $viewer_socket_name;
+	unlink $self->{viewer_socket_name};
 }
 
 1;

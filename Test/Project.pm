@@ -56,8 +56,6 @@ EOF
 sub run {
 	my ($self, @args) = @_;
 
-	$ENV{CITRUN_SOCKET} = "citrun-test.socket";
-
 	my $tmp_dir = $self->{tmp_dir};
 	$self->{pid} = open2(\*CHLD_OUT, undef, "$tmp_dir/$self->{prog_name}", @args);
 }
@@ -81,11 +79,10 @@ sub wait {
 	return ($real_ret, $stderr);
 }
 
-sub get_tmpdir {
+sub tmpdir {
 	my ($self) = @_;
 
 	return "/private$self->{tmp_dir}" if ($^O eq 'darwin');
-
 	return $self->{tmp_dir};
 }
 

@@ -1,15 +1,11 @@
 use strict;
-
-use Data::Dumper;
 use Test::More tests => 19;
-use Test::Differences;
-
 use Test::Project;
 use Test::Viewer;
 
 my $project = Test::Project->new();
+$ENV{CITRUN_SOCKET} = $project->tmpdir() . "/test.socket";
 my $viewer = Test::Viewer->new();
-unified_diff;
 
 $project->add_src(<<EOF);
 #include <err.h>

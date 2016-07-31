@@ -1,14 +1,11 @@
 use strict;
-
 use Test::More tests => 1;
-use Test::Differences;
-
 use Test::Project;
 use Test::Viewer;
 
-my $viewer = Test::Viewer->new();
 my $project = Test::Project->new();
-unified_diff;
+$ENV{CITRUN_SOCKET} = $project->tmpdir() . "/test.socket";
+my $viewer = Test::Viewer->new();
 
 $project->add_src(<<EOF
 void second_func();
