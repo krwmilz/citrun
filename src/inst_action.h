@@ -33,6 +33,6 @@ public:
 	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
 
 private:
-	clang::Rewriter TheRewriter;
-	RewriteASTConsumer *InstrumentASTConsumer;
+	clang::Rewriter		 m_TheRewriter;
+	RewriteASTConsumer	*m_InstrumentASTConsumer;
 };

@@ -28,17 +28,17 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
 	clang::SourceManager &sm = CI.getSourceManager();
-	TheRewriter.setSourceMgr(sm, CI.getLangOpts());
+	m_TheRewriter.setSourceMgr(sm, CI.getLangOpts());
 
 	// Hang onto a reference to this so we can read from it later
-	InstrumentASTConsumer = new RewriteASTConsumer(TheRewriter);
-	return std::unique_ptr<clang::ASTConsumer>(InstrumentASTConsumer);
+	m_InstrumentASTConsumer = new RewriteASTConsumer(m_TheRewriter);
+	return std::unique_ptr<clang::ASTConsumer>(m_InstrumentASTConsumer);
 }
 
 void
 InstrumentAction::EndSourceFileAction()
 {
-	clang::SourceManager &sm = TheRewriter.getSourceMgr();
+	clang::SourceManager &sm = m_TheRewriter.getSourceMgr();
 	const clang::FileID main_fid = sm.getMainFileID();
 	// llvm::errs() << "** EndSourceFileAction for: "
 	// 	<< sm.getFileEntryForID(main_fid)->getName()
@@ -57,14 +57,14 @@ InstrumentAction::EndSourceFileAction()
 	ss << "extern \"C\" {" << std::endl;
 	ss << "#endif" << std::endl;
 
-	// Embed the header directly in the primary source file.
+	// Embed the runtime header directly in the primary source file.
 	ss << runtime_h << std::endl;
 
 	// Execution data needs to be big because it only increments.
 	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
 
 	// Keep track of how many sites we instrumented.
-	int rw_count = InstrumentASTConsumer->get_visitor().GetRewriteCount();
+	int rw_count = m_InstrumentASTConsumer->get_visitor().GetRewriteCount();
 
 	// Define this translation units main book keeping data structure
 	ss << "static struct citrun_node _citrun_node = {" << std::endl
@@ -84,12 +84,12 @@ InstrumentAction::EndSourceFileAction()
 	ss << "}" << std::endl;
 	ss << "#endif" << std::endl;
 
-	TheRewriter.InsertTextAfter(start, ss.str());
+	m_TheRewriter.InsertTextAfter(start, ss.str());
 
 	llvm::StringRef file_ref(file_name);
 	std::error_code ec;
 	llvm::raw_fd_ostream output(file_ref, ec, llvm::sys::fs::F_None);
 
 	// Write the instrumented source file
-	TheRewriter.getEditBuffer(main_fid).write(output);
+	m_TheRewriter.getEditBuffer(main_fid).write(output);
 }
