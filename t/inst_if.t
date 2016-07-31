@@ -1,12 +1,9 @@
 use strict;
 
-use Test::More tests => 3;
-use Test::Differences;
-
+use Test::More tests => 1;
 use Test::Project;
 
 my $project = Test::Project->new();
-unified_diff;
 
 $project->add_src(<<EOF);
 #include <stdlib.h>
@@ -32,35 +29,7 @@ main(int argc, char *argv[])
 EOF
 
 $project->compile();
-
-my $inst_src_good = <<EOF;
-#include <stdlib.h>
-
-int
-main(int argc, char *argv[])
-{citrun_start();++_citrun_lines[3];++_citrun_lines[4];++_citrun_lines[5];
-	if ((++_citrun_lines[6], argc == 1))
-		return (++_citrun_lines[7], 1);
-	else
-		(++_citrun_lines[9], exit(14));
-
-	if ((++_citrun_lines[11], argc == 2)) {
-		return (++_citrun_lines[12], 5);
-	}
-	else if ((++_citrun_lines[14], argc == 3)) {
-		return (++_citrun_lines[15], 0);
-	}
-	else {
-		(++_citrun_lines[18], exit(0));
-	}
-}
-EOF
-
-my $inst_src = $project->instrumented_src();
-ok( $inst_src );
-
-eq_or_diff $inst_src, $inst_src_good, "instrumented source comparison";
-
 $project->run();
+
 my ($ret) = $project->wait();
 is($ret, 1, "instrumented program check");

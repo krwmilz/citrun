@@ -115,10 +115,6 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 			// Keep track of original source file names
 			m_source_files.push_back(arg);
 
-			if (std::getenv("CITRUN_TESTING"))
-				// Don't copy and restore original source files
-				continue;
-
 			char *dst_fn;
 			if ((dst_fn = std::tmpnam(NULL)) == NULL)
 				err(1, "tmpnam");
