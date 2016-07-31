@@ -20,6 +20,7 @@
 #include <cstring>		// memset, strcpy
 #include <fcntl.h>		// fcntl, F_GETFL
 #include <iostream>
+#include <stdexcept>
 #include <unistd.h>		// close
 
 #include "af_unix.h"
@@ -112,7 +113,7 @@ af_unix::write_all(uint8_t *buf, size_t bytes_total)
 		n = write(m_fd, buf + bytes_wrote, bytes_left);
 
 		if (n < 0)
-			err(1, "write()");
+			throw std::runtime_error("write failed");
 
 		bytes_wrote += n;
 		bytes_left -= n;

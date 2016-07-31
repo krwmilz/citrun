@@ -2,15 +2,16 @@
 // Original idea from Max Zunti.
 //
 #include <cassert>
+#include <csignal>	// sigaction
+#include <cstdlib>	// exit
 #include <iostream>
 #include <ncurses.h>
 #include <queue>
-#include <stdlib.h>	// exit
+#include <stdexcept>	// runtime_error
 #include <time.h>	// clock_gettime, nanosleep
 
 #include "af_unix.h"
 #include "runtime.hh"
-
 
 class CursesViewer : public RuntimeProcess {
 public:
@@ -89,7 +90,7 @@ CursesViewer::get_keyboard()
 	int ch = getch();
 
 	if (ch == 'q')
-		exit(0);
+		throw std::runtime_error("quit");
 	else if (ch == 'l' && m_tu < (m_num_tus - 1))
 		m_tu++;
 	else if (ch == 'h' && m_tu > 0)
@@ -223,7 +224,7 @@ main(int argc, char *argv[])
 	if (has_colors() == FALSE) {
 		endwin();
 		printf("Your terminal does not support color\n");
-		exit(1);
+		std::exit(1);
 	}
 	start_color();
 	init_pair(1, COLOR_RED, COLOR_BLACK);
@@ -235,12 +236,22 @@ main(int argc, char *argv[])
 	printw("Waiting for connection on /tmp/citrun.socket\n");
 	refresh();
 
+	// Block SIGPIPE so that write() will generate errors.
+	sigset_t mask_set;
+	sigemptyset(&mask_set);
+	sigaddset(&mask_set, SIGPIPE);
+	sigprocmask(SIG_BLOCK, &mask_set, NULL);
+
 	af_unix *client = listen_sock.accept();
 	if (client == NULL)
 		errx(1, "client was NULL");
 
-	CursesViewer conn(*client);
-	conn.loop();
+	try {
+		CursesViewer conn(*client);
+		conn.loop();
+	} catch (const std::exception &e) {
+		std::cerr << "ERROR: " << e.what();
+	}
 
 	endwin();
 
