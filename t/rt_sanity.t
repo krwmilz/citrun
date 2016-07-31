@@ -1,7 +1,7 @@
 use strict;
 
 use Cwd;
-use Test::More tests => 60;
+use Test::More tests => 61;
 use Test::Differences;
 
 use Test::Project;
@@ -61,6 +61,7 @@ $project->compile();
 $project->run(45);
 
 $viewer->accept();
+is( $viewer->{ver}, 0, "protocol version" );
 is( $viewer->{num_tus}, 3, "translation unit count" );
 is( $viewer->{progname}, "program", "program name" );
 is( $viewer->{cwd}, getcwd, "current working dir" );
