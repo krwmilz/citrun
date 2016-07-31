@@ -29,8 +29,9 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 
 	// Protocol defined in lib/runtime.c send_static().
 	// This is the receive side of things.
-	m_socket.read_all(m_ver);
-	assert(m_ver == 0);
+	m_socket.read_all(m_major);
+	assert(m_major == 0);
+	m_socket.read_all(m_minor);
 	m_socket.read_all(m_num_tus);
 	m_socket.read_all(m_lines_total);
 	m_socket.read_all(m_pid);

@@ -34,9 +34,9 @@ sub accept {
 
 	# Protocol defined in lib/runtime.c function send_static().
 	#
-	my $buf = read_all($client, 1 + 4 + 4 + 12);
-	($self->{ver}, $self->{num_tus}, $self->{lines_total}, $self->{pid},
-		$self->{ppid}, $self->{pgrp}) = unpack("CL5", $buf);
+	my $buf = read_all($client, 1 + 1 + 4 + 4 + 12);
+	($self->{major}, $self->{minor}, $self->{num_tus}, $self->{lines_total}, $self->{pid},
+		$self->{ppid}, $self->{pgrp}) = unpack("C2L5", $buf);
 
 	my $progname_sz = unpack("S", read_all($client, 2));
 	$self->{progname} = read_all($client, $progname_sz);

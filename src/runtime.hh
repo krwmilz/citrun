@@ -20,7 +20,8 @@ public:
 	void read_executions();
 
 	// Protocol defined in lib/runtime.c send_static().
-	uint8_t		m_ver;
+	uint8_t		m_major;
+	uint8_t		m_minor;
 	std::string	m_progname;
 	std::string	m_cwd;
 	uint32_t	m_num_tus;

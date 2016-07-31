@@ -142,7 +142,7 @@ xwrite(int d, const void *buf, size_t bytes_total)
 /*
  * Send static information contained in each instrumented node.
  * Sent program wide values:
- * - version
+ * - version major and minor
  * - total number of translation units
  * - total number of lines in program
  * - process id, parent process id, group process id
@@ -159,18 +159,20 @@ xwrite(int d, const void *buf, size_t bytes_total)
 static void
 send_static(int fd)
 {
+	uint8_t			 major = 0;
+	uint8_t			 minor = 0;
 	struct citrun_node	 node;
 	pid_t			 pids[3];
 	struct citrun_node	*w;
 	const char		*progname;
 	char			*cwd_buf;
-	uint16_t		 sz;
-	uint8_t			 ver = 0;
 	int			 i;
+	uint16_t		 sz;
 
 	assert(sizeof(pid_t) == 4);
 
-	xwrite(fd, &ver, sizeof(ver));
+	xwrite(fd, &major, sizeof(major));
+	xwrite(fd, &minor, sizeof(minor));
 	xwrite(fd, &nodes_total, sizeof(nodes_total));
 	xwrite(fd, &lines_total, sizeof(lines_total));
 
