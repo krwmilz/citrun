@@ -20,8 +20,27 @@
 .Nm citrun-term
 .Nd terminal viewer
 .Sh DESCRIPTION
-Listens for a connection from a single running instrumented program. Displays
-execution data in a terminal window.
+Listens for connections from running instrumented programs. Only supports one
+connection at a time.
+.Pp
+.Nm
+is controlled by the keys
+.Qq hjkl :
+.Pp
+.Bl -offset indent -compact
+.It
+.Qq j
+scrolls down
+.It
+.Qq k
+scrolls up
+.It
+.Qq h
+previous translation unit
+.It
+.Qq l
+next translation unit
+.El
 .Sh FILES
 .Bl -tag -width Ds
 .It Pa /tmp/citrun.socket
