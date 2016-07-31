@@ -62,14 +62,14 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 
 	std::stringstream ss;
 	ss << "(++_citrun_lines["
-		<< SM.getPresumedLineNumber(s->getLocStart())
+		<< m_SM.getPresumedLineNumber(s->getLocStart())
 		<< "], ";
-	if (TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
+	if (m_TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
 		return true;
 
-	TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
-	++rewrite_count;
+	m_TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
+	++m_rewrite_count;
 
 	return true;
 }
@@ -92,13 +92,13 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
 
 	// Animate function calls by firing the entire declaration.
-	int decl_start = SM.getPresumedLineNumber(f->getLocStart());
-	int decl_end = SM.getPresumedLineNumber(curly_brace);
+	int decl_start = m_SM.getPresumedLineNumber(f->getLocStart());
+	int decl_end = m_SM.getPresumedLineNumber(curly_brace);
 	for (int i = decl_start; i <= decl_end; i++)
 		rewrite_text << "++_citrun_lines[" << i << "];";
 
 	// Rewrite the function source right after the beginning curly brace.
-	TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
+	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
 
 	return true;
 }
@@ -107,5 +107,5 @@ clang::SourceLocation
 RewriteASTVisitor::real_loc_end(clang::Stmt *d)
 {
 	clang::SourceLocation _e(d->getLocEnd());
-	return clang::SourceLocation(clang::Lexer::getLocForEndOfToken(_e, 0, SM, lopt));
+	return clang::SourceLocation(clang::Lexer::getLocForEndOfToken(_e, 0, m_SM, m_lopt));
 }
