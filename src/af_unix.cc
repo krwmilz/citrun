@@ -26,19 +26,19 @@
 
 af_unix::af_unix()
 {
-	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+	if ((m_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 		err(1, "socket");
 }
 
 af_unix::~af_unix()
 {
-	close(fd);
+	close(m_fd);
 	if (m_bound)
 		unlink("/tmp/citrun.socket");
 }
 
 af_unix::af_unix(int f) :
-	fd(f)
+	m_fd(f)
 {
 }
 
@@ -47,9 +47,9 @@ af_unix::set_nonblock()
 {
 	int flags;
 
-	if ((flags = fcntl(fd, F_GETFL, 0)) < 0)
+	if ((flags = fcntl(m_fd, F_GETFL, 0)) < 0)
 		err(1, "fcntl(F_GETFL)");
-	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0)
+	if (fcntl(m_fd, F_SETFL, flags | O_NONBLOCK) < 0)
 		err(1, "fcntl(F_SETFL)");
 }
 
@@ -58,9 +58,9 @@ af_unix::set_block()
 {
 	int flags;
 
-	if ((flags = fcntl(fd, F_GETFL, 0)) < 0)
+	if ((flags = fcntl(m_fd, F_GETFL, 0)) < 0)
 		err(1, "fcntl(F_GETFL)");
-	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0)
+	if (fcntl(m_fd, F_SETFL, flags & ~O_NONBLOCK) < 0)
 		err(1, "fcntl(F_SETFL)");
 }
 
@@ -72,13 +72,13 @@ af_unix::set_listen()
 	addr.sun_family = AF_UNIX;
 	std::strcpy(addr.sun_path, "/tmp/citrun.socket");
 
-	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)))
+	if (bind(m_fd, (struct sockaddr *)&addr, sizeof(addr)))
 		err(1, "bind");
 
 	m_bound = 1;
 
 	// Size 1024 backlog
-	if (listen(fd, 1024))
+	if (listen(m_fd, 1024))
 		err(1, "listen");
 }
 
@@ -90,7 +90,7 @@ af_unix::accept()
 	socklen_t len = sizeof(struct sockaddr_un);
 
 	// Namespace collision
-	new_fd = ::accept(fd, (struct sockaddr *)&addr, &len);
+	new_fd = ::accept(m_fd, (struct sockaddr *)&addr, &len);
 	if (new_fd == -1) {
 		if (errno != EWOULDBLOCK) {
 			perror("accept");
@@ -109,7 +109,7 @@ af_unix::write_all(uint8_t *buf, size_t bytes_total)
 	ssize_t n;
 
 	while (bytes_left > 0) {
-		n = write(fd, buf + bytes_wrote, bytes_left);
+		n = write(m_fd, buf + bytes_wrote, bytes_left);
 
 		if (n < 0)
 			err(1, "write()");
@@ -129,7 +129,7 @@ af_unix::read_all(uint8_t *buf, size_t bytes_total)
 	ssize_t n;
 
 	while (bytes_left > 0) {
-		n = read(fd, buf + bytes_read, bytes_left);
+		n = read(m_fd, buf + bytes_read, bytes_left);
 
 		if (n == 0)
 			errx(1, "read(): read 0 bytes on socket");
