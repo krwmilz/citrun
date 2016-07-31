@@ -56,8 +56,9 @@ CursesViewer::CursesViewer(af_unix &socket) :
 
 	m_cur_tu = m_tus[0];
 
+	struct timespec one_fiftieth = { 0, 1 * 1000 * 1000 * 1000 / 50 };
 	for (int i = 0; i < 50; i++) {
-		m_frame_deltas.push(m_sleep);
+		m_frame_deltas.push(one_fiftieth);
 		m_execution_history.push(0);
 	}
 }
@@ -166,12 +167,11 @@ CursesViewer::print_statusbar()
 void
 CursesViewer::update_execs()
 {
-	// Add the newest execution count to the floating average.
-	m_exec_floating_avg += m_total_executions;
-
 	// Push on new data and pop old data off. Subtracts the oldest
 	// execution count from the floating average.
+	m_exec_floating_avg += m_total_executions;
 	m_execution_history.push(m_total_executions);
+
 	m_exec_floating_avg -= m_execution_history.front();
 	m_execution_history.pop();
 
