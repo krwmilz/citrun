@@ -9,11 +9,12 @@ if [ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ]; then
 	exit 2;
 fi
 
+ver="0.0"
 portname="${1}"
 uname=`uname`
 
 if [ "$uname" = "OpenBSD" ]; then
-	pkg_path=/usr/ports/packages/`uname -m`/all/${portname}-0.tgz
+	pkg_path=/usr/ports/packages/`uname -m`/all/${portname}-${ver}.tgz
 
 	# Make sure package building doesn't rely on anything that's already installed
 	doas pkg_delete $portname || true
@@ -24,7 +25,7 @@ if [ "$uname" = "OpenBSD" ]; then
 	export NO_CHECKSUM=1
 
 	# Always re-fetch the latest sources
-	rm -f /usr/ports/distfiles/${portname}-0.tar.gz
+	rm -f /usr/ports/distfiles/${portname}-${ver}.tar.gz
 
 	# The 'test' target will do a full build first
 	make -C openbsd/devel/$portname clean=all

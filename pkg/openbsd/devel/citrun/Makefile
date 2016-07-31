@@ -2,7 +2,7 @@
 
 COMMENT =		see your source code run
 
-DISTNAME =		citrun-0
+DISTNAME =		citrun-0.0
 CATEGORIES =		devel
 
 HOMEPAGE =		http://cit.run
