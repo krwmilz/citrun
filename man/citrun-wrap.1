@@ -33,15 +33,23 @@ The build command must search
 .Ev PATH
 when finding compiler executables, which must be one of the following:
 .Pp
-.Bl -tag -offset indent -compact
-.It - c++
-.It - cc
-.It - clang
-.It - clang++
-.It - eg++
-.It - egcc
-.It - g++
-.It - gcc
+.Bl -bullet -compact
+.It
+c++
+.It
+cc
+.It
+clang
+.It
+clang++
+.It
+eg++
+.It
+egcc
+.It
+g++
+.It
+gcc
 .El
 .Pp
 Because instrumentation is silent on stdout and stderr, instrumentation activity
@@ -62,10 +70,13 @@ Let
 .Qq program
 exist. It is:
 .Pp
-.Bl -tag -offset indent -compact
-.It - written in C
-.It - compiled with gcc
-.It - built with make and make searches PATH for gcc
+.Bl -bullet -compact
+.It
+written in C
+.It
+compiled with gcc
+.It
+built with make and make searches PATH for gcc
 .El
 .Pp
 Prepending
