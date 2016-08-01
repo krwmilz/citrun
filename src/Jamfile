@@ -18,6 +18,7 @@ LINKLIBS on citrun-term += -lcurses -L/usr/local/lib ;
 
 LinkLibraries citrun-term : utils ;
 Main citrun-term : term_main.cc ;
+InstallBin $(PREFIX)/bin : citrun-term ;
 
 #
 # citrun-gl
