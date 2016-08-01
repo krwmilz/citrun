@@ -70,9 +70,8 @@ InstrumentAction::EndSourceFileAction()
 		<< "#endif" << std::endl;
 	m_TheRewriter.InsertTextAfter(start, ss.str());
 
-	llvm::StringRef file_ref(file_name);
 	std::error_code ec;
-	llvm::raw_fd_ostream output(file_ref, ec, llvm::sys::fs::F_None);
+	llvm::raw_fd_ostream output(file_name, ec, llvm::sys::fs::F_None);
 
 	// Write the instrumented source file
 	m_TheRewriter.getEditBuffer(main_fid).write(output);
