@@ -288,7 +288,7 @@ CitrunInst::fork_compiler()
 	}
 
 	m_log << m_pfx << "Forked '" << m_args[0] << "' "
-	       << "pid is " << child_pid << ".\n";
+	       << "pid is '" << child_pid << "'.\n";
 
 	int status;
 	if (waitpid(child_pid, &status, 0) < 0)
@@ -299,7 +299,7 @@ CitrunInst::fork_compiler()
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
 
-	m_log << m_pfx << child_pid << " exited " << exit << ".\n";
+	m_log << m_pfx << "'" << child_pid << "' exited " << exit << ".\n";
 	return exit;
 }
 
