@@ -25,3 +25,5 @@ $exp->expect(undef, ("program"));
 
 $project->kill();
 $project->wait();
+
+$exp->soft_close();
