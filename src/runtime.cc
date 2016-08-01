@@ -15,7 +15,6 @@
 //
 #include <cassert>
 #include <err.h>
-#include <iostream>
 #include <fstream>
 
 #include "runtime.hh"

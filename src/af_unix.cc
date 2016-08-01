@@ -20,7 +20,6 @@
 #include <err.h>		// err
 #include <cstring>		// memset, strlcpy
 #include <fcntl.h>		// fcntl, F_GETFL
-#include <iostream>
 #include <stdexcept>
 #include <system_error>		// system_error
 #include <unistd.h>		// close, read

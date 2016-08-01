@@ -16,7 +16,6 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <err.h>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <string>
 
