@@ -164,7 +164,7 @@ CitrunInst::process_cmdline()
 
 CitrunInst::~CitrunInst()
 {
-	m_log << m_pfx << "citrun-inst is done.\n";
+	m_log << m_pfx << "Done.\n";
 }
 
 int
@@ -238,7 +238,7 @@ void
 CitrunInst::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
-		m_log << m_pfx << "Restored '" << tmp_file.first << "'\n";
+		m_log << m_pfx << "Restored '" << tmp_file.first << "'.\n";
 		copy_file(tmp_file.first, tmp_file.second);
 		unlink(tmp_file.second.c_str());
 	}
@@ -299,7 +299,7 @@ CitrunInst::fork_compiler()
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
 
-	m_log << m_pfx << "pid " << child_pid << " exited " << exit << "\n";
+	m_log << m_pfx << child_pid << " exited " << exit << ".\n";
 	return exit;
 }
 
@@ -347,7 +347,8 @@ CitrunInst::clean_path()
 int
 CitrunInst::compile_modified()
 {
-	m_log << m_pfx << "Running native compiler on modified source code.\n";
+	m_log << m_pfx << "Running native compiler on possibly modified "
+		<< "source code.\n";
 
 	int ret = fork_compiler();
 	restore_original_src();
