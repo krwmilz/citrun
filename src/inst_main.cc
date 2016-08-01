@@ -25,7 +25,7 @@
 #include <cstdlib>		// getenv
 #include <cstring>		// strcmp
 #include <err.h>
-#include <fstream>
+#include <fstream>		// ifstream, ofstream
 #include <sstream>
 #include <string>
 #include <unistd.h>		// execvp, fork, getpid, unlink
@@ -114,9 +114,9 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	if (uname(&utsname) == -1)
 		err(1, "uname");
 
-	m_log << m_pfx << "citrun-inst v0.0 on " << utsname.sysname
-		<< "-" << utsname.release << " " << utsname.machine << "\n";
-	m_log << m_pfx << "This program is called '" << m_args[0] << "'.\n";
+	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
+		<< "-" << utsname.release << " " << utsname.machine
+		<< ") called as '" << m_args[0] << "'.\n";
 
 	setprogname("citrun-inst");
 	clean_path();
