@@ -17,6 +17,7 @@
 #include <sys/time.h>		// utimes
 #include <sys/wait.h>		// waitpid
 
+#include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <cstdio>		// tmpnam
@@ -154,12 +155,11 @@ CitrunInst::instrument()
 	clang::tooling::CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
 	clang::tooling::ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
-	// ClangTool::run accepts a FrontendActionFactory, which is then used to
-	// create new objects implementing the FrontendAction interface. Here we
-	// use the helper newFrontendActionFactory to create a default factory
-	// that will return a new MyFrontendAction object every time.  To
-	// further customize this, we could create our own factory class.
-	// int ret = Tool.run(new MFAF(inst_files));
+	std::error_code ec;
+	llvm::raw_fd_ostream output("citrun.log", ec, llvm::sys::fs::F_None);
+	clang::DiagnosticOptions diags;
+
+	Tool.setDiagnosticConsumer(new clang::TextDiagnosticPrinter(output, &diags, false));
 	int ret = Tool.run(&(*clang::tooling::newFrontendActionFactory<InstrumentAction>()));
 
 	if (ret == 0)
