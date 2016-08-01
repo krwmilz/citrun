@@ -42,6 +42,7 @@ public:
 	CitrunInst(int, char *argv[]);
 	~CitrunInst();
 
+	void			process_cmdline();
 	int			instrument();
 	void			patch_link_command();
 	int			compile_modified();
@@ -120,7 +121,11 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 
 	setprogname("citrun-inst");
 	clean_path();
+}
 
+void
+CitrunInst::process_cmdline()
+{
 	m_log << m_pfx << "Processing " << m_args.size() << " command line arguments.\n";
 
 	for (auto &arg : m_args) {
@@ -353,6 +358,8 @@ int
 main(int argc, char *argv[])
 {
 	CitrunInst main(argc, argv);
+
+	main.process_cmdline();
 
 	if (main.instrument())
 		return 1;
