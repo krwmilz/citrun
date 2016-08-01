@@ -6,7 +6,10 @@ tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
 trap "rm -rf $tmpdir" EXIT
 echo "ok 1 - tmp dir created"
 
-cat <<EOF > $tmpdir/source_0.c
+export PATH="`pwd`/src:${PATH}"
+cd $tmpdir
+
+cat <<EOF > source_0.c
 #include <stdlib.h>
 
 long long
@@ -26,26 +29,25 @@ main(int argc, char *argv[])
 	long long n;
 
 	n = atoi(argv[1]);
-	fibonacci(n);
-
-	return 0;
+	return fibonacci(n);
 }
 EOF
 echo "ok 2 - source file wrote"
 
-cat <<EOF > $tmpdir/Jamfile
+cat <<EOF > Jamfile
 Main program : source_0.c ;
 EOF
 echo "ok 3 - Jamfile wrote"
 
-export PATH="`pwd`/src:${PATH}"
-cd $tmpdir && jam
-echo "ok 4 - source compiled"
+jam && echo "ok 4 - source compiled"
 
-cd $tmpdir && sed -e "s,^.*: ,," -e "s,'.*',''," -e "s,(.*),()," < citrun.log > citrun.log.proc
-echo "ok 5 - processed citrun.log"
+sed	-e "s,^.*: ,,"	\
+	-e "s,'.*','',"	\
+	-e "s,(.*),()," \
+	< citrun.log > citrun.log.proc \
+	&& echo "ok 5 - processed citrun.log"
 
-cat <<EOF > $tmpdir/citrun.log.good
+cat <<EOF > citrun.log.good
 citrun-inst v0.0 () called as ''.
 Processing 5 command line arguments.
 Found source file ''.
@@ -69,5 +71,4 @@ Forked ''.
 Done.
 EOF
 
-cd $tmpdir && diff -u citrun.log.proc citrun.log.good
-echo "ok 6 - diffed processed citrun.log against known good"
+diff -u citrun.log.proc citrun.log.good && echo "ok 6 - citrun.log diff"
