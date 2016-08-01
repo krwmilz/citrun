@@ -15,6 +15,7 @@
  */
 #include <sys/stat.h>		// stat
 #include <sys/time.h>		// utimes
+#include <sys/utsname.h>	// uname
 #include <sys/wait.h>		// waitpid
 
 #include <clang/Frontend/TextDiagnosticPrinter.h>
@@ -25,10 +26,9 @@
 #include <cstring>		// strcmp
 #include <err.h>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <string>
-#include <unistd.h>		// execvp, fork, unlink
+#include <unistd.h>		// execvp, fork, getpid, unlink
 
 #include "inst_action.h"
 
@@ -40,17 +40,26 @@ static llvm::cl::OptionCategory ToolingCategory("instrument options");
 class CitrunInst {
 public:
 	CitrunInst(int, char *argv[]);
-	int instrument();
-	void patch_link_command();
-	int fork_compiler();
-	void restore_original_src();
+	~CitrunInst();
+
+	int			instrument();
+	void			patch_link_command();
+	int			compile_modified();
 
 private:
+	void			clean_path();
+	int			fork_compiler();
+	void			restore_original_src();
+
 	std::vector<char *>	m_args;
 	std::vector<std::string> m_source_files;
 	std::map<std::string, std::string> m_temp_file_map;
 	bool			m_object_arg;
 	bool			m_compile_arg;
+	std::error_code		m_ec;
+	llvm::raw_fd_ostream	m_log;
+	pid_t			m_pid;
+	std::string		m_pfx;
 };
 
 // Returns true if value ends with suffix, false otherwise.
@@ -95,11 +104,29 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_args(argv, argv + argc),
 	m_object_arg(false),
-	m_compile_arg(false)
+	m_compile_arg(false),
+	m_ec(),
+	m_log("citrun.log", m_ec, llvm::sys::fs::F_Append),
+	m_pid(getpid()),
+	m_pfx(std::to_string(m_pid) + ": ")
 {
+	struct utsname utsname;
+	if (uname(&utsname) == -1)
+		err(1, "uname");
+
+	m_log << m_pfx << "citrun-inst v0.0 on " << utsname.sysname
+		<< "-" << utsname.release << " " << utsname.machine << "\n";
+	m_log << m_pfx << "This program is called '" << m_args[0] << "'.\n";
+
+	setprogname("citrun-inst");
+	clean_path();
+
+	m_log << m_pfx << "Processing " << m_args.size() << " command line arguments.\n";
+
 	for (auto &arg : m_args) {
 		if (std::strcmp(arg, "-E") == 0) {
-			// Preprocessing argument found, exec native command
+			m_log << m_pfx << "Preprocessor argument found\n";
+
 			m_args.push_back(NULL);
 			if (execvp(m_args[0], &m_args[0]))
 				err(1, "execvp");
@@ -113,8 +140,8 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 		if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
 		    ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
 
-			// Keep track of original source file names
 			m_source_files.push_back(arg);
+			m_log << m_pfx << "Found source file '" << arg << "'.\n";
 
 			char *dst_fn;
 			if ((dst_fn = std::tmpnam(NULL)) == NULL)
@@ -124,6 +151,14 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 			m_temp_file_map[arg] = dst_fn;
 		}
 	}
+
+	m_log << m_pfx << "Object arg = " << m_object_arg << ", "
+		<< "compile arg = " << m_compile_arg << "\n";
+}
+
+CitrunInst::~CitrunInst()
+{
+	m_log << m_pfx << "citrun-inst is done.\n";
 }
 
 int
@@ -131,12 +166,20 @@ CitrunInst::instrument()
 {
 	std::vector<const char *> clang_argv;
 
-	if (m_source_files.size() == 0)
+	if (m_source_files.size() == 0) {
+		m_log << m_pfx << "No source files to instrument.\n";
 		return 0;
+	}
 
+	// Construct a speical command line for ClangTool.
 	clang_argv.push_back(m_args[0]);
-	for (auto s : m_source_files)
+	m_log << m_pfx << "Attempting instrumentation on";
+
+	for (auto s : m_source_files) {
+		m_log << " '" << s << "'";
 		clang_argv.push_back(s.c_str());
+	}
+	m_log << ".\n";
 
 	clang_argv.push_back("--");
 
@@ -149,34 +192,39 @@ CitrunInst::instrument()
 #elif defined(__APPLE__)
 	clang_argv.push_back("-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include");
 #endif
+	m_log << m_pfx << "Adding search path '" << clang_argv.back() << "'.\n";
 
 	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();
 	clang::tooling::CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
 	clang::tooling::ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
-	std::error_code ec;
-	llvm::raw_fd_ostream output("citrun.log", ec, llvm::sys::fs::F_None);
 	clang::DiagnosticOptions diags;
+	clang::TextDiagnosticPrinter *log;
 
-	Tool.setDiagnosticConsumer(new clang::TextDiagnosticPrinter(output, &diags, false));
+	log = new clang::TextDiagnosticPrinter(m_log, &diags, false);
+	log->setPrefix(std::to_string(m_pid));
+	Tool.setDiagnosticConsumer(log);
+
 	int ret = Tool.run(&(*clang::tooling::newFrontendActionFactory<InstrumentAction>()));
 
-	if (ret == 0)
-		return 0;
-
-	// Instrumentation failed, try compiling with native compiler.
-	restore_original_src();
-	ret = fork_compiler();
-
-	// Native compiler succeeded. This is bad.
 	if (ret == 0) {
-		warnx("citrun instrumentation failed, but the native "
-			"compile succeeded!");
+		m_log << m_pfx << "Instrumentation successful.\n";
 		return 0;
 	}
 
-	// Native compiler failed too. That's okay.
+	m_log << m_pfx << "Instrumentation failed.\n";
+	m_log << m_pfx << "Attempting compilation of unmodified source.\n";
+
+	restore_original_src();
+	ret = fork_compiler();
+
+	if (ret == 0) {
+		m_log << m_pfx << "Bad news, native compile succeeded.\n";
+		return 0;
+	}
+
+	m_log << m_pfx << "Good, the native compiler also failed.\n";
 	return ret;
 }
 
@@ -184,6 +232,7 @@ void
 CitrunInst::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
+		m_log << m_pfx << "Restored '" << tmp_file.first << "'\n";
 		copy_file(tmp_file.first, tmp_file.second);
 		unlink(tmp_file.second.c_str());
 	}
@@ -212,6 +261,8 @@ CitrunInst::patch_link_command()
 	m_args.push_back(const_cast<char *>("-pthread"));
 #endif
 	m_args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
+
+	m_log << m_pfx << "Link detected, adding '" << m_args.back() << "'.\n";
 }
 
 int
@@ -230,24 +281,31 @@ CitrunInst::fork_compiler()
 			err(1, "execvp");
 	}
 
+	m_log << m_pfx << "Forked '" << m_args[0] << "' "
+	       << "pid is " << child_pid << ".\n";
+
 	int status;
 	if (waitpid(child_pid, &status, 0) < 0)
 		err(1, "waitpid");
 
 	// Return the exit code of the native compiler.
+	int exit = -1;
 	if (WIFEXITED(status))
-		return WEXITSTATUS(status);
+		exit = WEXITSTATUS(status);
 
-	return -1;
+	m_log << m_pfx << "pid " << child_pid << " exited " << exit << "\n";
+	return exit;
 }
 
 void
-clean_path()
+CitrunInst::clean_path()
 {
 	char *path;
 
-	if ((path = std::getenv("PATH")) == NULL)
+	if ((path = std::getenv("PATH")) == NULL) {
+		m_log << m_pfx << "PATH is not set.\n";
 		errx(1, "PATH must be set");
+	}
 
 	// Filter CITRUN_PATH out of PATH
 	std::stringstream path_ss(path);
@@ -270,8 +328,10 @@ clean_path()
 		first_component = 0;
 	}
 
-	if (!found_citrun_path)
+	if (!found_citrun_path) {
+		m_log << m_pfx << "'" << STR(CITRUN_PATH) << "' not in PATH.\n";
 		errx(1, "'%s' not in PATH", STR(CITRUN_PATH));
+	}
 
 	// Set new $PATH
 	if (setenv("PATH", new_path.str().c_str(), 1))
@@ -279,20 +339,24 @@ clean_path()
 }
 
 int
+CitrunInst::compile_modified()
+{
+	m_log << m_pfx << "Running native compiler on modified source code.\n";
+
+	int ret = fork_compiler();
+	restore_original_src();
+
+	return ret;
+}
+
+int
 main(int argc, char *argv[])
 {
-	// We probably didn't call citrun-inst directly.
-	setprogname("citrun-inst");
-	clean_path();
-
 	CitrunInst main(argc, argv);
 
 	if (main.instrument())
 		return 1;
 
 	main.patch_link_command();
-
-	int ret = main.fork_compiler();
-	main.restore_original_src();
-	return ret;
+	return main.compile_modified();
 }
