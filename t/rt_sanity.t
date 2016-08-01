@@ -1,6 +1,6 @@
 use strict;
 use Cwd;
-use Test::More tests => 62;
+use Test::More tests => 63;
 use Test::Project;
 use Test::Viewer;
 

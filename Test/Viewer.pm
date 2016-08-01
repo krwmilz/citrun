@@ -34,8 +34,9 @@ sub accept {
 	# Protocol defined in lib/runtime.c function send_static().
 	#
 	my $buf = read_all($client, 1 + 1 + 4 + 4 + 12);
-	($self->{major}, $self->{minor}, $self->{num_tus}, $self->{lines_total}, $self->{pid},
-		$self->{ppid}, $self->{pgrp}) = unpack("C2L5", $buf);
+	($self->{major}, $self->{minor},
+		$self->{num_tus}, $self->{lines_total},
+		@{ $self->{pids} }) = unpack("C2L5", $buf);
 
 	my $progname_sz = unpack("S", read_all($client, 2));
 	$self->{progname} = read_all($client, $progname_sz);
@@ -44,12 +45,13 @@ sub accept {
 	$self->{cwd} = read_all($client, $cwd_sz);
 
 	# Always sanity check these.
-	cmp_ok( $self->{pid},	">",	1,	"pid lower bound check" );
-	cmp_ok( $self->{pid},	"<",	100000,	"pid upper bound check" );
-	cmp_ok( $self->{ppid},	">",	1,	"ppid lower bound check" );
-	cmp_ok( $self->{ppid},	"<",	100000,	"ppid upper bound check" );
-	cmp_ok( $self->{pgrp},	">",	1,	"pgrp lower bound check" );
-	cmp_ok( $self->{pgrp},	"<",	100000,	"pgrp upper bound check" );
+	is( scalar @{ $self->{pids} },	3,	"number of pids" );
+	cmp_ok( $self->{pids}->[0],	">",	1,	"pid check lower" );
+	cmp_ok( $self->{pids}->[0],	"<",	100000,	"pid check upper" );
+	cmp_ok( $self->{pids}->[1],	">",	1,	"ppid check lower" );
+	cmp_ok( $self->{pids}->[1],	"<",	100000,	"ppid check upper" );
+	cmp_ok( $self->{pids}->[2],	">",	1,	"pgrp check lower" );
+	cmp_ok( $self->{pids}->[2],	"<",	100000,	"pgrp check upper" );
 
 	# Read the static translation unit information.
 	my @tus;
