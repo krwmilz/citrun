@@ -126,7 +126,8 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 void
 CitrunInst::process_cmdline()
 {
-	m_log << m_pfx << "Processing " << m_args.size() << " command line arguments.\n";
+	m_log << m_pfx << "Processing " << m_args.size()
+		<< " command line arguments.\n";
 
 	for (auto &arg : m_args) {
 		if (std::strcmp(arg, "-E") == 0) {
