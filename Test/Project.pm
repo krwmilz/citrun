@@ -50,7 +50,7 @@ EOF
 	$ENV{PATH} = cwd . "/src:$ENV{PATH}";
 
 	my $ret = system( "cd $tmp_dir && jam" );
-	die "make failed: $ret\n" if ($ret);
+	die "jam failed: $ret\n" if ($ret);
 }
 
 sub run {
