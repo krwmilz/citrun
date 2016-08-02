@@ -42,13 +42,13 @@ public:
 	CitrunInst(int, char *argv[]);
 	~CitrunInst();
 
+	void			clean_path();
 	void			process_cmdline();
 	int			instrument();
 	void			patch_link_command();
 	int			compile_modified();
 
 private:
-	void			clean_path();
 	int			fork_compiler();
 	void			restore_original_src();
 
@@ -311,6 +311,8 @@ CitrunInst::clean_path()
 		m_log << m_pfx << "PATH is not set.\n";
 		errx(1, "PATH must be set");
 	}
+
+	m_log << m_pfx << "PATH='" << path << "'\n";
 
 	// Filter CITRUN_PATH out of PATH
 	std::stringstream path_ss(path);
