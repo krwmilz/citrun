@@ -1,5 +1,6 @@
 @comment $OpenBSD$
 @bin bin/citrun-gl
+@bin bin/citrun-term
 bin/citrun-wrap
 lib/libcitrun.a
 @man man/man1/citrun-gl.1
