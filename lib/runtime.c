@@ -49,12 +49,7 @@ citrun_node_add(struct citrun_node *n)
 	if (n->old_lines == NULL)
 		err(1, "calloc");
 
-	/* Memory for buffering current line counts. */
-	n->tmp_lines = malloc(n->size * sizeof(uint64_t));
-	if (n->tmp_lines == NULL)
-		err(1, "malloc");
-
-	/* Memory staging area for line differences. */
+	/* Memory for buffering line differences. */
 	n->diffs = malloc(n->size * sizeof(uint32_t));
 	if (n->diffs == NULL)
 		err(1, "malloc");
@@ -214,10 +209,9 @@ static void
 send_dynamic(int fd)
 {
 	struct citrun_node	*w;
-	uint64_t		*tmp_lines;
-	uint64_t		*old_lines_ptr;
+	uint64_t		 cur_lines;
+	uint64_t		 old_lines;
 	uint64_t		 diff64;
-	uint32_t		*diffs;
 	uint32_t		 diff;
 	int			 i;
 	int			 line;
@@ -226,19 +220,15 @@ send_dynamic(int fd)
 	/* Write execution buffers. */
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 
-		/* These get dereferenced a lot so hold onto them. */
-		tmp_lines =	w->tmp_lines;
-		old_lines_ptr =	w->old_lines;
-		diffs =		w->diffs;
-
-		/* Snapshot execution buffers and copy them to storage. */
-		memcpy(tmp_lines, w->lines_ptr, w->size * 8);
-
 		/* Find execution differences line at a time. */
 		flag = 0;
 		for (line = 0; line < w->size; line++) {
-			assert(tmp_lines[line] >= old_lines_ptr[line]);
-			diff64 = tmp_lines[line] - old_lines_ptr[line];
+			cur_lines = w->lines_ptr[line];
+			old_lines = w->old_lines[line];
+			assert(cur_lines >= old_lines);
+
+			diff64 = cur_lines - old_lines;
+			w->old_lines[line] = cur_lines;
 
 			if (diff64 > UINT32_MAX)
 				diff = UINT32_MAX;
@@ -246,7 +236,7 @@ send_dynamic(int fd)
 				diff = diff64;
 
 			/* Store diffs so we can send a big buffer later. */
-			diffs[line] = diff;
+			w->diffs[line] = diff;
 			if (diff > 0)
 				flag = 1;
 		}
@@ -256,10 +246,7 @@ send_dynamic(int fd)
 
 		/* Sometimes write the diffs buffer. */
 		if (flag == 1)
-			xwrite(fd, diffs, w->size * sizeof(diff));
-
-		/* Replace old execution storage with snapshot. */
-		memcpy(old_lines_ptr, tmp_lines, w->size * 8);
+			xwrite(fd, w->diffs, w->size * sizeof(diff));
 	}
 	assert(i == nodes_total);
 	assert(w == NULL);
