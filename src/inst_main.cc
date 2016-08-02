@@ -81,7 +81,6 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 		<< ") called as '" << m_args[0] << "'.\n";
 
 	setprogname("citrun-inst");
-	clean_path();
 }
 
 // Returns true if value ends with suffix, false otherwise.
@@ -360,6 +359,7 @@ int
 main(int argc, char *argv[])
 {
 	CitrunInst main(argc, argv);
+	main.clean_path();
 
 	main.process_cmdline();
 
