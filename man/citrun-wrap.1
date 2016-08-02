@@ -56,6 +56,10 @@ Because instrumentation is silent on stdout and stderr, instrumentation activity
 is logged to the
 .Pa citrun.log
 file.
+.Pp
+Incremental building is supported. If the build command fails, fix the problem
+and then rerun the build command with
+.Nm .
 .Sh FILES
 .Bl -tag -width Ds
 .It Pa citrun.log
