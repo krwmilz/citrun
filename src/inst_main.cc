@@ -63,6 +63,27 @@ private:
 	std::string		m_pfx;
 };
 
+CitrunInst::CitrunInst(int argc, char *argv[]) :
+	m_args(argv, argv + argc),
+	m_object_arg(false),
+	m_compile_arg(false),
+	m_ec(),
+	m_log("citrun.log", m_ec, llvm::sys::fs::F_Append),
+	m_pid(getpid()),
+	m_pfx(std::to_string(m_pid) + ": ")
+{
+	struct utsname utsname;
+	if (uname(&utsname) == -1)
+		err(1, "uname");
+
+	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
+		<< "-" << utsname.release << " " << utsname.machine
+		<< ") called as '" << m_args[0] << "'.\n";
+
+	setprogname("citrun-inst");
+	clean_path();
+}
+
 // Returns true if value ends with suffix, false otherwise.
 static bool
 ends_with(std::string const &value, std::string const &suffix)
@@ -100,27 +121,6 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 
 	// Restore the original access and modification time
 	utimes(dst_fn.c_str(), st_tim);
-}
-
-CitrunInst::CitrunInst(int argc, char *argv[]) :
-	m_args(argv, argv + argc),
-	m_object_arg(false),
-	m_compile_arg(false),
-	m_ec(),
-	m_log("citrun.log", m_ec, llvm::sys::fs::F_Append),
-	m_pid(getpid()),
-	m_pfx(std::to_string(m_pid) + ": ")
-{
-	struct utsname utsname;
-	if (uname(&utsname) == -1)
-		err(1, "uname");
-
-	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
-		<< "-" << utsname.release << " " << utsname.machine
-		<< ") called as '" << m_args[0] << "'.\n";
-
-	setprogname("citrun-inst");
-	clean_path();
 }
 
 void
