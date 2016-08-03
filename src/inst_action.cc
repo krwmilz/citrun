@@ -73,6 +73,11 @@ InstrumentAction::EndSourceFileAction()
 	std::error_code ec;
 	llvm::raw_fd_ostream output(file_name, ec, llvm::sys::fs::F_None);
 
+	if (ec.value()) {
+		warnx("'%s': %s", file_name.c_str(), ec.message().c_str());
+		return;
+	}
+
 	// Write the instrumented source file
 	m_TheRewriter.getEditBuffer(main_fid).write(output);
 }
