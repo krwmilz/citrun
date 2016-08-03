@@ -5,7 +5,6 @@ use Expect;
 use Test::More tests => 409;
 use Test::Package;
 use Test::Viewer;
-use Time::HiRes qw( time usleep );
 
 my $package = Test::Package->new("mail/mutt");
 my $viewer = Test::Viewer->new();
@@ -120,17 +119,6 @@ my @known_good = (
 	["/thread.c", 1431, 386],
 	["/url.c", 325, 164],
 );
-
-if ($^O ne "darwin") {
-	my $to_insert = [ "/dotlock.c",		759,	139 ];
-
-	for my $i (0..(scalar @known_good - 1)) {
-		next if ($known_good[$i]->[0] lt $to_insert->[0]);
-
-		splice @known_good, $i, 0, ($to_insert);
-		last;
-	}
-}
 
 $viewer->accept();
 is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
