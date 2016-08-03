@@ -26,6 +26,7 @@
 #include <cstring>		// strcmp
 #include <err.h>
 #include <fstream>		// ifstream, ofstream
+#include <libgen.h>		// basename
 #include <sstream>
 #include <string>
 #include <unistd.h>		// execvp, fork, getpid, unlink
@@ -79,6 +80,15 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
 		<< "-" << utsname.release << " " << utsname.machine
 		<< ") called as '" << m_args[0] << "'.\n";
+
+	char *base_name;
+	if ((base_name = basename(argv[0])) == NULL)
+		err(1, "basename");
+
+	if (std::strcmp(base_name, argv[0]) != 0) {
+		m_log << m_pfx << "Changing '" << argv[0] << "' to '" << base_name << "'.\n";
+		m_args[0] = base_name;
+	}
 
 	setprogname("citrun-inst");
 }
