@@ -73,6 +73,9 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_pid(getpid()),
 	m_pfx(std::to_string(m_pid) + ": ")
 {
+	if (m_ec.value())
+		warnx("citrun.log: %s", m_ec.message().c_str());
+
 	struct utsname utsname;
 	if (uname(&utsname) == -1)
 		err(1, "uname");
