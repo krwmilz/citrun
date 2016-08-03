@@ -73,4 +73,4 @@ Forked ''.
 Done.
 EOF
 
-diff -u citrun.log.proc citrun.log.good && echo "ok 6 - citrun.log diff"
+diff -u citrun.log.good citrun.log.proc && echo "ok 6 - citrun.log diff"
