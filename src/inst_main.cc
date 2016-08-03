@@ -242,7 +242,7 @@ CitrunInst::instrument()
 	log->setPrefix(std::to_string(m_pid));
 	Tool.setDiagnosticConsumer(log);
 
-	int ret = Tool.run(&(*clang::tooling::newFrontendActionFactory<InstrumentAction>()));
+	int ret = Tool.run(clang::tooling::newFrontendActionFactory<InstrumentAction>().get());
 
 	if (ret == 0) {
 		m_log << m_pfx << "Instrumentation successful.\n";
