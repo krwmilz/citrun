@@ -288,6 +288,8 @@ CitrunInst::exec_compiler()
 int
 CitrunInst::fork_compiler()
 {
+	// Otherwise we'll get two copies of buffers after fork().
+	m_log.flush();
 
 	pid_t child_pid;
 	if ((child_pid = fork()) < 0)
