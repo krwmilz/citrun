@@ -49,6 +49,7 @@ public:
 	int			compile_modified();
 
 private:
+	void			exec_compiler();
 	int			fork_compiler();
 	void			restore_original_src();
 
@@ -142,10 +143,7 @@ CitrunInst::process_cmdline()
 	for (auto &arg : m_args) {
 		if (std::strcmp(arg, "-E") == 0) {
 			m_log << m_pfx << "Preprocessor argument found\n";
-
-			m_args.push_back(NULL);
-			if (execvp(m_args[0], &m_args[0]))
-				err(1, "execvp");
+			exec_compiler();
 		}
 		else if (std::strcmp(arg, "-o") == 0)
 			object_arg = true;
@@ -184,7 +182,7 @@ CitrunInst::process_cmdline()
 	if (linking) {
 		m_log << m_pfx << "Link detected, adding runtime libs ";
 #ifndef __APPLE__
-		// Except Mac OS, who always links this.
+		// OSX always links this.
 		m_args.push_back(const_cast<char *>("-pthread"));
 		m_log << m_args.back() << " ";
 #endif
@@ -196,10 +194,7 @@ CitrunInst::process_cmdline()
 		return;
 
 	m_log << m_pfx << "No source files found, executing native compiler.\n";
-	m_log.close();
-	m_args.push_back(NULL);
-	if (execvp(m_args[0], &m_args[0]))
-		err(1, "execvp");
+	exec_compiler();
 }
 
 CitrunInst::~CitrunInst()
@@ -280,21 +275,27 @@ CitrunInst::restore_original_src()
 	}
 }
 
+void
+CitrunInst::exec_compiler()
+{
+	m_log.close();
+
+	m_args.push_back(NULL);
+	if (execvp(m_args[0], &m_args[0]))
+		err(1, "execvp");
+}
+
 int
 CitrunInst::fork_compiler()
 {
-	// m_args must be NULL terminated for exec*() functions.
-	m_args.push_back(NULL);
 
 	pid_t child_pid;
 	if ((child_pid = fork()) < 0)
 		err(1, "fork");
 
-	if (child_pid == 0) {
-		// In child
-		if (execvp(m_args[0], &m_args[0]))
-			err(1, "execvp");
-	}
+	if (child_pid == 0)
+		// In child.
+		exec_compiler();
 
 	m_log << m_pfx << "Forked '" << m_args[0] << "' "
 	       << "pid is '" << child_pid << "'.\n";
