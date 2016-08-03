@@ -46,7 +46,6 @@ public:
 	void			clean_path();
 	void			process_cmdline();
 	int			instrument();
-	void			patch_link_command();
 	int			compile_modified();
 
 private:
@@ -56,8 +55,6 @@ private:
 	std::vector<char *>	m_args;
 	std::vector<std::string> m_source_files;
 	std::map<std::string, std::string> m_temp_file_map;
-	bool			m_object_arg;
-	bool			m_compile_arg;
 	std::error_code		m_ec;
 	llvm::raw_fd_ostream	m_log;
 	pid_t			m_pid;
@@ -66,8 +63,6 @@ private:
 
 CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_args(argv, argv + argc),
-	m_object_arg(false),
-	m_compile_arg(false),
 	m_ec(),
 	m_log("citrun.log", m_ec, llvm::sys::fs::F_Append),
 	m_pid(getpid()),
@@ -138,6 +133,9 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 void
 CitrunInst::process_cmdline()
 {
+	bool object_arg = false;
+	bool compile_arg = false;
+
 	m_log << m_pfx << "Processing " << m_args.size()
 		<< " command line arguments.\n";
 
@@ -150,9 +148,9 @@ CitrunInst::process_cmdline()
 				err(1, "execvp");
 		}
 		else if (std::strcmp(arg, "-o") == 0)
-			m_object_arg = true;
+			object_arg = true;
 		else if (std::strcmp(arg, "-c") == 0)
-			m_compile_arg = true;
+			compile_arg = true;
 
 		// Find source files
 		if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
@@ -170,8 +168,38 @@ CitrunInst::process_cmdline()
 		}
 	}
 
-	m_log << m_pfx << "Object arg = " << m_object_arg << ", "
-		<< "compile arg = " << m_compile_arg << "\n";
+	m_log << m_pfx << "Object arg = " << object_arg << ", "
+		<< "compile arg = " << compile_arg << "\n";
+
+	bool linking = false;
+	if (!object_arg && !compile_arg && m_source_files.size() > 0)
+		// Assume single line a.out compilation
+		// $ gcc main.c
+		linking = true;
+	else if (object_arg && !compile_arg)
+		// gcc -o main main.o fib.o while.o
+		// gcc -o main main.c fib.c
+		linking = true;
+
+	if (linking) {
+		m_log << m_pfx << "Link detected, adding runtime libs ";
+#ifndef __APPLE__
+		// Except Mac OS, who always links this.
+		m_args.push_back(const_cast<char *>("-pthread"));
+		m_log << m_args.back() << " ";
+#endif
+		m_args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
+		m_log << m_args.back() << " to command line.\n";
+	}
+
+	if (m_source_files.size() != 0)
+		return;
+
+	m_log << m_pfx << "No source files found, executing native compiler.\n";
+	m_log.close();
+	m_args.push_back(NULL);
+	if (execvp(m_args[0], &m_args[0]))
+		err(1, "execvp");
 }
 
 CitrunInst::~CitrunInst()
@@ -183,11 +211,6 @@ int
 CitrunInst::instrument()
 {
 	std::vector<const char *> clang_argv;
-
-	if (m_source_files.size() == 0) {
-		m_log << m_pfx << "No source files to instrument.\n";
-		return 0;
-	}
 
 	// Construct a speical command line for ClangTool.
 	clang_argv.push_back(m_args[0]);
@@ -251,36 +274,10 @@ CitrunInst::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
 		m_log << m_pfx << "Restored '" << tmp_file.first << "'.\n";
+
 		copy_file(tmp_file.first, tmp_file.second);
 		unlink(tmp_file.second.c_str());
 	}
-}
-
-void
-CitrunInst::patch_link_command()
-{
-	bool linking = false;
-
-	if (!m_object_arg && !m_compile_arg && m_source_files.size() > 0)
-		// Assume single line a.out compilation
-		// $ gcc main.c
-		linking = true;
-	else if (m_object_arg && !m_compile_arg)
-		// gcc -o main main.o fib.o while.o
-		// gcc -o main main.c fib.c
-		linking = true;
-
-	if (!linking)
-		return;
-
-	// libcitrun.a uses pthread so we must link it here.
-#ifndef __APPLE__
-	// Except Mac OS, who always links this.
-	m_args.push_back(const_cast<char *>("-pthread"));
-#endif
-	m_args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
-
-	m_log << m_pfx << "Link detected, adding '" << m_args.back() << "'.\n";
 }
 
 int
@@ -381,6 +378,5 @@ main(int argc, char *argv[])
 	if (main.instrument())
 		return 1;
 
-	main.patch_link_command();
 	return main.compile_modified();
 }
