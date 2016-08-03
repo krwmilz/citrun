@@ -43,6 +43,7 @@ public:
 	CitrunInst(int, char *argv[]);
 	~CitrunInst();
 
+	void			check_argv0();
 	void			clean_path();
 	void			process_cmdline();
 	int			instrument();
@@ -79,18 +80,67 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
 		<< "-" << utsname.release << " " << utsname.machine
 		<< ") called as '" << m_args[0] << "'.\n";
+}
 
+void
+CitrunInst::check_argv0()
+{
 	char *base_name;
-	if ((base_name = basename(argv[0])) == NULL)
+	if ((base_name = basename(m_args[0])) == NULL)
 		err(1, "basename");
 
-	if (std::strcmp(base_name, argv[0]) != 0) {
-		m_log << m_pfx << "Changing '" << argv[0] << "' to '" << base_name << "'.\n";
+	if (std::strcmp(base_name, m_args[0]) != 0) {
+		m_log << m_pfx << "Changing '" << m_args[0] << "' to '"
+			<< base_name << "'.\n";
 		m_args[0] = base_name;
 	}
 
 	setprogname("citrun-inst");
 }
+
+void
+CitrunInst::clean_path()
+{
+	char *path;
+
+	if ((path = std::getenv("PATH")) == NULL) {
+		m_log << m_pfx << "PATH is not set.\n";
+		errx(1, "PATH must be set");
+	}
+
+	m_log << m_pfx << "PATH='" << path << "'\n";
+
+	// Filter CITRUN_PATH out of PATH
+	std::stringstream path_ss(path);
+	std::ostringstream new_path;
+	std::string component;
+	bool first_component = 1;
+	bool found_citrun_path = 0;
+
+	while (std::getline(path_ss, component, ':')) {
+		if (component.compare(STR(CITRUN_PATH)) == 0) {
+			found_citrun_path = 1;
+			continue;
+		}
+
+		if (first_component == 0)
+			new_path << ":";
+
+		// It wasn't CITRUN_PATH, keep it
+		new_path << component;
+		first_component = 0;
+	}
+
+	if (!found_citrun_path) {
+		m_log << m_pfx << "'" << STR(CITRUN_PATH) << "' not in PATH.\n";
+		errx(1, "'%s' not in PATH", STR(CITRUN_PATH));
+	}
+
+	// Set new $PATH
+	if (setenv("PATH", new_path.str().c_str(), 1))
+		err(1, "setenv");
+}
+
 
 // Returns true if value ends with suffix, false otherwise.
 static bool
@@ -315,49 +365,6 @@ CitrunInst::fork_compiler()
 	return exit;
 }
 
-void
-CitrunInst::clean_path()
-{
-	char *path;
-
-	if ((path = std::getenv("PATH")) == NULL) {
-		m_log << m_pfx << "PATH is not set.\n";
-		errx(1, "PATH must be set");
-	}
-
-	m_log << m_pfx << "PATH='" << path << "'\n";
-
-	// Filter CITRUN_PATH out of PATH
-	std::stringstream path_ss(path);
-	std::ostringstream new_path;
-	std::string component;
-	bool first_component = 1;
-	bool found_citrun_path = 0;
-
-	while (std::getline(path_ss, component, ':')) {
-		if (component.compare(STR(CITRUN_PATH)) == 0) {
-			found_citrun_path = 1;
-			continue;
-		}
-
-		if (first_component == 0)
-			new_path << ":";
-
-		// It wasn't CITRUN_PATH, keep it
-		new_path << component;
-		first_component = 0;
-	}
-
-	if (!found_citrun_path) {
-		m_log << m_pfx << "'" << STR(CITRUN_PATH) << "' not in PATH.\n";
-		errx(1, "'%s' not in PATH", STR(CITRUN_PATH));
-	}
-
-	// Set new $PATH
-	if (setenv("PATH", new_path.str().c_str(), 1))
-		err(1, "setenv");
-}
-
 int
 CitrunInst::compile_modified()
 {
@@ -374,6 +381,8 @@ int
 main(int argc, char *argv[])
 {
 	CitrunInst main(argc, argv);
+	main.check_argv0();
+
 	main.clean_path();
 
 	main.process_cmdline();
