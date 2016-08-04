@@ -1,6 +1,6 @@
 #!/bin/sh
 
-dir=.
+dir=`pwd`
 [ "${1}" != "" ] && dir="${1}"
 
 if [ ! -d $dir ]; then
@@ -27,7 +27,7 @@ for i in 0 1 2 3 4 5 6; do
 	COUNT[$i]=0
 done
 
-echo Recursively checking directory \'$dir\'
+echo -n Recursively checking directory \'$dir\'
 for d in `find $dir -name citrun.log`; do
 	echo -n .
 	COUNT[0]=`expr ${COUNT[0]} + 1`
@@ -37,9 +37,9 @@ for d in `find $dir -name citrun.log`; do
 		COUNT[$i]=`expr ${COUNT[$i]} + $tmp`
 	done
 done
-echo done
 echo
 
 for i in 0 1 2 3 4 5 6; do
+	[ ${COUNT[$i]} -eq 0 ] && continue
 	printf "%8i  %s\n" ${COUNT[$i]} "${DESC[$i]}"
 done
