@@ -1,0 +1,45 @@
+#!/bin/sh
+
+dir=.
+[ "${1}" != "" ] && dir="${1}"
+
+if [ ! -d $dir ]; then
+	echo "$dir: no such directory"
+	exit 0
+fi
+
+GREP[1]="citrun-inst"
+GREP[2]="Forked "
+GREP[3]="Instrumentation successful."
+GREP[4]="Instrumentation failed."
+GREP[5]="Bad news"
+GREP[6]="Link detected"
+
+DESC[0]="Log files found"
+DESC[1]="Calls to the instrumentation tool"
+DESC[2]="Forked compilers"
+DESC[3]="Instrumentation successes"
+DESC[4]="Instrumentation failures"
+DESC[5]="Instrumentation failures (true positive)"
+DESC[6]="Application link commands"
+
+for i in 0 1 2 3 4 5 6; do
+	COUNT[$i]=0
+done
+
+echo Recursively checking directory \'$dir\'
+for d in `find $dir -name citrun.log`; do
+	echo -n .
+	COUNT[0]=`expr ${COUNT[0]} + 1`
+
+	for i in 1 2 3 4 5 6; do
+		tmp=`grep -c "${GREP[$i]}" $d`
+		COUNT[$i]=`expr ${COUNT[$i]} + $tmp`
+	done
+done
+echo done
+echo
+
+for i in 0 1 2 3 4 5 6; do
+	printf "%8i  %s\n" ${COUNT[$i]} "${DESC[$i]}"
+done
