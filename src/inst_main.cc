@@ -78,7 +78,7 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	if (uname(&utsname) == -1)
 		err(1, "uname");
 
-	m_log << m_pfx << "\n";
+	m_log << "\n";
 	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
 		<< "-" << utsname.release << " " << utsname.machine
 		<< ") called as '" << m_args[0] << "'.\n";
