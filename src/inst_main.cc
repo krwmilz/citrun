@@ -43,8 +43,7 @@ public:
 	CitrunInst(int, char *argv[]);
 	~CitrunInst();
 
-	void			check_argv0();
-	void			clean_path();
+	void			clean_PATH();
 	void			process_cmdline();
 	int			instrument();
 	int			compile_modified();
@@ -53,6 +52,8 @@ private:
 	void			exec_compiler();
 	int			fork_compiler();
 	void			restore_original_src();
+	void			save_if_srcfile(char *);
+	int			try_unmodified_compile();
 
 	std::vector<char *>	m_args;
 	std::vector<std::string> m_source_files;
@@ -77,14 +78,11 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	if (uname(&utsname) == -1)
 		err(1, "uname");
 
+	m_log << m_pfx << "\n";
 	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
 		<< "-" << utsname.release << " " << utsname.machine
 		<< ") called as '" << m_args[0] << "'.\n";
-}
 
-void
-CitrunInst::check_argv0()
-{
 	char *base_name;
 	if ((base_name = basename(m_args[0])) == NULL)
 		err(1, "basename");
@@ -98,8 +96,13 @@ CitrunInst::check_argv0()
 	setprogname("citrun-inst");
 }
 
+CitrunInst::~CitrunInst()
+{
+	m_log << m_pfx << "Done.\n";
+}
+
 void
-CitrunInst::clean_path()
+CitrunInst::clean_PATH()
 {
 	char *path;
 
@@ -182,6 +185,24 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 }
 
 void
+CitrunInst::save_if_srcfile(char *arg)
+{
+	if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
+		ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
+
+		m_source_files.push_back(arg);
+		m_log << m_pfx << "Found source file '" << arg << "'.\n";
+
+		char *dst_fn;
+		if ((dst_fn = std::tmpnam(NULL)) == NULL)
+			err(1, "tmpnam");
+
+		copy_file(dst_fn, arg);
+		m_temp_file_map[arg] = dst_fn;
+	}
+}
+
+void
 CitrunInst::process_cmdline()
 {
 	bool object_arg = false;
@@ -200,20 +221,7 @@ CitrunInst::process_cmdline()
 		else if (std::strcmp(arg, "-c") == 0)
 			compile_arg = true;
 
-		// Find source files
-		if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
-		    ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
-
-			m_source_files.push_back(arg);
-			m_log << m_pfx << "Found source file '" << arg << "'.\n";
-
-			char *dst_fn;
-			if ((dst_fn = std::tmpnam(NULL)) == NULL)
-				err(1, "tmpnam");
-
-			copy_file(dst_fn, arg);
-			m_temp_file_map[arg] = dst_fn;
-		}
+		save_if_srcfile(arg);
 	}
 
 	m_log << m_pfx << "Object arg = " << object_arg << ", "
@@ -243,13 +251,8 @@ CitrunInst::process_cmdline()
 	if (m_source_files.size() != 0)
 		return;
 
-	m_log << m_pfx << "No source files found, executing native compiler.\n";
+	m_log << m_pfx << "No source files found. Executing command line.\n";
 	exec_compiler();
-}
-
-CitrunInst::~CitrunInst()
-{
-	m_log << m_pfx << "Done.\n";
 }
 
 int
@@ -292,22 +295,26 @@ CitrunInst::instrument()
 	log->setPrefix(std::to_string(m_pid));
 	Tool.setDiagnosticConsumer(log);
 
-	int ret = Tool.run(clang::tooling::newFrontendActionFactory<InstrumentAction>().get());
-
-	if (ret == 0) {
-		m_log << m_pfx << "Instrumentation successful.\n";
-		return 0;
+	if (Tool.run(clang::tooling::newFrontendActionFactory<InstrumentAction>().get())) {
+		m_log << m_pfx << "Instrumentation failed.\n";
+		return try_unmodified_compile();
 	}
 
-	m_log << m_pfx << "Instrumentation failed.\n";
+	m_log << m_pfx << "Instrumentation successful.\n";
+	return 0;
+}
+
+int
+CitrunInst::try_unmodified_compile()
+{
 	m_log << m_pfx << "Attempting compilation of unmodified source.\n";
 
 	restore_original_src();
-	ret = fork_compiler();
+	int ret = fork_compiler();
 
 	if (ret == 0) {
 		m_log << m_pfx << "Bad news, native compile succeeded.\n";
-		return 0;
+		return 1;
 	}
 
 	m_log << m_pfx << "Good, the native compiler also failed.\n";
@@ -368,8 +375,7 @@ CitrunInst::fork_compiler()
 int
 CitrunInst::compile_modified()
 {
-	m_log << m_pfx << "Running native compiler on possibly modified "
-		<< "source code.\n";
+	m_log << m_pfx << "Running native compiler on modified source code.\n";
 
 	int ret = fork_compiler();
 	restore_original_src();
@@ -381,9 +387,8 @@ int
 main(int argc, char *argv[])
 {
 	CitrunInst main(argc, argv);
-	main.check_argv0();
 
-	main.clean_path();
+	main.clean_PATH();
 
 	main.process_cmdline();
 
