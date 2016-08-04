@@ -1,0 +1,40 @@
+.\"
+.\" Copyright (c) 2016 Kyle Milz <kyle@0x30.net>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: August 3 2016 $
+.Dt CITRUN-CHECK 1
+.Os
+.Sh NAME
+.Nm citrun-check
+.Nd check directory for instrumentation
+.Sh SYNOPSIS
+.Nm
+.Op Ar dir
+.Sh DESCRIPTION
+The
+.Nm
+script recursively checks either
+.Ar dir
+or the current working directory for instrumentation activity.
+.Pp
+An instrumentation summary is printed showing detailed counts of important
+events.
+.Pp
+The number of instrumentation failure true positives is an important value. If
+this is ever greater than 0, please send a bug report.
+.Sh EXIT STATUS
+.Ex -std
+.Sh SEE ALSO
+.Xr citrun-wrap 1

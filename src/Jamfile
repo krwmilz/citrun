@@ -1,10 +1,12 @@
 SubDir TOP src ;
 
 #
-# citrun-wrap
+# citrun-wrap, citrun-check
 #
 MkWrap citrun-wrap : wrap.in ;
-InstallShell $(PREFIX)/bin : citrun-wrap ;
+MakeLocate citrun-check : $(LOCATE_SOURCE) ;
+Shell citrun-check : check.in ;
+InstallShell $(PREFIX)/bin : citrun-wrap citrun-check ;
 
 #
 # utils.a
