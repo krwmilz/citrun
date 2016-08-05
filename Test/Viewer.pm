@@ -2,7 +2,6 @@ package Test::Viewer;
 
 use strict;
 use IO::Socket::UNIX;
-use List::MoreUtils qw( each_array );
 use Test::More;
 
 sub new {
@@ -75,8 +74,9 @@ sub cmp_static_data {
 	# Sort these alphabetically by file name (field 0).
 	my @sorted_tus = sort { $a->[0] cmp $b->[0] } @{ $self->{tus} };
 
-	my $it = each_array( @$known_good, @sorted_tus );
-	while ( my ($x, $y) = $it->() ) {
+	for my $x (@$known_good) {
+		my $y = shift @sorted_tus;
+
 		like( $y->[0],	qr/.*$x->[0]/,	"$x->[0]: filename check" );
 		is ( $y->[1],	$x->[1],	"$x->[0]: total lines check" );
 
