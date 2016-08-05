@@ -33,18 +33,15 @@ sub accept {
 
 	# Protocol defined in lib/runtime.c function send_static().
 	#
-	my $buf = read_all($client, 1 + 1 + 4 + 4 + 12);
-	($self->{major}, $self->{minor},
-		$self->{num_tus}, $self->{lines_total},
-		@{ $self->{pids} }) = unpack("C2L5", $buf);
-
-	my $progname_sz = unpack("S", read_all($client, 2));
-	$self->{progname} = read_all($client, $progname_sz);
-
-	my $cwd_sz = unpack("S", read_all($client, 2));
-	$self->{cwd} = read_all($client, $cwd_sz);
+	($self->{maj}, $self->{min}) = read_unpack($client, 2, "C2");
+	($self->{num_tus}, $self->{lines_total}) = read_unpack($client, 8, "L2");
+	@{ $self->{pids} } =	read_unpack($client, 12, "L3");
+	$self->{progname} =	read_string($client);
+	$self->{cwd} =		read_string($client);
 
 	# Always sanity check these.
+	is( $self->{maj}, 	0,	"major version" );
+	is( $self->{min}, 	0,	"minor version" );
 	is( scalar @{ $self->{pids} },	3,	"number of pids" );
 	cmp_ok( $self->{pids}->[0],	">",	1,	"pid check lower" );
 	cmp_ok( $self->{pids}->[0],	"<",	100000,	"pid check upper" );
@@ -56,13 +53,8 @@ sub accept {
 	# Read the static translation unit information.
 	my @tus;
 	for (1..$self->{num_tus}) {
-		# Absolute file path.
-		my $file_name_sz = unpack("S", read_all($client, 2));
-		my $file_name = read_all($client, $file_name_sz);
-
-		# Total number of lines and number of instrumented sites.
-		$buf = read_all($client, 4 + 4);
-		my ($num_lines, $inst_sites) = unpack("L2", $buf);
+		my $file_name = read_string($client);
+		my ($num_lines, $inst_sites) = read_unpack($client, 8, "L2");
 
 		# Keep this in order so it's easy to fetch dynamic data.
 		push @tus, [ $file_name, $num_lines, $inst_sites ];
@@ -78,19 +70,17 @@ sub get_dynamic_data {
 
 	for my $tu (@{ $self->{tus} }) {
 		# Check if there's any update.
-		my $buf = read_all($client, 1);
-		my $has_data = unpack("C", $buf);
+		my $has_data = read_unpack($client, 1, "C");
 
 		my $num_lines = $tu->[1];
-
 		my @data_tmp;
 		if ($has_data == 0) {
 			# print STDERR "no data for tu $_\n";
 			@data_tmp = (0) x $num_lines;
 		}
 		else {
-			$buf = read_all($client, 4 * $num_lines);
-			@data_tmp = unpack("L$num_lines", $buf);
+			@data_tmp = read_unpack($client, 4 * $num_lines,
+				"L$num_lines");
 		}
 
 		$data{$tu->[0]} = \@data_tmp;
@@ -141,6 +131,17 @@ sub cmp_dynamic_data {
 	cmp_ok( $good, ">", 0, "a single application execution took place" );
 
 	return $data;
+}
+
+sub read_string {
+	my ($client) = @_;
+	my $sz = unpack("S", read_all($client, 2));
+	return read_all($client, $sz);
+}
+
+sub read_unpack {
+	my ($sock, $bytes_total, $unpack_fmt) = @_;
+	return unpack($unpack_fmt, read_all($sock, $bytes_total));
 }
 
 sub read_all {
