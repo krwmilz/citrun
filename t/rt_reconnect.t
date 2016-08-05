@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 14;
+use Test::More tests => 7;
 use Test::Project;
 use Test::Viewer;
 

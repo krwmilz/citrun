@@ -39,18 +39,6 @@ sub accept {
 	$self->{progname} =	read_string($client);
 	$self->{cwd} =		read_string($client);
 
-	# Always sanity check these.
-	is( $self->{maj}, 	0,	"major version" );
-	is( $self->{min}, 	0,	"minor version" );
-	is( scalar @{ $self->{pids} },	3,	"number of pids" );
-	cmp_ok( $self->{pids}->[0],	">",	1,	"pid check lower" );
-	cmp_ok( $self->{pids}->[0],	"<",	100000,	"pid check upper" );
-	cmp_ok( $self->{pids}->[1],	">",	1,	"ppid check lower" );
-	cmp_ok( $self->{pids}->[1],	"<",	100000,	"ppid check upper" );
-	cmp_ok( $self->{pids}->[2],	">",	1,	"pgrp check lower" );
-	cmp_ok( $self->{pids}->[2],	"<",	100000,	"pgrp check upper" );
-
-	# Read the static translation unit information.
 	my @tus;
 	for (1..$self->{num_tus}) {
 		my $file_name = read_string($client);
