@@ -34,12 +34,12 @@ sub accept {
 	($self->{maj}, $self->{min}) = read_unpack($sock, 2, "C2");
 	($self->{num_tus}, $self->{lines_total}) = read_unpack($sock, 8, "L2");
 	@{ $self->{pids} } =	read_unpack($sock, 12, "L3");
-	$self->{progname} =	read_string($sock);
-	$self->{cwd} =		read_string($sock);
+	$self->{progname} =	read_all($sock, read_unpack($sock, 2, "S"));
+	$self->{cwd} =		read_all($sock, read_unpack($sock, 2, "S"));
 
 	my @tus;
 	for (1..$self->{num_tus}) {
-		my $file_name = read_string($sock);
+		my $file_name = read_all($sock, read_unpack($sock, 2, "S"));
 		my ($num_lines, $inst_sites) = read_unpack($sock, 8, "L2");
 
 		# Keep this in order so it's easy to fetch dynamic data.
@@ -117,12 +117,6 @@ sub cmp_dynamic_data {
 	cmp_ok( $good, ">", 0, "a single application execution took place" );
 
 	return $data;
-}
-
-sub read_string {
-	my ($client) = @_;
-	my $sz = unpack("S", read_all($client, 2));
-	return read_all($client, $sz);
 }
 
 sub read_unpack {
