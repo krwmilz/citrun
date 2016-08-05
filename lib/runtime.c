@@ -44,6 +44,15 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 {
 	struct citrun_node *walk = nodes_head;
 
+	/* Instrumented code and the runtime it links to are tightly bound. */
+	if (node_major != citrun_major || node_minor != citrun_minor) {
+		warnx("libcitrun (v%i.%i): Node '%s' has mismatched version (v%i.%i)",
+			citrun_major, citrun_minor,
+			n->file_name, node_major, node_minor);
+		warnx("libcitrun: Try cleaning all object files and reinstrumenting.");
+		return;
+	}
+
 	/* Zeroed memory for double buffering line counts. */
 	n->old_lines = calloc(n->size, sizeof(uint64_t));
 	if (n->old_lines == NULL)
