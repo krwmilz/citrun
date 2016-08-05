@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-
 use Expect;
 use Test::More tests => 458 ;
 use Test::Package;
@@ -11,8 +10,8 @@ my $package = Test::Package->new("editors/nvi");
 my $viewer = Test::Viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/nvi-2.1.3/nvi2-2.1.3/build/nvi");
-
-my @known_good = (
+$viewer->accept();
+$viewer->cmp_static_data([
 	["cl/cl_funcs.c", 853, 192],
 	["cl/cl_main.c", 423, 111],
 	["cl/cl_read.c", 331, 73],
@@ -127,12 +126,7 @@ my @known_good = (
 	["vi/vs_relative.c", 295, 49],
 	["vi/vs_smap.c", 1243, 379],
 	["vi/vs_split.c", 950, 172],
-);
-
-$viewer->accept();
-is( $viewer->{ntus}, scalar @known_good, "translation unit count" );
-
-$viewer->cmp_static_data(\@known_good);
+]);
 
 # Check that at least something has executed.
 $viewer->cmp_dynamic_data();
@@ -140,5 +134,4 @@ $viewer->cmp_dynamic_data();
 $exp->hard_close();
 $viewer->close();
 
-system("citrun-check /usr/ports/pobj/nvi-2.1.3");
 $package->clean();

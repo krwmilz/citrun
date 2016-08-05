@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Expect;
-use Test::More tests => 402;
+use Test::More tests => 406;
 use Test::Package;
 use Test::Viewer;
 
@@ -10,8 +10,8 @@ my $package = Test::Package->new("mail/mutt");
 my $viewer = Test::Viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/mutt-1.6.2/mutt-1.6.2/mutt");
-
-my @known_good = (
+$viewer->accept();
+$viewer->cmp_static_data([
 	# file name		lines	instrumented sites
 	["/account.c", 241, 89],
 	["/addrbook.c", 246, 98],
@@ -115,11 +115,6 @@ my @known_good = (
 	["/thread.c", 1431, 386],
 	["/url.c", 325, 164],
 );
-
-$viewer->accept();
-is( $viewer->{ntus}, scalar @known_good, "translation unit count" );
-
-$viewer->cmp_static_data(\@known_good);
 $viewer->cmp_dynamic_data();
 
 $exp->hard_close();

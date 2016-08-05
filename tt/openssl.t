@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-
 use Expect;
 use Test::More tests => 2734 ;
 use Test::Package;
@@ -12,8 +11,8 @@ my $viewer = Test::Viewer->new();
 
 $ENV{LD_LIBRARY_PATH}="/usr/ports/pobj/openssl-1.0.2h/openssl-1.0.2h";
 my $exp = Expect->spawn("/usr/ports/pobj/openssl*/openssl*/apps/openssl");
-
-my @known_good = (
+$viewer->accept();
+$viewer->cmp_static_data([
 	["apps/app_rand.c", 218, 56],
 	["apps/apps.c", 3229, 1018],
 	["apps/asn1pars.c", 431, 189],
@@ -697,12 +696,7 @@ my @known_good = (
 	["ssl/t1_srvr.c", 93, 14],
 	["ssl/t1_trce.c", 1267, 5],
 	["ssl/tls_srp.c", 543, 176],
-);
-
-$viewer->accept();
-is( $viewer->{ntus}, scalar @known_good, "translation unit count" );
-
-$viewer->cmp_static_data(\@known_good);
+]);
 
 # Check that at least something has executed.
 $viewer->cmp_dynamic_data();
@@ -710,4 +704,5 @@ $viewer->cmp_dynamic_data();
 $exp->hard_close();
 $viewer->close();
 
+system("citrun-check /usr/ports/pobj/openssl-*");
 $package->clean();

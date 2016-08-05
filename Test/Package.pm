@@ -33,6 +33,7 @@ EOF
 
 sub clean {
 	my ($self) = @_;
+	#system("citrun-check /usr/ports/pobj/$self->{port}-*");
 	system("make -C $self->{port} clean=all") == 0 or die "$!";
 }
 

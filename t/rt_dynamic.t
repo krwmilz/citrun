@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 111;
+use Test::More tests => 112;
 use Test::Project;
 use Test::Viewer;
 use Time::HiRes qw( usleep );
