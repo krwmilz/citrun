@@ -18,7 +18,7 @@
 .Os
 .Sh NAME
 .Nm citrun-check
-.Nd check directory for instrumentation
+.Nd check directories for instrumentation artifacts
 .Sh SYNOPSIS
 .Nm
 .Op Ar dir
@@ -27,13 +27,26 @@ The
 .Nm
 script recursively checks either
 .Ar dir
-or the current working directory for instrumentation activity.
+or the current working directory for instrumentation artifacts.
 .Pp
-An instrumentation summary is printed showing detailed counts of important
-events.
+A summary is printed showing detailed counts of important events. The following
+is an example of what the output looks like:
+.Bd -literal -offset indent
+Checking '/usr/ports/pobj/spidermonkey-24.2.0/'...
+       3  Log files found
+     185  Calls to the instrumentation tool
+     117  Forked compilers
+      97  Instrumentation successes
+      19  Instrumentation failures (false positive)
+       1  Instrumentation failures (true positive)
+      60  Application link commands
+.Ed
 .Pp
-The number of instrumentation failure true positives is an important value. If
-this is ever greater than 0, please send a bug report.
+The value of
+.Qq Instrumentation failures (true positives)
+is important. If
+this value is ever more than 0 it means that instrumentation failed but a native
+compile of the same source succeeded.
 .Sh EXIT STATUS
 .Ex -std
 .Sh SEE ALSO
