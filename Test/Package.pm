@@ -14,33 +14,26 @@ sub new {
 	my $dir = tempdir( CLEANUP => 1 );
 	$self->{dir} = $dir;
 
-	$self->{portsdir} = "/usr/ports";
-	$self->{port} = "$self->{portsdir}/$name";
+	$self->{port} = "/usr/ports/$name";
 
 	$ENV{CITRUN_SOCKET} = $self->{dir} . "/test.socket";
+
+	system(<<EOF) == 0 or die "build failed.";
+set -e
+make -C $self->{port} full-build-depends > $self->{dir}/deps
+pkg_info citrun > /dev/null
+doas pkg_add -zl $self->{dir}/deps
+
+make -C $self->{port} clean=all
+make -C $self->{port} PORTPATH="/usr/local/share/citrun:\\\${WRKDIR}/bin:\$PATH"
+EOF
 
 	return $self;
 }
 
-sub depends {
-	my ($self) = @_;
-
-	system("make -C $self->{port} full-build-depends > $self->{dir}/deps") == 0
-		or die "$!";
-	system("doas pkg_add -zl $self->{dir}/deps") == 0 or die "$!";
-}
-
 sub clean {
 	my ($self) = @_;
-
 	system("make -C $self->{port} clean=all") == 0 or die "$!";
-}
-
-sub build {
-	my ($self) = @_;
-
-	system("make -C $self->{port} PORTPATH=\"/home/kyle/citrun/src:\\\${WRKDIR}/bin:\$PATH\"") == 0
-		or die "$!";
 }
 
 sub get_file_size {

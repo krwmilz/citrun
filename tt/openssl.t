@@ -8,13 +8,8 @@ use Test::Report;
 use Test::Viewer;
 
 my $package = Test::Package->new("security/openssl");
-
-$package->depends();
-$package->clean();
-$package->build();
-
-# Verify: instrumented data structures are consistent.
 my $viewer = Test::Viewer->new();
+
 $ENV{LD_LIBRARY_PATH}="/usr/ports/pobj/openssl-1.0.2h/openssl-1.0.2h";
 my $exp = Expect->spawn("/usr/ports/pobj/openssl*/openssl*/apps/openssl");
 

@@ -10,10 +10,6 @@ use Test::Viewer;
 my $package = Test::Package->new("editors/nvi");
 my $viewer = Test::Viewer->new();
 
-$package->depends();
-$package->clean();
-$package->build();
-
 my $exp = Expect->spawn("/usr/ports/pobj/nvi-2.1.3/nvi2-2.1.3/build/nvi");
 
 my @known_good = (
@@ -144,4 +140,5 @@ $viewer->cmp_dynamic_data();
 $exp->hard_close();
 $viewer->close();
 
+system("citrun-check /usr/ports/pobj/nvi-2.1.3");
 $package->clean();
