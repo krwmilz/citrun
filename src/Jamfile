@@ -59,7 +59,9 @@ INST_SRCS =
 Stringize runtime_h.h : $(TOP)/lib/runtime.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
-ObjectC++Flags $(INST_SRCS) : -DCITRUN_LIB=$(CITRUN_LIB) -DCITRUN_PATH=$(CITRUN_PATH) ;
+ObjectC++Flags $(INST_SRCS) : -DCITRUN_LIB=$(CITRUN_LIB)
+	-DCITRUN_PATH=$(CITRUN_PATH)
+	-DCITRUN_COVERAGE=$(CITRUN_COVERAGE) ;
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 

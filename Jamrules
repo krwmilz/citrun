@@ -38,6 +38,14 @@ if $(OS) = LINUX {
 	LINKLIBS on citrun-inst = -lstdc++ -lbsd ;
 }
 
+if $(CITRUN_COVERAGE) {
+	LIBEGCOV = /usr/local/lib/gcc/x86_64-unknown-openbsd6.0/4.9.3/libgcov.a ;
+	LINKLIBS on citrun-gl += $(LIBEGCOV) ;
+	LINKLIBS on citrun-inst += $(LIBEGCOV) ;
+	LINKLIBS on citrun-term += $(LIBEGCOV) ;
+	LinkLibraries libcitrun : /usr/lib/gcc-lib/amd64-unknown-openbsd6.0/4.2.1/libgcov.a ;
+}
+
 actions Test {
 	prove ;
 }

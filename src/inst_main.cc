@@ -247,6 +247,10 @@ CitrunInst::process_cmdline()
 		m_args.push_back(const_cast<char *>("-pthread"));
 		m_log << m_args.back() << " ";
 #endif
+#ifdef CITRUN_COVERAGE
+		// Needed because libcitrun.a will be instrumented with gcov.
+		m_args.push_back(const_cast<char *>("-coverage"));
+#endif
 		m_args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
 		m_log << m_args.back() << "' to command line.\n";
 	}
