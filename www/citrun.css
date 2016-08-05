@@ -4,9 +4,8 @@ li { line-height: 1.5em; }
 
 /* Booorriing. 80 char width monospace.  */
 body {
-	max-width: 80ch;
+	max-width: 70ch;
 	margin: auto;
-	font-size: 1em ;
 	font-family: sans-serif;
 }
 
@@ -16,7 +15,7 @@ body {
 }
 
 .screenshot {
-	width: 50%;
-	float: right;
-	border: 1px dotted black;
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
 }
