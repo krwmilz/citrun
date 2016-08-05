@@ -25,24 +25,22 @@ sub new {
 sub accept {
 	my ($self) = @_;
 
-	# Accept a new connection on the listening viewer socket.
-	my $socket = $self->{viewer_socket};
-
-	my $client = $socket->accept();
-	$self->{client_socket} = $client;
+	my $listen_sock = $self->{viewer_socket};
+	my $sock = $listen_sock->accept();
+	$self->{client_socket} = $sock;
 
 	# Protocol defined in lib/runtime.c function send_static().
 	#
-	($self->{maj}, $self->{min}) = read_unpack($client, 2, "C2");
-	($self->{num_tus}, $self->{lines_total}) = read_unpack($client, 8, "L2");
-	@{ $self->{pids} } =	read_unpack($client, 12, "L3");
-	$self->{progname} =	read_string($client);
-	$self->{cwd} =		read_string($client);
+	($self->{maj}, $self->{min}) = read_unpack($sock, 2, "C2");
+	($self->{num_tus}, $self->{lines_total}) = read_unpack($sock, 8, "L2");
+	@{ $self->{pids} } =	read_unpack($sock, 12, "L3");
+	$self->{progname} =	read_string($sock);
+	$self->{cwd} =		read_string($sock);
 
 	my @tus;
 	for (1..$self->{num_tus}) {
-		my $file_name = read_string($client);
-		my ($num_lines, $inst_sites) = read_unpack($client, 8, "L2");
+		my $file_name = read_string($sock);
+		my ($num_lines, $inst_sites) = read_unpack($sock, 8, "L2");
 
 		# Keep this in order so it's easy to fetch dynamic data.
 		push @tus, [ $file_name, $num_lines, $inst_sites ];
