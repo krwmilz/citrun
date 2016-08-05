@@ -15,6 +15,11 @@ sub new {
 	$self->{tmp_dir} = tempdir( CLEANUP => 1 );
 	$self->{src_files} = [];
 	$self->{prog_name} = "program";
+
+	my $tmp_dir = $self->{tmp_dir};
+	$tmp_dir = "/private$self->{tmp_dir}" if ($^O eq 'darwin');
+	$ENV{CITRUN_SOCKET} = "$tmp_dir/test.socket";
+
 	return $self;
 }
 
@@ -77,13 +82,6 @@ sub wait {
 	}
 
 	return ($real_ret, $stderr);
-}
-
-sub tmpdir {
-	my ($self) = @_;
-
-	return "/private$self->{tmp_dir}" if ($^O eq 'darwin');
-	return $self->{tmp_dir};
 }
 
 sub DESTROY {

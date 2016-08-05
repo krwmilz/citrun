@@ -4,7 +4,6 @@ use Test::Project;
 use Test::Viewer;
 
 my $project = Test::Project->new();
-$ENV{CITRUN_SOCKET} = $project->tmpdir() . "/test.socket";
 
 $project->add_src(<<EOF);
 int
