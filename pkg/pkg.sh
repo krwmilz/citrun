@@ -42,7 +42,7 @@ elif [ "$uname" = "Darwin" ]; then
 	sudo port -v -D darwin/devel/citrun build
 	sudo port -v -D darwin/devel/citrun install
 
-	cp /opt/local/var/macports/software/citrun/citrun-0_0.darwin_15.x86_64.tbz2 .
+	cp /opt/local/var/macports/software/citrun/citrun-0.0_0.darwin_15.x86_64.tbz2 .
 
 elif [ "$uname" = "Linux" ]; then
 	sudo dpkg -r $portname || true
