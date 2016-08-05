@@ -1,13 +1,8 @@
-#!/bin/sh
-
-set -e
-set -x
+#!/bin/sh -ex
 
 # Single point of entry for building packages on all platforms.
 #
-if [ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ]; then
-	exit 2;
-fi
+[ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ] && exit 2
 
 ver="0.0"
 portname="${1}"
