@@ -19,6 +19,7 @@
 #include <cerrno>		// EWOULDBLOCK
 #include <err.h>		// err
 #include <cstring>		// memset, strlcpy
+#include <cstdlib>		// getenv
 #include <fcntl.h>		// fcntl, F_GETFL
 #include <stdexcept>
 #include <system_error>		// system_error
