@@ -20,22 +20,24 @@
 .Nm citrun-term
 .Nd terminal viewer
 .Sh DESCRIPTION
-Listens for connections from running instrumented programs. Only supports one
-connection at a time.
+Displays live execution data from running instrumented programs. Note only one
+connection at a time is supported (for now).
 .Pp
+The
 .Nm
-is controlled by the keys
-.Qq hjkl :
+control keys are
+.Qq hjkl
+and have the following effects:
 .Pp
 .Bl -tag -offset indent -compact
 .It Qq j
-scrolls down
+Scrolls source down one line
 .It Qq k
-scrolls up
+Scrolls source up one line
 .It Qq h
-previous translation unit
+Moves to previous translation unit, if possible
 .It Qq l
-next translation unit
+Moves to next translation unit, if possible
 .El
 .Sh FILES
 .Bl -tag -width Ds
