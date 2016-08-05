@@ -27,11 +27,13 @@
 #include <err.h>
 #include <fstream>		// ifstream, ofstream
 #include <libgen.h>		// basename
-#include <sstream>
+#include <iostream>
+#include <sstream>		// stringstream
 #include <string>
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
-#include "inst_action.h"
+#include "lib/runtime.h"	// citrun_major, citrun_minor
+#include "inst_action.h"	// InstrumentAction
 
 #define STR_EXPAND(tok) #tok
 #define STR(tok) STR_EXPAND(tok)
@@ -77,9 +79,10 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	if (uname(&utsname) == -1)
 		err(1, "uname");
 
-	m_log << "\n";
-	m_log << m_pfx << "citrun-inst v0.0 (" << utsname.sysname
-		<< "-" << utsname.release << " " << utsname.machine
+	m_log << "\n" << m_pfx << "citrun-inst v"
+		<< unsigned(citrun_major) << "." << unsigned(citrun_minor)
+		<< " (" << utsname.sysname << "-" << utsname.release
+		<< " " << utsname.machine
 		<< ") called as '" << m_args[0] << "'.\n";
 
 	char *base_name;

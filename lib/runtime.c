@@ -40,7 +40,7 @@ static void *relay_thread(void *);
  * Public interface: Insert a node into the sorted translation unit list.
  */
 void
-citrun_node_add(struct citrun_node *n)
+citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 {
 	struct citrun_node *walk = nodes_head;
 
@@ -154,8 +154,6 @@ xwrite(int d, const void *buf, size_t bytes_total)
 static void
 send_static(int fd)
 {
-	uint8_t			 major = 0;
-	uint8_t			 minor = 0;
 	struct citrun_node	 node;
 	pid_t			 pids[3];
 	struct citrun_node	*w;
@@ -166,8 +164,8 @@ send_static(int fd)
 
 	assert(sizeof(pid_t) == 4);
 
-	xwrite(fd, &major, sizeof(major));
-	xwrite(fd, &minor, sizeof(minor));
+	xwrite(fd, &citrun_major, sizeof(citrun_major));
+	xwrite(fd, &citrun_minor, sizeof(citrun_minor));
 	xwrite(fd, &nodes_total, sizeof(nodes_total));
 	xwrite(fd, &lines_total, sizeof(lines_total));
 

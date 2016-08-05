@@ -63,7 +63,7 @@ InstrumentAction::EndSourceFileAction()
 	ss << "};" << std::endl;
 	ss << "__attribute__((constructor))" << std::endl
 		<< "static void citrun_constructor() {" << std::endl
-		<< "	citrun_node_add(&_citrun_node);" << std::endl
+		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun_node);" << std::endl
 		<< "}" << std::endl;
 	ss << "#ifdef __cplusplus" << std::endl
 		<< "}" << std::endl
