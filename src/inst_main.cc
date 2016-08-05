@@ -238,7 +238,7 @@ CitrunInst::process_cmdline()
 		linking = true;
 
 	if (linking) {
-		m_log << m_pfx << "Link detected, adding runtime libs ";
+		m_log << m_pfx << "Link detected, adding ";
 #ifndef __APPLE__
 		// OSX always links this.
 		m_args.push_back(const_cast<char *>("-pthread"));
@@ -262,13 +262,9 @@ CitrunInst::instrument()
 
 	// Construct a speical command line for ClangTool.
 	clang_argv.push_back(m_args[0]);
-	m_log << m_pfx << "Attempting instrumentation on";
 
-	for (auto s : m_source_files) {
-		m_log << " '" << s << "'";
+	for (auto s : m_source_files)
 		clang_argv.push_back(s.c_str());
-	}
-	m_log << ".\n";
 
 	clang_argv.push_back("--");
 
