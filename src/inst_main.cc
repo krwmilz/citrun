@@ -301,17 +301,15 @@ CitrunInst::instrument()
 int
 CitrunInst::try_unmodified_compile()
 {
-	m_log << m_pfx << "Attempting compilation of unmodified source.\n";
-
 	restore_original_src();
 	int ret = fork_compiler();
 
 	if (ret == 0) {
-		m_log << m_pfx << "Bad news bud native compile succeeded.\n";
+		m_log << m_pfx << "But the native compile succeeded!\n";
 		return 1;
 	}
 
-	m_log << m_pfx << "Good news bud the native compiler also failed.\n";
+	m_log << m_pfx << "And the native compile failed.\n";
 	return ret;
 }
 
