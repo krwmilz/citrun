@@ -3,7 +3,7 @@
 PortSystem          1.0
 
 name                citrun
-version             0
+version             0.0
 categories          devel
 maintainers         openmaintainer@macports.org
 platforms           darwin
@@ -31,8 +31,8 @@ depends_run         port:perl5 \
                     port:p5.22-list-moreutils \
                     port:p5.22-test-differences
 
-depends_lib         port:llvm-3.7 \
-                    port:clang-3.7 \
+depends_lib         port:llvm-3.8 \
+                    port:clang-3.8 \
                     port:freetype
 
 build.cmd           PREFIX=${prefix} jam
