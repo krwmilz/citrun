@@ -1,7 +1,8 @@
 use strict;
-use Test::More tests => 51;
+use Test::More tests => 111;
 use Test::Project;
 use Test::Viewer;
+use Time::HiRes qw( usleep );
 
 my $project = Test::Project->new();
 my $viewer = Test::Viewer->new();
@@ -56,20 +57,15 @@ $project->compile();
 $project->run(45);
 
 $viewer->accept();
-
-# Check static data.
-my @known_good = [
-	# filename	lines	inst sites
+$viewer->cmp_static_data([
 	[ "source_0.c",	20,	9 ],
 	[ "source_1.c",	11,	7 ],
 	[ "source_2.c",	9,	6 ],
-];
-$viewer->cmp_static_data(@known_good);
+]);
 
-# Request and check execution data.
+# Check initial execution counts
+#
 my $data = $viewer->get_dynamic_data();
-
-# The nodes can be in any order.
 my ($s0, $s1, $s2) = sort keys %$data;
 
 my @lines = @{ $data->{$s0} };
@@ -91,6 +87,11 @@ is( $lines[8], 0, "src 1 line 8 check" );
 
 my @lines = @{ $data->{$s2} };
 is( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);
+
+for (1..60) {
+	usleep(10 * 1000);
+	$viewer->cmp_dynamic_data();
+}
 
 $project->kill();
 my ($ret, $err) = $project->wait();
