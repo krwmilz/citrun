@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+table.head, table.foot { width: 100%; }
+td.head-rtitle, td.foot-os { text-align: right; }
+td.head-vol { text-align: center; }
+table.foot td { width: 50%; }
+table.head td { width: 33%; }
+div.spacer { margin: 1em 0; }
+</style>
+<link rel="stylesheet" href="/citrun.css" type="text/css" media="all"/>
+<title>
+CITRUN-CHECK(1)</title>
+</head>
+<body>
+<div class="mandoc">
+<table class="head">
+<tbody>
+<tr>
+<td class="head-ltitle">
+CITRUN-CHECK(1)</td>
+<td class="head-vol">
+General Commands Manual</td>
+<td class="head-rtitle">
+CITRUN-CHECK(1)</td>
+</tr>
+</tbody>
+</table>
+<div class="section">
+<h1 id="NAME">NAME</h1> <b class="name">citrun-check</b> &#8212; <span class="desc">check directories for instrumentation artifacts</span></div>
+<div class="section">
+<h1 id="SYNOPSIS">SYNOPSIS</h1><table class="synopsis">
+<col style="width: 12.00ex;"/>
+<col/>
+<tbody>
+<tr>
+<td>
+<b class="name">citrun-check</b></td>
+<td>
+[<span class="opt"><i class="arg">dir</i></span>]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun-check</b> script recursively checks either <i class="arg">dir</i> or the current working directory for instrumentation artifacts.<div class="spacer">
+</div>
+A summary is printed showing detailed counts of important events. The following is an example of what the output looks like:<div class="spacer">
+</div>
+<pre style="margin-left: 5.00ex;" class="lit display">
+Checking '/usr/ports/pobj/spidermonkey-24.2.0/'... 
+       3  Log files found 
+     185  Calls to the instrumentation tool 
+     117  Forked compilers 
+      97  Instrumentation successes 
+      19  Instrumentation failures (false positive) 
+       1  Instrumentation failures (true positive) 
+      60  Application link commands</pre>
+<div class="spacer">
+</div>
+The value of &#8220;Instrumentation failures (true positives)&#8221; is important. If this value is ever more than 0 it means that instrumentation failed but a native compile of the same source succeeded.</div>
+<div class="section">
+<h1 id="EXIT_STATUS">EXIT STATUS</h1> The <b class="utility">citrun-check</b> utility exits&#160;0 on success, and&#160;&gt;0 if an error occurs.</div>
+<div class="section">
+<h1 id="SEE_ALSO">SEE ALSO</h1> <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a></div>
+<table class="foot">
+<tbody>
+<tr>
+<td class="foot-date">
+August 3, 2016</td>
+<td class="foot-os">
+OpenBSD 6.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>
+
