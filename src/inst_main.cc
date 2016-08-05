@@ -41,7 +41,6 @@ static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 class CitrunInst {
 public:
 	CitrunInst(int, char *argv[]);
-	~CitrunInst();
 
 	void			clean_PATH();
 	void			process_cmdline();
@@ -94,11 +93,6 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	}
 
 	setprogname("citrun-inst");
-}
-
-CitrunInst::~CitrunInst()
-{
-	m_log << m_pfx << "Done.\n";
 }
 
 void

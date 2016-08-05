@@ -60,7 +60,6 @@ Running native compiler on modified source code.
 Forked ''.
 '' exited 0.
 Restored ''.
-Done.
 
 citrun-inst v0.0 () called as ''.
 PATH=''
