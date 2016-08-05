@@ -36,7 +36,7 @@
 #define STR_EXPAND(tok) #tok
 #define STR(tok) STR_EXPAND(tok)
 
-static llvm::cl::OptionCategory ToolingCategory("instrument options");
+static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
 class CitrunInst {
 public:
@@ -238,14 +238,14 @@ CitrunInst::process_cmdline()
 		linking = true;
 
 	if (linking) {
-		m_log << m_pfx << "Link detected, adding ";
+		m_log << m_pfx << "Link detected, adding '";
 #ifndef __APPLE__
 		// OSX always links this.
 		m_args.push_back(const_cast<char *>("-pthread"));
 		m_log << m_args.back() << " ";
 #endif
 		m_args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
-		m_log << m_args.back() << " to command line.\n";
+		m_log << m_args.back() << "' to command line.\n";
 	}
 
 	if (m_source_files.size() != 0)
@@ -258,31 +258,29 @@ CitrunInst::process_cmdline()
 int
 CitrunInst::instrument()
 {
+	//
+	// Create a special command line for ClangTool that looks like:
+	// clang++ src1.c src2.c -- clang++ -I. -Isrc -c src1.c src2.c
+	//
 	std::vector<const char *> clang_argv;
-
-	// Construct a speical command line for ClangTool.
 	clang_argv.push_back(m_args[0]);
-
 	for (auto s : m_source_files)
 		clang_argv.push_back(s.c_str());
-
 	clang_argv.push_back("--");
-
-	// Append original command line verbatim
 	clang_argv.insert(clang_argv.end(), m_args.begin(), m_args.end());
-
-	// We should be able to get this programmatically, but I don't know how.
 #if defined(__OpenBSD__)
 	clang_argv.push_back("-I/usr/local/lib/clang/3.8.0/include");
+	m_log << m_pfx << "Added clangtool argument '" << clang_argv.back() << "'.\n";
 #elif defined(__APPLE__)
 	clang_argv.push_back("-I/opt/local/libexec/llvm-3.7/lib/clang/3.7/include");
+	m_log << m_pfx << "Added clangtool argument '" << clang_argv.back() << "'.\n";
 #endif
-	m_log << m_pfx << "Adding search path '" << clang_argv.back() << "'.\n";
 
-	// give clang it's <source files> -- <native command line> arg style
 	int clang_argc = clang_argv.size();
-	clang::tooling::CommonOptionsParser op(clang_argc, &clang_argv[0], ToolingCategory);
-	clang::tooling::ClangTool Tool(op.getCompilations(), op.getSourcePathList());
+	clang::tooling::CommonOptionsParser
+		op(clang_argc, &clang_argv[0], ToolingCategory);
+	clang::tooling::ClangTool
+		Tool(op.getCompilations(), op.getSourcePathList());
 
 	clang::DiagnosticOptions diags;
 	clang::TextDiagnosticPrinter *log;
