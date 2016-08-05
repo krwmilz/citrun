@@ -21,6 +21,7 @@ public:
 		return read_all((uint8_t *)&buf, sizeof(T));
 	};
 
+	void read_string(std::string &);
 	int read_all(uint8_t *, size_t);
 	int write_all(uint8_t *, size_t);
 private:

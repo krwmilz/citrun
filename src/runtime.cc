@@ -24,7 +24,6 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	m_socket(sock),
 	m_tus_with_execs(0)
 {
-	uint16_t sz;
 	assert(sizeof(pid_t) == 4);
 
 	// Protocol defined in lib/runtime.c send_static().
@@ -37,20 +36,12 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	m_socket.read_all(m_pid);
 	m_socket.read_all(m_ppid);
 	m_socket.read_all(m_pgrp);
-
-	m_socket.read_all(sz);
-	m_progname.resize(sz);
-	m_socket.read_all((uint8_t *)&m_progname[0], sz);
-
-	m_socket.read_all(sz);
-	m_cwd.resize(sz);
-	m_socket.read_all((uint8_t *)&m_cwd[0], sz);
+	m_socket.read_string(m_progname);
+	m_socket.read_string(m_cwd);
 
 	m_tus.resize(m_num_tus);
 	for (auto &t : m_tus) {
-		m_socket.read_all(sz);
-		t.file_name.resize(sz);
-		m_socket.read_all((uint8_t *)&t.file_name[0], sz);
+		m_socket.read_string(t.file_name);
 		m_socket.read_all(t.num_lines);
 		m_socket.read_all(t.inst_sites);
 

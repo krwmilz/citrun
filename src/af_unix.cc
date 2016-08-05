@@ -132,6 +132,16 @@ af_unix::write_all(uint8_t *buf, size_t bytes_total)
 	return bytes_wrote;
 }
 
+void
+af_unix::read_string(std::string &str)
+{
+	uint16_t sz;
+
+	read_all(sz);
+	str.resize(sz);
+	read_all((uint8_t *)&str[0], sz);
+}
+
 int
 af_unix::read_all(uint8_t *buf, size_t bytes_total)
 {
