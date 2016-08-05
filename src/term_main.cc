@@ -67,7 +67,9 @@ CursesViewer::CursesViewer(af_unix &socket) :
 void
 CursesViewer::loop()
 {
+#ifndef __APPLE__
 	clock_gettime(CLOCK_UPTIME, &m_last_frame);
+#endif
 
 	// Make getch() non-blocking.
 	nodelay(stdscr, true);
@@ -183,6 +185,7 @@ CursesViewer::update_execs()
 void
 CursesViewer::update_sleep()
 {
+#ifndef __APPLE__
 	struct timespec tmp, delta;
 	struct timespec one = { 1, 0 };
 	struct timespec zero = { 0, 0 };
@@ -212,6 +215,7 @@ CursesViewer::update_sleep()
 		// least shift.
 		timespecsub(&m_sleep, &shift, &m_sleep);
 
+#endif
 	nanosleep(&m_sleep, NULL);
 }
 
