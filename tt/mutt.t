@@ -9,10 +9,6 @@ use Test::Viewer;
 my $package = Test::Package->new("mail/mutt");
 my $viewer = Test::Viewer->new();
 
-$package->depends();
-$package->clean();
-$package->build();
-
 my $exp = Expect->spawn("/usr/ports/pobj/mutt-1.6.2/mutt-1.6.2/mutt");
 
 my @known_good = (
