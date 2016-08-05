@@ -1,6 +1,6 @@
 package Test::Viewer;
-use strict;
 
+use strict;
 use IO::Socket::UNIX;
 use List::MoreUtils qw( each_array );
 use Test::More;
@@ -50,31 +50,22 @@ sub accept {
 
 sub get_dynamic_data {
 	my ($self) = @_;
+	my $sock = $self->{client_socket};
 
-	my $client = $self->{client_socket};
 	my %data;
-
 	for my $tu (@{ $self->{tus} }) {
-		# Check if there's any update.
-		my $has_data = read_unpack($client, 1, "C");
+		my ($file_name, $nlines) = @{ $tu };
 
-		my $num_lines = $tu->[1];
-		my @data_tmp;
-		if ($has_data == 0) {
-			# print STDERR "no data for tu $_\n";
-			@data_tmp = (0) x $num_lines;
+		# Protocol defined in lib/runtime.c function send_dynamic().
+		#
+		if (read_unpack($sock, 1, "C") == 0) {
+			$data{$file_name} = [ (0) x $nlines ];
+			next;
 		}
-		else {
-			@data_tmp = read_unpack($client, 4 * $num_lines,
-				"L$num_lines");
-		}
-
-		$data{$tu->[0]} = \@data_tmp;
+		$data{$file_name} = [ read_unpack($sock, 4 * $nlines, "L$nlines") ];
 	}
 
-	# Send an 'ok' response
-	$client->syswrite("\x01", 1);
-
+	$sock->syswrite("\x01", 1);
 	return \%data;
 }
 
@@ -84,13 +75,8 @@ sub cmp_static_data {
 	# Sort these alphabetically by file name (field 0).
 	my @sorted_tus = sort { $a->[0] cmp $b->[0] } @{ $self->{tus} };
 
-	# Walk two lists at the same time
-	# http://stackoverflow.com/questions/822563/how-can-i-iterate-over-multiple-lists-at-the-same-time-in-perl
 	my $it = each_array( @$known_good, @sorted_tus );
 	while ( my ($x, $y) = $it->() ) {
-		# For Vim and Mutt respectively.
-		next if ($x->[0] eq "if_xcmdsrv.c" || $x->[0] eq "/conststrings.c");
-
 		like( $y->[0],	qr/.*$x->[0]/,	"$x->[0]: filename check" );
 		is ( $y->[1],	$x->[1],	"$x->[0]: total lines check" );
 
