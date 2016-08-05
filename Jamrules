@@ -15,9 +15,26 @@ OPTIM = $(CFLAGS) ;
 
 C++FLAGS += -std=c++11 ;
 
+_CLANG_LIBS =
+	-lclangAST
+	-lclangAnalysis
+	-lclangBasic
+	-lclangDriver
+	-lclangEdit
+	-lclangFrontend
+	-lclangFrontendTool
+	-lclangLex
+	-lclangParse
+	-lclangRewrite
+	-lclangRewriteFrontend
+	-lclangSema
+	-lclangSerialization
+	-lclangTooling ;
+
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
+	CLANG_LIBS = -Wl,--start-group $(_CLANG_LIBS) -Wl,--end-group ;
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
 	LINKLIBS on citrun-inst = -lestdc++ ;
@@ -26,6 +43,7 @@ if $(OS) = OPENBSD {
 
 if $(OS) = MACOSX {
 	PKG_CONFIG_LIBS = glew freetype2 ;
+	CLANG_LIBS = $(_CLANG_LIBS) ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lc++ -lm ;
 	LINKLIBS on citrun-inst = -lc++ ;
 	LINKLIBS on citrun-term = -lc++ ;
@@ -33,6 +51,7 @@ if $(OS) = MACOSX {
 
 if $(OS) = LINUX {
 	# llvm version is 3.5 on Debian, which is too old.
+	CLANG_LIBS = -Wl,--start-group $(_CLANG_LIBS) -Wl,--end-group ;
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lbsd -lstdc++ -lm -lglut ;
 	LINKLIBS on citrun-inst = -lstdc++ -lbsd ;

@@ -66,23 +66,6 @@ ObjectC++Flags $(INST_SRCS) : -DCITRUN_LIB=$(CITRUN_LIB)
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 
-CLANG_LIBS =
-	-Wl,--start-group
-	-lclangAST
-	-lclangAnalysis
-	-lclangBasic
-	-lclangDriver
-	-lclangEdit
-	-lclangFrontend
-	-lclangFrontendTool
-	-lclangLex
-	-lclangParse
-	-lclangRewrite
-	-lclangRewriteFrontend
-	-lclangSema
-	-lclangSerialization
-	-lclangTooling
-	-Wl,--end-group ;
 LLVM_LIBS = bitreader mcparser transformutils option ;
 
 LINKLIBS on citrun-inst += $(CLANG_LIBS) ;
