@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Expect;
-use Test::More tests => 465 ;
+use Test::More tests => 458 ;
 use Test::Package;
 use Test::Report;
 use Test::Viewer;
@@ -130,7 +130,7 @@ my @known_good = (
 );
 
 $viewer->accept();
-is( $viewer->{num_tus}, scalar @known_good, "translation unit count" );
+is( $viewer->{ntus}, scalar @known_good, "translation unit count" );
 
 $viewer->cmp_static_data(\@known_good);
 
