@@ -1,13 +1,12 @@
 #!/bin/sh -e
 
-dir=`pwd`
-[ "${1}" != "" ] && dir="${1}"
-
 function err {
 	echo "${1}"
 	exit 1
 }
 
+dir=`pwd`
+[ $# -eq 1 ] && dir="${1}"
 [ -d $dir ] || err "$dir: no such directory"
 
 GREP[1]="citrun-inst"
@@ -29,7 +28,7 @@ for i in 0 1 2 3 4 5 6; do
 	COUNT[$i]=0
 done
 
-echo -n Recursively checking directory \'$dir\'
+echo -n Checking \'$dir\'
 for d in `find $dir -name citrun.log`; do
 	echo -n .
 	COUNT[0]=`expr ${COUNT[0]} + 1`
