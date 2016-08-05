@@ -208,10 +208,13 @@ CitrunInst::process_cmdline()
 	bool object_arg = false;
 	bool compile_arg = false;
 
-	m_log << m_pfx << "Processing " << m_args.size()
-		<< " command line arguments.\n";
+	m_log << m_pfx << "Command line is '";
+	for (auto &arg : m_args)
+		m_log << arg << " ";
+	m_log << "'.\n";
 
 	for (auto &arg : m_args) {
+
 		if (std::strcmp(arg, "-E") == 0) {
 			m_log << m_pfx << "Preprocessor argument found\n";
 			exec_compiler();

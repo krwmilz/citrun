@@ -51,7 +51,7 @@ cat <<EOF > citrun.log.good
 
 citrun-inst v0.0 () called as ''.
 PATH=''
-Processing 5 command line arguments.
+Command line is ''.
 Found source file ''.
 Object arg = 1, compile arg = 1
 Added clangtool argument ''.
@@ -64,7 +64,7 @@ Done.
 
 citrun-inst v0.0 () called as ''.
 PATH=''
-Processing 4 command line arguments.
+Command line is ''.
 Object arg = 1, compile arg = 0
 Link detected, adding '' to command line.
 No source files found. Executing command line.
