@@ -59,7 +59,7 @@ $project->run(45);
 $viewer->accept();
 is( $viewer->{maj}, 0, "protocol major" );
 is( $viewer->{min}, 0, "protocol minor" );
-is( $viewer->{num_tus}, 3, "translation unit count" );
+is( $viewer->{ntus}, 3, "translation unit count" );
 is( $viewer->{progname}, "program", "program name" );
 is( $viewer->{cwd}, getcwd, "current working dir" );
 

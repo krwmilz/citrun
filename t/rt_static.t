@@ -30,7 +30,7 @@ cmp_ok( $viewer->{pids}->[1],	">",	1,	"ppid check lower" );
 cmp_ok( $viewer->{pids}->[1],	"<",	100000,	"ppid check upper" );
 cmp_ok( $viewer->{pids}->[2],	">",	1,	"pgrp check lower" );
 cmp_ok( $viewer->{pids}->[2],	"<",	100000,	"pgrp check upper" );
-is( $viewer->{num_tus}, 1, "translation unit count" );
+is( $viewer->{ntus}, 1, "translation unit count" );
 
 my @known_good = [ [ "source_0.c", 8, 2 ] ];
 $viewer->cmp_static_data(@known_good);

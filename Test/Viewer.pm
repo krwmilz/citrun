@@ -32,13 +32,13 @@ sub accept {
 	# Protocol defined in lib/runtime.c function send_static().
 	#
 	($self->{maj}, $self->{min}) = read_unpack($sock, 2, "C2");
-	($self->{num_tus}, $self->{lines_total}) = read_unpack($sock, 8, "L2");
+	($self->{ntus}, $self->{nlines}) = read_unpack($sock, 8, "L2");
 	@{ $self->{pids} } =	read_unpack($sock, 12, "L3");
 	$self->{progname} =	read_all($sock, read_unpack($sock, 2, "S"));
 	$self->{cwd} =		read_all($sock, read_unpack($sock, 2, "S"));
 
 	my @tus;
-	for (1..$self->{num_tus}) {
+	for (1..$self->{ntus}) {
 		my $file_name = read_all($sock, read_unpack($sock, 2, "S"));
 		my ($num_lines, $inst_sites) = read_unpack($sock, 8, "L2");
 
