@@ -39,7 +39,7 @@ sub clean {
 sub build {
 	my ($self) = @_;
 
-	system("make -C $self->{port} PORTPATH=/home/kyle/citrun/src:\$PATH") == 0
+	system("make -C $self->{port} PORTPATH=\"/home/kyle/citrun/src:\\\${WRKDIR}/bin:\$PATH\"") == 0
 		or die "$!";
 }
 
