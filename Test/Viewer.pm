@@ -70,6 +70,7 @@ sub get_dynamic_data {
 
 sub cmp_static_data {
 	my ($self, $known_good) = @_;
+	is( $self->{ntus}, scalar @$known_good, "translation unit count" );
 
 	# Sort these alphabetically by file name (field 0).
 	my @sorted_tus = sort { $a->[0] cmp $b->[0] } @{ $self->{tus} };
