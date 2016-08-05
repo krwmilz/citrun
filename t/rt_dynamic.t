@@ -1,6 +1,5 @@
 use strict;
-use Cwd;
-use Test::More tests => 56;
+use Test::More tests => 51;
 use Test::Project;
 use Test::Viewer;
 
@@ -57,11 +56,6 @@ $project->compile();
 $project->run(45);
 
 $viewer->accept();
-is( $viewer->{maj}, 0, "protocol major" );
-is( $viewer->{min}, 0, "protocol minor" );
-is( $viewer->{ntus}, 3, "translation unit count" );
-is( $viewer->{progname}, "program", "program name" );
-is( $viewer->{cwd}, getcwd, "current working dir" );
 
 # Check static data.
 my @known_good = [

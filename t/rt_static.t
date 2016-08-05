@@ -1,5 +1,6 @@
 use strict;
-use Test::More tests => 16;
+use Cwd;
+use Test::More tests => 19;
 use Test::Project;
 use Test::Viewer;
 
@@ -10,30 +11,29 @@ $project->add_src(<<EOF);
 int
 main(void)
 {
-	/* Just do something so we can probe the runtime reliably */
 	while (1);
 	return 0;
 }
 EOF
-
 $project->compile();
 $project->run();
 
 $viewer->accept();
-
-is( $viewer->{maj}, 	0,	"major version" );
-is( $viewer->{min}, 	0,	"minor version" );
-is( scalar @{ $viewer->{pids} },	3,	"number of pids" );
+is( $viewer->{maj}, 	0,	"protocol major version" );
+is( $viewer->{min}, 	0,	"protocol minor version" );
+is( $viewer->{ntus},	1,	"translation unit count" );
+is( $viewer->{nlines},	7,	"total program lines" );
+is( $viewer->{progname}, "program", "program name" );
+is( $viewer->{cwd},	getcwd,	"current working dir" );
+is( @{ $viewer->{pids} },	3,	"number of pids" );
 cmp_ok( $viewer->{pids}->[0],	">",	1,	"pid check lower" );
 cmp_ok( $viewer->{pids}->[0],	"<",	100000,	"pid check upper" );
 cmp_ok( $viewer->{pids}->[1],	">",	1,	"ppid check lower" );
 cmp_ok( $viewer->{pids}->[1],	"<",	100000,	"ppid check upper" );
 cmp_ok( $viewer->{pids}->[2],	">",	1,	"pgrp check lower" );
 cmp_ok( $viewer->{pids}->[2],	"<",	100000,	"pgrp check upper" );
-is( $viewer->{ntus}, 1, "translation unit count" );
 
-my @known_good = [ [ "source_0.c", 8, 2 ] ];
-$viewer->cmp_static_data(@known_good);
+$viewer->cmp_static_data([ [ "source_0.c", 7, 2 ] ]);
 
 $project->kill();
 my ($ret, $err) = $project->wait();
