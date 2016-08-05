@@ -13,7 +13,7 @@ else {
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
 
-C++FLAGS += -std=c++11 ;
+C++FLAGS += -std=c++11 -I$(TOP) ;
 
 _CLANG_LIBS =
 	-lclangAST

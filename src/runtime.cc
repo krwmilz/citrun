@@ -17,6 +17,7 @@
 #include <err.h>
 #include <fstream>
 
+#include "lib/runtime.h"	// citrun_major
 #include "runtime.hh"
 
 RuntimeProcess::RuntimeProcess(af_unix &sock) :
@@ -29,7 +30,7 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	// Protocol defined in lib/runtime.c send_static().
 	// This is the receive side of things.
 	m_socket.read_all(m_major);
-	assert(m_major == 0);
+	assert(m_major == citrun_major);
 	m_socket.read_all(m_minor);
 	m_socket.read_all(m_num_tus);
 	m_socket.read_all(m_lines_total);
