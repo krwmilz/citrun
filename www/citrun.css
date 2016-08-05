@@ -1,16 +1,14 @@
-/* This is necessary IMHO. */
 p  { line-height: 1.5em; }
 li { line-height: 1.5em; }
 
-/* Booorriing. 80 char width monospace.  */
 body {
 	max-width: 70ch;
+	padding: 10px;
 	margin: auto;
 	font-family: sans-serif;
 }
 
 .inline_logo {
-	/* Logos next to text need to be the same size as the text. */
 	height: 1em;
 }
 
