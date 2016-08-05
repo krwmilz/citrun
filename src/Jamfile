@@ -41,6 +41,7 @@ Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
 Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
 
 ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
+ObjectC++Flags $(GL_SRCS) : -I/usr/local/include ;
 
 LINKLIBS on citrun-gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
 LinkLibraries citrun-gl : libglyphy utils ;
