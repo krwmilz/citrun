@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 7;
 use Test::Project;
 use Test::Viewer;
 
@@ -22,7 +22,6 @@ sleep(1);
 
 my $viewer = Test::Viewer->new();
 $viewer->accept();
-is( $viewer->{ntus}, 1, "num tus check" );
 $viewer->cmp_static_data([ [ "source_0.c", 7, 2 ] ]);
 
 $project->kill();

@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 14;
+use Test::More tests => 13;
 use Test::Project;
 use Test::Viewer;
 
@@ -42,7 +42,6 @@ $project->run(45);
 
 # Accept the runtime connection and check a few things.
 $viewer->accept();
-is( $viewer->{ntus}, 1, "num tus check" );
 $viewer->cmp_static_data([ [ "source_0.c", 28, 18 ] ]);
 
 my $data = $viewer->get_dynamic_data();
