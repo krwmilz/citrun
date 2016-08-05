@@ -313,11 +313,11 @@ CitrunInst::try_unmodified_compile()
 	int ret = fork_compiler();
 
 	if (ret == 0) {
-		m_log << m_pfx << "Bad news, native compile succeeded.\n";
+		m_log << m_pfx << "Bad news bud native compile succeeded.\n";
 		return 1;
 	}
 
-	m_log << m_pfx << "Good, the native compiler also failed.\n";
+	m_log << m_pfx << "Good news bud the native compiler also failed.\n";
 	return ret;
 }
 

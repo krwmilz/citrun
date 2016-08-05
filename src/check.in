@@ -11,15 +11,15 @@ fi
 GREP[1]="citrun-inst"
 GREP[2]="Forked "
 GREP[3]="Instrumentation successful."
-GREP[4]="Instrumentation failed."
-GREP[5]="Bad news"
+GREP[4]="Good news bud"
+GREP[5]="Bad news bud"
 GREP[6]="Link detected"
 
 DESC[0]="Log files found"
 DESC[1]="Calls to the instrumentation tool"
 DESC[2]="Forked compilers"
 DESC[3]="Instrumentation successes"
-DESC[4]="Instrumentation failures"
+DESC[4]="Instrumentation failures (false positive)"
 DESC[5]="Instrumentation failures (true positive)"
 DESC[6]="Application link commands"
 
