@@ -1,7 +1,5 @@
 #!/bin/sh -e
 
-git clean -fdx
-
 export CITRUN_COVERAGE=1
 CFLAGS="-coverage -O0 -ggdb" jam -j4
 
