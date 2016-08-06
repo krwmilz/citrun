@@ -273,7 +273,7 @@ CitrunInst::instrument()
 	clang_argv.push_back("--");
 	clang_argv.insert(clang_argv.end(), m_args.begin(), m_args.end());
 #if defined(__OpenBSD__)
-	clang_argv.push_back("-I/usr/local/lib/clang/3.8.0/include");
+	clang_argv.push_back("-I/usr/local/lib/clang/3.8.1/include");
 	m_log << m_pfx << "Added clangtool argument '" << clang_argv.back() << "'.\n";
 #elif defined(__APPLE__)
 	clang_argv.push_back("-I/opt/local/libexec/llvm-3.8/lib/clang/3.8.1/include");
