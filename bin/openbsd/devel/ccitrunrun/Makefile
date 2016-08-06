@@ -2,7 +2,8 @@
 
 COMMENT =		see citrun run
 
-DISTNAME =		ccitrunrun-0
+PKGNAME =		ccitrunrun-0.0
+DISTNAME =		citrun-0.0
 CATEGORIES =		devel
 
 HOMEPAGE =		http://cit.run
@@ -27,7 +28,14 @@ BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
 do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} citrun-wrap jam -j4
+	cd ${WRKSRC} && sed -i \
+		-e "s,struct citrun_node,struct ccitrunrun_node," \
+		-e "s,citrun_node_add,ccitrunrun_node_add," \
+		-e "s,citrun_major,ccitrunrun_major,g" \
+		-e "s,citrun_minor,ccitrunrun_minor,g" \
+		lib/runtime.h lib/runtime.c \
+		src/inst_action.cc src/inst_main.cc src/runtime.cc
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -j4
 
 do-test:
 	cd ${WRKSRC} && prove
