@@ -13,7 +13,7 @@ my $viewer = Test::Viewer->new();
 
 system("citrun-check /usr/ports/pobj/ccitrunrun-*");
 
-my $exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/citrun-gl");
+my $exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/ccitrunrun-gl");
 $viewer->accept();
 $viewer->cmp_static_data([
 	# file name			lines	instrumented sites
@@ -38,7 +38,7 @@ $viewer->cmp_static_data([
 $exp->hard_close();
 $viewer->close();
 
-$exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/citrun-term");
+$exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/ccitrunrun-term");
 $viewer->accept();
 $viewer->cmp_static_data([
 	# file name		lines	instrumented sites
@@ -49,7 +49,7 @@ $viewer->cmp_static_data([
 $exp->hard_close();
 $viewer->close();
 
-$exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/citrun-inst");
+$exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/ccitrunrun-inst");
 $viewer->accept();
 
 $viewer->cmp_static_data([
@@ -60,4 +60,4 @@ $viewer->cmp_static_data([
 ]);
 
 $exp->hard_close();
-$package->clean();
+#$package->clean();
