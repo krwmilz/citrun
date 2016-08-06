@@ -114,7 +114,7 @@ $viewer->cmp_static_data([
 	["/system.c", 142, 65],
 	["/thread.c", 1431, 386],
 	["/url.c", 325, 164],
-);
+]);
 $viewer->cmp_dynamic_data();
 
 $exp->hard_close();
