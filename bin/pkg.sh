@@ -4,31 +4,30 @@
 #
 [ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ] && exit 2
 
-ver="0.0"
 portname="${1}"
 uname=`uname`
 
 if [ "$uname" = "OpenBSD" ]; then
-	pkg_path=/usr/ports/packages/`uname -m`/all/${portname}-${ver}.tgz
+	pkg_path=/usr/ports/packages/`uname -m`/all/${portname}-*.tgz
 
 	# Make sure package building doesn't rely on anything that's already installed
 	doas pkg_delete $portname || true
 	rm -f $pkg_path
 
 	# Don't check checksums as this script is used for continuous integration
-	export PORTSDIR_PATH="`pwd`/openbsd:/usr/ports"
+	export PORTSDIR_PATH="`pwd`/bin/openbsd:/usr/ports"
 	export NO_CHECKSUM=1
 
 	# Always re-fetch the latest sources
-	rm -f /usr/ports/distfiles/${portname}-${ver}.tar.gz
+	rm -f /usr/ports/distfiles/${portname}-*.tar.gz
 
 	# The 'test' target will do a full build first
-	make -C openbsd/devel/$portname clean=all
-	make -C openbsd/devel/$portname build
-	make -C openbsd/devel/$portname package
+	make -C bin/openbsd/devel/$portname clean=all
+	make -C bin/openbsd/devel/$portname build
+	make -C bin/openbsd/devel/$portname package
 
 	doas pkg_add -Dunsigned -r $pkg_path
-	cp $pkg_path .
+	mv $pkg_path bin/
 
 elif [ "$uname" = "Darwin" ]; then
 	sudo port uninstall $portname
