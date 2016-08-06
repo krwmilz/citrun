@@ -1,45 +1,37 @@
 #!/bin/sh -e
 
-# Single point of entry for building packages on all platforms.
-#
-[ "${1}" != "citrun" -a "${1}" != "ccitrunrun" ] && exit 2
-
-portname="${1}"
 uname=`uname`
-
 if [ "$uname" = "OpenBSD" ]; then
-	pkg_path=/usr/ports/packages/`uname -m`/all/${portname}-*.tgz
+	pkg_path=/usr/ports/packages/`uname -m`/all/citrun-*.tgz
 
 	# Make sure package building doesn't rely on anything that's already installed
-	doas pkg_delete $portname || true
+	doas pkg_delete citrun || true
 	rm -f $pkg_path
 
-	# Don't check checksums as this script is used for continuous integration
-	export PORTSDIR_PATH="`pwd`/bin/openbsd:/usr/ports"
+	rm -rf /usr/ports/devel/citrun
+	cp -R bin/openbsd/citrun /usr/ports/devel/
+
 	export NO_CHECKSUM=1
+	rm -f /usr/ports/distfiles/citrun-*.tar.gz
 
-	# Always re-fetch the latest sources
-	rm -f /usr/ports/distfiles/${portname}-*.tar.gz
-
-	# The 'test' target will do a full build first
-	make -C bin/openbsd/devel/$portname clean=all
-	make -C bin/openbsd/devel/$portname build
-	make -C bin/openbsd/devel/$portname package
+	make -C /usr/ports/devel/citrun clean=all
+	make -C /usr/ports/devel/citrun build
+	make -C /usr/ports/devel/citrun package
 
 	doas pkg_add -Dunsigned -r $pkg_path
 	mv $pkg_path bin/
 
 elif [ "$uname" = "Darwin" ]; then
-	sudo port uninstall $portname
+	sudo port uninstall citrun
 
 	sudo port -v -D darwin/devel/citrun clean
 	sudo port -v -D darwin/devel/citrun build
 	sudo port -v -D darwin/devel/citrun install
 
-	cp /opt/local/var/macports/software/citrun/citrun-0.0_0.darwin_15.x86_64.tbz2 .
+	cp /opt/local/var/macports/software/citrun/citrun-0.0_0.darwin_15.x86_64.tbz2 bin/
 
 elif [ "$uname" = "Linux" ]; then
-	sudo dpkg -r $portname || true
+	sudo dpkg -r citrun || true
 
 	tmpdir=`mktemp -d`
 	trap "rm -rf $tmpdir" EXIT
