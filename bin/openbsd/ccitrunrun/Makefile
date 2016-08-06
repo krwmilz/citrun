@@ -13,15 +13,14 @@ PERMIT_PACKAGE_CDROM =	Yes
 
 MASTER_SITES =		${HOMEPAGE}/src/
 
-WANTLIB +=		GL GLU GLEW glut c citrun freetype m pthread z
+WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
 
 # -std=c++11
 MODULES =		gcc4
 MODGCC4_ARCHS =		*
 MODGCC4_LANGS =		c++
 
-LIB_DEPENDS =		devel/citrun \
-			graphics/freeglut \
+LIB_DEPENDS =		graphics/freeglut \
 			graphics/glew
 
 BUILD_DEPENDS =		devel/jam \

@@ -11,7 +11,7 @@ system("rm -rf /usr/ports/devel/ccitrunrun; cp -R bin/openbsd/ccitrunrun /usr/po
 my $package = Test::Package->new("devel/ccitrunrun");
 my $viewer = Test::Viewer->new();
 
-system("citrun-check /usr/ports/pobj/ccitrunrun-*");
+system("./src/citrun-check /usr/ports/pobj/ccitrunrun-*");
 
 my $exp = Expect->spawn("/usr/ports/pobj/ccitrunrun-*/citrun-*/src/ccitrunrun-gl");
 $viewer->accept();

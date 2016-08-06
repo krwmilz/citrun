@@ -17,15 +17,15 @@ sub new {
 	$self->{port} = "/usr/ports/$name";
 
 	$ENV{CITRUN_SOCKET} = $self->{dir} . "/test.socket";
+	my $cwd = cwd;
 
 	system(<<EOF) == 0 or die "build failed.";
 set -e
 make -C $self->{port} full-build-depends > $self->{dir}/deps
-pkg_info citrun > /dev/null
 doas pkg_add -zl $self->{dir}/deps
 
 make -C $self->{port} clean=all
-make -C $self->{port} PORTPATH="/usr/local/share/citrun:\\\${WRKDIR}/bin:\$PATH"
+make -C $self->{port} PORTPATH="$cwd/src:\\\${WRKDIR}/bin:\$PATH"
 EOF
 
 	return $self;
