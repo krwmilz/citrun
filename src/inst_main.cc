@@ -63,6 +63,7 @@ private:
 	llvm::raw_fd_ostream	m_log;
 	pid_t			m_pid;
 	std::string		m_pfx;
+	bool			m_is_citruninst;
 };
 
 CitrunInst::CitrunInst(int argc, char *argv[]) :
@@ -70,7 +71,8 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_ec(),
 	m_log("citrun.log", m_ec, llvm::sys::fs::F_Append),
 	m_pid(getpid()),
-	m_pfx(std::to_string(m_pid) + ": ")
+	m_pfx(std::to_string(m_pid) + ": "),
+	m_is_citruninst(false)
 {
 	if (m_ec.value())
 		warnx("citrun.log: %s", m_ec.message().c_str());
@@ -93,6 +95,11 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 		m_log << m_pfx << "Changing '" << m_args[0] << "' to '"
 			<< base_name << "'.\n";
 		m_args[0] = base_name;
+	}
+
+	if (std::strcmp(m_args[0], "citrun-inst") == 0) {
+		m_log << m_pfx << "citrun-inst called directly.\n";
+		m_is_citruninst = true;
 	}
 
 	setprogname("citrun-inst");
@@ -332,6 +339,11 @@ void
 CitrunInst::exec_compiler()
 {
 	m_log.close();
+
+	if (m_is_citruninst) {
+		m_log << m_pfx << "Running as citrun-inst, not re-exec()'ing\n";
+		exit(0);
+	}
 
 	m_args.push_back(NULL);
 	if (execvp(m_args[0], &m_args[0]))
