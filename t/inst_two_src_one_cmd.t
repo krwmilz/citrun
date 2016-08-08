@@ -45,6 +45,32 @@ Found source file ''.
 Object arg = 1, compile arg = 0
 Link detected, adding '' to command line.
 Added clangtool argument ''.
+Instrumentation of '' finished:
+    6 Lines of source code
+    30 Lines of instrumentation header
+    1 Functions called ''
+    1 Function declarations
+    0 If statements
+    0 For statements
+    0 While statements
+    0 Switch statements
+    1 Return statement values
+    0 Call expressions
+    3 Total statements in source
+Modified source written successfully.
+Instrumentation of '' finished:
+    6 Lines of source code
+    30 Lines of instrumentation header
+    0 Functions called ''
+    1 Function declarations
+    0 If statements
+    0 For statements
+    0 While statements
+    0 Switch statements
+    1 Return statement values
+    0 Call expressions
+    3 Total statements in source
+Modified source written successfully.
 Instrumentation successful.
 Running native compiler on modified source code.
 Forked ''.

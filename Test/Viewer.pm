@@ -39,10 +39,10 @@ sub accept {
 	my @tus;
 	for (1..$self->{ntus}) {
 		my $file_name = read_all($sock, read_unpack($sock, 2, "S"));
-		my ($num_lines, $inst_sites) = read_unpack($sock, 8, "L2");
+		my ($num_lines) = read_unpack($sock, 4, "L");
 
 		# Keep this in order so it's easy to fetch dynamic data.
-		push @tus, [ $file_name, $num_lines, $inst_sites ];
+		push @tus, [ $file_name, $num_lines ];
 	}
 	$self->{tus} = \@tus;
 }

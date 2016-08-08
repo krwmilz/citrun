@@ -55,6 +55,19 @@ Command line is ''.
 Found source file ''.
 Object arg = 1, compile arg = 1
 Added clangtool argument ''.
+Instrumentation of '' finished:
+    22 Lines of source code
+    30 Lines of instrumentation header
+    1 Functions called ''
+    5 Function declarations
+    2 If statements
+    0 For statements
+    0 While statements
+    0 Switch statements
+    5 Return statement values
+    4 Call expressions
+    198 Total statements in source
+Modified source written successfully.
 Instrumentation successful.
 Running native compiler on modified source code.
 Forked ''.
