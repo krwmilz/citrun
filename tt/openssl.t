@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Expect;
-use Test::More tests => 2734 ;
+use Test::More tests => 1368 ;
 use Test::Package;
 use Test::Report;
 use Test::Viewer;

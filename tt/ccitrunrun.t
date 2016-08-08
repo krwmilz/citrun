@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Cwd;
 use Expect;
-use Test::More tests => 95;
+use Test::More tests => 49;
 use Test::Package;
 use Test::Viewer;
 
