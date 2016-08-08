@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 112;
+use Test::More tests => 106;
 use Test::Project;
 use Test::Viewer;
 use Time::HiRes qw( usleep );
@@ -58,9 +58,9 @@ $project->run(45);
 
 $viewer->accept();
 $viewer->cmp_static_data([
-	[ "source_0.c",	20,	9 ],
-	[ "source_1.c",	11,	7 ],
-	[ "source_2.c",	9,	6 ],
+	[ "source_0.c",	20 ],
+	[ "source_1.c",	11 ],
+	[ "source_2.c",	9 ],
 ]);
 
 # Check initial execution counts

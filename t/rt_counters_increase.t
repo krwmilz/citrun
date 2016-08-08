@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 13;
+use Test::More tests => 11;
 use Test::Project;
 use Test::Viewer;
 
@@ -42,7 +42,7 @@ $project->run(45);
 
 # Accept the runtime connection and check a few things.
 $viewer->accept();
-$viewer->cmp_static_data([ [ "source_0.c", 28, 18 ] ]);
+$viewer->cmp_static_data([ [ "source_0.c", 28 ] ]);
 
 my $data = $viewer->get_dynamic_data();
 ok( keys %$data == 1, "single dynamic data key" );

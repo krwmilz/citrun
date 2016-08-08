@@ -80,10 +80,6 @@ sub cmp_static_data {
 
 		like( $y->[0],	qr/.*$x->[0]/,	"$x->[0]: filename check" );
 		is ( $y->[1],	$x->[1],	"$x->[0]: total lines check" );
-
-		# Check instrumented sites ranges
-		cmp_ok ( $y->[2], ">", $x->[2] - 100, "$x->[0]: instr sites check lower" );
-		cmp_ok ( $y->[2], "<", $x->[2] + 100, "$x->[0]: instr sites check upper" );
 	}
 }
 

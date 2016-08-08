@@ -1,6 +1,6 @@
 use strict;
 use Cwd;
-use Test::More tests => 20;
+use Test::More tests => 18;
 use Test::Project;
 use Test::Viewer;
 
@@ -33,7 +33,7 @@ cmp_ok( $viewer->{pids}->[1],	"<",	100000,	"ppid check upper" );
 cmp_ok( $viewer->{pids}->[2],	">",	1,	"pgrp check lower" );
 cmp_ok( $viewer->{pids}->[2],	"<",	100000,	"pgrp check upper" );
 
-$viewer->cmp_static_data([ [ "source_0.c", 7, 2 ] ]);
+$viewer->cmp_static_data([ [ "source_0.c", 7 ] ]);
 
 $project->kill();
 my ($ret, $err) = $project->wait();
