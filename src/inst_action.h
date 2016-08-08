@@ -44,21 +44,3 @@ private:
 	std::string		 m_pfx;
 	bool			 m_is_citruninst;
 };
-
-class InstrumentActionFactory : public clang::tooling::FrontendActionFactory {
-public:
-	InstrumentActionFactory(llvm::raw_fd_ostream *log, std::string const &pfx, bool citruninst) :
-		m_log(log),
-		m_pfx(pfx),
-		m_is_citruninst(citruninst)
-	{};
-
-	clang::ASTFrontendAction *create() {
-		return new InstrumentAction(m_log, m_pfx, m_is_citruninst);
-	}
-
-private:
-	llvm::raw_fd_ostream	*m_log;
-	std::string		 m_pfx;
-	bool			 m_is_citruninst;
-};

@@ -29,42 +29,30 @@
 #include <libgen.h>		// basename
 #include <iostream>
 #include <sstream>		// stringstream
-#include <string>
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
 #include "lib/runtime.h"	// citrun_major, citrun_minor
-#include "inst_action.h"	// InstrumentAction
+#include "inst_main.h"
 
 #define STR_EXPAND(tok) #tok
 #define STR(tok) STR_EXPAND(tok)
 
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
-class CitrunInst {
-public:
-	CitrunInst(int, char *argv[]);
+int
+main(int argc, char *argv[])
+{
+	CitrunInst main(argc, argv);
 
-	void			clean_PATH();
-	void			process_cmdline();
-	int			instrument();
-	int			compile_modified();
+	main.clean_PATH();
 
-private:
-	void			exec_compiler();
-	int			fork_compiler();
-	void			restore_original_src();
-	void			save_if_srcfile(char *);
-	int			try_unmodified_compile();
+	main.process_cmdline();
 
-	std::vector<char *>	m_args;
-	std::vector<std::string> m_source_files;
-	std::map<std::string, std::string> m_temp_file_map;
-	std::error_code		m_ec;
-	llvm::raw_fd_ostream	m_log;
-	pid_t			m_pid;
-	std::string		m_pfx;
-	bool			m_is_citruninst;
-};
+	if (main.instrument())
+		return 1;
+
+	return main.compile_modified();
+}
 
 CitrunInst::CitrunInst(int argc, char *argv[]) :
 	m_args(argv, argv + argc),
@@ -391,19 +379,4 @@ CitrunInst::compile_modified()
 	restore_original_src();
 
 	return ret;
-}
-
-int
-main(int argc, char *argv[])
-{
-	CitrunInst main(argc, argv);
-
-	main.clean_PATH();
-
-	main.process_cmdline();
-
-	if (main.instrument())
-		return 1;
-
-	return main.compile_modified();
 }
