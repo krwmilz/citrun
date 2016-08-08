@@ -70,7 +70,7 @@ InstrumentAction::EndSourceFileAction()
 	std::string header = ss.str();
 	unsigned header_sz = std::count(header.begin(), header.end(), '\n');
 
-	if (m_TheRewriter.InsertTextAfter(start, header)) {
+	if (!m_is_citruninst && m_TheRewriter.InsertTextAfter(start, header)) {
 		*m_log << m_pfx << "Failed inserting " << header_sz
 			<< " lines of instrumentation preabmle.";
 		return;
@@ -90,8 +90,15 @@ InstrumentAction::EndSourceFileAction()
 	*m_log << m_pfx << "    " << v.m_callexpr << " Call expressions\n";
 	*m_log << m_pfx << "    " << v.m_totalstmt << " Total statements in source\n";
 
+	std::string out_file(file_name);
+	if (m_is_citruninst) {
+		out_file = file_name + ".citrun";
+		*m_log << m_pfx << "Writing modified source to '"
+			<< out_file << "'.\n";
+	}
+
 	std::error_code ec;
-	llvm::raw_fd_ostream output(file_name, ec, llvm::sys::fs::F_None);
+	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
 	if (ec.value()) {
 		*m_log << m_pfx << "Error writing modified source: "
 			<< ec.message() << "\n";

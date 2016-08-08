@@ -85,10 +85,8 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 		m_args[0] = base_name;
 	}
 
-	if (std::strcmp(m_args[0], "citrun-inst") == 0) {
-		m_log << m_pfx << "citrun-inst called directly.\n";
+	if (std::strcmp(m_args[0], "citrun-inst") == 0)
 		m_is_citruninst = true;
-	}
 
 	setprogname("citrun-inst");
 }
@@ -96,8 +94,11 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 void
 CitrunInst::clean_PATH()
 {
-	char *path;
+	if (m_is_citruninst)
+		// Running citrun-inst directly is guarded against exec() loops
+		return;
 
+	char *path;
 	if ((path = std::getenv("PATH")) == NULL) {
 		m_log << m_pfx << "PATH is not set.\n";
 		errx(1, "PATH must be set");
@@ -184,6 +185,11 @@ CitrunInst::save_if_srcfile(char *arg)
 
 		m_source_files.push_back(arg);
 		m_log << m_pfx << "Found source file '" << arg << "'.\n";
+
+		if (m_is_citruninst)
+			// In this mode the modified source file is written to a
+			// completely different file.
+			return;
 
 		char *dst_fn;
 		if ((dst_fn = std::tmpnam(NULL)) == NULL)
@@ -289,13 +295,19 @@ CitrunInst::instrument()
 	Tool.setDiagnosticConsumer(log);
 
 	std::unique_ptr<InstrumentActionFactory> f =
-		llvm::make_unique<InstrumentActionFactory>(&m_log, m_pfx, false);
-	if (Tool.run(f.get())) {
-		m_log << m_pfx << "Instrumentation failed.\n";
-		return try_unmodified_compile();
+		llvm::make_unique<InstrumentActionFactory>(&m_log, m_pfx, m_is_citruninst);
+
+	int ret = Tool.run(f.get());
+	m_log << m_pfx << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
+
+	if (m_is_citruninst) {
+		// Nothing left to do if we're in this mode.
+		m_log.close();
+		exit(ret);
 	}
 
-	m_log << m_pfx << "Instrumentation successful.\n";
+	if (ret)
+		return try_unmodified_compile();
 	return 0;
 }
 
