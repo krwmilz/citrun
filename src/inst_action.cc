@@ -76,19 +76,29 @@ InstrumentAction::EndSourceFileAction()
 		return;
 	}
 
-	RewriteASTVisitor v = m_InstrumentASTConsumer->get_visitor();
 	*m_log << m_pfx << "Instrumentation of '" << file_name << "' finished:\n";
 	*m_log << m_pfx << "    " << num_lines << " Lines of source code\n";
 	*m_log << m_pfx << "    " << header_sz << " Lines of instrumentation header\n";
-	*m_log << m_pfx << "    " << v.m_mainfunc << " Functions called 'main'\n";
-	*m_log << m_pfx << "    " << v.m_funcdecl << " Function declarations\n";
-	*m_log << m_pfx << "    " << v.m_ifstmt << " If statements\n";
-	*m_log << m_pfx << "    " << v.m_forstmt << " For statements\n";
-	*m_log << m_pfx << "    " << v.m_whilestmt << " While statements\n";
-	*m_log << m_pfx << "    " << v.m_switchstmt << " Switch statements\n";
-	*m_log << m_pfx << "    " << v.m_returnstmt << " Return statement values\n";
-	*m_log << m_pfx << "    " << v.m_callexpr << " Call expressions\n";
-	*m_log << m_pfx << "    " << v.m_totalstmt << " Total statements in source\n";
+
+	std::vector<std::string> counter_descr;
+	counter_descr.push_back("Functions called 'main'");
+	counter_descr.push_back("Function definitions");
+	counter_descr.push_back("If statements");
+	counter_descr.push_back("For statements");
+	counter_descr.push_back("While statements");
+	counter_descr.push_back("Switch statements");
+	counter_descr.push_back("Return statement values");
+	counter_descr.push_back("Call expressions");
+	counter_descr.push_back("Total statements");
+
+	RewriteASTVisitor v = m_InstrumentASTConsumer->get_visitor();
+	for (int i = 0; i < 9; i++) {
+		int count = v.m_counters[i];
+		if (count == 0)
+			continue;
+		*m_log << m_pfx << "    " << count << " " << counter_descr[i]
+			<< "\n";
+	}
 
 	std::string out_file(file_name);
 	if (m_is_citruninst) {

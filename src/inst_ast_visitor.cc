@@ -29,37 +29,37 @@ RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 bool
 RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
-	m_totalstmt++;
+	m_counters[8]++;
 
 	if (clang::isa<clang::IfStmt>(s)) {
 		s = clang::cast<clang::IfStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_ifstmt++;
+		m_counters[2]++;
 	}
 	else if (clang::isa<clang::ForStmt>(s)) {
 		s = clang::cast<clang::ForStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_forstmt++;
+		m_counters[3]++;
 	}
 	else if (clang::isa<clang::WhileStmt>(s)) {
 		s = clang::cast<clang::WhileStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_whilestmt++;
+		m_counters[4]++;
 	}
 	else if (clang::isa<clang::SwitchStmt>(s)) {
 		s = clang::cast<clang::SwitchStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_switchstmt++;
+		m_counters[5]++;
 	}
 	else if (clang::isa<clang::ReturnStmt>(s)) {
 		s = clang::cast<clang::ReturnStmt>(s)->getRetValue();
 		if (modify_stmt(s) == false)
 			return true;
-		m_returnstmt++;
+		m_counters[6]++;
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
@@ -71,7 +71,7 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 	else if (clang::isa<clang::CallExpr>(s)) {
 		if (modify_stmt(s) == false)
 			return true;
-		m_callexpr++;
+		m_counters[7]++;
 	}
 
 	return true;
@@ -107,7 +107,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// main() is a special case because it must start the runtime thread.
 	clang::DeclarationName DeclName = f->getNameInfo().getName();
 	if (DeclName.getAsString() == "main") {
-		m_mainfunc++;
+		m_counters[0]++;
 		rewrite_text << "citrun_start();";
 	}
 
@@ -123,7 +123,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// Rewrite the function source right after the beginning curly brace.
 	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
 
-	m_funcdecl++;
+	m_counters[1]++;
 	return true;
 }
 

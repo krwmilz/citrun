@@ -39,14 +39,10 @@ Instrumentation of '' finished:
     10 Lines of source code
     30 Lines of instrumentation header
     1 Functions called ''
-    1 Function declarations
-    0 If statements
-    0 For statements
+    1 Function definitions
     2 While statements
-    0 Switch statements
     1 Return statement values
-    0 Call expressions
-    18 Total statements in source
+    18 Total statements
 Writing modified source to ''.
 Modified source written successfully.
 Instrumentation successful.
