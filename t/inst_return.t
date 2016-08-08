@@ -1,12 +1,10 @@
-use strict;
-use Test::More tests => 1;
-use Test::Project;
-use Test::Viewer;
+#!/bin/sh -e
+echo 1..3
 
-my $project = Test::Project->new();
-my $viewer = Test::Viewer->new();
+. test/utils.sh
+setup
 
-$project->add_src(<<EOF);
+cat <<EOF > return.c
 int foo() {
 	return 0;
 }
@@ -20,8 +18,47 @@ int main(void) {
 }
 EOF
 
-$project->compile();
-$project->run();
+cat <<EOF > return.c.inst_good
+int foo() {++_citrun_lines[1];
+	return (++_citrun_lines[2], 0);
+}
 
-my ($ret) = $project->wait();
-is($ret, 10, "instrumented program check");
+int main(void) {citrun_start();++_citrun_lines[5];
+	return (++_citrun_lines[6], 10);
+
+	return (++_citrun_lines[8], 10 + 10);
+
+	return (++_citrun_lines[10], (++_citrun_lines[10], foo()));
+}
+EOF
+
+cat <<EOF > citrun.log.good
+
+citrun-inst v0.0 () called as ''.
+Command line is ''.
+Found source file ''.
+Object arg = 0, compile arg = 1
+Added clangtool argument ''.
+Instrumentation of '' finished:
+    12 Lines of source code
+    30 Lines of instrumentation header
+    1 Functions called ''
+    2 Function declarations
+    0 If statements
+    0 For statements
+    0 While statements
+    0 Switch statements
+    4 Return statement values
+    1 Call expressions
+    14 Total statements in source
+Writing modified source to ''.
+Modified source written successfully.
+Instrumentation successful.
+EOF
+
+citrun-inst -c return.c
+
+diff -u return.c.inst_good return.c.citrun && echo "ok 2 - instrumented source diff"
+
+process_citrun_log
+diff -u citrun.log.good citrun.log.proc && echo "ok 3 - citrun.log diff"
