@@ -29,47 +29,68 @@ RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 bool
 RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
-	clang::Stmt *stmt_to_inst = NULL;
+	m_totalstmt++;
 
 	if (clang::isa<clang::IfStmt>(s)) {
-		stmt_to_inst = clang::cast<clang::IfStmt>(s)->getCond();
+		s = clang::cast<clang::IfStmt>(s)->getCond();
+		if (modify_stmt(s) == false)
+			return true;
+		m_ifstmt++;
 	}
 	else if (clang::isa<clang::ForStmt>(s)) {
-		stmt_to_inst = clang::cast<clang::ForStmt>(s)->getCond();
+		s = clang::cast<clang::ForStmt>(s)->getCond();
+		if (modify_stmt(s) == false)
+			return true;
+		m_forstmt++;
 	}
 	else if (clang::isa<clang::WhileStmt>(s)) {
-		stmt_to_inst = clang::cast<clang::WhileStmt>(s)->getCond();
+		s = clang::cast<clang::WhileStmt>(s)->getCond();
+		if (modify_stmt(s) == false)
+			return true;
+		m_whilestmt++;
 	}
 	else if (clang::isa<clang::SwitchStmt>(s)) {
-		stmt_to_inst = clang::cast<clang::SwitchStmt>(s)->getCond();
+		s = clang::cast<clang::SwitchStmt>(s)->getCond();
+		if (modify_stmt(s) == false)
+			return true;
+		m_switchstmt++;
 	}
 	else if (clang::isa<clang::ReturnStmt>(s)) {
-		stmt_to_inst = clang::cast<clang::ReturnStmt>(s)->getRetValue();
+		s = clang::cast<clang::ReturnStmt>(s)->getRetValue();
+		if (modify_stmt(s) == false)
+			return true;
+		m_returnstmt++;
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
 		|| isa<SwitchCase>(s)) {
 	}
-	*/
 	else if (clang::isa<clang::DeclStmt>(s)) {
 	}
+	*/
 	else if (clang::isa<clang::CallExpr>(s)) {
-		stmt_to_inst = s;
+		if (modify_stmt(s) == false)
+			return true;
+		m_callexpr++;
 	}
 
-	if (stmt_to_inst == NULL)
-		return true;
+	return true;
+}
+
+bool
+RewriteASTVisitor::modify_stmt(clang::Stmt *s)
+{
+	if (s == NULL)
+		return false;
 
 	std::stringstream ss;
 	ss << "(++_citrun_lines["
 		<< m_SM.getPresumedLineNumber(s->getLocStart())
 		<< "], ";
-	if (m_TheRewriter.InsertTextBefore(stmt_to_inst->getLocStart(), ss.str()))
+	if (m_TheRewriter.InsertTextBefore(s->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
-		return true;
-
-	m_TheRewriter.InsertTextAfter(real_loc_end(stmt_to_inst), ")");
-	++m_rewrite_count;
+		return false;
+	m_TheRewriter.InsertTextAfter(real_loc_end(s), ")");
 
 	return true;
 }
@@ -85,8 +106,10 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 
 	// main() is a special case because it must start the runtime thread.
 	clang::DeclarationName DeclName = f->getNameInfo().getName();
-	if (DeclName.getAsString() == "main")
+	if (DeclName.getAsString() == "main") {
+		m_mainfunc++;
 		rewrite_text << "citrun_start();";
+	}
 
 	clang::Stmt *FuncBody = f->getBody();
 	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
@@ -100,6 +123,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// Rewrite the function source right after the beginning curly brace.
 	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
 
+	m_funcdecl++;
 	return true;
 }
 

@@ -300,7 +300,9 @@ CitrunInst::instrument()
 	log->setPrefix(std::to_string(m_pid));
 	Tool.setDiagnosticConsumer(log);
 
-	if (Tool.run(clang::tooling::newFrontendActionFactory<InstrumentAction>().get())) {
+	std::unique_ptr<InstrumentActionFactory> f =
+		llvm::make_unique<InstrumentActionFactory>(&m_log, m_pfx, false);
+	if (Tool.run(f.get())) {
 		m_log << m_pfx << "Instrumentation failed.\n";
 		return try_unmodified_compile();
 	}

@@ -1,6 +1,7 @@
 #include <clang/AST/ASTConsumer.h>
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Rewrite/Core/Rewriter.h>
+#include <clang/Tooling/Tooling.h>
 
 #include "inst_ast_visitor.h"
 
@@ -27,7 +28,11 @@ private:
 // For each source file provided to the tool, a new FrontendAction is created.
 class InstrumentAction : public clang::ASTFrontendAction {
 public:
-	InstrumentAction() {};
+	InstrumentAction(llvm::raw_fd_ostream *log, std::string const &pfx, bool citruninst) :
+		m_log(log),
+		m_pfx(pfx),
+		m_is_citruninst(citruninst)
+	{};
 
 	void EndSourceFileAction() override;
 	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
@@ -35,4 +40,25 @@ public:
 private:
 	clang::Rewriter		 m_TheRewriter;
 	RewriteASTConsumer	*m_InstrumentASTConsumer;
+	llvm::raw_fd_ostream	*m_log;
+	std::string		 m_pfx;
+	bool			 m_is_citruninst;
+};
+
+class InstrumentActionFactory : public clang::tooling::FrontendActionFactory {
+public:
+	InstrumentActionFactory(llvm::raw_fd_ostream *log, std::string const &pfx, bool citruninst) :
+		m_log(log),
+		m_pfx(pfx),
+		m_is_citruninst(citruninst)
+	{};
+
+	clang::ASTFrontendAction *create() {
+		return new InstrumentAction(m_log, m_pfx, m_is_citruninst);
+	}
+
+private:
+	llvm::raw_fd_ostream	*m_log;
+	std::string		 m_pfx;
+	bool			 m_is_citruninst;
 };

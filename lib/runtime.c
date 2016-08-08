@@ -158,7 +158,6 @@ xwrite(int d, const void *buf, size_t bytes_total)
  * - length of source file name
  * - source file name
  * - size of the execution counters
- * - number of instrumentation sites.
  */
 static void
 send_static(int fd)
@@ -203,7 +202,6 @@ send_static(int fd)
 		xwrite(fd, &sz, sizeof(sz));
 		xwrite(fd, node.file_name, sz);
 		xwrite(fd, &node.size, sizeof(node.size));
-		xwrite(fd, &node.inst_sites, sizeof(node.size));
 	}
 	assert(i == nodes_total);
 	assert(w == NULL);

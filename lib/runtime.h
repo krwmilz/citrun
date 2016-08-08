@@ -4,7 +4,6 @@ static uint8_t citrun_minor =	0;
 struct citrun_node {
 	uint64_t		*lines_ptr;
 	uint32_t		 size;
-	uint32_t		 inst_sites;
 	const char		*file_name;
 	struct citrun_node	*next;
 	uint64_t		*old_lines;
