@@ -9,40 +9,72 @@ dir=`pwd`
 [ $# -eq 1 ] && dir="${1}"
 [ -d $dir ] || err "$dir: no such directory"
 
-GREP[1]="citrun-inst"
-GREP[2]="Forked "
-GREP[3]="Instrumentation successful"
-GREP[4]="And the native compile failed"
-GREP[5]="But the native compile succeeded"
-GREP[6]="Link detected"
+GREP[1]="Found source file"
+GREP[2]="citrun-inst"
+GREP[3]="Forked "
+GREP[4]="Instrumentation successful"
+GREP[5]="And the native compile failed"
+GREP[6]="But the native compile succeeded"
+GREP[7]="Link detected"
+GREP[8]="warning: "
+GREP[9]="error: "
 
 DESC[0]="Log files found"
-DESC[1]="Calls to the instrumentation tool"
-DESC[2]="Forked compilers"
-DESC[3]="Instrumentation successes"
-DESC[4]="Instrumentation failures (false positive)"
-DESC[5]="Instrumentation failures (true positive)"
-DESC[6]="Application link commands"
+DESC[1]="Source files input"
+DESC[2]="Calls to the instrumentation tool"
+DESC[3]="Forked compilers"
+DESC[4]="Instrumentation successes"
+DESC[5]="Instrumentation and native compilation failures"
+DESC[6]="Instrumentation failures but native compilation succeeded"
+DESC[7]="Application link commands"
+DESC[8]="Warnings during source parsing"
+DESC[9]="Errors during source parsing"
 
-for i in 0 1 2 3 4 5 6; do
+FINE[0]="Lines of source code"
+FINE[1]="Lines of instrumentation header"
+FINE[2]="Functions called 'main'"
+FINE[3]="Function definitions"
+FINE[4]="If statements"
+FINE[5]="For statements"
+FINE[6]="While statements"
+FINE[7]="Switch statements"
+FINE[8]="Return statement values"
+FINE[9]="Call expressions"
+FINE[10]="Total statements"
+
+for i in 0 1 2 3 4 5 6 7 8 9 10; do
 	COUNT[$i]=0
+	FINE_COUNT[$i]=0
 done
 
-echo -n Checking \'$dir\'
+echo -n Checking \'$dir\' ''
 for d in `find $dir -name citrun.log`; do
 	echo -n .
-	COUNT[0]=`expr ${COUNT[0]} + 1`
+	COUNT[0]=$((COUNT[0] + 1))
 
-	for i in 1 2 3 4 5 6; do
+	for i in 1 2 3 4 5 6 7 8 9; do
 		tmp=`grep -c "${GREP[$i]}" $d`
-		COUNT[$i]=`expr ${COUNT[$i]} + $tmp`
+		COUNT[$i]=$((COUNT[$i] + tmp))
+	done
+
+	for i in 0 1 2 3 4 5 6 7 8 9 10; do
+		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" $d`
+		[ "$tmp" = "" ] && continue
+		FINE_COUNT[$i]=$((FINE_COUNT[$i] + tmp))
 	done
 done
+echo Done
+
 echo
+echo Summary:
+for i in 0 1 2 3 4 5 6 7 8 9; do
+	[ $i -ne 0 ] && [ ${COUNT[$i]} -eq 0 ] && continue
+	printf "%10i %s\n" ${COUNT[$i]} "${DESC[$i]}"
+done
 
-[ ${COUNT[0]} -eq 0 ] && err "No results."
-
-for i in 0 1 2 3 4 5 6; do
-	[ ${COUNT[$i]} -eq 0 ] && continue
-	printf "%8i  %s\n" ${COUNT[$i]} "${DESC[$i]}"
+echo
+echo Totals:
+for i in 0 1 2 3 4 5 6 7 8 9 10; do
+	[ ${FINE_COUNT[$i]} -eq 0 ] && continue
+	printf "%10i %s\n" ${FINE_COUNT[$i]} "${FINE[$i]}"
 done
