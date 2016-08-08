@@ -43,7 +43,6 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	for (auto &t : m_tus) {
 		m_socket.read_string(t.file_name);
 		m_socket.read_all(t.num_lines);
-		m_socket.read_all(t.inst_sites);
 
 		t.exec_diffs.resize(t.num_lines, 0);
 		t.source.resize(t.num_lines);
