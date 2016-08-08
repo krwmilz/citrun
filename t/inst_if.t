@@ -4,8 +4,6 @@ echo 1..3
 . test/utils.sh
 setup
 
-echo "ok 1 - tmp dir created"
-
 cat <<EOF > if.c
 #include <stdlib.h>
 
