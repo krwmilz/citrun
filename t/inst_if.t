@@ -49,8 +49,7 @@ cat <<EOF > citrun.log.good
 citrun-inst v0.0 () called as ''.
 Command line is ''.
 Found source file ''.
-Object arg = 0, compile arg = 0
-Link detected, adding '' to command line.
+Object arg = 0, compile arg = 1
 Added clangtool argument ''.
 Instrumentation of '' finished:
     18 Lines of source code
@@ -69,7 +68,7 @@ Modified source written successfully.
 Instrumentation successful.
 EOF
 
-citrun-inst if.c
+citrun-inst -c if.c
 
 diff -u if.c.inst_good if.c.citrun && echo "ok 2 - instrumented source diff"
 
