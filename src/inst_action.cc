@@ -74,12 +74,12 @@ InstrumentAction::EndSourceFileAction()
 	string const file_name = getCurrentFile();
 
 	//
-	// Write instrumentation preamble. Includes
+	// Write instrumentation preamble. Includes:
 	// - runtime header,
 	// - per tu citrun_node
 	// - static constructor for runtime initialization
 	//
-	stringstream preamble;
+	ostringstream preamble;
 	preamble << "#ifdef __cplusplus" << endl
 		<< "extern \"C\" {" << endl
 		<< "#endif" << endl;
