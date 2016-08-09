@@ -1,10 +1,11 @@
+#include <array>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
 class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor> {
 public:
 	RewriteASTVisitor(clang::Rewriter &R) :
-		m_counters(9, 0),
+		m_counters(),
 		m_TheRewriter(R),
 		m_SM(R.getSourceMgr())
 	{}
@@ -14,7 +15,7 @@ public:
 	bool VisitFunctionDecl(clang::FunctionDecl *f);
 
 	// Order defined by descriptions in inst_action.cc.
-	std::vector<int>	 m_counters;
+	std::array<int, 9>	 m_counters;
 
 private:
 	bool			 modify_stmt(clang::Stmt *);
