@@ -19,16 +19,16 @@ int main(void) {
 EOF
 
 cat <<EOF > return.c.inst_good
-int foo() {++_citrun_lines[1];
-	return (++_citrun_lines[2], 0);
+int foo() {++_citrun_lines[0];
+	return (++_citrun_lines[1], 0);
 }
 
-int main(void) {citrun_start();++_citrun_lines[5];
-	return (++_citrun_lines[6], 10);
+int main(void) {citrun_start();++_citrun_lines[4];
+	return (++_citrun_lines[5], 10);
 
-	return (++_citrun_lines[8], 10 + 10);
+	return (++_citrun_lines[7], 10 + 10);
 
-	return (++_citrun_lines[10], (++_citrun_lines[10], foo()));
+	return (++_citrun_lines[9], (++_citrun_lines[9], foo()));
 }
 EOF
 

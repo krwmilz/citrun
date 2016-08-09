@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 106;
+use Test::More tests => 107;
 use Test::Project;
 use Test::Viewer;
 use Time::HiRes qw( usleep );
@@ -69,21 +69,22 @@ my $data = $viewer->get_dynamic_data();
 my ($s0, $s1, $s2) = sort keys %$data;
 
 my @lines = @{ $data->{$s0} };
-is( $lines[$_], 0, "src 0 line $_ check" ) for (1..6);
-is( $lines[$_], 1, "src 0 line $_ check" ) for (7..9);
-is( $lines[$_], 0, "src 0 line $_ check" ) for (10..11);
-is( $lines[12], 1, "src 0 line 14 check" );
-is( $lines[$_], 0, "src 0 line $_ check" ) for (13..14);
-is( $lines[15], 1, "src 0 line 15 check" );
-is( $lines[16], 0, "src 0 line 16 check" );
-is( $lines[17], 2, "src 0 line 17 check" );
-is( $lines[$_], 0, "src 0 line $_ check" ) for (18..19);
+is( $lines[$_], 0, "src 0 line $_ check" ) for (0..5);
+is( $lines[$_], 1, "src 0 line $_ check" ) for (6..8);
+is( $lines[$_], 0, "src 0 line $_ check" ) for (9..10);
+is( $lines[11], 1, "src 0 line 11 check" );
+is( $lines[$_], 0, "src 0 line $_ check" ) for (12..13);
+is( $lines[14], 1, "src 0 line 14 check" );
+is( $lines[15], 0, "src 0 line 15 check" );
+is( $lines[16], 2, "src 0 line 16 check" );
+is( $lines[$_], 0, "src 0 line $_ check" ) for (17..18);
 
 my @lines = @{ $data->{$s1} };
-is( $lines[0], 0, "src 1 line 0 check" );
-cmp_ok ( $lines[$_], ">", 1, "src 1 line $_ check" ) for (1..3);
-cmp_ok ( $lines[$_], ">", 10, "src 1 line $_ check" ) for (4..7);
-is( $lines[8], 0, "src 1 line 8 check" );
+cmp_ok ( $lines[$_], ">", 1, "src 1 line $_ check" ) for (0..2);
+cmp_ok ( $lines[$_], ">", 10, "src 1 line $_ check" ) for (3..6);
+is( $lines[7], 0, "src 1 line 7 check" );
+cmp_ok( $lines[8], ">", 10, "src 1 line 8 check" );
+is( $lines[9],		0, "src 1 line 9 check" );
 
 my @lines = @{ $data->{$s2} };
 is( $lines[$_], 0, "src 2 line $_ check" ) for (0..8);

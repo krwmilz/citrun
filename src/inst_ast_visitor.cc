@@ -85,7 +85,7 @@ RewriteASTVisitor::modify_stmt(clang::Stmt *s)
 
 	std::stringstream ss;
 	ss << "(++_citrun_lines["
-		<< m_SM.getPresumedLineNumber(s->getLocStart())
+		<< m_SM.getPresumedLineNumber(s->getLocStart()) - 1
 		<< "], ";
 	if (m_TheRewriter.InsertTextBefore(s->getLocStart(), ss.str()))
 		// writing failed, don't attempt to add ")"
@@ -118,7 +118,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	int decl_start = m_SM.getPresumedLineNumber(f->getLocStart());
 	int decl_end = m_SM.getPresumedLineNumber(curly_brace);
 	for (int i = decl_start; i <= decl_end; i++)
-		rewrite_text << "++_citrun_lines[" << i << "];";
+		rewrite_text << "++_citrun_lines[" << i - 1 << "];";
 
 	// Rewrite the function source right after the beginning curly brace.
 	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());

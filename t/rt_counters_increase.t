@@ -49,7 +49,7 @@ ok( keys %$data == 1, "single dynamic data key" );
 my ($exec_lines1) = values %$data;
 
 # Only lines 8 - 12 in the source code above are executing
-for (8..12) {
+for (7..11) {
 	# Runtime sends execution differences.
 	cmp_ok( $exec_lines1->[$_], ">", 0, "line $_ executed nonzero times" );
 }

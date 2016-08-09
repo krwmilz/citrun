@@ -24,17 +24,17 @@ EOF
 cat <<EOF > switch.c.inst_good
 int
 main(void)
-{citrun_start();++_citrun_lines[1];++_citrun_lines[2];++_citrun_lines[3];
+{citrun_start();++_citrun_lines[0];++_citrun_lines[1];++_citrun_lines[2];
 	int i;
 
-	switch ((++_citrun_lines[6], i)) {
+	switch ((++_citrun_lines[5], i)) {
 	case 0:
 		break;
 	case 1:
 		break;
 	}
 
-	return (++_citrun_lines[13], 0);
+	return (++_citrun_lines[12], 0);
 }
 EOF
 
