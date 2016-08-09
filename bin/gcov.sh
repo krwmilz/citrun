@@ -6,5 +6,5 @@ CFLAGS="-coverage -O0 -ggdb" jam -j4
 prove
 prove tt
 
-gcov -o lib lib/runtime.c
+gcov -o src src/runtime.c
 egcov -r src/*.cc
