@@ -6,6 +6,17 @@ class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor> {
 public:
 	RewriteASTVisitor(clang::Rewriter &R) :
 		m_counters(),
+		m_counter_descr({
+				"Functions called 'main'",
+				"Function definitions",
+				"If statements",
+				"For statements",
+				"While statements",
+				"Switch statements",
+				"Return statement values",
+				"Call expressions",
+				"Total statements"
+				}),
 		m_TheRewriter(R),
 		m_SM(R.getSourceMgr())
 	{}
@@ -14,8 +25,8 @@ public:
 	bool VisitStmt(clang::Stmt *s);
 	bool VisitFunctionDecl(clang::FunctionDecl *f);
 
-	// Order defined by descriptions in inst_action.cc.
 	std::array<int, 9>	 m_counters;
+	std::array<std::string, 9> m_counter_descr;
 
 private:
 	bool			 modify_stmt(clang::Stmt *);
