@@ -40,6 +40,8 @@ public:
 	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &, clang::StringRef) override;
 
 private:
+	void			 write_modified_src(clang::FileID const &);
+
 	clang::Rewriter		 m_TheRewriter;
 	RewriteASTConsumer	*m_InstrumentASTConsumer;
 	llvm::raw_fd_ostream	*m_log;

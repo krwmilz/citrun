@@ -35,6 +35,31 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 }
 
 void
+InstrumentAction::write_modified_src(clang::FileID const &fid)
+{
+	std::string out_file(getCurrentFile());
+
+	if (m_is_citruninst) {
+		out_file += ".citrun";
+		*m_log << m_pfx << "Writing modified source to '"
+			<< out_file << "'.\n";
+	}
+
+	std::error_code ec;
+	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
+	if (ec.value()) {
+		*m_log << m_pfx << "Error writing modified source: "
+			<< ec.message() << "\n";
+		warnx("'%s': %s", out_file.c_str(), ec.message().c_str());
+		return;
+	}
+
+	// Write the instrumented source file
+	m_TheRewriter.getEditBuffer(fid).write(output);
+	*m_log << m_pfx << "Modified source written successfully.\n";
+}
+
+void
 InstrumentAction::EndSourceFileAction()
 {
 	clang::SourceManager &sm = m_TheRewriter.getSourceMgr();
@@ -46,29 +71,33 @@ InstrumentAction::EndSourceFileAction()
 
 	std::string const file_name = getCurrentFile();
 
-	// Write instrumentation preamble. Includes runtime header, per tu
-	// citrun_node and static constructor for runtime initialization.
-	std::stringstream ss;
-	ss << "#ifdef __cplusplus" << std::endl
+	//
+	// Write instrumentation preamble. Includes
+	// - runtime header,
+	// - per tu citrun_node
+	// - static constructor for runtime initialization
+	//
+	std::stringstream preamble;
+	preamble << "#ifdef __cplusplus" << std::endl
 		<< "extern \"C\" {" << std::endl
 		<< "#endif" << std::endl;
-	ss << runtime_h << std::endl;
-	ss << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
-	ss << "static struct citrun_node _citrun_node = {" << std::endl
+	preamble << runtime_h << std::endl;
+	preamble << "static uint64_t _citrun_lines[" << num_lines << "];" << std::endl;
+	preamble << "static struct citrun_node _citrun_node = {" << std::endl
 		<< "	_citrun_lines," << std::endl
 		<< "	" << num_lines << "," << std::endl
 		<< "	\"" << m_compiler_file_name << "\"," << std::endl
 		<< "	\"" << file_name << "\"," << std::endl;
-	ss << "};" << std::endl;
-	ss << "__attribute__((constructor))" << std::endl
+	preamble << "};" << std::endl;
+	preamble << "__attribute__((constructor))" << std::endl
 		<< "static void citrun_constructor() {" << std::endl
 		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun_node);" << std::endl
 		<< "}" << std::endl;
-	ss << "#ifdef __cplusplus" << std::endl
+	preamble << "#ifdef __cplusplus" << std::endl
 		<< "}" << std::endl
 		<< "#endif" << std::endl;
 
-	std::string header = ss.str();
+	std::string header = preamble.str();
 	unsigned header_sz = std::count(header.begin(), header.end(), '\n');
 
 	if (!m_is_citruninst && m_TheRewriter.InsertTextAfter(start, header)) {
@@ -92,23 +121,5 @@ InstrumentAction::EndSourceFileAction()
 			<< v.m_counter_descr[i] << "\n";
 	}
 
-	std::string out_file(file_name);
-	if (m_is_citruninst) {
-		out_file = file_name + ".citrun";
-		*m_log << m_pfx << "Writing modified source to '"
-			<< out_file << "'.\n";
-	}
-
-	std::error_code ec;
-	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
-	if (ec.value()) {
-		*m_log << m_pfx << "Error writing modified source: "
-			<< ec.message() << "\n";
-		warnx("'%s': %s", file_name.c_str(), ec.message().c_str());
-		return;
-	}
-
-	// Write the instrumented source file
-	m_TheRewriter.getEditBuffer(main_fid).write(output);
-	*m_log << m_pfx << "Modified source written successfully.\n";
+	write_modified_src(main_fid);
 }
