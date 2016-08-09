@@ -28,10 +28,12 @@ private:
 // For each source file provided to the tool, a new FrontendAction is created.
 class InstrumentAction : public clang::ASTFrontendAction {
 public:
-	InstrumentAction(llvm::raw_fd_ostream *log, std::string const &pfx, bool citruninst) :
+	InstrumentAction(llvm::raw_fd_ostream *log, std::string const &pfx,
+			bool citruninst, std::string const &filename) :
 		m_log(log),
 		m_pfx(pfx),
-		m_is_citruninst(citruninst)
+		m_is_citruninst(citruninst),
+		m_compiler_file_name(filename)
 	{};
 
 	void EndSourceFileAction() override;
@@ -43,4 +45,5 @@ private:
 	llvm::raw_fd_ostream	*m_log;
 	std::string		 m_pfx;
 	bool			 m_is_citruninst;
+	std::string		 m_compiler_file_name;
 };

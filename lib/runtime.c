@@ -48,7 +48,7 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 	if (node_major != citrun_major || node_minor != citrun_minor) {
 		warnx("libcitrun (v%i.%i): Node '%s' has mismatched version (v%i.%i)",
 			citrun_major, citrun_minor,
-			n->file_name, node_major, node_minor);
+			n->abs_file_path, node_major, node_minor);
 		warnx("libcitrun: Try cleaning all object files and reinstrumenting.");
 		return;
 	}
@@ -155,8 +155,10 @@ xwrite(int d, const void *buf, size_t bytes_total)
  * - length of current working directory
  * - current working directory
  * Sent for each instrumented translation unit:
- * - length of source file name
- * - source file name
+ * - length of compiler source file path
+ * - compiler source file path
+ * - length of absolute source file path
+ * - absolute source file path
  * - size of the execution counters
  */
 static void
@@ -197,10 +199,14 @@ send_static(int fd)
 
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 		node = *w;
-		sz = strnlen(node.file_name, PATH_MAX);
 
+		sz = strnlen(node.comp_file_path, PATH_MAX);
 		xwrite(fd, &sz, sizeof(sz));
-		xwrite(fd, node.file_name, sz);
+		xwrite(fd, node.comp_file_path, sz);
+
+		sz = strnlen(node.abs_file_path, PATH_MAX);
+		xwrite(fd, &sz, sizeof(sz));
+		xwrite(fd, node.abs_file_path, sz);
 		xwrite(fd, &node.size, sizeof(node.size));
 	}
 	assert(i == nodes_total);

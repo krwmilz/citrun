@@ -57,6 +57,7 @@ InstrumentAction::EndSourceFileAction()
 	ss << "static struct citrun_node _citrun_node = {" << std::endl
 		<< "	_citrun_lines," << std::endl
 		<< "	" << num_lines << "," << std::endl
+		<< "	\"" << m_compiler_file_name << "\"," << std::endl
 		<< "	\"" << file_name << "\"," << std::endl;
 	ss << "};" << std::endl;
 	ss << "__attribute__((constructor))" << std::endl
@@ -76,7 +77,7 @@ InstrumentAction::EndSourceFileAction()
 		return;
 	}
 
-	*m_log << m_pfx << "Instrumentation of '" << file_name << "' finished:\n";
+	*m_log << m_pfx << "Instrumentation of '" << m_compiler_file_name << "' finished:\n";
 	*m_log << m_pfx << "    " << num_lines << " Lines of source code\n";
 	*m_log << m_pfx << "    " << header_sz << " Lines of instrumentation header\n";
 

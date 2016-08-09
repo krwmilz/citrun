@@ -52,7 +52,7 @@ Object arg = 1, compile arg = 1
 Added clangtool argument ''.
 Instrumentation of '' finished:
     22 Lines of source code
-    30 Lines of instrumentation header
+    32 Lines of instrumentation header
     1 Functions called ''
     5 Function definitions
     2 If statements

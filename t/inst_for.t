@@ -39,7 +39,7 @@ Object arg = 0, compile arg = 1
 Added clangtool argument ''.
 Instrumentation of '' finished:
     11 Lines of source code
-    30 Lines of instrumentation header
+    32 Lines of instrumentation header
     1 Functions called ''
     4 Function definitions
     1 For statements

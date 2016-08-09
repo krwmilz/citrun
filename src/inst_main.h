@@ -33,18 +33,23 @@ private:
 //
 class InstrumentActionFactory : public clang::tooling::FrontendActionFactory {
 public:
-	InstrumentActionFactory(llvm::raw_fd_ostream *log, std::string const &pfx, bool citruninst) :
+	InstrumentActionFactory(llvm::raw_fd_ostream *log, std::string const &pfx,
+			bool citruninst, std::vector<std::string> const &src_files) :
 		m_log(log),
 		m_pfx(pfx),
-		m_is_citruninst(citruninst)
+		m_is_citruninst(citruninst),
+		m_source_files(src_files),
+		m_i(0)
 	{};
 
 	clang::ASTFrontendAction *create() {
-		return new InstrumentAction(m_log, m_pfx, m_is_citruninst);
+		return new InstrumentAction(m_log, m_pfx, m_is_citruninst, m_source_files[m_i++]);
 	}
 
 private:
 	llvm::raw_fd_ostream	*m_log;
 	std::string		 m_pfx;
 	bool			 m_is_citruninst;
+	std::vector<std::string> m_source_files;
+	int			 m_i;
 };

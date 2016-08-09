@@ -295,7 +295,7 @@ CitrunInst::instrument()
 	Tool.setDiagnosticConsumer(log);
 
 	std::unique_ptr<InstrumentActionFactory> f =
-		llvm::make_unique<InstrumentActionFactory>(&m_log, m_pfx, m_is_citruninst);
+		llvm::make_unique<InstrumentActionFactory>(&m_log, m_pfx, m_is_citruninst, m_source_files);
 
 	int ret = Tool.run(f.get());
 	m_log << m_pfx << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
