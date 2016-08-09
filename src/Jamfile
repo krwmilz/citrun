@@ -11,7 +11,7 @@ InstallShell $(PREFIX)/bin : citrun-wrap citrun-check ;
 #
 # utils.a
 #
-Library utils : af_unix.cc runtime.cc ;
+Library utils : af_unix.cc runtime_proc.cc ;
 
 #
 # citrun-term

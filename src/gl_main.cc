@@ -8,7 +8,7 @@
 #include "demo-font.h"
 #include "gl_buffer.h"
 #include "gl_view.h"
-#include "runtime.hh"
+#include "runtime_proc.h"
 
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"

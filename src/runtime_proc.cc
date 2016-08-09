@@ -18,7 +18,7 @@
 #include <fstream>
 
 #include "lib/runtime.h"	// citrun_major
-#include "runtime.hh"
+#include "runtime_proc.h"
 
 RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	m_socket(sock),

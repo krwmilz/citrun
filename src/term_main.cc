@@ -12,7 +12,7 @@
 #include <time.h>	// clock_gettime, nanosleep
 
 #include "af_unix.h"
-#include "runtime.hh"
+#include "runtime_proc.h"	// RuntimeProcess
 
 class CursesViewer : public RuntimeProcess {
 public:
