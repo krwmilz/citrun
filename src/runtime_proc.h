@@ -19,7 +19,7 @@ public:
 	RuntimeProcess(af_unix &);
 	void read_executions();
 
-	// Protocol defined in lib/runtime.c send_static().
+	// Protocol defined in src/runtime.c send_static().
 	uint8_t		m_major;
 	uint8_t		m_minor;
 	std::string	m_progname;

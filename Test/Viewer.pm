@@ -28,7 +28,7 @@ sub accept {
 	my $sock = $listen_sock->accept();
 	$self->{client_socket} = $sock;
 
-	# Protocol defined in lib/runtime.c function send_static().
+	# Protocol defined in src/runtime.c function send_static().
 	#
 	($self->{maj}, $self->{min}) = read_unpack($sock, 2, "C2");
 	($self->{ntus}, $self->{nlines}) = read_unpack($sock, 8, "L2");
@@ -56,7 +56,7 @@ sub get_dynamic_data {
 	for my $tu (@{ $self->{tus} }) {
 		my ($file_name, $nlines) = @{ $tu };
 
-		# Protocol defined in lib/runtime.c function send_dynamic().
+		# Protocol defined in src/runtime.c function send_dynamic().
 		#
 		if (read_unpack($sock, 1, "C") == 0) {
 			$data{$file_name} = [ (0) x $nlines ];

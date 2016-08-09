@@ -26,7 +26,7 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 {
 	assert(sizeof(pid_t) == 4);
 
-	// Protocol defined in lib/runtime.c send_static().
+	// Protocol defined in src/runtime.c send_static().
 	// This is the receive side of things.
 	m_socket.read_all(m_major);
 	assert(m_major == citrun_major);
