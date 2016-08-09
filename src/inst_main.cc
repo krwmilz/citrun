@@ -31,7 +31,7 @@
 #include <sstream>		// stringstream
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
-#include "lib/runtime.h"	// citrun_major, citrun_minor
+#include "runtime.h"		// citrun_major, citrun_minor
 #include "inst_main.h"
 
 #define STR_EXPAND(tok) #tok

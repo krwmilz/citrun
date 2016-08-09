@@ -6,14 +6,14 @@ if $(PREFIX) {
 else {
 	# No PREFIX means an in tree build. Use absolute paths to local copies.
 	ROOT = "`readlink -f $(TOP)`" ;
-	CITRUN_LIB =  $(ROOT)/lib/libcitrun.a ;
+	CITRUN_LIB =  $(ROOT)/src/libcitrun.a ;
 	CITRUN_PATH = $(ROOT)/src ;
 }
 
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
 
-C++FLAGS += -std=c++11 -I$(TOP) ;
+C++FLAGS += -std=c++11 ;
 
 _CLANG_LIBS =
 	-lclangAST

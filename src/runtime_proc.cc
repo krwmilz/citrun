@@ -17,7 +17,7 @@
 #include <err.h>
 #include <fstream>
 
-#include "lib/runtime.h"	// citrun_major
+#include "runtime.h"		// citrun_major
 #include "runtime_proc.h"
 
 RuntimeProcess::RuntimeProcess(af_unix &sock) :

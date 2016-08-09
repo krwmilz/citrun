@@ -1,6 +1,13 @@
 SubDir TOP src ;
 
 #
+# libcitrun.a
+#
+ObjectCcFlags runtime.c : -fPIC -pthread -ansi ;
+Library libcitrun : runtime.c ;
+InstallLib $(PREFIX)/lib : libcitrun.a ;
+
+#
 # citrun-wrap, citrun-check
 #
 MkWrap citrun-wrap : wrap.in ;
@@ -57,7 +64,7 @@ INST_SRCS =
 	inst_action.cc
 	inst_visitor.cc ;
 
-Stringize runtime_h.h : $(TOP)/lib/runtime.h ;
+Stringize runtime_h.h : runtime.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
 ObjectC++Flags $(INST_SRCS) : -DCITRUN_LIB=$(CITRUN_LIB)
