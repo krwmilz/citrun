@@ -55,7 +55,7 @@ InstallBin $(PREFIX)/bin : citrun-gl ;
 INST_SRCS =
 	inst_main.cc
 	inst_action.cc
-	inst_ast_visitor.cc ;
+	inst_visitor.cc ;
 
 Stringize runtime_h.h : $(TOP)/lib/runtime.h ;
 

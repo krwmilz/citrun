@@ -18,7 +18,7 @@
 #include <sstream>
 #include <string>
 
-#include "inst_ast_visitor.h"
+#include "inst_visitor.h"
 
 bool
 RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
