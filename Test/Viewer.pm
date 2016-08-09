@@ -43,7 +43,7 @@ sub accept {
 		my ($num_lines) = read_unpack($sock, 4, "L");
 
 		# Keep this in order so it's easy to fetch dynamic data.
-		push @tus, [ $comp_file_name, $num_lines ];
+		push @tus, [ $abs_file_name, $num_lines ];
 	}
 	$self->{tus} = \@tus;
 }
