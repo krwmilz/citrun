@@ -50,16 +50,16 @@ CursesViewer::CursesViewer(af_unix &socket) :
 	m_offset(0),
 	m_floating_avg({ 1, 0 }),
 	m_exec_floating_avg(0),
-	m_sleep({ 0, 1 * 1000 * 1000 * 1000 / 100 }),
+	m_sleep({ 0, 1 * 1000 * 1000 * 1000 / 66 }),
 	m_total_executions(0)
 {
 	getmaxyx(stdscr, m_size_y, m_size_x);
 
 	m_cur_tu = m_tus[0];
 
-	struct timespec one_fiftieth = { 0, 1 * 1000 * 1000 * 1000 / 50 };
-	for (int i = 0; i < 50; i++) {
-		m_frame_deltas.push(one_fiftieth);
+	struct timespec one_thirtythird = { 0, 1 * 1000 * 1000 * 1000 / 33 };
+	for (int i = 0; i < 33; i++) {
+		m_frame_deltas.push(one_thirtythird);
 		m_execution_history.push(0);
 	}
 }
@@ -75,8 +75,8 @@ CursesViewer::loop()
 	nodelay(stdscr, true);
 
 	while (1) {
-		assert(m_frame_deltas.size() == 50);
-		assert(m_execution_history.size() == 50);
+		assert(m_frame_deltas.size() == 33);
+		assert(m_execution_history.size() == 33);
 
 		erase();
 		read_executions();
@@ -120,7 +120,7 @@ CursesViewer::draw()
 		m_total_executions += e;
 
 		int color = 0;
-		if (e > 100000 )
+		if (e > 100000)
 			color = 5;
 		else if (e > 10000)
 			color = 4;
@@ -150,19 +150,18 @@ CursesViewer::print_statusbar()
 	move(m_size_y - 1, 0);
 	clrtoeol();
 
-	printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s (%i)] [%i us]",
-		m_progname.c_str(),
-		m_cur_tu.comp_file_path.c_str(),
-		m_tu + 1, m_num_tus,
-		m_fps,
-		m_eps / 1000, m_tus_with_execs,
-		m_sleep.tv_sec + m_sleep.tv_nsec / 1000);
-
 	for (int i = 1; i <= 5; i++) {
 		attron(COLOR_PAIR(i));
 		printw("<<");
 		attroff(COLOR_PAIR(i));
 	}
+
+	printw(" [%s] [%s] [%i/%i] [%i fps] [%ik execs/s (%i)]",
+		m_progname.c_str(),
+		m_cur_tu.comp_file_path.c_str(),
+		m_tu + 1, m_num_tus,
+		m_fps,
+		m_eps / 1000, m_tus_with_execs);
 
 	printw("\n");
 }
@@ -178,7 +177,7 @@ CursesViewer::update_execs()
 	m_exec_floating_avg -= m_execution_history.front();
 	m_execution_history.pop();
 
-	m_eps = m_exec_floating_avg / 50;
+	m_eps = m_exec_floating_avg / 33;
 	m_total_executions = 0;
 }
 
@@ -205,7 +204,7 @@ CursesViewer::update_sleep()
 	timespecsub(&m_floating_avg, &tmp, &m_floating_avg);
 	timespecadd(&m_floating_avg, &delta, &m_floating_avg);
 
-	m_fps = 50 * 1000 / (m_floating_avg.tv_sec * 1000 + m_floating_avg.tv_nsec / (1000 * 1000));
+	m_fps = 33 * 1000 / (m_floating_avg.tv_sec * 1000 + m_floating_avg.tv_nsec / (1000 * 1000));
 
 	if (timespeccmp(&m_floating_avg, &one, <))
 		// We're executing too fast. Increase sleep.
