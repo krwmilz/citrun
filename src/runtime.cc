@@ -41,7 +41,8 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 
 	m_tus.resize(m_num_tus);
 	for (auto &t : m_tus) {
-		m_socket.read_string(t.file_name);
+		m_socket.read_string(t.comp_file_path);
+		m_socket.read_string(t.abs_file_path);
 		m_socket.read_all(t.num_lines);
 
 		t.exec_diffs.resize(t.num_lines, 0);
@@ -54,7 +55,7 @@ void
 RuntimeProcess::read_source(struct TranslationUnit &t)
 {
 	std::string line;
-	std::ifstream file_stream(t.file_name);
+	std::ifstream file_stream(t.abs_file_path);
 
 	if (file_stream.is_open() == 0)
 		errx(1, "ifstream.open()");

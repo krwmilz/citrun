@@ -6,7 +6,8 @@
 #include "af_unix.h"
 
 struct TranslationUnit {
-	std::string	file_name;
+	std::string	comp_file_path;
+	std::string	abs_file_path;
 	uint32_t	num_lines;
 	uint8_t		has_execs;
 	std::vector<uint32_t> exec_diffs;

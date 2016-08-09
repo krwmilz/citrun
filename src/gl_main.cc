@@ -213,7 +213,7 @@ window::next_frame(View *vu)
 		cur_pos.x = 0;
 		glyphy_point_t tmp;
 		for (auto &t : conn->m_tus) {
-			demo_buffer_add_text(buffer, t.file_name.c_str(), font, 1);
+			demo_buffer_add_text(buffer, t.comp_file_path.c_str(), font, 1);
 		}
 	}
 

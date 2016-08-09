@@ -114,7 +114,7 @@ CursesViewer::draw()
 	int upper_bound = m_size_y - 2 + m_offset;
 
 	for (int i = m_offset; i < upper_bound && i < m_cur_tu.num_lines; i++) {
-		uint32_t e = m_cur_tu.exec_diffs[i + 1];
+		uint32_t e = m_cur_tu.exec_diffs[i];
 		std::string l = m_cur_tu.source[i];
 
 		m_total_executions += e;
@@ -152,7 +152,7 @@ CursesViewer::print_statusbar()
 
 	printw("%s [%s (%i/%i)] [%i fps] [%ik execs/s (%i)] [%i us]",
 		m_progname.c_str(),
-		m_cur_tu.file_name.c_str(),
+		m_cur_tu.comp_file_path.c_str(),
 		m_tu + 1, m_num_tus,
 		m_fps,
 		m_eps / 1000, m_tus_with_execs,
