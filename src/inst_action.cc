@@ -116,7 +116,7 @@ InstrumentAction::EndSourceFileAction()
 	// Write out statistics from the AST visitor.
 	//
 	RewriteASTVisitor v = m_InstrumentASTConsumer->get_visitor();
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < NCOUNTERS; i++) {
 		if (v.m_counters[i] == 0)
 			continue;
 		*m_log << m_pfx << "    " << v.m_counters[i] << " "

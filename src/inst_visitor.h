@@ -2,6 +2,19 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
+enum counters {
+	FUNC_MAIN,
+	FUNC_DEF,
+	IF_STMT,
+	FOR_STMT,
+	WHILE_STMT,
+	SWITCH_STMT,
+	RET_STMT_VAL,
+	CALL_EXPR,
+	TOTAL_STMT,
+	NCOUNTERS
+};
+
 class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor> {
 public:
 	RewriteASTVisitor(clang::Rewriter &R) :
@@ -25,8 +38,8 @@ public:
 	bool VisitStmt(clang::Stmt *s);
 	bool VisitFunctionDecl(clang::FunctionDecl *f);
 
-	std::array<int, 9>	 m_counters;
-	std::array<std::string, 9> m_counter_descr;
+	std::array<int, NCOUNTERS> m_counters;
+	std::array<std::string, NCOUNTERS> m_counter_descr;
 
 private:
 	bool			 modify_stmt(clang::Stmt *);

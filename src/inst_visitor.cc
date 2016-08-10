@@ -29,37 +29,37 @@ RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 bool
 RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
-	m_counters[8]++;
+	m_counters[TOTAL_STMT]++;
 
 	if (clang::isa<clang::IfStmt>(s)) {
 		s = clang::cast<clang::IfStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_counters[2]++;
+		m_counters[IF_STMT]++;
 	}
 	else if (clang::isa<clang::ForStmt>(s)) {
 		s = clang::cast<clang::ForStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_counters[3]++;
+		m_counters[FOR_STMT]++;
 	}
 	else if (clang::isa<clang::WhileStmt>(s)) {
 		s = clang::cast<clang::WhileStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_counters[4]++;
+		m_counters[WHILE_STMT]++;
 	}
 	else if (clang::isa<clang::SwitchStmt>(s)) {
 		s = clang::cast<clang::SwitchStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
 			return true;
-		m_counters[5]++;
+		m_counters[SWITCH_STMT]++;
 	}
 	else if (clang::isa<clang::ReturnStmt>(s)) {
 		s = clang::cast<clang::ReturnStmt>(s)->getRetValue();
 		if (modify_stmt(s) == false)
 			return true;
-		m_counters[6]++;
+		m_counters[RET_STMT_VAL]++;
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
@@ -71,7 +71,7 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 	else if (clang::isa<clang::CallExpr>(s)) {
 		if (modify_stmt(s) == false)
 			return true;
-		m_counters[7]++;
+		m_counters[CALL_EXPR]++;
 	}
 
 	return true;
@@ -107,7 +107,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// main() is a special case because it must start the runtime thread.
 	clang::DeclarationName DeclName = f->getNameInfo().getName();
 	if (DeclName.getAsString() == "main") {
-		m_counters[0]++;
+		m_counters[FUNC_MAIN]++;
 		rewrite_text << "citrun_start();";
 	}
 
@@ -123,7 +123,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// Rewrite the function source right after the beginning curly brace.
 	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
 
-	m_counters[1]++;
+	m_counters[FUNC_DEF]++;
 	return true;
 }
 
