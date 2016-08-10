@@ -288,12 +288,14 @@ CitrunInst::instrument()
 	clang::tooling::ClangTool
 		Tool(op.getCompilations(), op.getSourcePathList());
 
-	clang::DiagnosticOptions diags;
-	clang::TextDiagnosticPrinter *log;
+	if (!m_is_citruninst) {
+		clang::DiagnosticOptions diags;
+		clang::TextDiagnosticPrinter *log;
 
-	log = new clang::TextDiagnosticPrinter(m_log, &diags, false);
-	log->setPrefix(std::to_string(m_pid));
-	Tool.setDiagnosticConsumer(log);
+		log = new clang::TextDiagnosticPrinter(m_log, &diags, false);
+		log->setPrefix(std::to_string(m_pid));
+		Tool.setDiagnosticConsumer(log);
+	}
 
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(&m_log, m_pfx, m_is_citruninst, m_source_files);
