@@ -1,28 +1,22 @@
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 9;
 use Test::Project;
 use Test::Viewer;
 
 my $project = Test::Project->new();
 
-$project->add_src(<<EOF);
-int
-main(void)
-{
-	while (1);
-	return 0;
-}
-EOF
-
-$project->compile();
-$project->run();
+$project->run(45);
 
 # Give the runtime a chance to reconnect
 sleep(1);
 
 my $viewer = Test::Viewer->new();
 $viewer->accept();
-$viewer->cmp_static_data([ [ "source_0.c", 7 ] ]);
+$viewer->cmp_static_data([
+	[ "one.c",	20 ],
+	[ "three.c",	9 ],
+	[ "two.c",	11 ],
+]);
 
 $project->kill();
 my ($ret, $err) = $project->wait();

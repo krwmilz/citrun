@@ -12,57 +12,79 @@ sub new {
 	bless ($self, $class);
 
 	# Make new temporary directory, clean it up at exit
-	$self->{tmp_dir} = tempdir( CLEANUP => 1 );
-	$self->{src_files} = [];
-	$self->{prog_name} = "program";
+	my $tmp_dir = tempdir( CLEANUP => 1 );
 
-	my $tmp_dir = $self->{tmp_dir};
-	$tmp_dir = "/private$self->{tmp_dir}" if ($^O eq 'darwin');
-	$ENV{CITRUN_SOCKET} = "$tmp_dir/test.socket";
+	# Use the tools in this source tree
+	$ENV{PATH} = cwd . "/src:$ENV{PATH}";
+	$ENV{CITRUN_SOCKET} = "test.socket";
+	chdir $tmp_dir;
+
+	open( my $src_fh, ">", "one.c" );
+	print $src_fh <<EOF;
+#include <err.h>
+#include <stdlib.h>
+
+long long fib(long long);
+void print_output(long long);
+
+int
+main(int argc, char *argv[])
+{
+	long long n;
+
+	if (argc != 2)
+		errx(1, "argc != 2");
+
+	n = atoi(argv[1]);
+
+	print_output(fib(n));
+	return 0;
+}
+EOF
+	close( $src_fh );
+
+	open( my $src_fh, ">", "two.c" );
+	print $src_fh <<EOF;
+long long
+fib(long long n)
+{
+	if (n == 0)
+		return 0;
+	else if (n == 1)
+		return 1;
+
+	return fib(n - 1) + fib(n - 2);
+}
+EOF
+	close( $src_fh );
+
+	open( my $src_fh, ">", "three.c" );
+	print $src_fh <<EOF;
+#include <stdio.h>
+
+void
+print_output(long long n)
+{
+	fprintf(stderr, "%lli", n);
+	return;
+}
+EOF
+	close( $src_fh );
+
+	open( my $src_fh, ">", "Jamfile" );
+	print $src_fh <<EOF;
+Main program : one.c two.c three.c ;
+EOF
+
+	my $ret = system( "jam" );
+	die "jam failed: $ret\n" if ($ret);
 
 	return $self;
 }
 
-sub add_src {
-	my ($self, $source) = @_;
-	my $num_src_files = scalar(@{ $self->{src_files} });
-
-	# Create temporary file name
-	my $src_name = "source_$num_src_files.c";
-
-	# Write source code to temp directory
-	open( my $src_fh, ">", "$self->{tmp_dir}/$src_name" );
-	syswrite( $src_fh, $source );
-	close( $src_fh );
-
-	push @{ $self->{src_files} }, $src_name;
-}
-
-sub compile {
-	my ($self) = @_;
-	my $tmp_dir = $self->{tmp_dir};
-	my $src_files = join(" ", @{ $self->{src_files} });
-
-	my $jamfile = <<EOF;
-Main $self->{prog_name} : $src_files ;
-EOF
-	# Write Jamfile to temp directory
-	open( my $jamfile_fh, ">", "$tmp_dir/Jamfile" );
-	syswrite( $jamfile_fh, $jamfile );
-	close( $jamfile_fh );
-
-	# Use the tools in this source tree
-	$ENV{PATH} = cwd . "/src:$ENV{PATH}";
-
-	my $ret = system( "cd $tmp_dir && jam" );
-	die "jam failed: $ret\n" if ($ret);
-}
-
 sub run {
 	my ($self, @args) = @_;
-
-	my $tmp_dir = $self->{tmp_dir};
-	$self->{pid} = open2(\*CHLD_OUT, undef, "$tmp_dir/$self->{prog_name}", @args);
+	$self->{pid} = open2(\*CHLD_OUT, undef, "program", @args);
 }
 
 sub kill {
