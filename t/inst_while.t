@@ -41,7 +41,7 @@ Instrumentation of '' finished:
     32 Lines of instrumentation header
     1 Functions called ''
     1 Function definitions
-    2 While statements
+    2 While loops
     1 Return statement values
     18 Total statements
 Writing modified source to ''.
