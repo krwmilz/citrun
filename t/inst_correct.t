@@ -31,37 +31,32 @@ main(int argc, char *argv[])
 }
 EOF
 
-cat <<EOF > citrun.log.good
+cat <<EOF > check.good
+Checking ..done
 
-citrun-inst v0.0 () called as ''.
-Resource directory is ''
-PATH=''
-Command line is ''.
-Found source file ''.
-Object arg = 1, compile arg = 0
-Link detected, adding '' to command line.
-Added clangtool argument ''.
-Instrumentation of '' finished:
-    25 Lines of source code
-    32 Lines of instrumentation header
-    1 Functions called ''
-    5 Function definitions
-    3 If statements
-    6 Return statement values
-    4 Call expressions
-    198 Total statements
-Modified source written successfully.
-Instrumentation successful.
-Running native compiler on modified source code.
-Forked ''.
-'' exited 0.
-Restored ''.
+Summary:
+         1 Log files found
+         1 Source files input
+         1 Calls to the instrumentation tool
+         1 Forked compilers
+         1 Instrument successes
+         1 Application link commands
+
+Totals:
+        25 Lines of source code
+        32 Lines of instrumentation header
+         1 Functions called 'main'
+         5 Function definitions
+         3 If statements
+         6 Return statement values
+         4 Call expressions
+       198 Total statements
 EOF
 
 cc -o fib fib.c
+citrun-check > check.out
 
-process_citrun_log
-diff -u citrun.log.good citrun.log.proc && echo "ok 2 citrun.log diff"
+diff -u check.good check.out && echo "ok 2 citrun.log diff"
 
 export CITRUN_SOCKET=
 ./fib

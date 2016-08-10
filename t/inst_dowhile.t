@@ -26,30 +26,28 @@ main(int argc, char *argv[])
 }
 EOF
 
-cat <<EOF > citrun.log.good
+cat <<EOF > check.good
+Checking ..done
 
-citrun-inst v0.0 () called as ''.
-Resource directory is ''
-Command line is ''.
-Found source file ''.
-Object arg = 0, compile arg = 1
-Added clangtool argument ''.
-Instrumentation of '' finished:
-    9 Lines of source code
-    32 Lines of instrumentation header
-    1 Functions called ''
-    1 Function definitions
-    1 Do while loops
-    1 Return statement values
-    11 Total statements
-Writing modified source to ''.
-Modified source written successfully.
-Instrumentation successful.
+Summary:
+         1 Log files found
+         1 Source files input
+         1 Calls to the instrumentation tool
+         1 Instrument successes
+
+Totals:
+         9 Lines of source code
+        32 Lines of instrumentation header
+         1 Functions called 'main'
+         1 Function definitions
+         1 Do while loops
+         1 Return statement values
+        11 Total statements
 EOF
 
 citrun-inst -c while.c
+cat citrun.log
+citrun-check > check.out
 
 diff -u while.c.inst_good while.c.citrun && echo "ok 2 - instrumented source diff"
-
-process_citrun_log
-diff -u citrun.log.good citrun.log.proc && echo "ok 3 - citrun.log diff"
+diff -u check.good check.out && echo "ok 3 - citrun.log diff"
