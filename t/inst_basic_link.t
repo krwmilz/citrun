@@ -18,11 +18,11 @@ echo "ok 2 - source files wrote"
 cc main.c
 echo "ok 3 - source compiled"
 
-citrun-check | sed -e "s,'.*',''," > citrun-check.txt
+citrun-check > citrun-check.txt
 echo "ok 4 - processed citrun.log"
 
 cat <<EOF > citrun-check.txt.good
-Checking '' .Done
+Checking ..done
 
 Summary:
          1 Log files found
@@ -35,7 +35,7 @@ Summary:
 Totals:
          6 Lines of source code
         32 Lines of instrumentation header
-         1 Functions called ''
+         1 Functions called 'main'
          1 Function definitions
          1 Return statement values
          3 Total statements
