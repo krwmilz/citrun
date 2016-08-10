@@ -56,6 +56,7 @@ for d in `find $dir -name citrun.log`; do
 	done
 
 	let i=0
+	typeset -i tmp
 	while [ $i -lt $fine_len ]; do
 		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" $d`
 		if [ "$tmp" = "" ]; then
