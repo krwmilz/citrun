@@ -1,17 +1,14 @@
-use strict;
-use Test::More tests => 5;
-use Test::Project;
-use Test::Viewer;
+#!/bin/sh
+echo 1..5
 
-my $project = Test::Project->new();
-my $viewer = Test::Viewer->new();
+. test/utils.sh
+setup
 
-$project->add_src(<<EOF);
-#include <stdio.h>
+cat <<EOF > fib.c
 #include <stdlib.h>
 
-long long
-fibonacci(long long n)
+int
+fibonacci(int n)
 {
 	if (n == 0)
 		return 0;
@@ -24,33 +21,54 @@ fibonacci(long long n)
 int
 main(int argc, char *argv[])
 {
-	long long n;
+	int n;
 
-	if (argc != 2) {
-		printf("usage: %s <N>", argv[0]);
-		return 1;
-	}
+	if (argc != 2)
+		return -1;
 
 	n = atoi(argv[1]);
-
-	printf("result: %lli", fibonacci(n));
-
-	return 0;
+	return fibonacci(n);
 }
 EOF
 
-$project->compile();
+cat <<EOF > citrun.log.good
 
-$project->run();
-my ($ret, $err) = $project->wait();
-is($ret, 1, "instrumented program check return code");
+citrun-inst v0.0 () called as ''.
+Resource directory is ''
+PATH=''
+Command line is ''.
+Found source file ''.
+Object arg = 1, compile arg = 0
+Link detected, adding '' to command line.
+Added clangtool argument ''.
+Instrumentation of '' finished:
+    25 Lines of source code
+    32 Lines of instrumentation header
+    1 Functions called ''
+    5 Function definitions
+    3 If statements
+    6 Return statement values
+    4 Call expressions
+    198 Total statements
+Modified source written successfully.
+Instrumentation successful.
+Running native compiler on modified source code.
+Forked ''.
+'' exited 0.
+Restored ''.
+EOF
 
-$project->run(10);
-my ($ret, $err) = $project->wait();
-is($ret, 0, "instrumented program check correctness 1");
-is($err, "result: 55", "instrumented program check correctness 1");
+cc -o fib fib.c
 
-$project->run(20);
-my ($ret, $err) = $project->wait();
-is($ret, 0, "instrumented program check correctness 2");
-is($err, "result: 6765", "instrumented program check correctness 2");
+process_citrun_log
+diff -u citrun.log.good citrun.log.proc && echo "ok 2 citrun.log diff"
+
+export CITRUN_SOCKET=
+./fib
+[ $? -eq 255 ] && echo ok
+
+./fib 10 # = 55
+[ $? -eq 55 ] && echo ok
+
+./fib 12 # = 6765
+[ $? -eq 144 ] && echo ok
