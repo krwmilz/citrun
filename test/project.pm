@@ -1,4 +1,4 @@
-package Test::Project;
+package test::project;
 use strict;
 
 use Cwd;
