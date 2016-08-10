@@ -46,6 +46,7 @@ cat <<EOF > check.good
 Checking ..done
 
 Summary:
+         1 Log files found
          3 Source files input
          4 Calls to the instrumentation tool
          3 Forked compilers
