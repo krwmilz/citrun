@@ -1,5 +1,5 @@
 #!/bin/sh
-echo 1..2
+echo 1..3
 
 . test/utils.sh
 setup
