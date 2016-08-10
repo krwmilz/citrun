@@ -28,6 +28,7 @@ DESC[6]="Instrument failed but native compile succeeded (TP)!"
 DESC[7]="Application link commands"
 DESC[8]="Warnings during source parsing"
 DESC[9]="Errors during source parsing"
+desc_len=${#DESC[@]}
 
 FINE[0]="Lines of source code"
 FINE[1]="Lines of instrumentation header"
@@ -40,40 +41,53 @@ FINE[7]="Switch statements"
 FINE[8]="Return statement values"
 FINE[9]="Call expressions"
 FINE[10]="Total statements"
-
-for i in 0 1 2 3 4 5 6 7 8 9 10; do
-	COUNT[$i]=0
-	FINE_COUNT[$i]=0
-done
+fine_len=${#FINE[@]}
 
 echo -n Checking \'$dir\' ''
 for d in `find $dir -name citrun.log`; do
 	echo -n .
-	COUNT[0]=$((COUNT[0] + 1))
+	let COUNT[0]++
 
-	for i in 1 2 3 4 5 6 7 8 9; do
+	let i=1
+	while [ $i -lt $desc_len ]; do
 		tmp=`grep -c "${GREP[$i]}" $d`
-		COUNT[$i]=$((COUNT[$i] + tmp))
+		let COUNT[$i]+=tmp
+		let i++
 	done
 
-	for i in 0 1 2 3 4 5 6 7 8 9 10; do
+	let i=0
+	while [ $i -lt $fine_len ]; do
 		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" $d`
-		[ "$tmp" = "" ] && continue
-		FINE_COUNT[$i]=$((FINE_COUNT[$i] + tmp))
+		if [ "$tmp" = "" ]; then
+			let i++
+			continue
+		fi
+		let FINE_COUNT[$i]+=tmp
+		let i++
 	done
 done
 echo Done
 
 echo
 echo Summary:
-for i in 0 1 2 3 4 5 6 7 8 9; do
-	[ $i -ne 0 ] && [ ${COUNT[$i]} -eq 0 ] && continue
+let i=0
+while [ $i -lt $desc_len ]; do
+	if [ $i -ne 0 ] && [ ${COUNT[$i]} -eq 0 ]; then
+		let i++
+		continue
+	fi
 	printf "%10i %s\n" ${COUNT[$i]} "${DESC[$i]}"
+	let i++
 done
 
 echo
 echo Totals:
-for i in 0 1 2 3 4 5 6 7 8 9 10; do
-	[ ${FINE_COUNT[$i]} -eq 0 ] && continue
+let i=0
+while [ $i -lt $fine_len ]; do
+	if [ ${FINE_COUNT[$i]} -eq 0 ]; then
+		let i++
+		continue
+	fi
 	printf "%10i %s\n" ${FINE_COUNT[$i]} "${FINE[$i]}"
+	let i++
 done
