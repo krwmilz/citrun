@@ -76,7 +76,7 @@ LINKLIBS on citrun-inst += $(CLANG_LIBS) ;
 LINKLIBS on citrun-inst += `llvm-config --libs $(LLVM_LIBS) --system-libs` ;
 
 Main citrun-inst : $(INST_SRCS) ;
-InstallBin $(PREFIX)/share/citrun : citrun-inst ;
+InstallBin $(PREFIX)/bin : citrun-inst ;
 
 #
 # citrun-inst symlinks
