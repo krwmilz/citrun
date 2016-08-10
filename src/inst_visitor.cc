@@ -33,39 +33,27 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 
 	if (clang::isa<clang::IfStmt>(s)) {
 		s = clang::cast<clang::IfStmt>(s)->getCond();
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[IF_STMT]++;
+		modify_stmt(s, m_counters[IF_STMT]);
 	}
 	else if (clang::isa<clang::ForStmt>(s)) {
 		s = clang::cast<clang::ForStmt>(s)->getCond();
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[FOR_STMT]++;
+		modify_stmt(s, m_counters[FOR_STMT]);
 	}
 	else if (clang::isa<clang::WhileStmt>(s)) {
 		s = clang::cast<clang::WhileStmt>(s)->getCond();
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[WHILE_STMT]++;
+		modify_stmt(s, m_counters[WHILE_STMT]);
 	}
 	else if (clang::isa<clang::DoStmt>(s)) {
 		s = clang::cast<clang::DoStmt>(s)->getCond();
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[DOWHILE_STMT]++;
+		modify_stmt(s, m_counters[DOWHILE_STMT]);
 	}
 	else if (clang::isa<clang::SwitchStmt>(s)) {
 		s = clang::cast<clang::SwitchStmt>(s)->getCond();
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[SWITCH_STMT]++;
+		modify_stmt(s, m_counters[SWITCH_STMT]);
 	}
 	else if (clang::isa<clang::ReturnStmt>(s)) {
 		s = clang::cast<clang::ReturnStmt>(s)->getRetValue();
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[RET_STMT_VAL]++;
+		modify_stmt(s, m_counters[RET_STMT_VAL]);
 	}
 	/*
 	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
@@ -75,29 +63,33 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 	}
 	*/
 	else if (clang::isa<clang::CallExpr>(s)) {
-		if (modify_stmt(s) == false)
-			return true;
-		m_counters[CALL_EXPR]++;
+		modify_stmt(s, m_counters[CALL_EXPR]);
 	}
 
 	return true;
 }
 
 bool
-RewriteASTVisitor::modify_stmt(clang::Stmt *s)
+RewriteASTVisitor::modify_stmt(clang::Stmt *s, int &counter)
 {
 	if (s == NULL)
 		return false;
 
+	// If x = y is the original statement on line 19 then we try rewriting
+	// as (++citrun_lines[19], x = y).
 	std::stringstream ss;
 	ss << "(++_citrun_lines["
 		<< m_SM.getPresumedLineNumber(s->getLocStart()) - 1
 		<< "], ";
-	if (m_TheRewriter.InsertTextBefore(s->getLocStart(), ss.str()))
+
+	if (m_TheRewriter.InsertTextBefore(s->getLocStart(), ss.str())) {
 		// writing failed, don't attempt to add ")"
+		m_counters[REWRITE_ERROR]++;
 		return false;
+	}
 	m_TheRewriter.InsertTextAfter(real_loc_end(s), ")");
 
+	counter++;
 	return true;
 }
 

@@ -13,6 +13,7 @@ enum counters {
 	RET_STMT_VAL,
 	CALL_EXPR,
 	TOTAL_STMT,
+	REWRITE_ERROR,
 	NCOUNTERS
 };
 
@@ -30,7 +31,8 @@ public:
 				"Switch statements",
 				"Return statement values",
 				"Call expressions",
-				"Total statements"
+				"Total statements",
+				"Errors rewriting source code"
 				}),
 		m_TheRewriter(R),
 		m_SM(R.getSourceMgr())
@@ -44,7 +46,7 @@ public:
 	std::array<std::string, NCOUNTERS> m_counter_descr;
 
 private:
-	bool			 modify_stmt(clang::Stmt *);
+	bool			 modify_stmt(clang::Stmt *, int &);
 	clang::SourceLocation	 real_loc_end(clang::Stmt *);
 
 	clang::Rewriter		&m_TheRewriter;
