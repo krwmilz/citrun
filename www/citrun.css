@@ -2,7 +2,7 @@ p  { line-height: 1.5em; }
 li { line-height: 1.5em; }
 
 body {
-	max-width: 70ch;
+	max-width: 80ch;
 	padding: 10px;
 	margin: auto;
 	font-family: sans-serif;
