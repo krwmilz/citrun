@@ -37,10 +37,11 @@ FINE[3]="Function definitions"
 FINE[4]="If statements"
 FINE[5]="For statements"
 FINE[6]="While statements"
-FINE[7]="Switch statements"
-FINE[8]="Return statement values"
-FINE[9]="Call expressions"
-FINE[10]="Total statements"
+FINE[7]="Do while statements"
+FINE[8]="Switch statements"
+FINE[9]="Return statement values"
+FINE[10]="Call expressions"
+FINE[11]="Total statements"
 fine_len=${#FINE[@]}
 
 echo -n Checking \'$dir\' ''

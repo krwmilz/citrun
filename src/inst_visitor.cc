@@ -49,6 +49,12 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 			return true;
 		m_counters[WHILE_STMT]++;
 	}
+	else if (clang::isa<clang::DoStmt>(s)) {
+		s = clang::cast<clang::DoStmt>(s)->getCond();
+		if (modify_stmt(s) == false)
+			return true;
+		m_counters[DOWHILE_STMT]++;
+	}
 	else if (clang::isa<clang::SwitchStmt>(s)) {
 		s = clang::cast<clang::SwitchStmt>(s)->getCond();
 		if (modify_stmt(s) == false)
