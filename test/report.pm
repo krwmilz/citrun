@@ -1,4 +1,4 @@
-package Test::Report;
+package test::report;
 use strict;
 
 use List::MoreUtils qw( each_array );
