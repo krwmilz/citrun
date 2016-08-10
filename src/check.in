@@ -1,4 +1,3 @@
-#!/bin/sh -e
 
 function err {
 	echo "${1}"
