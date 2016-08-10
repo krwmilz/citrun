@@ -1,9 +1,9 @@
 use strict;
 use Test::More tests => 9;
-use Test::Project;
+use test::project;
 use Test::Viewer;
 
-my $project = Test::Project->new();
+my $project = test::project->new();
 
 $project->run(45);
 

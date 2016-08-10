@@ -1,9 +1,9 @@
 use strict;
 use Expect;
 use Test::More tests => 1;
-use Test::Project;
+use test::project;
 
-my $project = Test::Project->new();
+my $project = test::project->new();
 
 my $exp = Expect->spawn("citrun-term");
 my $waiting = "Waiting for connection on $ENV{CITRUN_SOCKET}";

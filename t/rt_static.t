@@ -1,10 +1,10 @@
 use strict;
 use Cwd;
 use Test::More tests => 22;
-use Test::Project;
+use test::project;
 use Test::Viewer;
 
-my $project = Test::Project->new();
+my $project = test::project->new();
 my $viewer = Test::Viewer->new();
 
 $project->run(45);
