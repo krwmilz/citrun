@@ -19,8 +19,7 @@ sub new {
 	$ENV{CITRUN_SOCKET} = "test.socket";
 	chdir $tmp_dir;
 
-	open( my $src_fh, ">", "one.c" );
-	print $src_fh <<EOF;
+	write_file("one.c", <<EOF);
 #include <err.h>
 #include <stdlib.h>
 
@@ -41,10 +40,8 @@ main(int argc, char *argv[])
 	return 0;
 }
 EOF
-	close( $src_fh );
 
-	open( my $src_fh, ">", "two.c" );
-	print $src_fh <<EOF;
+	write_file("two.c", <<EOF);
 long long
 fib(long long n)
 {
@@ -56,10 +53,8 @@ fib(long long n)
 	return fib(n - 1) + fib(n - 2);
 }
 EOF
-	close( $src_fh );
 
-	open( my $src_fh, ">", "three.c" );
-	print $src_fh <<EOF;
+	write_file("three.c", <<EOF);
 #include <stdio.h>
 
 void
@@ -69,10 +64,8 @@ print_output(long long n)
 	return;
 }
 EOF
-	close( $src_fh );
 
-	open( my $src_fh, ">", "Jamfile" );
-	print $src_fh <<EOF;
+	write_file("Jamfile", <<EOF);
 Main program : one.c two.c three.c ;
 EOF
 
@@ -80,6 +73,13 @@ EOF
 	die "jam failed: $ret\n" if ($ret);
 
 	return $self;
+}
+
+sub write_file {
+	my ($name, $content) = @_;
+	open( my $src_fh, ">", $name );
+	print $src_fh $content;
+	close( $src_fh );
 }
 
 sub run {
