@@ -45,6 +45,7 @@ sed	-e "s,^.*: ,,"	\
 cat <<EOF > citrun.log.good
 
 citrun-inst v0.0 () called as ''.
+Resource directory is ''
 PATH=''
 Command line is ''.
 Found source file ''.
@@ -67,6 +68,7 @@ Forked ''.
 Restored ''.
 
 citrun-inst v0.0 () called as ''.
+Resource directory is ''
 PATH=''
 Command line is ''.
 Object arg = 1, compile arg = 0

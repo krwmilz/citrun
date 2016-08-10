@@ -33,6 +33,7 @@ echo "ok 4 - processed citrun.log"
 cat <<EOF > citrun.log.good
 
 citrun-inst v0.0 () called as ''.
+Resource directory is ''
 PATH=''
 Command line is ''.
 Found source file ''.

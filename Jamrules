@@ -1,14 +1,16 @@
+#
+# Knowing the absolute path to citrun resources is necessary for
+# instrumentation. If PREFIX is set, assume we're building a package.
+#
 if $(PREFIX) {
-	# PREFIX was set, use absolute install paths.
-	CITRUN_LIB =  $(PREFIX)/lib/libcitrun.a ;
-	CITRUN_PATH = $(PREFIX)/share/citrun ;
+	BUILD_MODE = "RELEASE" ;
+	CITRUN_SHARE = $(PREFIX)/share/citrun ;
 }
 else {
-	# No PREFIX means an in tree build. Use absolute paths to local copies.
-	ROOT = "`readlink -f $(TOP)`" ;
-	CITRUN_LIB =  $(ROOT)/src/libcitrun.a ;
-	CITRUN_PATH = $(ROOT)/src ;
+	BUILD_MODE = "DEBUG" ;
+	CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
 }
+echo ...build citrun ($(BUILD_MODE)) on $(OS)... ;
 
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
@@ -101,7 +103,7 @@ rule MkWrap
 
 actions MkWrap
 {
-	sed -e s,%CITRUN_PATH%,$(CITRUN_PATH), < $(2) > $(1) ;
+	sed -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), < $(2) > $(1) ;
 	chmod 755 $(1) ;
 }
 
@@ -118,8 +120,3 @@ actions InstLink
 {
 	$(RM) $(<) && $(LN) -s citrun-inst $(<) ;
 }
-
-echo ...build citrun ($(OS))... ;
-echo "   C++=		$(C++)" ;
-echo "   CITRUN_LIB=	$(CITRUN_LIB)" ;
-echo "   CITRUN_PATH=	$(CITRUN_PATH)" ;

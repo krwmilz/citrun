@@ -5,7 +5,7 @@ SubDir TOP src ;
 #
 ObjectCcFlags runtime.c : -fPIC -pthread -ansi ;
 Library libcitrun : runtime.c ;
-InstallLib $(PREFIX)/lib : libcitrun.a ;
+InstallLib $(PREFIX)/share/citrun : libcitrun.a ;
 
 #
 # citrun-wrap, citrun-check
@@ -15,9 +15,7 @@ MakeLocate citrun-check : $(LOCATE_SOURCE) ;
 Shell citrun-check : check.in ;
 InstallShell $(PREFIX)/bin : citrun-wrap citrun-check ;
 
-#
 # utils.a
-#
 Library utils : af_unix.cc runtime_proc.cc ;
 
 #
@@ -67,8 +65,7 @@ INST_SRCS =
 Stringize runtime_h.h : runtime.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
-ObjectC++Flags $(INST_SRCS) : -DCITRUN_LIB=$(CITRUN_LIB)
-	-DCITRUN_PATH=$(CITRUN_PATH)
+ObjectC++Flags $(INST_SRCS) : -DCITRUN_SHARE=$(CITRUN_SHARE)
 	-DCITRUN_COVERAGE=$(CITRUN_COVERAGE) ;
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;

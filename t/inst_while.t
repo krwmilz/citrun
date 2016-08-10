@@ -31,6 +31,7 @@ EOF
 cat <<EOF > citrun.log.good
 
 citrun-inst v0.0 () called as ''.
+Resource directory is ''
 Command line is ''.
 Found source file ''.
 Object arg = 0, compile arg = 1

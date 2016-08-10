@@ -74,6 +74,7 @@ CitrunInst::CitrunInst(int argc, char *argv[]) :
 		<< " (" << utsname.sysname << "-" << utsname.release
 		<< " " << utsname.machine
 		<< ") called as '" << m_args[0] << "'.\n";
+	m_log << m_pfx << "Resource directory is '" << STR(CITRUN_SHARE) << "'\n";
 
 	char *base_name;
 	if ((base_name = basename(m_args[0])) == NULL)
@@ -106,7 +107,7 @@ CitrunInst::clean_PATH()
 
 	m_log << m_pfx << "PATH='" << path << "'\n";
 
-	// Filter CITRUN_PATH out of PATH
+	// Filter CITRUN_SHARE out of PATH
 	std::stringstream path_ss(path);
 	std::ostringstream new_path;
 	std::string component;
@@ -114,7 +115,7 @@ CitrunInst::clean_PATH()
 	bool found_citrun_path = 0;
 
 	while (std::getline(path_ss, component, ':')) {
-		if (component.compare(STR(CITRUN_PATH)) == 0) {
+		if (component.compare(STR(CITRUN_SHARE)) == 0) {
 			found_citrun_path = 1;
 			continue;
 		}
@@ -122,14 +123,14 @@ CitrunInst::clean_PATH()
 		if (first_component == 0)
 			new_path << ":";
 
-		// It wasn't CITRUN_PATH, keep it
+		// It wasn't CITRUN_SHARE, keep it
 		new_path << component;
 		first_component = 0;
 	}
 
 	if (!found_citrun_path) {
-		m_log << m_pfx << "'" << STR(CITRUN_PATH) << "' not in PATH.\n";
-		errx(1, "'%s' not in PATH", STR(CITRUN_PATH));
+		m_log << m_pfx << "'" << STR(CITRUN_SHARE) << "' not in PATH.\n";
+		errx(1, "'%s' not in PATH", STR(CITRUN_SHARE));
 	}
 
 	// Set new $PATH
@@ -249,7 +250,7 @@ CitrunInst::process_cmdline()
 		// Needed because libcitrun.a will be instrumented with gcov.
 		m_args.push_back(const_cast<char *>("-coverage"));
 #endif
-		m_args.push_back(const_cast<char *>(STR(CITRUN_LIB)));
+		m_args.push_back(const_cast<char *>(STR(CITRUN_SHARE) "/libcitrun.a"));
 		m_log << m_args.back() << "' to command line.\n";
 	}
 
