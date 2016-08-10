@@ -7,11 +7,3 @@ function setup
 	export PATH="`pwd`/src:${PATH}"
 	cd $tmpdir
 }
-
-function process_citrun_log
-{
-	sed	-e "s,^.*: ,,"	\
-		-e "s,'.*','',"	\
-		-e "s,(.*),()," \
-		< citrun.log > citrun.log.proc
-}
