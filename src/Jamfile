@@ -5,7 +5,6 @@ SubDir TOP src ;
 #
 ObjectCcFlags runtime.c : -fPIC -pthread -ansi ;
 Library libcitrun : runtime.c ;
-InstallLib $(PREFIX)/share/citrun : libcitrun.a ;
 
 #
 # citrun-wrap, citrun-check
@@ -13,7 +12,6 @@ InstallLib $(PREFIX)/share/citrun : libcitrun.a ;
 MkWrap citrun-wrap : wrap.in ;
 MakeLocate citrun-check : $(LOCATE_SOURCE) ;
 Shell citrun-check : check.in ;
-InstallShell $(PREFIX)/bin : citrun-wrap citrun-check ;
 
 # utils.a
 Library utils : af_unix.cc runtime_proc.cc ;
@@ -25,7 +23,6 @@ LINKLIBS on citrun-term += -lcurses -L/usr/local/lib ;
 
 LinkLibraries citrun-term : utils ;
 Main citrun-term : term_main.cc ;
-InstallBin $(PREFIX)/bin : citrun-term ;
 
 #
 # citrun-gl
@@ -52,7 +49,6 @@ LINKLIBS on citrun-gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
 LinkLibraries citrun-gl : libglyphy utils ;
 
 Main citrun-gl : $(GL_SRCS) ;
-InstallBin $(PREFIX)/bin : citrun-gl ;
 
 #
 # citrun-inst
@@ -76,7 +72,6 @@ LINKLIBS on citrun-inst += $(CLANG_LIBS) ;
 LINKLIBS on citrun-inst += `llvm-config --libs $(LLVM_LIBS) --system-libs` ;
 
 Main citrun-inst : $(INST_SRCS) ;
-InstallBin $(PREFIX)/bin : citrun-inst ;
 
 #
 # citrun-inst symlinks
@@ -93,5 +88,12 @@ InstLink eg++ : citrun-inst ;
 CP = cp -PR ;
 FILEMODE = 755 ;
 InstallFile $(PREFIX)/share/citrun : cc gcc clang clang++ g++ c++ egcc eg++ ;
+
+#
+# install
+#
+InstallLib $(PREFIX)/share/citrun : libcitrun.a ;
+InstallShell $(PREFIX)/bin : citrun-wrap citrun-check ;
+InstallBin $(PREFIX)/bin : citrun-term citrun-gl citrun-inst ;
 
 SubInclude TOP src glyphy ;
