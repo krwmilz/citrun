@@ -1,11 +1,11 @@
 use strict;
 use Test::More tests => 107;
 use test::project;
-use Test::Viewer;
+use test::viewer;
 use Time::HiRes qw( usleep );
 
 my $project = test::project->new();
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 
 $project->run(45);
 

@@ -1,7 +1,7 @@
 use strict;
 use Test::More tests => 9;
 use test::project;
-use Test::Viewer;
+use test::viewer;
 
 my $project = test::project->new();
 
@@ -10,7 +10,7 @@ $project->run(45);
 # Give the runtime a chance to reconnect
 sleep(1);
 
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 $viewer->accept();
 $viewer->cmp_static_data([
 	[ "one.c",	20 ],

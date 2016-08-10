@@ -4,10 +4,10 @@ use Expect;
 use Test::More tests => 1368 ;
 use Test::Package;
 use Test::Report;
-use Test::Viewer;
+use test::viewer;
 
 my $package = Test::Package->new("security/openssl");
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 
 $ENV{LD_LIBRARY_PATH}="/usr/ports/pobj/openssl-1.0.2h/openssl-1.0.2h";
 my $exp = Expect->spawn("/usr/ports/pobj/openssl*/openssl*/apps/openssl");

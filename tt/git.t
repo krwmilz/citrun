@@ -4,11 +4,11 @@ use Expect;
 use Test::More tests => 540 ;
 use Test::Package;
 use Test::Report;
-use Test::Viewer;
+use test::viewer;
 use Time::HiRes qw( usleep );
 
 my $package = Test::Package->new("devel/git");
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/git-2.9.0/git-2.9.0/git", "clone", "http://git.0x30.net/citrun", "/usr/ports/pobj/git-*");
 $viewer->accept();

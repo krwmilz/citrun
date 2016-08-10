@@ -4,10 +4,10 @@ use warnings;
 use Expect;
 use Test::More tests => 204;
 use Test::Package;
-use Test::Viewer;
+use test::viewer;
 
 my $package = Test::Package->new("mail/mutt");
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/mutt-1.6.2/mutt-1.6.2/mutt");
 $viewer->accept();

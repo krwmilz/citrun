@@ -4,12 +4,12 @@ use Cwd;
 use Expect;
 use Test::More tests => 49;
 use Test::Package;
-use Test::Viewer;
+use test::viewer;
 
 $ENV{NO_CHECKSUM} = 1;
 system("rm -rf /usr/ports/devel/ccitrunrun; cp -R bin/openbsd/ccitrunrun /usr/ports/devel/");
 my $package = Test::Package->new("devel/ccitrunrun");
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 
 system("./src/citrun-check /usr/ports/pobj/ccitrunrun-*");
 

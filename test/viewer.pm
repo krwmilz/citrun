@@ -1,4 +1,4 @@
-package Test::Viewer;
+package test::viewer;
 
 use strict;
 use IO::Socket::UNIX;

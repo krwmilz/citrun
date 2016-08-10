@@ -4,10 +4,10 @@ use Expect;
 use Test::More tests => 230 ;
 use Test::Package;
 use Test::Report;
-use Test::Viewer;
+use test::viewer;
 
 my $package = Test::Package->new("editors/nvi");
-my $viewer = Test::Viewer->new();
+my $viewer = test::viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/nvi-2.1.3/nvi2-2.1.3/build/nvi");
 $viewer->accept();
