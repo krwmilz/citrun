@@ -2,11 +2,10 @@ use strict;
 use warnings;
 use Expect;
 use Test::More tests => 1368 ;
-use Test::Package;
-use Test::Report;
+use test::package;
 use test::viewer;
 
-my $package = Test::Package->new("security/openssl");
+my $package = test::package->new("security/openssl");
 my $viewer = test::viewer->new();
 
 $ENV{LD_LIBRARY_PATH}="/usr/ports/pobj/openssl-1.0.2h/openssl-1.0.2h";
@@ -704,5 +703,35 @@ $viewer->cmp_dynamic_data();
 $exp->hard_close();
 $viewer->close();
 
-system("citrun-check /usr/ports/pobj/openssl-*");
+open( my $fh, ">", "check.good" );
+print $fh <<EOF;
+Checking ...done
+
+Summary:
+        58 Log files found
+       752 Source files input
+       868 Calls to the instrumentation tool
+       752 Forked compilers
+       752 Instrument successes
+        58 Application link commands
+       752 Warnings during source parsing
+
+Totals:
+    322027 Lines of source code
+     24064 Lines of instrumentation header
+        43 Functions called 'main'
+     10574 Function definitions
+     25212 If statements
+      1486 For loops
+       476 While loops
+        76 Do while loops
+       334 Switch statements
+     10801 Return statement values
+     31196 Call expressions
+   2611342 Total statements
+     16412 Errors rewriting source
+EOF
+
+system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/openssl-* > check.out");
+system("diff -u check.good check.out");
 $package->clean();
