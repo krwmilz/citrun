@@ -34,6 +34,7 @@ Totals:
          1 Return statement values
          1 Call expressions
          9 Total statements
+         8 Statements in system headers
 EOF
 
 cc -o hello hello.c
