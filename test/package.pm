@@ -19,8 +19,10 @@ sub new {
 
 	system(<<EOF) == 0 or die "build failed.";
 set -e
-make -C $self->{port} full-build-depends > deps
-doas pkg_add -zl deps
+make -C $self->{port} full-build-depends | sort | uniq > deps
+pkg_info -q > installed
+comm -2 -3 deps installed > needed
+diff -u /dev/null needed
 
 make -C $self->{port} clean=all
 make -C $self->{port} PORTPATH="$ENV{CITRUN_TOOLS}:\\\${WRKDIR}/bin:\$PATH"
