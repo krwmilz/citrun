@@ -32,14 +32,14 @@ do-build:
 		-e "s,citrun_node_add,ccitrunrun_node_add," \
 		-e "s,citrun_major,ccitrunrun_major,g" \
 		-e "s,citrun_minor,ccitrunrun_minor,g" \
-		lib/runtime.h lib/runtime.c \
-		src/inst_action.cc src/inst_main.cc src/runtime.cc
+		src/runtime.h src/runtime.c \
+		src/inst_action.cc src/inst_main.cc src/runtime_proc.cc
 	cd ${WRKSRC} && sed -i \
 		-e "s,citrun-inst,ccitrunrun-inst," \
 		-e "s,citrun-term,ccitrunrun-term," \
 		-e "s,citrun-gl,ccitrunrun-gl," \
 		-e "s,libcitrun,libccitrunrun," \
-		Jamrules lib/runtime.c lib/Jamfile src/Jamfile src/inst_main.cc src/check.in
+		Jamrules src/runtime.c src/Jamfile src/inst_main.cc src/check.in
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -j4
 
 do-test:
