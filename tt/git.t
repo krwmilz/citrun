@@ -2,12 +2,11 @@ use strict;
 use warnings;
 use Expect;
 use Test::More tests => 540 ;
-use Test::Package;
-use Test::Report;
+use test::package;
 use test::viewer;
 use Time::HiRes qw( usleep );
 
-my $package = Test::Package->new("devel/git");
+my $package = test::package->new("devel/git");
 my $viewer = test::viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/git-2.9.0/git-2.9.0/git", "clone", "http://git.0x30.net/citrun", "/usr/ports/pobj/git-*");
@@ -289,5 +288,37 @@ $viewer->cmp_dynamic_data();
 $exp->hard_close();
 $viewer->close();
 
-system("citrun-check /usr/ports/pobj/git-*");
+open( my $fh, ">", "check.good" );
+print $fh <<EOF;
+Checking ..done
+
+Summary:
+         1 Log files found
+       381 Source files input
+       448 Calls to the instrumentation tool
+       381 Forked compilers
+       376 Instrument successes
+         5 Both instrument and native compile failed (FP)
+        82 Application link commands
+        45 Warnings during source parsing
+         5 Errors during source parsing
+
+Totals:
+    185689 Lines of source code
+     12192 Lines of instrumentation header
+       100 Functions called 'main'
+     32539 Function definitions
+     25154 If statements
+      2061 For loops
+      1442 While loops
+       411 Do while loops
+       294 Switch statements
+     29334 Return statement values
+     57537 Call expressions
+   1539430 Total statements
+     19674 Errors rewriting source
+EOF
+
+system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/git-* > check.out");
+system("diff -u check.good check.out");
 $package->clean();
