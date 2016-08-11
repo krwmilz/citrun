@@ -18,7 +18,7 @@ if [ "$uname" = "OpenBSD" ]; then
 	make -C /usr/ports/devel/citrun build
 	make -C /usr/ports/devel/citrun package
 
-	doas pkg_add -Dunsigned -r $pkg_path
+	#doas pkg_add -Dunsigned -r $pkg_path
 	mv $pkg_path bin/
 
 elif [ "$uname" = "Darwin" ]; then
