@@ -57,9 +57,9 @@ Instrumentation of '' finished:
     1 Functions called ''
     5 Function definitions
     2 If statements
-    5 Return statement values
+    4 Return statement values
     4 Call expressions
-    198 Total statements
+    58 Total statements
 Modified source written successfully.
 Instrumentation successful.
 Running native compiler on modified source code.

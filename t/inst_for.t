@@ -45,8 +45,7 @@ Totals:
          1 Functions called 'main'
          4 Function definitions
          1 For loops
-         1 Return statement values
-       155 Total statements
+        15 Total statements
 EOF
 
 citrun-inst -c for.c

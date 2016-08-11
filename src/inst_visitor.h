@@ -35,8 +35,11 @@ public:
 				"Errors rewriting source code"
 				}),
 		m_TheRewriter(R),
-		m_SM(R.getSourceMgr())
+		m_SM(R.getSourceMgr()),
+		m_lopt(R.getLangOpts())
 	{}
+
+	virtual bool TraverseStmt(clang::Stmt *);
 
 	bool VisitVarDecl(clang::VarDecl *d);
 	bool VisitStmt(clang::Stmt *s);
@@ -52,5 +55,4 @@ private:
 	clang::Rewriter		&m_TheRewriter;
 	clang::SourceManager	&m_SM;
 	clang::LangOptions	 m_lopt;
-
 };

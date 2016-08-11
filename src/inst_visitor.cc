@@ -21,6 +21,22 @@
 #include "inst_visitor.h"
 
 bool
+RewriteASTVisitor::TraverseStmt(clang::Stmt *s)
+{
+	if (s == NULL)
+		return true;
+
+	clang::SourceLocation start_loc = s->getLocStart();
+	clang::FullSourceLoc full_loc(start_loc, m_SM);
+
+	if (full_loc.isInSystemHeader())
+		return false;
+
+	RecursiveASTVisitor<RewriteASTVisitor>::TraverseStmt(s);
+	return true;
+}
+
+bool
 RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 {
 	return true;

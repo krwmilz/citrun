@@ -48,9 +48,9 @@ Totals:
          1 Functions called 'main'
          5 Function definitions
          3 If statements
-         6 Return statement values
+         5 Return statement values
          4 Call expressions
-       198 Total statements
+        58 Total statements
 EOF
 
 cc -o fib fib.c

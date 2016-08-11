@@ -59,9 +59,9 @@ Totals:
          1 Functions called 'main'
          4 Function definitions
          3 If statements
-         4 Return statement values
+         3 Return statement values
          2 Call expressions
-       173 Total statements
+        33 Total statements
 EOF
 
 citrun-inst -c if.c
