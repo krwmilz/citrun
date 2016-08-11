@@ -3,12 +3,12 @@ use warnings;
 use Cwd;
 use Expect;
 use Test::More tests => 49;
-use Test::Package;
+use test::package;
 use test::viewer;
 
 $ENV{NO_CHECKSUM} = 1;
 system("rm -rf /usr/ports/devel/ccitrunrun; cp -R bin/openbsd/ccitrunrun /usr/ports/devel/");
-my $package = Test::Package->new("devel/ccitrunrun");
+my $package = test::package->new("devel/ccitrunrun");
 my $viewer = test::viewer->new();
 
 system("./src/citrun-check /usr/ports/pobj/ccitrunrun-*");
@@ -32,7 +32,7 @@ $viewer->cmp_static_data([
 	["/src/glyphy/glyphy-sdf.cc",	92,	15618],
 	["/src/glyphy/glyphy-shaders.cc",40,	15168],
 	["/src/matrix4x4.c",		399,	191],
-	["/src/runtime.cc",		89,	6905],
+	["/src/runtime_proc.cc",	89,	6905],
 	["/src/trackball.c",		338,	46],
 ]);
 $exp->hard_close();
@@ -43,8 +43,8 @@ $viewer->accept();
 $viewer->cmp_static_data([
 	# file name		lines	instrumented sites
 	["/src/af_unix.cc",	166,	4207],
-	["/src/runtime.cc",	89,	6905],
-	["/src/term_main.cc",	265,	7658],
+	["/src/runtime_proc.cc", 89,	6905],
+	["/src/term_main.cc",	264,	7658],
 ]);
 $exp->hard_close();
 $viewer->close();
@@ -54,10 +54,42 @@ $viewer->accept();
 
 $viewer->cmp_static_data([
 	# file name			lines	instrumented sites
-	[ "/src/inst_action.cc",	84,	63901 ],
-	[ "/src/inst_ast_visitor.cc",	112,	54839 ],
-	[ "/src/inst_main.cc",		396,	64187 ],
+	[ "/src/inst_action.cc",	128,	63901 ],
+	[ "/src/inst_main.cc",		398,	64187 ],
+	[ "/src/inst_visitor.cc",	150,	54839 ],
 ]);
 
 $exp->hard_close();
-#$package->clean();
+
+open( my $fh, ">", "check.good" );
+print $fh <<EOF;
+Checking ..done
+
+Summary:
+         1 Log files found
+        23 Source files input
+        26 Calls to the instrumentation tool
+        23 Forked compilers
+        23 Instrument successes
+         3 Application link commands
+        10 Warnings during source parsing
+
+Totals:
+      5350 Lines of source code
+       736 Lines of instrumentation header
+         3 Functions called 'main'
+     95180 Function definitions
+      7819 If statements
+       477 For loops
+       216 While loops
+         3 Do while loops
+       265 Switch statements
+     45362 Return statement values
+     65866 Call expressions
+   1021314 Total statements
+     73094 Errors rewriting source
+EOF
+
+system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/ccitrunrun-* > check.out");
+system("diff -u check.good check.out");
+$package->clean();
