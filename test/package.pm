@@ -11,23 +11,20 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
-	my $dir = tempdir( CLEANUP => 1 );
-	$self->{dir} = $dir;
-
 	$self->{port} = "/usr/ports/$name";
-
-	$ENV{CITRUN_SOCKET} = $self->{dir} . "/test.socket";
-	my $cwd = cwd;
+	my $dir = tempdir( CLEANUP => 1 );
+	$ENV{CITRUN_SOCKET} = "test.socket";
+	$ENV{CITRUN_TOOLS} = cwd . "/src";
+	chdir $dir;
 
 	system(<<EOF) == 0 or die "build failed.";
 set -e
-make -C $self->{port} full-build-depends > $self->{dir}/deps
-doas pkg_add -zl $self->{dir}/deps
+make -C $self->{port} full-build-depends > deps
+doas pkg_add -zl deps
 
 make -C $self->{port} clean=all
-make -C $self->{port} PORTPATH="$cwd/src:\\\${WRKDIR}/bin:\$PATH"
+make -C $self->{port} PORTPATH="$ENV{CITRUN_TOOLS}:\\\${WRKDIR}/bin:\$PATH"
 EOF
-
 	return $self;
 }
 

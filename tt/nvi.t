@@ -2,11 +2,10 @@ use strict;
 use warnings;
 use Expect;
 use Test::More tests => 230 ;
-use Test::Package;
-use Test::Report;
+use test::package;
 use test::viewer;
 
-my $package = Test::Package->new("editors/nvi");
+my $package = test::package->new("editors/nvi");
 my $viewer = test::viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/nvi-2.1.3/nvi2-2.1.3/build/nvi");
@@ -134,4 +133,35 @@ $viewer->cmp_dynamic_data();
 $exp->hard_close();
 $viewer->close();
 
+open( my $fh, ">", "check.good" );
+print $fh <<EOF;
+Checking ...done
+
+Summary:
+         2 Log files found
+       115 Source files input
+       116 Calls to the instrumentation tool
+       115 Forked compilers
+       115 Instrument successes
+         2 Application link commands
+        32 Warnings during source parsing
+
+Totals:
+     47830 Lines of source code
+      3680 Lines of instrumentation header
+         2 Functions called 'main'
+      2102 Function definitions
+      3399 If statements
+       363 For loops
+        62 While loops
+        14 Do while loops
+       171 Switch statements
+      1909 Return statement values
+      3488 Call expressions
+    239351 Total statements
+      3277 Errors rewriting source
+EOF
+
+system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/nvi-* > check.out");
+system("diff -u check.good check.out");
 $package->clean();
