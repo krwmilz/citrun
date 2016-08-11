@@ -37,19 +37,4 @@ sub clean {
 	system("make -C $self->{port} clean=all") == 0 or die "$!";
 }
 
-sub get_file_size {
-	my ($self, $file) = @_;
-
-	die "file '$file' does not exist." unless (-f "$self->{srcdir}$file");
-	return ((stat "$self->{srcdir}$file")[7]);
-}
-
-sub time_system {
-	my ($self, $cmd) = @_;
-
-	my $start = time;
-	system("cd $self->{srcdir} && $cmd") == 0 or die "'$cmd'\n";
-	return time - $start;
-}
-
 1;
