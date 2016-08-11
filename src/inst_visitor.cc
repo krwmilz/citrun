@@ -26,10 +26,7 @@ RewriteASTVisitor::TraverseStmt(clang::Stmt *s)
 	if (s == NULL)
 		return true;
 
-	clang::SourceLocation start_loc = s->getLocStart();
-	clang::FullSourceLoc full_loc(start_loc, m_SM);
-
-	if (full_loc.isInSystemHeader())
+	if (m_SM.isInMainFile(s->getLocStart()) == false)
 		return false;
 
 	RecursiveASTVisitor<RewriteASTVisitor>::TraverseStmt(s);
