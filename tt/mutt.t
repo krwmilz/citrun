@@ -3,10 +3,10 @@ use warnings;
 
 use Expect;
 use Test::More tests => 204;
-use Test::Package;
+use test::package;
 use test::viewer;
 
-my $package = Test::Package->new("mail/mutt");
+my $package = test::package->new("mail/mutt");
 my $viewer = test::viewer->new();
 
 my $exp = Expect->spawn("/usr/ports/pobj/mutt-1.6.2/mutt-1.6.2/mutt");
@@ -118,4 +118,39 @@ $viewer->cmp_static_data([
 $viewer->cmp_dynamic_data();
 
 $exp->hard_close();
+
+open( my $fh, ">", "check.good" );
+print $fh <<EOF;
+Checking ....done
+
+Summary:
+         3 Log files found
+       218 Source files input
+       262 Calls to the instrumentation tool
+       218 Forked compilers
+       209 Instrument successes
+         9 Both instrument and native compile failed (FP)
+        73 Application link commands
+       339 Warnings during source parsing
+        10 Errors during source parsing
+
+Totals:
+     94664 Lines of source code
+      6976 Lines of instrumentation header
+       102 Functions called 'main'
+      4199 Function definitions
+      7746 If statements
+       658 For loops
+       568 While loops
+        52 Do while loops
+       147 Switch statements
+      3279 Return statement values
+     12037 Call expressions
+    431223 Total statements
+      5826 Errors rewriting source
+EOF
+
+system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/mutt-* > check.out");
+system("diff -u check.good check.out");
+
 $package->clean();
