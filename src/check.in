@@ -46,7 +46,6 @@ FINE[9]="Return statement values"
 FINE[10]="Call expressions"
 FINE[11]="Total statements"
 FINE[12]="Errors rewriting source"
-FINE[13]="Statements in system headers"
 fine_len=${#FINE[@]}
 
 echo -n Checking .

@@ -14,7 +14,6 @@ enum counters {
 	CALL_EXPR,
 	TOTAL_STMT,
 	REWRITE_ERROR,
-	SYS_HEADER_STMT,
 	NCOUNTERS
 };
 
@@ -33,8 +32,7 @@ public:
 				"Return statement values",
 				"Call expressions",
 				"Total statements",
-				"Errors rewriting source code",
-				"Statements in system headers"
+				"Errors rewriting source code"
 				}),
 		m_TheRewriter(R),
 		m_SM(R.getSourceMgr()),

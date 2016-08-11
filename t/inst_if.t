@@ -62,7 +62,6 @@ Totals:
          3 Return statement values
          2 Call expressions
         33 Total statements
-        13 Statements in system headers
 EOF
 
 citrun-inst -c if.c

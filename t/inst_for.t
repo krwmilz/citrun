@@ -46,7 +46,6 @@ Totals:
          4 Function definitions
          1 For loops
         15 Total statements
-        13 Statements in system headers
 EOF
 
 citrun-inst -c for.c
