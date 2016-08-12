@@ -13,12 +13,13 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
+#include "inst_visitor.h"
+
 #include <clang/AST/AST.h>
 #include <clang/Lex/Lexer.h>
 #include <sstream>
 #include <string>
 
-#include "inst_visitor.h"
 
 bool
 RewriteASTVisitor::TraverseStmt(clang::Stmt *s)
