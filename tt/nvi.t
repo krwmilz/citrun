@@ -158,7 +158,7 @@ Totals:
        161 Switch statements
       1728 Return statement values
       3476 Call expressions
-    215219 Total statements
+    196364 Total statements
       3118 Errors rewriting source
 EOF
 

@@ -39,6 +39,14 @@ RewriteASTVisitor::TraverseDecl(clang::Decl *d)
 	if (m_SM.isInMainFile(d->getLocStart()) == false)
 		return false;
 
+	if (clang::isa<clang::VarDecl>(d)) {
+		clang::VarDecl *vd = clang::cast<clang::VarDecl>(d);
+		if (vd->hasGlobalStorage())
+			return false;
+	}
+	if (clang::isa<clang::EnumDecl>(d))
+		return false;
+
 	RecursiveASTVisitor<RewriteASTVisitor>::TraverseDecl(d);
 	return true;
 }
