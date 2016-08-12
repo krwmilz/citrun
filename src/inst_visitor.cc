@@ -50,6 +50,8 @@ RewriteASTVisitor::TraverseDecl(clang::Decl *d)
 		if (vd->hasGlobalStorage())
 			return false;
 	}
+	if (clang::isa<clang::RecordDecl>(d))
+		return false;
 	if (clang::isa<clang::EnumDecl>(d))
 		return false;
 
