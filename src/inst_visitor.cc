@@ -69,48 +69,66 @@ bool
 RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
 	m_counters[TOTAL_STMT]++;
+	return true;
+}
 
-	if (clang::isa<clang::IfStmt>(s)) {
-		s = clang::cast<clang::IfStmt>(s)->getCond();
-		modify_stmt(s, m_counters[IF_STMT]);
-	}
-	else if (clang::isa<clang::ForStmt>(s)) {
-		s = clang::cast<clang::ForStmt>(s)->getCond();
-		modify_stmt(s, m_counters[FOR_STMT]);
-	}
-	else if (clang::isa<clang::WhileStmt>(s)) {
-		s = clang::cast<clang::WhileStmt>(s)->getCond();
-		modify_stmt(s, m_counters[WHILE_STMT]);
-	}
-	else if (clang::isa<clang::DoStmt>(s)) {
-		s = clang::cast<clang::DoStmt>(s)->getCond();
-		modify_stmt(s, m_counters[DOWHILE_STMT]);
-	}
-	else if (clang::isa<clang::SwitchStmt>(s)) {
-		s = clang::cast<clang::SwitchStmt>(s)->getCond();
-		modify_stmt(s, m_counters[SWITCH_STMT]);
-	}
-	else if (clang::isa<clang::ReturnStmt>(s)) {
-		s = clang::cast<clang::ReturnStmt>(s)->getRetValue();
-		modify_stmt(s, m_counters[RET_STMT_VAL]);
-	}
-	/*
-	else if (isa<BreakStmt>(s) || isa<ContinueStmt>(s) ||
-		|| isa<SwitchCase>(s)) {
-	}
-	else if (clang::isa<clang::DeclStmt>(s)) {
-	}
-	*/
-	else if (clang::isa<clang::CallExpr>(s)) {
-		modify_stmt(s, m_counters[CALL_EXPR]);
-	}
-	else if (clang::isa<clang::BinaryOperator>(s)) {
-		// If we can't rewrite the last token, don't even start.
-		if (s->getLocEnd().isMacroID())
-			return true;
-		modify_stmt(s, m_counters[BIN_OPER]);
-	}
+bool
+RewriteASTVisitor::VisitIfStmt(clang::IfStmt *i)
+{
+	modify_stmt(i->getCond(), m_counters[IF_STMT]);
+	return true;
+}
 
+bool
+RewriteASTVisitor::VisitForStmt(clang::ForStmt *f)
+{
+	modify_stmt(f->getCond(), m_counters[FOR_STMT]);
+	return true;
+}
+
+bool
+RewriteASTVisitor::VisitWhileStmt(clang::WhileStmt *w)
+{
+	modify_stmt(w->getCond(), m_counters[WHILE_STMT]);
+	return true;
+}
+
+bool
+RewriteASTVisitor::VisitDoStmt(clang::DoStmt *d)
+{
+	modify_stmt(d->getCond(), m_counters[DOWHILE_STMT]);
+	return true;
+}
+
+bool
+RewriteASTVisitor::VisitSwitchStmt(clang::SwitchStmt *s)
+{
+	modify_stmt(s->getCond(), m_counters[SWITCH_STMT]);
+	return true;
+}
+
+bool
+RewriteASTVisitor::VisitReturnStmt(clang::ReturnStmt *r)
+{
+	modify_stmt(r->getRetValue(), m_counters[RET_STMT_VAL]);
+	return true;
+}
+
+bool
+RewriteASTVisitor::VisitCallExpr(clang::CallExpr *c)
+{
+	modify_stmt(c, m_counters[CALL_EXPR]);
+	return true;
+}
+
+bool
+RewriteASTVisitor::VisitBinaryOperator(clang::BinaryOperator *b)
+{
+
+	// If we can't rewrite the last token, don't even start.
+	if (b->getLocEnd().isMacroID())
+		return true;
+	modify_stmt(b, m_counters[BIN_OPER]);
 	return true;
 }
 

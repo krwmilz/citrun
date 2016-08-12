@@ -48,6 +48,15 @@ public:
 	bool VisitStmt(clang::Stmt *s);
 	bool VisitFunctionDecl(clang::FunctionDecl *f);
 
+	bool VisitIfStmt(clang::IfStmt *);
+	bool VisitForStmt(clang::ForStmt *);
+	bool VisitWhileStmt(clang::WhileStmt *);
+	bool VisitDoStmt(clang::DoStmt *);
+	bool VisitSwitchStmt(clang::SwitchStmt *);
+	bool VisitReturnStmt(clang::ReturnStmt *);
+	bool VisitCallExpr(clang::CallExpr *);
+	bool VisitBinaryOperator(clang::BinaryOperator *);
+
 	std::array<int, NCOUNTERS> m_counters;
 	std::array<std::string, NCOUNTERS> m_counter_descr;
 
