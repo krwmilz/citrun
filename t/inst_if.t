@@ -27,16 +27,16 @@ cat <<EOF > if.c.inst_good
 
 int
 main(int argc, char *argv[])
-{citrun_start();++_citrun_lines[2];++_citrun_lines[3];++_citrun_lines[4];
-	if ((++_citrun_lines[5], (++_citrun_lines[5], argc == 1)))
-		return (++_citrun_lines[6], 1);
+{citrun_start();++_citrun[2];++_citrun[3];++_citrun[4];
+	if ((++_citrun[5], (++_citrun[5], argc == 1)))
+		return (++_citrun[6], 1);
 	else
-		(++_citrun_lines[8], exit(14));
+		(++_citrun[8], exit(14));
 
-	if ((++_citrun_lines[10], ((++_citrun_lines[10], argc = 2))))
-		return (++_citrun_lines[11], 5);
+	if ((++_citrun[10], ((++_citrun[10], argc = 2))))
+		return (++_citrun[11], 5);
 	else
-		(++_citrun_lines[13], exit(0));
+		(++_citrun[13], exit(0));
 }
 EOF
 

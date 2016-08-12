@@ -38,9 +38,9 @@ static const struct {
 	unsigned char data[0 + 64 * 6];
 } blah;
 
-int main(void) {citrun_start();++_citrun_lines[13];
-	if ((++_citrun_lines[14], (++_citrun_lines[14], 4 + 3)))
-		return (++_citrun_lines[15], 0);
+int main(void) {citrun_start();++_citrun[13];
+	if ((++_citrun[14], (++_citrun[14], 4 + 3)))
+		return (++_citrun[15], 0);
 }
 EOF
 

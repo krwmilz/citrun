@@ -83,9 +83,9 @@ InstrumentAction::EndSourceFileAction()
 		<< "extern \"C\" {\n"
 		<< "#endif\n";
 	preamble << runtime_h << "\n";
-	preamble << "static uint64_t _citrun_lines[" << num_lines << "];\n";
+	preamble << "static uint64_t _citrun[" << num_lines << "];\n";
 	preamble << "static struct citrun_node _citrun_node = {\n"
-		<< "	_citrun_lines,\n"
+		<< "	_citrun,\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"
 		<< "	\"" << file_name << "\",\n";

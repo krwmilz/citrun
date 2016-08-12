@@ -18,11 +18,11 @@ EOF
 cat <<EOF > while.c.inst_good
 int
 main(int argc, char *argv[])
-{citrun_start();++_citrun_lines[0];++_citrun_lines[1];++_citrun_lines[2];
+{citrun_start();++_citrun[0];++_citrun[1];++_citrun[2];
 	do {
 		argc++;
-	} while ((++_citrun_lines[5], (++_citrun_lines[5], argc != 10)));
-	return (++_citrun_lines[6], 0);
+	} while ((++_citrun[5], (++_citrun[5], argc != 10)));
+	return (++_citrun[6], 0);
 }
 EOF
 

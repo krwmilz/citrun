@@ -22,10 +22,10 @@ cat <<EOF > for.c.inst_good
 
 int
 main(int argc, char *argv[])
-{citrun_start();++_citrun_lines[2];++_citrun_lines[3];++_citrun_lines[4];
+{citrun_start();++_citrun[2];++_citrun[3];++_citrun[4];
 	for (;;);
 
-	for ((++_citrun_lines[7], argc = 0); (++_citrun_lines[7], (++_citrun_lines[7], argc < 10)); argc++)
+	for ((++_citrun[7], argc = 0); (++_citrun[7], (++_citrun[7], argc < 10)); argc++)
 		argv++;
 }
 EOF
