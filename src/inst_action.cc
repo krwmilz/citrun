@@ -13,18 +13,17 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
+#include "inst_action.h"
+#include "runtime_h.h"
+
 #include <clang/Frontend/CompilerInstance.h>
 #include <err.h>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-#include "inst_action.h"
-#include "runtime_h.h"
 
-using namespace std;
-
-unique_ptr<clang::ASTConsumer>
+std::unique_ptr<clang::ASTConsumer>
 InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRef file)
 {
 	// llvm::errs() << "** Creating AST consumer for: " << file << "\n";
@@ -33,13 +32,13 @@ InstrumentAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::StringRe
 
 	// Hang onto a reference to this so we can read from it later
 	m_InstrumentASTConsumer = new RewriteASTConsumer(m_TheRewriter);
-	return unique_ptr<clang::ASTConsumer>(m_InstrumentASTConsumer);
+	return std::unique_ptr<clang::ASTConsumer>(m_InstrumentASTConsumer);
 }
 
 void
 InstrumentAction::write_modified_src(clang::FileID const &fid)
 {
-	string out_file(getCurrentFile());
+	std::string out_file(getCurrentFile());
 
 	if (m_is_citruninst) {
 		out_file += ".citrun";
@@ -47,7 +46,7 @@ InstrumentAction::write_modified_src(clang::FileID const &fid)
 			<< out_file << "'.\n";
 	}
 
-	error_code ec;
+	std::error_code ec;
 	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
 	if (ec.value()) {
 		*m_log << m_pfx << "Error writing modified source: "
@@ -71,7 +70,7 @@ InstrumentAction::EndSourceFileAction()
 	clang::SourceLocation end = sm.getLocForEndOfFile(main_fid);
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
-	string const file_name = getCurrentFile();
+	std::string const file_name = getCurrentFile();
 
 	//
 	// Write instrumentation preamble. Includes:
@@ -79,27 +78,27 @@ InstrumentAction::EndSourceFileAction()
 	// - per tu citrun_node
 	// - static constructor for runtime initialization
 	//
-	ostringstream preamble;
-	preamble << "#ifdef __cplusplus" << endl
-		<< "extern \"C\" {" << endl
-		<< "#endif" << endl;
-	preamble << runtime_h << endl;
-	preamble << "static uint64_t _citrun_lines[" << num_lines << "];" << endl;
-	preamble << "static struct citrun_node _citrun_node = {" << endl
-		<< "	_citrun_lines," << endl
-		<< "	" << num_lines << "," << endl
-		<< "	\"" << m_compiler_file_name << "\"," << endl
-		<< "	\"" << file_name << "\"," << endl;
-	preamble << "};" << endl;
-	preamble << "__attribute__((constructor))" << endl
-		<< "static void citrun_constructor() {" << endl
-		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun_node);" << endl
-		<< "}" << endl;
-	preamble << "#ifdef __cplusplus" << endl
-		<< "}" << endl
-		<< "#endif" << endl;
+	std::ostringstream preamble;
+	preamble << "#ifdef __cplusplus\n"
+		<< "extern \"C\" {\n"
+		<< "#endif\n";
+	preamble << runtime_h << "\n";
+	preamble << "static uint64_t _citrun_lines[" << num_lines << "];\n";
+	preamble << "static struct citrun_node _citrun_node = {\n"
+		<< "	_citrun_lines,\n"
+		<< "	" << num_lines << ",\n"
+		<< "	\"" << m_compiler_file_name << "\",\n"
+		<< "	\"" << file_name << "\",\n";
+	preamble << "};\n";
+	preamble << "__attribute__((constructor))\n"
+		<< "static void citrun_constructor() {\n"
+		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun_node);\n"
+		<< "}\n";
+	preamble << "#ifdef __cplusplus\n"
+		<< "}\n"
+		<< "#endif\n";
 
-	string header = preamble.str();
+	std::string header = preamble.str();
 	unsigned header_sz = count(header.begin(), header.end(), '\n');
 
 	if (!m_is_citruninst && m_TheRewriter.InsertTextAfter(start, header)) {

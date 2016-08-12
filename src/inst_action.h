@@ -1,9 +1,10 @@
+#include "inst_visitor.h"
+
 #include <clang/AST/ASTConsumer.h>
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Tooling/Tooling.h>
 
-#include "inst_visitor.h"
 
 class RewriteASTConsumer : public clang::ASTConsumer {
 public:
