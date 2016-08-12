@@ -55,7 +55,7 @@ Instrumentation of '' finished:
     22 Lines of source code
     32 Lines of instrumentation header
     1 Functions called ''
-    5 Function definitions
+    2 Function definitions
     2 If statements
     4 Return statement values
     4 Call expressions

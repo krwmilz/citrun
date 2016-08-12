@@ -43,7 +43,7 @@ Totals:
         11 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
-         4 Function definitions
+         1 Function definitions
          1 For loops
         15 Total statements
 EOF

@@ -40,6 +40,7 @@ public:
 	{}
 
 	virtual bool TraverseStmt(clang::Stmt *);
+	virtual bool TraverseDecl(clang::Decl *);
 
 	bool VisitVarDecl(clang::VarDecl *d);
 	bool VisitStmt(clang::Stmt *s);

@@ -307,16 +307,16 @@ Totals:
     185689 Lines of source code
      12192 Lines of instrumentation header
        100 Functions called 'main'
-     32539 Function definitions
-     25154 If statements
-      2061 For loops
-      1442 While loops
-       411 Do while loops
+      6015 Function definitions
+     18733 If statements
+      1767 For loops
+      1117 While loops
+        81 Do while loops
        294 Switch statements
-     29334 Return statement values
-     57537 Call expressions
-   1539430 Total statements
-     19674 Errors rewriting source
+      7664 Return statement values
+     36340 Call expressions
+    904248 Total statements
+      7375 Errors rewriting source
 EOF
 
 system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/git-* > check.out");

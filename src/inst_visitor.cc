@@ -34,6 +34,16 @@ RewriteASTVisitor::TraverseStmt(clang::Stmt *s)
 }
 
 bool
+RewriteASTVisitor::TraverseDecl(clang::Decl *d)
+{
+	if (m_SM.isInMainFile(d->getLocStart()) == false)
+		return false;
+
+	RecursiveASTVisitor<RewriteASTVisitor>::TraverseDecl(d);
+	return true;
+}
+
+bool
 RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 {
 	return true;
