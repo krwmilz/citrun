@@ -721,15 +721,15 @@ Totals:
      24064 Lines of instrumentation header
         43 Functions called 'main'
       6722 Function definitions
-     25118 If statements
-      1482 For loops
-       476 While loops
-        76 Do while loops
-       333 Switch statements
-     10646 Return statement values
-     30962 Call expressions
-   1021053 Total statements
-     16352 Errors rewriting source
+     15969 If statements
+       877 For loops
+       277 While loops
+        47 Do while loops
+       275 Switch statements
+      7438 Return statement values
+     18751 Call expressions
+    419379 Total statements
+      2912 Errors rewriting source
 EOF
 
 system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/openssl-* > check.out");

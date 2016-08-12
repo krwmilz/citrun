@@ -151,15 +151,15 @@ Totals:
       3680 Lines of instrumentation header
          2 Functions called 'main'
        658 Function definitions
-      3255 If statements
-       347 For loops
-        58 While loops
-        12 Do while loops
-       161 Switch statements
-      1728 Return statement values
-      3476 Call expressions
-    196364 Total statements
-      3118 Errors rewriting source
+      1711 If statements
+       176 For loops
+        33 While loops
+         6 Do while loops
+       100 Switch statements
+       979 Return statement values
+      1646 Call expressions
+     49388 Total statements
+       353 Errors rewriting source
 EOF
 
 system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/nvi-* > check.out");

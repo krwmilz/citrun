@@ -26,7 +26,13 @@ RewriteASTVisitor::TraverseStmt(clang::Stmt *s)
 	if (s == NULL)
 		return true;
 
-	if (m_SM.isInMainFile(s->getLocStart()) == false)
+	clang::SourceLocation start_loc = s->getLocStart();
+	if (m_SM.isInMainFile(start_loc) == false)
+		return false;
+
+	// Instrumenting statement conditions in macros works perfectly.
+	// Instrumenting binary operators in macros does not work well.
+	if (clang::Lexer::isAtStartOfMacroExpansion(start_loc, m_SM, m_lopt))
 		return false;
 
 	RecursiveASTVisitor<RewriteASTVisitor>::TraverseStmt(s);
