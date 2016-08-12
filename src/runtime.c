@@ -52,13 +52,13 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 	}
 
 	/* Zeroed memory for double buffering line counts. */
-	n->old_lines = calloc(n->size, sizeof(uint64_t));
-	if (n->old_lines == NULL)
+	n->data_old = calloc(n->size, sizeof(uint64_t));
+	if (n->data_old == NULL)
 		err(1, "calloc");
 
 	/* Memory for buffering line differences. */
-	n->diffs = malloc(n->size * sizeof(uint32_t));
-	if (n->diffs == NULL)
+	n->data_diff = malloc(n->size * sizeof(uint32_t));
+	if (n->data_diff == NULL)
 		err(1, "malloc");
 
 	nodes_total++;
@@ -229,12 +229,12 @@ send_dynamic(int fd)
 		/* Find execution differences line at a time. */
 		flag = 0;
 		for (line = 0; line < w->size; line++) {
-			cur_lines = w->lines_ptr[line];
-			old_lines = w->old_lines[line];
+			cur_lines = w->data[line];
+			old_lines = w->data_old[line];
 			assert(cur_lines >= old_lines);
 
 			diff64 = cur_lines - old_lines;
-			w->old_lines[line] = cur_lines;
+			w->data_old[line] = cur_lines;
 
 			if (diff64 > UINT32_MAX)
 				diff = UINT32_MAX;
@@ -242,7 +242,7 @@ send_dynamic(int fd)
 				diff = diff64;
 
 			/* Store diffs so we can send a big buffer later. */
-			w->diffs[line] = diff;
+			w->data_diff[line] = diff;
 			if (diff > 0)
 				flag = 1;
 		}
@@ -252,7 +252,7 @@ send_dynamic(int fd)
 
 		/* Sometimes write the diffs buffer. */
 		if (flag == 1)
-			xwrite(fd, w->diffs, w->size * sizeof(diff));
+			xwrite(fd, w->data_diff, w->size * sizeof(diff));
 	}
 	assert(i == nodes_total);
 	assert(w == NULL);
