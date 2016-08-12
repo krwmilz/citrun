@@ -4,6 +4,7 @@ function setup
 	trap "rm -rf $tmpdir" EXIT
 	echo "ok 1 - tmp dir created"
 
-	export PATH="`pwd`/src:${PATH}"
+	export CITRUN_TOOLS="`pwd`/src";
+	export PATH="${CITRUN_TOOLS}:${PATH}"
 	cd $tmpdir
 }

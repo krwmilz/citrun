@@ -45,7 +45,7 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 
 	/* Instrumented code and the runtime it links to are tightly bound. */
 	if (node_major != citrun_major || node_minor != citrun_minor) {
-		warnx("libcitrun-%i.%i: Node has mismatched version '%i.%i'",
+		warnx("libcitrun %i.%i: node with version %i.%i skipped",
 			citrun_major, citrun_minor,
 			node_major, node_minor);
 		return;
