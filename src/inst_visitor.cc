@@ -168,5 +168,5 @@ clang::SourceLocation
 RewriteASTVisitor::real_loc_end(clang::Stmt *d)
 {
 	clang::SourceLocation _e(d->getLocEnd());
-	return clang::SourceLocation(clang::Lexer::getLocForEndOfToken(_e, 0, m_SM, m_lopt));
+	return clang::Lexer::getLocForEndOfToken(_e, 0, m_SM, m_lopt);
 }
