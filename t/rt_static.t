@@ -1,6 +1,6 @@
 use strict;
 use Cwd;
-use Test::More tests => 22;
+use Test::More tests => 21;
 use test::project;
 use test::viewer;
 
@@ -13,7 +13,6 @@ $viewer->accept();
 is( $viewer->{maj}, 	0,	"protocol major version" );
 is( $viewer->{min}, 	0,	"protocol minor version" );
 is( $viewer->{ntus},	3,	"translation unit count" );
-is( $viewer->{nlines},	40,	"total program lines" );
 is( $viewer->{progname}, "program", "program name" );
 is( $viewer->{cwd},	getcwd,	"current working dir" );
 is( @{ $viewer->{pids} },	3,	"number of pids" );

@@ -32,7 +32,6 @@ RuntimeProcess::RuntimeProcess(af_unix &sock) :
 	assert(m_major == citrun_major);
 	m_socket.read_all(m_minor);
 	m_socket.read_all(m_num_tus);
-	m_socket.read_all(m_lines_total);
 	m_socket.read_all(m_pid);
 	m_socket.read_all(m_ppid);
 	m_socket.read_all(m_pgrp);

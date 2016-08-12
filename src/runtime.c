@@ -32,7 +32,6 @@
 
 static struct citrun_node	*nodes_head;
 static uint32_t			 nodes_total;
-static uint32_t			 lines_total;
 
 static void *relay_thread(void *);
 
@@ -46,10 +45,9 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 
 	/* Instrumented code and the runtime it links to are tightly bound. */
 	if (node_major != citrun_major || node_minor != citrun_minor) {
-		warnx("libcitrun (v%i.%i): Node '%s' has mismatched version (v%i.%i)",
+		warnx("libcitrun-%i.%i: Node has mismatched version '%i.%i'",
 			citrun_major, citrun_minor,
-			n->abs_file_path, node_major, node_minor);
-		warnx("libcitrun: Try cleaning all object files and reinstrumenting.");
+			node_major, node_minor);
 		return;
 	}
 
@@ -64,7 +62,6 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 		err(1, "malloc");
 
 	nodes_total++;
-	lines_total += n->size;
 
 	/* If the list is empty or we need to replace the list head */
 	if (nodes_head == NULL || nodes_head->size >= n->size) {
@@ -148,7 +145,6 @@ xwrite(int d, const void *buf, size_t bytes_total)
  * Sent program wide values:
  * - version major and minor
  * - total number of translation units
- * - total number of lines in program
  * - process id, parent process id, group process id
  * - length of program name
  * - program name
@@ -177,7 +173,6 @@ send_static(int fd)
 	xwrite(fd, &citrun_major, sizeof(citrun_major));
 	xwrite(fd, &citrun_minor, sizeof(citrun_minor));
 	xwrite(fd, &nodes_total, sizeof(nodes_total));
-	xwrite(fd, &lines_total, sizeof(lines_total));
 
 	pids[0] = getpid();
 	pids[1] = getppid();

@@ -182,7 +182,6 @@ window::next_frame(View *vu)
 
 		std::stringstream ss;
 		ss << "program name:\t" << conn->m_progname << std::endl;
-		ss << "code lines:\t" << conn->m_lines_total << std::endl;
 		ss << "trnsltn units:\t" << conn->m_num_tus << std::endl;
 		ss << "process id:\t" << conn->m_pid << std::endl;
 		ss << "parent pid:\t" << conn->m_ppid << std::endl;

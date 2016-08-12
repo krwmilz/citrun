@@ -31,7 +31,7 @@ sub accept {
 	# Protocol defined in src/runtime.c function send_static().
 	#
 	($self->{maj}, $self->{min}) = read_unpack($sock, 2, "C2");
-	($self->{ntus}, $self->{nlines}) = read_unpack($sock, 8, "L2");
+	($self->{ntus}) = read_unpack($sock, 4, "L");
 	@{ $self->{pids} } =	read_unpack($sock, 12, "L3");
 	$self->{progname} =	read_all($sock, read_unpack($sock, 2, "S"));
 	$self->{cwd} =		read_all($sock, read_unpack($sock, 2, "S"));

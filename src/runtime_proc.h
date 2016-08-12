@@ -25,7 +25,6 @@ public:
 	std::string	m_progname;
 	std::string	m_cwd;
 	uint32_t	m_num_tus;
-	uint32_t	m_lines_total;
 	pid_t		m_pid;
 	pid_t		m_ppid;
 	pid_t		m_pgrp;
