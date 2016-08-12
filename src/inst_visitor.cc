@@ -69,7 +69,7 @@ RewriteASTVisitor::VisitVarDecl(clang::VarDecl *d)
 bool
 RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 {
-	m_counters[TOTAL_STMT]++;
+	++m_counters[TOTAL_STMT];
 	return true;
 }
 
@@ -148,12 +148,12 @@ RewriteASTVisitor::modify_stmt(clang::Stmt *s, int &counter)
 
 	if (m_TheRewriter.InsertTextBefore(s->getLocStart(), ss.str())) {
 		// writing failed, don't attempt to add ")"
-		m_counters[REWRITE_ERROR]++;
+		++m_counters[REWRITE_ERROR];
 		return false;
 	}
 	m_TheRewriter.InsertTextAfter(real_loc_end(s), ")");
 
-	counter++;
+	++counter;
 	return true;
 }
 
@@ -169,7 +169,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// main() is a special case because it must start the runtime thread.
 	clang::DeclarationName DeclName = f->getNameInfo().getName();
 	if (DeclName.getAsString() == "main") {
-		m_counters[FUNC_MAIN]++;
+		++m_counters[FUNC_MAIN];
 		rewrite_text << "citrun_start();";
 	}
 
@@ -179,13 +179,13 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	// Animate function calls by firing the entire declaration.
 	int decl_start = m_SM.getPresumedLineNumber(f->getLocStart());
 	int decl_end = m_SM.getPresumedLineNumber(curly_brace);
-	for (int i = decl_start; i <= decl_end; i++)
+	for (int i = decl_start; i <= decl_end; ++i)
 		rewrite_text << "++_citrun_lines[" << i - 1 << "];";
 
 	// Rewrite the function source right after the beginning curly brace.
 	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());
 
-	m_counters[FUNC_DEF]++;
+	++m_counters[FUNC_DEF];
 	return true;
 }
 
