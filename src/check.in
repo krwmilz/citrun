@@ -45,7 +45,8 @@ FINE[8]="Switch statements"
 FINE[9]="Return statement values"
 FINE[10]="Call expressions"
 FINE[11]="Total statements"
-FINE[12]="Errors rewriting source"
+FINE[12]="Binary operators"
+FINE[13]="Errors rewriting source"
 fine_len=${#FINE[@]}
 
 echo -n Checking .

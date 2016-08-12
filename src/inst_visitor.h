@@ -13,6 +13,7 @@ enum counters {
 	RET_STMT_VAL,
 	CALL_EXPR,
 	TOTAL_STMT,
+	BIN_OPER,
 	REWRITE_ERROR,
 	NCOUNTERS
 };
@@ -32,6 +33,7 @@ public:
 				"Return statement values",
 				"Call expressions",
 				"Total statements",
+				"Binary operators",
 				"Errors rewriting source code"
 				}),
 		m_TheRewriter(R),

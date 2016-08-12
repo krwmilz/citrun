@@ -17,8 +17,6 @@ main(int argc, char *argv[])
 
 	if ((argc = 2))
 		return 5;
-	if (argc && argc + 1)
-		return 0;
 	else
 		exit(0);
 }
@@ -30,17 +28,15 @@ cat <<EOF > if.c.inst_good
 int
 main(int argc, char *argv[])
 {citrun_start();++_citrun_lines[2];++_citrun_lines[3];++_citrun_lines[4];
-	if ((++_citrun_lines[5], argc == 1))
+	if ((++_citrun_lines[5], (++_citrun_lines[5], argc == 1)))
 		return (++_citrun_lines[6], 1);
 	else
 		(++_citrun_lines[8], exit(14));
 
-	if ((++_citrun_lines[10], (argc = 2)))
+	if ((++_citrun_lines[10], ((++_citrun_lines[10], argc = 2))))
 		return (++_citrun_lines[11], 5);
-	if ((++_citrun_lines[12], argc && argc + 1))
-		return (++_citrun_lines[13], 0);
 	else
-		(++_citrun_lines[15], exit(0));
+		(++_citrun_lines[13], exit(0));
 }
 EOF
 
@@ -54,14 +50,15 @@ Summary:
          1 Instrument successes
 
 Totals:
-        18 Lines of source code
+        16 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
-         3 If statements
-         3 Return statement values
+         2 If statements
+         2 Return statement values
          2 Call expressions
-        33 Total statements
+        23 Total statements
+         2 Binary operators
 EOF
 
 citrun-inst -c if.c

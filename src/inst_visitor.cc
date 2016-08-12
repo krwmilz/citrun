@@ -104,6 +104,12 @@ RewriteASTVisitor::VisitStmt(clang::Stmt *s)
 	else if (clang::isa<clang::CallExpr>(s)) {
 		modify_stmt(s, m_counters[CALL_EXPR]);
 	}
+	else if (clang::isa<clang::BinaryOperator>(s)) {
+		// If we can't rewrite the last token, don't even start.
+		if (s->getLocEnd().isMacroID())
+			return true;
+		modify_stmt(s, m_counters[BIN_OPER]);
+	}
 
 	return true;
 }

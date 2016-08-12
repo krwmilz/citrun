@@ -86,6 +86,7 @@ Totals:
         89 Return statement values
       1097 Call expressions
      16820 Total statements
+      1559 Binary operators
          6 Errors rewriting source
 EOF
 

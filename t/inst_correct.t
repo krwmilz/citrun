@@ -51,6 +51,7 @@ Totals:
          5 Return statement values
          4 Call expressions
         58 Total statements
+         7 Binary operators
 EOF
 
 cc -o fib fib.c

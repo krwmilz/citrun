@@ -25,7 +25,7 @@ main(int argc, char *argv[])
 {citrun_start();++_citrun_lines[2];++_citrun_lines[3];++_citrun_lines[4];
 	for (;;);
 
-	for (argc = 0; (++_citrun_lines[7], argc < 10); argc++)
+	for ((++_citrun_lines[7], argc = 0); (++_citrun_lines[7], (++_citrun_lines[7], argc < 10)); argc++)
 		argv++;
 }
 EOF
@@ -46,6 +46,7 @@ Totals:
          1 Function definitions
          1 For loops
         15 Total statements
+         2 Binary operators
 EOF
 
 citrun-inst -c for.c

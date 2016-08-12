@@ -60,6 +60,7 @@ Instrumentation of '' finished:
     4 Return statement values
     4 Call expressions
     58 Total statements
+    6 Binary operators
 Modified source written successfully.
 Instrumentation successful.
 Running native compiler on modified source code.

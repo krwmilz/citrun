@@ -20,10 +20,10 @@ cat <<EOF > while.c.inst_good
 int
 main(int argc, char *argv[])
 {citrun_start();++_citrun_lines[0];++_citrun_lines[1];++_citrun_lines[2];
-	while ((++_citrun_lines[3], argc < 17))
+	while ((++_citrun_lines[3], (++_citrun_lines[3], argc < 17)))
 		argc++;
 
-	while ((++_citrun_lines[6], (argc && argv)));
+	while ((++_citrun_lines[6], ((++_citrun_lines[6], argc && argv))));
 	return (++_citrun_lines[7], 0);
 }
 EOF
@@ -45,6 +45,7 @@ Totals:
          2 While loops
          1 Return statement values
         18 Total statements
+         2 Binary operators
 EOF
 
 citrun-inst -c while.c

@@ -21,7 +21,7 @@ main(int argc, char *argv[])
 {citrun_start();++_citrun_lines[0];++_citrun_lines[1];++_citrun_lines[2];
 	do {
 		argc++;
-	} while ((++_citrun_lines[5], argc != 10));
+	} while ((++_citrun_lines[5], (++_citrun_lines[5], argc != 10)));
 	return (++_citrun_lines[6], 0);
 }
 EOF
@@ -43,10 +43,10 @@ Totals:
          1 Do while loops
          1 Return statement values
         11 Total statements
+         1 Binary operators
 EOF
 
 citrun-inst -c while.c
-cat citrun.log
 citrun-check > check.out
 
 diff -u while.c.inst_good while.c.citrun && echo "ok 2 - instrumented source diff"
