@@ -64,8 +64,8 @@ Totals:
          1 Binary operators
 EOF
 
-citrun-inst -c enum.c
-citrun-check > check.out
+$TEST_TOOLS/citrun-inst -c enum.c
+$TEST_TOOLS/citrun-check > check.out
 
 diff -u enum.c.inst_good enum.c.citrun && echo "ok 2 - instrumented source diff"
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

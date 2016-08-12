@@ -15,7 +15,7 @@ main(int argc, char *argv[])
 EOF
 
 /usr/bin/cc -c main.c
-/usr/bin/cc -o main main.o -pthread $CITRUN_TOOLS/libcitrun.a
+/usr/bin/cc -o main main.o -pthread $TEST_TOOLS/libcitrun.a
 
 export CITRUN_SOCKET=
 main 2> out

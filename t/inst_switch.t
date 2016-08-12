@@ -57,8 +57,8 @@ Totals:
         14 Total statements
 EOF
 
-citrun-inst -c switch.c
-citrun-check > check.out
+$TEST_TOOLS/citrun-inst -c switch.c
+$TEST_TOOLS/citrun-check > check.out
 
 diff -u switch.c.inst_good switch.c.citrun && echo "ok 2 - instrumented source diff"
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

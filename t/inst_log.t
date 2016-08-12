@@ -34,7 +34,7 @@ Main program : source_0.c ;
 EOF
 echo "ok 3 - Jamfile wrote"
 
-jam && echo "ok 4 - source compiled"
+$TEST_TOOLS/citrun-wrap jam && echo "ok 4 - source compiled"
 
 sed	-e "s,^.*: ,,"	\
 	-e "s,'.*','',"	\

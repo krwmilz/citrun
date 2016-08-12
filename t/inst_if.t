@@ -61,8 +61,8 @@ Totals:
          2 Binary operators
 EOF
 
-citrun-inst -c if.c
-citrun-check > check.out
+$TEST_TOOLS/citrun-inst -c if.c
+$TEST_TOOLS/citrun-check > check.out
 
 diff -u if.c.inst_good if.c.citrun && echo "ok 2 - instrumented source diff"
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

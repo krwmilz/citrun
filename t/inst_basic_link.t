@@ -15,10 +15,10 @@ echo "ok 2 - source files wrote"
 
 # Check that a command as simple as this works.
 #
-cc main.c
+$TEST_TOOLS/citrun-wrap cc main.c
 echo "ok 3 - source compiled"
 
-citrun-check > citrun-check.txt
+$TEST_TOOLS/citrun-check > citrun-check.txt
 echo "ok 4 - processed citrun.log"
 
 cat <<EOF > citrun-check.txt.good

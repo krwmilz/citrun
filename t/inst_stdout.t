@@ -36,8 +36,8 @@ Totals:
          9 Total statements
 EOF
 
-cc -o hello hello.c
-citrun-check > check.out
+$TEST_TOOLS/citrun-wrap cc -o hello hello.c
+$TEST_TOOLS/citrun-check > check.out
 
 export CITRUN_SOCKET=
 [ "`./hello`" = "hello, world!" ] && echo ok program prints

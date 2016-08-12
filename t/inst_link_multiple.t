@@ -38,9 +38,8 @@ cat <<EOF > Jamfile
 Main program : one.c two.c three.c ;
 EOF
 
-jam && echo "ok - source compiled"
-
-citrun-check > check.out && echo ok
+$TEST_TOOLS/citrun-wrap jam && echo "ok - source compiled"
+$TEST_TOOLS/citrun-check > check.out && echo ok
 
 cat <<EOF > check.good
 Checking ..done

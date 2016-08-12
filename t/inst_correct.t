@@ -54,8 +54,8 @@ Totals:
          7 Binary operators
 EOF
 
-cc -o fib fib.c
-citrun-check > check.out
+$TEST_TOOLS/citrun-wrap cc -o fib fib.c
+$TEST_TOOLS/citrun-check > check.out
 
 diff -u check.good check.out && echo "ok 2 citrun.log diff"
 

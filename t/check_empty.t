@@ -4,7 +4,7 @@ echo 1..2
 . test/utils.sh
 setup
 
-citrun-check > check.out
+$TEST_TOOLS/citrun-check > check.out
 
 cat <<EOF > check.good
 Checking .done

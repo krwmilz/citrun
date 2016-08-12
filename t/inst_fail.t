@@ -1,18 +1,13 @@
 #!/bin/sh
+echo 1..3
 
-echo 1..2
+. test/utils.sh
+setup
 
-tmpfile=`mktemp`
-logfile=`mktemp`
+echo "int main(void) { return 0; " > bad.c
 
-echo "int main(void) { return 0; " > $tmpfile.c
+$TEST_TOOLS/citrun-wrap gcc -c bad.c 2> err.out
+[ $? -eq 1 ] && echo ok 2
+grep -q "error: expected" err.out && echo ok 3
 
-export PATH="`pwd`/src:${PATH}"
-gcc -c $tmpfile.c 2> $logfile
-
-[ $? -eq 1 ] && echo ok 1
-grep -q "error: expected" $logfile && echo ok 2
-
-rm $tmpfile.c
-rm $tmpfile
-rm $logfile
+$TEST_TOOLS/citrun-check
