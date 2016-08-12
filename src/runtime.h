@@ -1,6 +1,6 @@
 #include <stdint.h>
-static uint8_t citrun_major =	 0;
-static uint8_t citrun_minor =	 0;
+static const uint8_t citrun_major =	 0;
+static const uint8_t citrun_minor =	 0;
 struct citrun_node {
 	uint64_t		*data;
 	uint32_t		 size;
