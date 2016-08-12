@@ -705,7 +705,7 @@ $viewer->close();
 
 open( my $fh, ">", "check.good" );
 print $fh <<EOF;
-Checking ...done
+Checking ...........................................................done
 
 Summary:
         58 Log files found
@@ -721,15 +721,15 @@ Totals:
      24064 Lines of instrumentation header
         43 Functions called 'main'
      10574 Function definitions
-     25212 If statements
-      1486 For loops
+     25118 If statements
+      1482 For loops
        476 While loops
         76 Do while loops
-       334 Switch statements
-     10801 Return statement values
-     31196 Call expressions
-   2611342 Total statements
-     16412 Errors rewriting source
+       333 Switch statements
+     10646 Return statement values
+     30962 Call expressions
+   1770286 Total statements
+     16352 Errors rewriting source
 EOF
 
 system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/openssl-* > check.out");

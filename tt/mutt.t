@@ -139,14 +139,14 @@ Totals:
       6976 Lines of instrumentation header
        102 Functions called 'main'
       4199 Function definitions
-      7746 If statements
+      7536 If statements
        658 For loops
-       568 While loops
+       470 While loops
         52 Do while loops
        147 Switch statements
-      3279 Return statement values
-     12037 Call expressions
-    431223 Total statements
+      2715 Return statement values
+     11739 Call expressions
+    376507 Total statements
       5826 Errors rewriting source
 EOF
 
