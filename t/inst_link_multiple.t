@@ -7,9 +7,7 @@ setup
 cat <<EOF > one.c
 void second_func();
 
-int
-main(void)
-{
+int main(void) {
 	second_func();
 	return 0;
 }
@@ -18,18 +16,14 @@ EOF
 cat <<EOF > two.c
 void third_func();
 
-void
-second_func(void)
-{
+void second_func(void) {
 	third_func();
 	return;
 }
 EOF
 
 cat <<EOF > three.c
-void
-third_func(void)
-{
+void third_func(void) {
 	return;
 }
 EOF
@@ -53,7 +47,7 @@ Summary:
          1 Application link commands
 
 Totals:
-        24 Lines of source code
+        18 Lines of source code
         96 Lines of instrumentation header
          1 Functions called 'main'
          3 Function definitions

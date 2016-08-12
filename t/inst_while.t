@@ -1,13 +1,14 @@
 #!/bin/sh -e
+#
+# Make sure that while loop condition instrumentation works.
+#
 echo 1..3
 
 . test/utils.sh
 setup
 
 cat <<EOF > while.c
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	while (argc < 17)
 		argc++;
 
@@ -17,14 +18,12 @@ main(int argc, char *argv[])
 EOF
 
 cat <<EOF > while.c.inst_good
-int
-main(int argc, char *argv[])
-{citrun_start();++_citrun[0];++_citrun[1];++_citrun[2];
-	while ((++_citrun[3], (++_citrun[3], argc < 17)))
+int main(int argc, char *argv[]) {citrun_start();++_citrun[0];
+	while ((++_citrun[1], (++_citrun[1], argc < 17)))
 		argc++;
 
-	while ((++_citrun[6], ((++_citrun[6], argc && argv))));
-	return (++_citrun[7], 0);
+	while ((++_citrun[4], ((++_citrun[4], argc && argv))));
+	return (++_citrun[5], 0);
 }
 EOF
 
@@ -38,7 +37,7 @@ Summary:
          1 Instrument successes
 
 Totals:
-        10 Lines of source code
+         8 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions

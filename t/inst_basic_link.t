@@ -5,11 +5,7 @@ echo 1..5
 setup
 
 cat <<EOF > main.c
-int
-main(void)
-{
-	return 0;
-}
+int main(void) { return 0; }
 EOF
 echo "ok 2 - source files wrote"
 
@@ -33,7 +29,7 @@ Summary:
          1 Application link commands
 
 Totals:
-         6 Lines of source code
+         2 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions

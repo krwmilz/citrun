@@ -7,9 +7,7 @@ setup
 cat <<EOF > hello.c
 #include <stdio.h>
 
-int
-main(void)
-{
+int main(void) {
 	printf("hello, world!");
 	return 0;
 }
@@ -27,7 +25,7 @@ Summary:
          1 Application link commands
 
 Totals:
-         9 Lines of source code
+         7 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions

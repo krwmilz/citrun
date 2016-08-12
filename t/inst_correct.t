@@ -7,9 +7,7 @@ setup
 cat <<EOF > fib.c
 #include <stdlib.h>
 
-int
-fibonacci(int n)
-{
+int fibonacci(int n) {
 	if (n == 0)
 		return 0;
 	else if (n == 1)
@@ -18,9 +16,7 @@ fibonacci(int n)
 	return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int n;
 
 	if (argc != 2)
@@ -43,7 +39,7 @@ Summary:
          1 Application link commands
 
 Totals:
-        25 Lines of source code
+        21 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
          2 Function definitions

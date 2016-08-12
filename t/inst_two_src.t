@@ -5,17 +5,13 @@ echo 1..3
 setup
 
 cat <<EOF > main.c
-int
-main(void)
-{
+int main(void) {
 	return 0;
 }
 EOF
 
 cat <<EOF > other.c
-int
-other(void)
-{
+int other(void) {
 	return 0;
 }
 EOF
@@ -32,7 +28,7 @@ Summary:
          1 Application link commands
 
 Totals:
-        12 Lines of source code
+         8 Lines of source code
         64 Lines of instrumentation header
          1 Functions called 'main'
          2 Function definitions

@@ -1,13 +1,14 @@
 #!/bin/sh -e
+#
+# Make sure that switch statement condition instrumentation works.
+#
 echo 1..3
 
 . test/utils.sh
 setup
 
 cat <<EOF > switch.c
-int
-main(void)
-{
+int main(void) {
 	int i;
 
 	switch (i) {
@@ -22,19 +23,17 @@ main(void)
 EOF
 
 cat <<EOF > switch.c.inst_good
-int
-main(void)
-{citrun_start();++_citrun[0];++_citrun[1];++_citrun[2];
+int main(void) {citrun_start();++_citrun[0];
 	int i;
 
-	switch ((++_citrun[5], i)) {
+	switch ((++_citrun[3], i)) {
 	case 0:
 		break;
 	case 1:
 		break;
 	}
 
-	return (++_citrun[12], 0);
+	return (++_citrun[10], 0);
 }
 EOF
 
@@ -48,7 +47,7 @@ Summary:
          1 Instrument successes
 
 Totals:
-        15 Lines of source code
+        13 Lines of source code
         32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
