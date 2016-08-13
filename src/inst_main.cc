@@ -39,10 +39,8 @@
 
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
-InstrumentLogger llog;
-
 int
-clean_PATH()
+clean_PATH(InstrumentLogger &llog)
 {
 	char *path;
 	if ((path = std::getenv("PATH")) == NULL) {
@@ -86,7 +84,7 @@ clean_PATH()
 }
 
 void
-print_toolinfo(const char *argv0)
+print_toolinfo(InstrumentLogger &llog, const char *argv0)
 {
 	struct utsname utsname;
 
@@ -116,9 +114,8 @@ main(int argc, char *argv[])
 	if (std::strcmp(base_name, "citrun-inst") == 0)
 		is_citruninst = true;
 
-	llog.set_output(is_citruninst);
-
-	print_toolinfo(argv[0]);
+	InstrumentLogger llog(is_citruninst);
+	print_toolinfo(llog, argv[0]);
 
 	if (std::strcmp(base_name, argv[0]) != 0) {
 		llog << "Changing '" << argv[0] << "' to '" << base_name << "'.\n";
@@ -127,7 +124,7 @@ main(int argc, char *argv[])
 
 	setprogname("citrun-inst");
 
-	if (is_citruninst == false && clean_PATH() != 0)
+	if (is_citruninst == false && clean_PATH(llog) != 0)
 		// We were not called as citrun-inst and path cleaning failed.
 		return 1;
 
