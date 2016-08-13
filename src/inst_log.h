@@ -11,6 +11,11 @@ public:
 		m_pid(getpid()),
 		m_needs_prefix(true)
 	{};
+	InstrumentLogger(InstrumentLogger &o) :
+		m_pid(o.m_pid),
+		m_output(o.m_output),
+		m_needs_prefix(o.m_needs_prefix)
+	{}
 	//~InstrumentLogger()
 	//{ llvm::errs() << "~InstrumentLogger()\n"; };
 
@@ -52,6 +57,7 @@ public:
 
 	pid_t			 m_pid;
 	llvm::raw_ostream	*m_output;
+	bool		 	 m_needs_prefix;
 
 private:
 	void print_prefix() {
@@ -65,8 +71,6 @@ private:
 		if (std::find(rhs.begin(), rhs.end(), '\n') != rhs.end())
 			m_needs_prefix = true;
 	};
-
-	bool		 	 m_needs_prefix;
 };
 
 #endif // _INST_LOG_H_

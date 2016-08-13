@@ -5,7 +5,7 @@
 
 class CitrunInst {
 public:
-	CitrunInst(int, char *argv[], InstrumentLogger *, bool);
+	CitrunInst(int, char *argv[], InstrumentLogger &, bool);
 
 	void			clean_PATH();
 	void			process_cmdline();
@@ -20,7 +20,7 @@ private:
 	int			try_unmodified_compile();
 
 	std::vector<char *>	m_args;
-	InstrumentLogger	*m_log;
+	InstrumentLogger	m_log;
 	bool			m_is_citruninst;
 	std::vector<std::string> m_source_files;
 	std::map<std::string, std::string> m_temp_file_map;
@@ -31,7 +31,7 @@ private:
 //
 class InstrumentActionFactory : public clang::tooling::FrontendActionFactory {
 public:
-	InstrumentActionFactory(InstrumentLogger *log, bool citruninst,
+	InstrumentActionFactory(InstrumentLogger &log, bool citruninst,
 			std::vector<std::string> const &src_files) :
 		m_log(log),
 		m_is_citruninst(citruninst),
@@ -44,7 +44,7 @@ public:
 	}
 
 private:
-	InstrumentLogger	*m_log;
+	InstrumentLogger	 m_log;
 	bool			 m_is_citruninst;
 	std::vector<std::string> m_source_files;
 	int			 m_i;
