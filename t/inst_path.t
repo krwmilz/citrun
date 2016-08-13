@@ -4,7 +4,7 @@
 # - not having PATH set errors
 # - not having CITRUN_SHARE in PATH when using transparent compile mode errors
 #
-echo 1..6
+echo 1..5
 
 #
 # This test is a little special. It unsets PATH and sets it to the empty string,
