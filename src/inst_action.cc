@@ -42,14 +42,14 @@ InstrumentAction::write_modified_src(clang::FileID const &fid)
 
 	if (m_is_citruninst) {
 		out_file += ".citrun";
-		*m_log << m_pfx << "Writing modified source to '"
+		*m_log << "Writing modified source to '"
 			<< out_file << "'.\n";
 	}
 
 	std::error_code ec;
 	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
 	if (ec.value()) {
-		*m_log << m_pfx << "Error writing modified source: "
+		*m_log << "Error writing modified source: "
 			<< ec.message() << "\n";
 		warnx("'%s': %s", out_file.c_str(), ec.message().c_str());
 		return;
@@ -57,7 +57,7 @@ InstrumentAction::write_modified_src(clang::FileID const &fid)
 
 	// Write the instrumented source file
 	m_TheRewriter.getEditBuffer(fid).write(output);
-	*m_log << m_pfx << "Modified source written successfully.\n";
+	*m_log << "Modified source written successfully.\n";
 }
 
 void
@@ -102,23 +102,23 @@ InstrumentAction::EndSourceFileAction()
 	unsigned header_sz = count(header.begin(), header.end(), '\n');
 
 	if (!m_is_citruninst && m_TheRewriter.InsertTextAfter(start, header)) {
-		*m_log << m_pfx << "Failed inserting " << header_sz
+		*m_log << "Failed inserting " << header_sz
 			<< " lines of instrumentation preabmle.";
 		return;
 	}
 
-	*m_log << m_pfx << "Instrumentation of '" << m_compiler_file_name << "' finished:\n";
-	*m_log << m_pfx << "    " << num_lines << " Lines of source code\n";
-	*m_log << m_pfx << "    " << header_sz << " Lines of instrumentation header\n";
+	*m_log << "Instrumentation of '" << m_compiler_file_name << "' finished:\n";
+	*m_log << "    " << num_lines << " Lines of source code\n";
+	*m_log << "    " << header_sz << " Lines of instrumentation header\n";
 
 	//
 	// Write out statistics from the AST visitor.
 	//
 	RewriteASTVisitor v = m_InstrumentASTConsumer->get_visitor();
-	for (int i = 0; i < NCOUNTERS; i++) {
+	for (int i = 0; i < NCOUNTERS; ++i) {
 		if (v.m_counters[i] == 0)
 			continue;
-		*m_log << m_pfx << "    " << v.m_counters[i] << " "
+		*m_log << "    " << v.m_counters[i] << " "
 			<< v.m_counter_descr[i] << "\n";
 	}
 

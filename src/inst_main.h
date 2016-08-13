@@ -40,7 +40,7 @@ public:
 	{};
 
 	clang::ASTFrontendAction *create() {
-		return new InstrumentAction((llvm::raw_fd_ostream*)m_log->m_output, "", m_is_citruninst, m_source_files[m_i++]);
+		return new InstrumentAction(m_log, m_is_citruninst, m_source_files[m_i++]);
 	}
 
 private:

@@ -1,4 +1,9 @@
+#ifndef __INST_LOG_H_
+#define __INST_LOG_H_
+
+#include <err.h>
 #include <llvm/Support/raw_ostream.h>
+#include <unistd.h>		// getpid
 
 class InstrumentLogger {
 public:
@@ -6,8 +11,8 @@ public:
 		m_pid(getpid()),
 		m_needs_prefix(true)
 	{};
-	~InstrumentLogger()
-	{ std::cerr << "~InstrumentLogger()" << std::endl; };
+	//~InstrumentLogger()
+	//{ llvm::errs() << "~InstrumentLogger()\n"; };
 
 	void set_output(const bool &is_citruninst) {
 
@@ -63,3 +68,5 @@ private:
 
 	bool		 	 m_needs_prefix;
 };
+
+#endif // _INST_LOG_H_
