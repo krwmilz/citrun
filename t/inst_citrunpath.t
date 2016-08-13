@@ -1,5 +1,5 @@
 #!/bin/sh
-
+#
 # Test that not having CITRUN_PATH (defined at build) in PATH errors out.
 #
 echo 1..1
