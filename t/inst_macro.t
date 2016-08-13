@@ -37,15 +37,14 @@ Summary:
 
 Totals:
          7 Lines of source code
-        32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
          1 Return statement values
          7 Total statements
 EOF
 
-$TEST_TOOLS/citrun-inst -c macro.c
+$TEST_TOOLS/citrun-inst -c macro.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u macro.c.inst_good macro.c.citrun && echo "ok 2 - instrumented source diff"
+inst_diff macro.c 2
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

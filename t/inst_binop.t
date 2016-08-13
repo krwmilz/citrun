@@ -1,4 +1,7 @@
-#!/bin/sh -e
+#!/bin/sh
+#
+# Test that binary operators in strange cases work. Includes enums and globals.
+#
 echo 1..3
 
 . test/utils.sh
@@ -55,7 +58,6 @@ Summary:
 
 Totals:
         18 Lines of source code
-        32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
          1 If statements
@@ -64,8 +66,8 @@ Totals:
          1 Binary operators
 EOF
 
-$TEST_TOOLS/citrun-inst -c enum.c
+$TEST_TOOLS/citrun-inst -c enum.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u enum.c.inst_good enum.c.citrun && echo "ok 2 - instrumented source diff"
+inst_diff enum.c 2
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

@@ -12,7 +12,7 @@ fi
 [ -d $dir ] || err "$dir: no such directory"
 
 GREP[1]="Found source file"
-GREP[2]="citrun-inst v"
+GREP[2]="Tool called as "
 GREP[3]="Forked "
 GREP[4]="Instrumentation successful"
 GREP[5]="And the native compile failed"

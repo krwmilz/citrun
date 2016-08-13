@@ -93,14 +93,14 @@ print_toolinfo(const char *argv0)
 	struct utsname utsname;
 	if (uname(&utsname) == -1) {
 		warn("uname");
-		llog << "(?) ";
+		llog << "(Unknown OS)\n";
 	} else {
 		llog << "("
 			<< utsname.sysname << "-"
 			<< utsname.release << " "
-			<< utsname.machine << ") ";
+			<< utsname.machine << ")\n";
 	}
-	llog << "called as '" << argv0 << "'.\n";
+	llog << "Tool called as '" << argv0 << "'.\n";
 	llog << "Resource directory is '" << STR(CITRUN_SHARE) << "'\n";
 }
 

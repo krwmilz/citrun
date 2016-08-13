@@ -48,7 +48,6 @@ Summary:
 
 Totals:
         13 Lines of source code
-        32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
          1 Switch statements
@@ -56,8 +55,8 @@ Totals:
         14 Total statements
 EOF
 
-$TEST_TOOLS/citrun-inst -c switch.c
+$TEST_TOOLS/citrun-inst -c switch.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u switch.c.inst_good switch.c.citrun && echo "ok 2 - instrumented source diff"
+inst_diff switch.c 2
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

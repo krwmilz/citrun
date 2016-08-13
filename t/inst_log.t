@@ -43,8 +43,8 @@ sed	-e "s,^.*: ,,"	\
 	&& echo "ok 5 - processed citrun.log"
 
 cat <<EOF > citrun.log.good
-
-citrun-inst v0.0 () called as ''.
+citrun-inst 0.0 ()
+Tool called as ''.
 Resource directory is ''
 PATH=''
 Command line is ''.
@@ -53,7 +53,6 @@ Object arg = 1, compile arg = 1
 Added clangtool argument ''.
 Instrumentation of '' finished:
     22 Lines of source code
-    32 Lines of instrumentation header
     1 Functions called ''
     2 Function definitions
     2 If statements
@@ -67,8 +66,8 @@ Running native compiler on modified source code.
 Forked ''.
 '' exited 0.
 Restored ''.
-
-citrun-inst v0.0 () called as ''.
+citrun-inst 0.0 ()
+Tool called as ''.
 Resource directory is ''
 PATH=''
 Command line is ''.

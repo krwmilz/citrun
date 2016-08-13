@@ -36,7 +36,6 @@ Summary:
 
 Totals:
          7 Lines of source code
-        32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
          1 Do while loops
@@ -45,8 +44,8 @@ Totals:
          1 Binary operators
 EOF
 
-$TEST_TOOLS/citrun-inst -c while.c
+$TEST_TOOLS/citrun-inst -c while.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u while.c.inst_good while.c.citrun && echo "ok 2 - instrumented source diff"
+inst_diff while.c 2
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

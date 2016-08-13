@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 echo 1..3
 
 . test/utils.sh
@@ -43,7 +43,6 @@ Summary:
 
 Totals:
         12 Lines of source code
-        32 Lines of instrumentation header
          1 Functions called 'main'
          1 Function definitions
          2 If statements
@@ -52,8 +51,9 @@ Totals:
          2 Binary operators
 EOF
 
-$TEST_TOOLS/citrun-inst -c if.c
+$TEST_TOOLS/citrun-inst -c if.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u if.c.inst_good if.c.citrun && echo "ok 2 - instrumented source diff"
+inst_diff if.c 2
+#diff -u if.c.inst_good if.c.citrun && echo "ok 2 - instrumented source diff"
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

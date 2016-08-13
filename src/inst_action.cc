@@ -98,18 +98,13 @@ InstrumentAction::EndSourceFileAction()
 		<< "}\n"
 		<< "#endif\n";
 
-	std::string header = preamble.str();
-	unsigned header_sz = count(header.begin(), header.end(), '\n');
-
-	if (!m_is_citruninst && m_TheRewriter.InsertTextAfter(start, header)) {
-		m_log << "Failed inserting " << header_sz
-			<< " lines of instrumentation preabmle.";
+	if (m_TheRewriter.InsertTextAfter(start, preamble.str())) {
+		m_log << "Failed to insert the instrumentation preabmle.";
 		return;
 	}
 
 	m_log << "Instrumentation of '" << m_compiler_file_name << "' finished:\n";
 	m_log << "    " << num_lines << " Lines of source code\n";
-	m_log << "    " << header_sz << " Lines of instrumentation header\n";
 
 	//
 	// Write out statistics from the AST visitor.

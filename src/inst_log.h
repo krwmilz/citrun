@@ -9,35 +9,34 @@ class InstrumentLogger {
 public:
 	InstrumentLogger() :
 		m_pid(getpid()),
-		m_needs_prefix(true)
+		m_needs_prefix(true),
+		m_delete(true)
 	{};
 	InstrumentLogger(InstrumentLogger &o) :
 		m_pid(o.m_pid),
 		m_output(o.m_output),
-		m_needs_prefix(o.m_needs_prefix)
+		m_needs_prefix(o.m_needs_prefix),
+		m_delete(false)
 	{}
-	//~InstrumentLogger()
-	//{ llvm::errs() << "~InstrumentLogger()\n"; };
+	~InstrumentLogger() { if (m_delete) delete m_output; };
 
 	void set_output(const bool &is_citruninst) {
 
 		if (is_citruninst) {
 			m_output = &llvm::outs();
+			m_delete = false;
 			return;
 		} else {
 			std::error_code ec;
-			llvm::raw_fd_ostream *log_file =
-				new llvm::raw_fd_ostream("citrun.log", ec, llvm::sys::fs::F_Append);
+			m_output = new llvm::raw_fd_ostream("citrun.log", ec, llvm::sys::fs::F_Append);
 
 			if (ec.value()) {
 				warnx("citrun.log: %s", ec.message().c_str());
 				m_output = &llvm::nulls();
+				m_delete = false;
 				return;
 			}
-			m_output = log_file;
 		}
-
-		//m_output = &output;
 	};
 
 	template <typename T>
@@ -71,6 +70,8 @@ private:
 		if (std::find(rhs.begin(), rhs.end(), '\n') != rhs.end())
 			m_needs_prefix = true;
 	};
+
+	bool	m_delete;
 };
 
 #endif // _INST_LOG_H_
