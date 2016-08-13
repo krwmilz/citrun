@@ -209,6 +209,21 @@ CitrunInst::save_if_srcfile(char *arg)
 	}
 }
 
+bool
+CitrunInst::is_link_cmd(bool object_arg, bool compile_arg)
+{
+	if (!object_arg && !compile_arg && m_source_files.size() > 0)
+		// Assume single line a.out compilation
+		// $ gcc main.c
+		return true;
+	else if (object_arg && !compile_arg)
+		// gcc -o main main.o fib.o while.o
+		// gcc -o main main.c fib.c
+		return true;
+
+	return false;
+}
+
 void
 CitrunInst::process_cmdline()
 {
@@ -237,17 +252,7 @@ CitrunInst::process_cmdline()
 	m_log << "Object arg = " << object_arg << ", "
 		<< "compile arg = " << compile_arg << "\n";
 
-	bool linking = false;
-	if (!object_arg && !compile_arg && m_source_files.size() > 0)
-		// Assume single line a.out compilation
-		// $ gcc main.c
-		linking = true;
-	else if (object_arg && !compile_arg)
-		// gcc -o main main.o fib.o while.o
-		// gcc -o main main.c fib.c
-		linking = true;
-
-	if (linking) {
+	if (is_link_cmd(object_arg, compile_arg)) {
 		m_log << "Link detected, adding '";
 #ifndef __APPLE__
 		// OSX always links this.

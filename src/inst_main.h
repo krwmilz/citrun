@@ -17,6 +17,7 @@ private:
 	int			fork_compiler();
 	void			restore_original_src();
 	void			save_if_srcfile(char *);
+	bool			is_link_cmd(bool, bool);
 
 	std::vector<char *>	m_args;
 	InstrumentLogger	m_log;
