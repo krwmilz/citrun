@@ -9,7 +9,7 @@ use Time::HiRes qw( usleep );
 my $package = test::package->new("devel/git");
 my $viewer = test::viewer->new();
 
-my $exp = Expect->spawn("/usr/ports/pobj/git-2.9.0/git-2.9.0/git", "clone", "http://git.0x30.net/citrun", "/usr/ports/pobj/git-*");
+my $exp = Expect->spawn("/usr/ports/pobj/git-2.9.2/git-2.9.2/git", "clone", "http://git.0x30.net/citrun", "/usr/ports/pobj/git-*");
 $viewer->accept();
 $viewer->cmp_static_data([
 		["/abspath.c",181,228],
@@ -305,7 +305,6 @@ Summary:
 
 Totals:
     185689 Lines of source code
-     12192 Lines of instrumentation header
        100 Functions called 'main'
       6015 Function definitions
      16473 If statements

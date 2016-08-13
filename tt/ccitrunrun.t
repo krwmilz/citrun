@@ -76,7 +76,6 @@ Summary:
 
 Totals:
       5350 Lines of source code
-       736 Lines of instrumentation header
          3 Functions called 'main'
        222 Function definitions
        205 If statements
