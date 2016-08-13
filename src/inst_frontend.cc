@@ -34,7 +34,7 @@
 
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
-CitrunInst::CitrunInst(int argc, char *argv[], InstrumentLogger &l, bool is_citruninst) :
+CitrunInst::CitrunInst(int argc, char *argv[], InstrumentLogger *l, bool is_citruninst) :
 	m_args(argv, argv + argc),
 	m_log(l),
 	m_is_citruninst(is_citruninst)
@@ -87,7 +87,7 @@ CitrunInst::save_if_srcfile(char *arg)
 		ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
 
 		m_source_files.push_back(arg);
-		m_log << "Found source file '" << arg << "'.\n";
+		*m_log << "Found source file '" << arg << "'.\n";
 
 		if (m_is_citruninst)
 			// In this mode the modified source file is written to a
@@ -124,15 +124,15 @@ CitrunInst::process_cmdline()
 	bool object_arg = false;
 	bool compile_arg = false;
 
-	m_log << "Command line is '";
+	*m_log << "Command line is '";
 	for (auto &arg : m_args)
-		m_log << arg << " ";
-	m_log << "'.\n";
+		*m_log << arg << " ";
+	*m_log << "'.\n";
 
 	for (auto &arg : m_args) {
 
 		if (std::strcmp(arg, "-E") == 0) {
-			m_log << "Preprocessor argument found\n";
+			*m_log << "Preprocessor argument found\n";
 			exec_compiler();
 		}
 		else if (std::strcmp(arg, "-o") == 0)
@@ -143,28 +143,28 @@ CitrunInst::process_cmdline()
 		save_if_srcfile(arg);
 	}
 
-	m_log << "Object arg = " << object_arg << ", "
+	*m_log << "Object arg = " << object_arg << ", "
 		<< "compile arg = " << compile_arg << "\n";
 
 	if (is_link_cmd(object_arg, compile_arg)) {
-		m_log << "Link detected, adding '";
+		*m_log << "Link detected, adding '";
 #ifndef __APPLE__
 		// OSX always links this.
 		m_args.push_back(const_cast<char *>("-pthread"));
-		m_log << m_args.back() << " ";
+		*m_log << m_args.back() << " ";
 #endif
 #ifdef CITRUN_COVERAGE
 		// Needed because libcitrun.a will be instrumented with gcov.
 		m_args.push_back(const_cast<char *>("-coverage"));
 #endif
 		m_args.push_back(const_cast<char *>(STR(CITRUN_SHARE) "/libcitrun.a"));
-		m_log << m_args.back() << "' to command line.\n";
+		*m_log << m_args.back() << "' to command line.\n";
 	}
 
 	if (m_source_files.size() != 0)
 		return;
 
-	m_log << "No source files found. Executing command line.\n";
+	*m_log << "No source files found. Executing command line.\n";
 	exec_compiler();
 }
 
@@ -183,10 +183,10 @@ CitrunInst::instrument()
 	clang_argv.insert(clang_argv.end(), m_args.begin(), m_args.end());
 #if defined(__OpenBSD__)
 	clang_argv.push_back("-I/usr/local/lib/clang/3.8.1/include");
-	m_log << "Added clangtool argument '" << clang_argv.back() << "'.\n";
+	*m_log << "Added clangtool argument '" << clang_argv.back() << "'.\n";
 #elif defined(__APPLE__)
 	clang_argv.push_back("-I/opt/local/libexec/llvm-3.8/lib/clang/3.8.1/include");
-	m_log << "Added clangtool argument '" << clang_argv.back() << "'.\n";
+	*m_log << "Added clangtool argument '" << clang_argv.back() << "'.\n";
 #endif
 
 	int clang_argc = clang_argv.size();
@@ -198,15 +198,15 @@ CitrunInst::instrument()
 	clang::DiagnosticOptions diags;
 	clang::TextDiagnosticPrinter *log;
 
-	log = new clang::TextDiagnosticPrinter(*m_log.m_output, &diags, false);
-	log->setPrefix(std::to_string(m_log.m_pid));
+	log = new clang::TextDiagnosticPrinter(*m_log->m_output, &diags, false);
+	log->setPrefix(std::to_string(m_log->m_pid));
 	Tool.setDiagnosticConsumer(log);
 
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
 
 	int ret = Tool.run(f.get());
-	m_log << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
+	*m_log << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
 	return ret;
 }
 
@@ -217,11 +217,11 @@ CitrunInst::try_unmodified_compile()
 	int ret = fork_compiler();
 
 	if (ret == 0) {
-		m_log << "But the native compile succeeded!\n";
+		*m_log << "But the native compile succeeded!\n";
 		return 1;
 	}
 
-	m_log << "And the native compile failed.\n";
+	*m_log << "And the native compile failed.\n";
 	return ret;
 }
 
@@ -229,7 +229,7 @@ void
 CitrunInst::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
-		m_log << "Restored '" << tmp_file.first << "'.\n";
+		*m_log << "Restored '" << tmp_file.first << "'.\n";
 
 		copy_file(tmp_file.first, tmp_file.second);
 		unlink(tmp_file.second.c_str());
@@ -240,10 +240,10 @@ void
 CitrunInst::exec_compiler()
 {
 	// XXX: Need to destroy log here.
-	m_log.m_output->flush();
+	m_log->m_output->flush();
 
 	if (m_is_citruninst) {
-		m_log << "Running as citrun-inst, not re-exec()'ing\n";
+		*m_log << "Running as citrun-inst, not re-exec()'ing\n";
 		exit(0);
 	}
 
@@ -256,7 +256,7 @@ int
 CitrunInst::fork_compiler()
 {
 	// Otherwise we'll get two copies of buffers after fork().
-	m_log.m_output->flush();
+	m_log->m_output->flush();
 
 	pid_t child_pid;
 	if ((child_pid = fork()) < 0)
@@ -266,7 +266,7 @@ CitrunInst::fork_compiler()
 		// In child.
 		exec_compiler();
 
-	m_log << "Forked '" << m_args[0] << "' "
+	*m_log << "Forked '" << m_args[0] << "' "
 	       << "pid is '" << child_pid << "'.\n";
 
 	int status;
@@ -278,14 +278,14 @@ CitrunInst::fork_compiler()
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
 
-	m_log << "'" << child_pid << "' exited " << exit << ".\n";
+	*m_log << "'" << child_pid << "' exited " << exit << ".\n";
 	return exit;
 }
 
 int
 CitrunInst::compile_modified()
 {
-	m_log << "Running native compiler on modified source code.\n";
+	*m_log << "Running native compiler on modified source code.\n";
 
 	int ret = fork_compiler();
 	restore_original_src();

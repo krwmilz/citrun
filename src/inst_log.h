@@ -7,7 +7,6 @@
 class InstrumentLogger {
 public:
 	InstrumentLogger(const bool &);
-	InstrumentLogger(InstrumentLogger &o);
 	~InstrumentLogger();
 
 	template <typename T>
@@ -21,12 +20,12 @@ public:
 
 	pid_t		 m_pid;
 	llvm::raw_ostream *m_output;
-	bool	 	 m_needs_prefix;
 
 private:
 	void		 print_prefix();
 	void		 check_newline(const std::string &);
 
+	bool	 	 m_needs_prefix;
 	bool		 m_delete;
 };
 

@@ -115,7 +115,7 @@ main(int argc, char *argv[])
 		// We were not called as citrun-inst and path cleaning failed.
 		return 1;
 
-	CitrunInst main(argc, argv, llog, is_citruninst);
+	CitrunInst main(argc, argv, &llog, is_citruninst);
 	main.process_cmdline();
 
 	int ret = main.instrument();

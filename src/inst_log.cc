@@ -6,14 +6,14 @@
 InstrumentLogger::InstrumentLogger(const bool &is_citruninst) :
 	m_pid(getpid()),
 	m_needs_prefix(true),
-	m_delete(true)
+	m_delete(false)
 {
 	if (is_citruninst) {
 		m_output = &llvm::outs();
-		m_delete = false;
 	} else {
 		std::error_code ec;
 		m_output = new llvm::raw_fd_ostream("citrun.log", ec, llvm::sys::fs::F_Append);
+		m_delete = true;
 
 		if (ec.value()) {
 			warnx("citrun.log: %s", ec.message().c_str());
@@ -22,13 +22,6 @@ InstrumentLogger::InstrumentLogger(const bool &is_citruninst) :
 		}
 	}
 }
-
-InstrumentLogger::InstrumentLogger(InstrumentLogger &o) :
-	m_pid(o.m_pid),
-	m_output(o.m_output),
-	m_needs_prefix(o.m_needs_prefix),
-	m_delete(false)
-{}
 
 InstrumentLogger::~InstrumentLogger()
 {
