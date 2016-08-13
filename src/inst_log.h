@@ -1,38 +1,14 @@
 #ifndef __INST_LOG_H_
 #define __INST_LOG_H_
 
-#include <err.h>
 #include <llvm/Support/raw_ostream.h>
-#include <unistd.h>		// getpid
+#include <unistd.h>		// pid_t
 
 class InstrumentLogger {
 public:
-	InstrumentLogger(const bool &is_citruninst) :
-		m_pid(getpid()),
-		m_needs_prefix(true),
-		m_delete(true)
-	{
-		if (is_citruninst) {
-			m_output = &llvm::outs();
-			m_delete = false;
-		} else {
-			std::error_code ec;
-			m_output = new llvm::raw_fd_ostream("citrun.log", ec, llvm::sys::fs::F_Append);
-
-			if (ec.value()) {
-				warnx("citrun.log: %s", ec.message().c_str());
-				m_output = &llvm::nulls();
-				m_delete = false;
-			}
-		}
-	};
-	InstrumentLogger(InstrumentLogger &o) :
-		m_pid(o.m_pid),
-		m_output(o.m_output),
-		m_needs_prefix(o.m_needs_prefix),
-		m_delete(false)
-	{}
-	~InstrumentLogger() { if (m_delete) delete m_output; };
+	InstrumentLogger(const bool &);
+	InstrumentLogger(InstrumentLogger &o);
+	~InstrumentLogger();
 
 	template <typename T>
 	friend InstrumentLogger& operator<<(InstrumentLogger& out, const T &rhs)
@@ -41,32 +17,17 @@ public:
 		*out.m_output << rhs;
 		return out;
 	}
-	friend InstrumentLogger& operator<<(InstrumentLogger& out, const char *rhs)
-	{
-		out.print_prefix();
-		*out.m_output << rhs;
-		out.check_newline(rhs);
-		return out;
-	}
+	friend InstrumentLogger& operator<<(InstrumentLogger&, const char *);
 
-	pid_t			 m_pid;
-	llvm::raw_ostream	*m_output;
-	bool		 	 m_needs_prefix;
+	pid_t		 m_pid;
+	llvm::raw_ostream *m_output;
+	bool	 	 m_needs_prefix;
 
 private:
-	void print_prefix() {
-		if (m_needs_prefix) {
-			*m_output << m_pid << ": ";
-			m_needs_prefix = false;
-		}
-	};
+	void		 print_prefix();
+	void		 check_newline(const std::string &);
 
-	void check_newline(const std::string &rhs) {
-		if (std::find(rhs.begin(), rhs.end(), '\n') != rhs.end())
-			m_needs_prefix = true;
-	};
-
-	bool	m_delete;
+	bool		 m_delete;
 };
 
 #endif // _INST_LOG_H_

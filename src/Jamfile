@@ -54,6 +54,7 @@ Main citrun-gl : $(GL_SRCS) ;
 # citrun-inst
 #
 INST_SRCS =
+	inst_log.cc
 	inst_main.cc
 	inst_frontend.cc
 	inst_action.cc
