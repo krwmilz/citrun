@@ -11,7 +11,7 @@ HOMEPAGE =		http://cit.run
 # BSD
 PERMIT_PACKAGE_CDROM =	Yes
 
-MASTER_SITES =		${HOMEPAGE}/src/
+MASTER_SITES =		${HOMEPAGE}/
 
 WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
 
