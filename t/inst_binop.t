@@ -3,9 +3,7 @@
 # Test that binary operators in strange cases work. Includes enums and globals.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > enum.c
 enum ASDF {

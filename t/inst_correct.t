@@ -1,8 +1,9 @@
 #!/bin/sh
+#
+# Check that a simple program can execute successfully with instrumentation.
+#
 echo 1..5
-
 . test/utils.sh
-setup
 
 cat <<EOF > fib.c
 #include <stdlib.h>

@@ -3,9 +3,7 @@
 # Test that the instrumentation preamble is what we think it is.
 #
 echo 1..2
-
 . test/utils.sh
-setup
 
 touch preamble.c
 $TEST_TOOLS/citrun-inst -c preamble.c > citrun.log

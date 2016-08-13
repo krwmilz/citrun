@@ -3,9 +3,7 @@
 # Test that for loop condition instrumenting works.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > for.c
 int main(int argc, char *argv[]) {

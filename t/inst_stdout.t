@@ -1,8 +1,9 @@
 #!/bin/sh
+#
+# Simple program that prints output.
+#
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > hello.c
 #include <stdio.h>

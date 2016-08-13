@@ -1,8 +1,10 @@
 #!/bin/sh
+#
+# Check that linking object files of one citrun version with libcitrun of
+# another shows a warning message.
+#
 echo 1..2
-
 . test/utils.sh
-setup
 
 cat <<EOF > main.c
 #include <stddef.h>

@@ -1,11 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # Make sure that do while loop condition instrumentation works.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > while.c
 int main(int argc, char *argv[]) {

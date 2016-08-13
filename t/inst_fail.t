@@ -1,8 +1,9 @@
 #!/bin/sh
+#
+# Check that a program that won't compile natively is handled properly.
+#
 echo 1..3
-
 . test/utils.sh
-setup
 
 echo "int main(void) { return 0; " > bad.c
 

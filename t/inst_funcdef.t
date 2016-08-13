@@ -1,11 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # Check that really long function declarations are instrumented properly.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > funcdef.c
 void

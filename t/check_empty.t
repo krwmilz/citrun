@@ -1,8 +1,9 @@
 #!/bin/sh
+#
+# Verify the output when 0 citrun.log files are found.
+#
 echo 1..2
-
 . test/utils.sh
-setup
 
 $TEST_TOOLS/citrun-check > check.out
 

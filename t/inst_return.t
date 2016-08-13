@@ -1,8 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
+#
+# Check that return statement values (if any) are instrumented correctly.
+#
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > return.c
 int foo() {

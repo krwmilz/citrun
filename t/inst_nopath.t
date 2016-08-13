@@ -3,9 +3,7 @@
 # Test that not having PATH set errors out.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 # Save locations to tools because after unset PATH they are not available.
 grep=`which grep`

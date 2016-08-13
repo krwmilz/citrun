@@ -1,8 +1,9 @@
 #!/bin/sh
+#
+# Check that if statement conditions are instrumented properly.
+#
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > if.c
 int main(int argc, char *argv[]) {
@@ -55,5 +56,4 @@ $TEST_TOOLS/citrun-inst -c if.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
 inst_diff if.c 2
-#diff -u if.c.inst_good if.c.citrun && echo "ok 2 - instrumented source diff"
 diff -u check.good check.out && echo "ok 3 - citrun.log diff"

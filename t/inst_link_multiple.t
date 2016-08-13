@@ -1,8 +1,9 @@
 #!/bin/sh
+#
+# Check that linking more than one instrumented object file together works.
+#
 echo 1..4
-
 . test/utils.sh
-setup
 
 cat <<EOF > one.c
 void second_func();

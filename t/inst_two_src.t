@@ -1,8 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
+#
+# Check that two source files given on the same command line both get
+# instrumented fully.
+#
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > main.c
 int main(void) {

@@ -3,9 +3,7 @@
 # Check that the advertised source file extensions work.
 #
 echo 1..2
-
 . test/utils.sh
-setup
 
 touch main.{c,cc,cxx,cpp,C}
 $TEST_TOOLS/citrun-wrap cc -c main.c

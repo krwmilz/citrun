@@ -4,9 +4,7 @@
 # end of binary operators.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 cat <<EOF > macro.c
 #define MAYBE 1023;

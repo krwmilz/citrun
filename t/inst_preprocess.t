@@ -3,9 +3,7 @@
 # Make sure preprocessor flag (-E) causes no instrumentation to be done.
 #
 echo 1..3
-
 . test/utils.sh
-setup
 
 echo "int main(void) { return 0; }" > prepro.c
 

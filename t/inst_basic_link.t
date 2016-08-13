@@ -1,8 +1,9 @@
-#!/bin/sh -e
+#!/bin/sh
+#
+# Check that the most basic of compile command lines works.
+#
 echo 1..5
-
 . test/utils.sh
-setup
 
 cat <<EOF > main.c
 int main(void) { return 0; }

@@ -1,8 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
+#
+# Check that a raw citrun.log file is in good shape.
+# citrun-check relies on this output, and citrun-check is used quite a bit.
+#
 echo 1..6
-
 . test/utils.sh
-setup
 
 cat <<EOF > source_0.c
 #include <stdlib.h>
