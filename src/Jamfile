@@ -55,6 +55,7 @@ Main citrun-gl : $(GL_SRCS) ;
 #
 INST_SRCS =
 	inst_main.cc
+	inst_frontend.cc
 	inst_action.cc
 	inst_visitor.cc ;
 
