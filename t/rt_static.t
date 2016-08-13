@@ -24,7 +24,7 @@ cmp_ok( $viewer->{pids}->[2],	">",	1,	"pgrp check lower" );
 cmp_ok( $viewer->{pids}->[2],	"<",	100000,	"pgrp check upper" );
 
 $viewer->cmp_static_data([
-		[ "one.c", 20 ],
+		[ "one.c", 34 ],
 		[ "three.c", 9 ],
 		[ "two.c", 11 ],
 ]);

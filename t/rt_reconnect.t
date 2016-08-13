@@ -13,7 +13,7 @@ sleep(1);
 my $viewer = test::viewer->new();
 $viewer->accept();
 $viewer->cmp_static_data([
-	[ "one.c",	20 ],
+	[ "one.c",	34 ],
 	[ "three.c",	9 ],
 	[ "two.c",	11 ],
 ]);
