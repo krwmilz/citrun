@@ -11,7 +11,7 @@ setup
 grep=`which grep`
 
 unset PATH
-$TEST_TOOLS/gcc -c nomatter.c 2> err.out
+$TEST_TOOLS/gcc -c nomatter.c
 
 [ $? -eq 1 ] && echo ok 2
-$grep -q "PATH must be set" err.out && echo ok 3
+$grep -q "Error: PATH is not set" citrun.log && echo ok 3

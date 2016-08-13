@@ -41,13 +41,13 @@ static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
 InstrumentLogger llog;
 
-void
+int
 clean_PATH()
 {
 	char *path;
 	if ((path = std::getenv("PATH")) == NULL) {
-		llog << "PATH is not set.\n";
-		errx(1, "PATH must be set");
+		llog << "Error: PATH is not set.\n";
+		return 1;
 	}
 
 	llog << "PATH='" << path << "'\n";
@@ -74,31 +74,33 @@ clean_PATH()
 	}
 
 	if (!found_citrun_path) {
-		llog << "'" << STR(CITRUN_SHARE) << "' not in PATH.\n";
-		errx(1, "'%s' not in PATH", STR(CITRUN_SHARE));
+		llog << "Error: '" << STR(CITRUN_SHARE) << "' not in PATH.\n";
+		return 1;
 	}
 
 	// Set new $PATH
 	if (setenv("PATH", new_path.str().c_str(), 1))
 		err(1, "setenv");
+
+	return 0;
 }
 
 void
 print_toolinfo(const char *argv0)
 {
+	struct utsname utsname;
+
 	llog << "citrun-inst "
 		<< unsigned(citrun_major) << "."
 		<< unsigned(citrun_minor) << " ";
-
-	struct utsname utsname;
 	if (uname(&utsname) == -1)
 		llog << "(Unknown OS)\n";
 	else {
-		llog << "("
-			<< utsname.sysname << "-"
+		llog << "(" << utsname.sysname << "-"
 			<< utsname.release << " "
 			<< utsname.machine << ")\n";
 	}
+
 	llog << "Tool called as '" << argv0 << "'.\n";
 	llog << "Resource directory is '" << STR(CITRUN_SHARE) << "'\n";
 }
@@ -125,8 +127,9 @@ main(int argc, char *argv[])
 
 	setprogname("citrun-inst");
 
-	if (is_citruninst == false)
-		clean_PATH();
+	if (is_citruninst == false && clean_PATH() != 0)
+		// We were not called as citrun-inst and path cleaning failed.
+		return 1;
 
 	CitrunInst main(argc, argv, llog, is_citruninst);
 	main.process_cmdline();
