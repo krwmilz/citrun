@@ -130,8 +130,13 @@ main(int argc, char *argv[])
 
 	CitrunInst main(argc, argv, llog, is_citruninst);
 	main.process_cmdline();
-	if (main.instrument())
-		return 1;
+
+	int ret = main.instrument();
+	if (is_citruninst)
+		return ret;
+	if (ret)
+		return main.try_unmodified_compile();
+
 	return main.compile_modified();
 }
 
@@ -303,14 +308,7 @@ CitrunInst::instrument()
 
 	int ret = Tool.run(f.get());
 	m_log << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
-
-	if (m_is_citruninst)
-		// Nothing left to do if we're in this mode.
-		exit(ret);
-
-	if (ret)
-		return try_unmodified_compile();
-	return 0;
+	return ret;
 }
 
 int

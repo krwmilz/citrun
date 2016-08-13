@@ -7,9 +7,9 @@ class CitrunInst {
 public:
 	CitrunInst(int, char *argv[], InstrumentLogger &, bool);
 
-	void			clean_PATH();
 	void			process_cmdline();
 	int			instrument();
+	int			try_unmodified_compile();
 	int			compile_modified();
 
 private:
@@ -17,7 +17,6 @@ private:
 	int			fork_compiler();
 	void			restore_original_src();
 	void			save_if_srcfile(char *);
-	int			try_unmodified_compile();
 
 	std::vector<char *>	m_args;
 	InstrumentLogger	m_log;
