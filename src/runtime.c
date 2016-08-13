@@ -142,6 +142,7 @@ xwrite(int d, const void *buf, size_t bytes_total)
 
 /*
  * Send static information contained in each instrumented node.
+ *
  * Sent program wide values:
  * - version major and minor
  * - total number of translation units
@@ -209,7 +210,15 @@ send_static(int fd)
 }
 
 /*
- * For each node in the chain send the dynamic line count data.
+ * For each instrumented translation unit this runtime knows about, send the
+ * number of lines that have executed since this was called last.
+ *
+ * Sends:
+ * - a one byte flag indicating if there were any executions in the translation
+ *   unit at all
+ * - if the flag is one, then a buffer with a size equal to the number of lines
+ *   in the translation is sent, each index into the buffer is a line count
+ *   difference.
  */
 static void
 send_dynamic(int fd)
@@ -223,7 +232,7 @@ send_dynamic(int fd)
 	int			 line;
 	uint8_t			 flag;
 
-	/* Write execution buffers. */
+	/* Walk each translation unit. */
 	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
 
 		/* Find execution differences line at a time. */
