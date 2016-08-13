@@ -42,16 +42,14 @@ InstrumentAction::write_modified_src(clang::FileID const &fid)
 
 	if (m_is_citruninst) {
 		out_file += ".citrun";
-		m_log << "Writing modified source to '"
-			<< out_file << "'.\n";
+		m_log << "Writing modified source to '" << out_file << "'.\n";
 	}
 
 	std::error_code ec;
 	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
 	if (ec.value()) {
-		m_log << "Error writing modified source: "
-			<< ec.message() << "\n";
-		warnx("'%s': %s", out_file.c_str(), ec.message().c_str());
+		m_log << "Error writing modified source '" << out_file
+			<< "': " << ec.message() << "\n";
 		return;
 	}
 
@@ -70,8 +68,6 @@ InstrumentAction::EndSourceFileAction()
 	clang::SourceLocation end = sm.getLocForEndOfFile(main_fid);
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
-	std::string const file_name = getCurrentFile();
-
 	//
 	// Write instrumentation preamble. Includes:
 	// - runtime header,
@@ -88,7 +84,7 @@ InstrumentAction::EndSourceFileAction()
 		<< "	_citrun,\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"
-		<< "	\"" << file_name << "\",\n";
+		<< "	\"" << getCurrentFile().str() << "\",\n";
 	preamble << "};\n";
 	preamble << "__attribute__((constructor))\n"
 		<< "static void citrun_constructor() {\n"

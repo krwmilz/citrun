@@ -91,10 +91,9 @@ print_toolinfo(const char *argv0)
 		<< unsigned(citrun_minor) << " ";
 
 	struct utsname utsname;
-	if (uname(&utsname) == -1) {
-		warn("uname");
+	if (uname(&utsname) == -1)
 		llog << "(Unknown OS)\n";
-	} else {
+	else {
 		llog << "("
 			<< utsname.sysname << "-"
 			<< utsname.release << " "
