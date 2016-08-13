@@ -122,7 +122,6 @@ sub wait {
 
 sub DESTROY {
 	my ($self) = @_;
-
 	$self->kill() if ($self->{pid});
 }
 
