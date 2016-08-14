@@ -208,17 +208,16 @@ InstrumentFrontend::instrument()
 }
 
 int
-InstrumentFrontend::try_unmodified_compile()
+InstrumentFrontend::try_compile(std::string const &variant)
 {
-	restore_original_src();
 	int ret = fork_compiler();
 
 	if (ret == 0) {
-		*m_log << "But the native compile succeeded!\n";
-		return 1;
+		*m_log << "But " << variant << " succeeded!\n";
+		return 0;
 	}
 
-	*m_log << "And the native compile failed.\n";
+	*m_log << "And " << variant << " failed.\n";
 	return ret;
 }
 
@@ -277,15 +276,4 @@ InstrumentFrontend::fork_compiler()
 
 	*m_log << "'" << child_pid << "' exited " << exit << ".\n";
 	return exit;
-}
-
-int
-InstrumentFrontend::compile_modified()
-{
-	*m_log << "Running native compiler on modified source code.\n";
-
-	int ret = fork_compiler();
-	restore_original_src();
-
-	return ret;
 }

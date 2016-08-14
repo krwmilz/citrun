@@ -123,17 +123,28 @@ main(int argc, char *argv[])
 	main.process_cmdline();
 
 	int ret = main.instrument();
-	llog << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
+	llog << "Rewriting " << (ret ? "failed.\n" : "successful.\n");
 
 	std::chrono::high_resolution_clock::time_point now =
 		std::chrono::high_resolution_clock::now();
 	llog << std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count()
-		<< " Milliseconds spent transforming source.\n";
+		<< " Milliseconds spent rewriting source.\n";
 
 	if (is_citruninst)
 		return ret;
-	if (ret)
-		return main.try_unmodified_compile();
+	if (ret) {
+		main.restore_original_src();
+		return main.try_compile("the native compile");
+	}
 
-	return main.compile_modified();
+	ret = main.fork_compiler();
+	llog << "Rewritten source compile "
+		<< (ret ? "failed.\n" : "successful.\n");
+
+	main.restore_original_src();
+
+	if (ret == 0)
+		return 0;
+
+	return main.try_compile("the unrewritten source compile");
 }
