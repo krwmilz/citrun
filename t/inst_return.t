@@ -34,8 +34,6 @@ int main(void) {citrun_start();++_citrun[4];
 EOF
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          1 Source files input
@@ -56,4 +54,4 @@ $TEST_TOOLS/citrun-inst -c return.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
 inst_diff return.c 2
-diff -u check.good check.out && echo "ok 3 - citrun.log diff"
+check_diff 3

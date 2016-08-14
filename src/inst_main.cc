@@ -18,6 +18,7 @@
 
 #include <sys/utsname.h>	// uname
 
+#include <chrono>		// std::chrono::high_resolution_clock
 #include <cstring>		// strcmp
 #include <err.h>
 #include <libgen.h>		// basename
@@ -93,6 +94,9 @@ print_toolinfo(InstrumentLogger &llog, const char *argv0)
 int
 main(int argc, char *argv[])
 {
+	std::chrono::high_resolution_clock::time_point m_start_time =
+		std::chrono::high_resolution_clock::now();
+
 	char *base_name;
 	if ((base_name = basename(argv[0])) == NULL)
 		err(1, "basename");
@@ -112,13 +116,19 @@ main(int argc, char *argv[])
 	setprogname("citrun-inst");
 
 	if (is_citruninst == false && clean_PATH(llog) != 0)
-		// We were not called as citrun-inst and path cleaning failed.
+		// We were not called as citrun-inst and PATH cleaning failed.
 		return 1;
 
 	CitrunInst main(argc, argv, &llog, is_citruninst);
 	main.process_cmdline();
 
 	int ret = main.instrument();
+
+	std::chrono::high_resolution_clock::time_point now =
+		std::chrono::high_resolution_clock::now();
+	llog << std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count()
+		<< " Milliseconds spent transforming source.\n";
+
 	if (is_citruninst)
 		return ret;
 	if (ret)

@@ -1,4 +1,6 @@
-
+#
+# Script that counts events in citrun.log files.
+#
 function err {
 	echo "${1}"
 	exit 1
@@ -34,7 +36,7 @@ DESC[9]="Errors during source parsing"
 desc_len=${#DESC[@]}
 
 FINE[0]="Lines of source code"
-FINE[1]="Lines of instrumentation header"
+FINE[1]="Milliseconds spent transforming source"
 FINE[2]="Functions called 'main'"
 FINE[3]="Function definitions"
 FINE[4]="If statements"
@@ -49,10 +51,10 @@ FINE[12]="Binary operators"
 FINE[13]="Errors rewriting source"
 fine_len=${#FINE[@]}
 
-echo -n Checking .
+[ -t 1 ] && echo -n Checking .
 let COUNT[0]=0
 for d in `find $dir -name citrun.log`; do
-	echo -n .
+	[ -t 1 ] && echo -n .
 	let COUNT[0]++
 
 	let i=1
@@ -74,9 +76,9 @@ for d in `find $dir -name citrun.log`; do
 		let i++
 	done
 done
-echo done
+[ -t 1 ] && echo done
+[ -t 1 ] && echo
 
-echo
 echo Summary:
 [ ${COUNT[0]} -eq 0 ] && err "         0 ${DESC[0]}"
 let i=0

@@ -41,6 +41,7 @@ $TEST_TOOLS/citrun-wrap jam && echo "ok 4 - source compiled"
 sed	-e "s,^.*: ,,"	\
 	-e "s,'.*','',"	\
 	-e "s,(.*),()," \
+	-e "/Milliseconds/d" \
 	< citrun.log > citrun.log.proc \
 	&& echo "ok 5 - processed citrun.log"
 

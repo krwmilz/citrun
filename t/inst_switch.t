@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # Make sure that switch statement condition instrumentation works.
 #
@@ -36,8 +36,6 @@ int main(void) {citrun_start();++_citrun[0];
 EOF
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          1 Source files input
@@ -57,4 +55,4 @@ $TEST_TOOLS/citrun-inst -c switch.c > citrun.log
 $TEST_TOOLS/citrun-check > check.out
 
 inst_diff switch.c 2
-diff -u check.good check.out && echo "ok 3 - citrun.log diff"
+check_diff 3

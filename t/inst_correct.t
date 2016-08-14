@@ -29,8 +29,6 @@ int main(int argc, char *argv[]) {
 EOF
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          1 Source files input
@@ -53,7 +51,7 @@ EOF
 $TEST_TOOLS/citrun-wrap cc -o fib fib.c
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u check.good check.out && echo "ok 2 citrun.log diff"
+check_diff 2
 
 export CITRUN_SOCKET=
 ./fib

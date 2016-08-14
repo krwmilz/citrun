@@ -15,8 +15,6 @@ int main(void) {
 EOF
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          1 Source files input
@@ -40,4 +38,4 @@ $TEST_TOOLS/citrun-check > check.out
 export CITRUN_SOCKET=
 [ "`./hello`" = "hello, world!" ] && echo ok program prints
 
-diff -u check.good check.out && echo ok citrun-check diff
+check_diff 3

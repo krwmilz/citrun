@@ -37,8 +37,6 @@ $TEST_TOOLS/citrun-wrap jam && echo "ok - source compiled"
 $TEST_TOOLS/citrun-check > check.out && echo ok
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          3 Source files input
@@ -56,4 +54,4 @@ Totals:
         13 Total statements
 EOF
 
-diff -u check.good check.out && echo ok
+check_diff 4

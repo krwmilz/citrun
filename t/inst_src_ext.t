@@ -14,8 +14,6 @@ $TEST_TOOLS/citrun-wrap c++ -c main.cpp
 $TEST_TOOLS/citrun-wrap cc -c main.C
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          4 Source files input
@@ -28,4 +26,4 @@ Totals:
 EOF
 
 $TEST_TOOLS/citrun-check > check.out
-diff -u check.out check.good && echo ok 2
+check_diff 2

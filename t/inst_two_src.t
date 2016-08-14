@@ -19,8 +19,6 @@ int other(void) {
 EOF
 
 cat <<EOF > check.good
-Checking ..done
-
 Summary:
          1 Log files found
          2 Source files input
@@ -40,4 +38,4 @@ EOF
 $TEST_TOOLS/citrun-wrap cc -o main main.c other.c && echo "ok - source compiled"
 $TEST_TOOLS/citrun-check > check.out
 
-diff -u check.good check.out && echo ok - citrun-check diff
+check_diff 3
