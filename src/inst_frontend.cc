@@ -204,9 +204,7 @@ InstrumentFrontend::instrument()
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
 
-	int ret = Tool.run(f.get());
-	*m_log << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
-	return ret;
+	return Tool.run(f.get());
 }
 
 int

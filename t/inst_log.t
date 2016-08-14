@@ -50,9 +50,8 @@ citrun-inst 0.0 ()
 Tool called as ''.
 Resource directory is ''
 PATH=''
-Command line is ''.
 Found source file ''.
-Object arg = 1, compile arg = 1
+Command line is ''.
 Added clangtool argument ''.
 Instrumentation of '' finished:
     22 Lines of source code
@@ -74,7 +73,6 @@ Tool called as ''.
 Resource directory is ''
 PATH=''
 Command line is ''.
-Object arg = 1, compile arg = 0
 Link detected, adding '' to command line.
 No source files found. Executing command line.
 EOF

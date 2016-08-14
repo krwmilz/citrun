@@ -123,6 +123,7 @@ main(int argc, char *argv[])
 	main.process_cmdline();
 
 	int ret = main.instrument();
+	llog << "Instrumentation " << (ret ? "failed.\n" : "successful.\n");
 
 	std::chrono::high_resolution_clock::time_point now =
 		std::chrono::high_resolution_clock::now();
