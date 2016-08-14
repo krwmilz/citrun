@@ -1,11 +1,11 @@
-#include <string>
-
 #include "inst_action.h"	// InstrumentAction
 #include "inst_log.h"
 
-class CitrunInst {
+#include <string>
+
+class InstrumentFrontend {
 public:
-	CitrunInst(int, char *argv[], InstrumentLogger *, bool);
+	InstrumentFrontend(int, char *argv[], InstrumentLogger *, bool);
 
 	void			process_cmdline();
 	int			instrument();

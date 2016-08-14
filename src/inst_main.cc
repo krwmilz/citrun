@@ -14,7 +14,7 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include "runtime.h"		// citrun_major, citrun_minor
-#include "inst_frontend.h"
+#include "inst_frontend.h"	// InstrumentFrontend
 
 #include <sys/utsname.h>	// uname
 
@@ -119,7 +119,7 @@ main(int argc, char *argv[])
 		// We were not called as citrun-inst and PATH cleaning failed.
 		return 1;
 
-	CitrunInst main(argc, argv, &llog, is_citruninst);
+	InstrumentFrontend main(argc, argv, &llog, is_citruninst);
 	main.process_cmdline();
 
 	int ret = main.instrument();

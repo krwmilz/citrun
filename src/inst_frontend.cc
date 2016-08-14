@@ -34,7 +34,8 @@
 
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
-CitrunInst::CitrunInst(int argc, char *argv[], InstrumentLogger *l, bool is_citruninst) :
+InstrumentFrontend::InstrumentFrontend(int argc, char *argv[],
+		InstrumentLogger *l, bool is_citruninst) :
 	m_args(argv, argv + argc),
 	m_log(l),
 	m_is_citruninst(is_citruninst)
@@ -81,7 +82,7 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 }
 
 void
-CitrunInst::save_if_srcfile(char *arg)
+InstrumentFrontend::save_if_srcfile(char *arg)
 {
 	if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
 		ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
@@ -104,7 +105,7 @@ CitrunInst::save_if_srcfile(char *arg)
 }
 
 bool
-CitrunInst::is_link_cmd(bool object_arg, bool compile_arg)
+InstrumentFrontend::is_link_cmd(bool object_arg, bool compile_arg)
 {
 	if (!object_arg && !compile_arg && m_source_files.size() > 0)
 		// Assume single line a.out compilation
@@ -119,7 +120,7 @@ CitrunInst::is_link_cmd(bool object_arg, bool compile_arg)
 }
 
 void
-CitrunInst::process_cmdline()
+InstrumentFrontend::process_cmdline()
 {
 	bool object_arg = false;
 	bool compile_arg = false;
@@ -169,7 +170,7 @@ CitrunInst::process_cmdline()
 }
 
 int
-CitrunInst::instrument()
+InstrumentFrontend::instrument()
 {
 	//
 	// Create a special command line for ClangTool that looks like:
@@ -211,7 +212,7 @@ CitrunInst::instrument()
 }
 
 int
-CitrunInst::try_unmodified_compile()
+InstrumentFrontend::try_unmodified_compile()
 {
 	restore_original_src();
 	int ret = fork_compiler();
@@ -226,7 +227,7 @@ CitrunInst::try_unmodified_compile()
 }
 
 void
-CitrunInst::restore_original_src()
+InstrumentFrontend::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
 		*m_log << "Restored '" << tmp_file.first << "'.\n";
@@ -237,7 +238,7 @@ CitrunInst::restore_original_src()
 }
 
 void
-CitrunInst::exec_compiler()
+InstrumentFrontend::exec_compiler()
 {
 	// XXX: Need to destroy log here.
 	m_log->m_output->flush();
@@ -253,7 +254,7 @@ CitrunInst::exec_compiler()
 }
 
 int
-CitrunInst::fork_compiler()
+InstrumentFrontend::fork_compiler()
 {
 	// Otherwise we'll get two copies of buffers after fork().
 	m_log->m_output->flush();
@@ -283,7 +284,7 @@ CitrunInst::fork_compiler()
 }
 
 int
-CitrunInst::compile_modified()
+InstrumentFrontend::compile_modified()
 {
 	*m_log << "Running native compiler on modified source code.\n";
 
