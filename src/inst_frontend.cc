@@ -27,6 +27,7 @@
 #include <err.h>
 #include <fstream>		// ifstream, ofstream
 #include <libgen.h>		// basename
+#include <sstream>		// ostringstream
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
 #define STR_EXPAND(tok) #tok
@@ -84,39 +85,55 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 void
 InstrumentFrontend::save_if_srcfile(char *arg)
 {
-	if (ends_with(arg, ".c") || ends_with(arg, ".cc") ||
-		ends_with(arg, ".cpp") || ends_with(arg, ".cxx")) {
+	if (!ends_with(arg, ".c") && !ends_with(arg, ".cc") &&
+	    !ends_with(arg, ".cpp") && !ends_with(arg, ".cxx"))
+		return;
 
-		m_source_files.push_back(arg);
-		*m_log << "Found source file '" << arg << "'.\n";
+	m_source_files.push_back(arg);
+	*m_log << "Found source file '" << arg << "'.\n";
 
-		if (m_is_citruninst)
-			// In this mode the modified source file is written to a
-			// completely different file.
-			return;
+	if (m_is_citruninst)
+		// In this mode the modified source file is written to a
+		// completely different file.
+		return;
 
-		char *dst_fn;
-		if ((dst_fn = std::tmpnam(NULL)) == NULL)
-			err(1, "tmpnam");
+	char *dst_fn;
+	if ((dst_fn = std::tmpnam(NULL)) == NULL)
+		err(1, "tmpnam");
 
-		copy_file(dst_fn, arg);
-		m_temp_file_map[arg] = dst_fn;
-	}
+	copy_file(dst_fn, arg);
+	m_temp_file_map[arg] = dst_fn;
 }
 
-bool
-InstrumentFrontend::is_link_cmd(bool object_arg, bool compile_arg)
+void
+InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 {
+	bool linking = false;
+
 	if (!object_arg && !compile_arg && m_source_files.size() > 0)
 		// Assume single line a.out compilation
 		// $ gcc main.c
-		return true;
+		linking = true;
 	else if (object_arg && !compile_arg)
 		// gcc -o main main.o fib.o while.o
 		// gcc -o main main.c fib.c
-		return true;
+		linking = true;
 
-	return false;
+	if (!linking)
+		return;
+
+	*m_log << "Link detected, adding '";
+#ifndef __APPLE__
+	// OSX always links this.
+	m_args.push_back(const_cast<char *>("-pthread"));
+	*m_log << m_args.back() << " ";
+#endif
+#ifdef CITRUN_COVERAGE
+	// Needed because libcitrun.a will be instrumented with gcov.
+	m_args.push_back(const_cast<char *>("-coverage"));
+#endif
+	m_args.push_back(const_cast<char *>(STR(CITRUN_SHARE) "/libcitrun.a"));
+	*m_log << m_args.back() << "' to command line.\n";
 }
 
 void
@@ -125,12 +142,9 @@ InstrumentFrontend::process_cmdline()
 	bool object_arg = false;
 	bool compile_arg = false;
 
-	*m_log << "Command line is '";
-	for (auto &arg : m_args)
-		*m_log << arg << " ";
-	*m_log << "'.\n";
-
+	std::ostringstream cmd_line;
 	for (auto &arg : m_args) {
+		cmd_line << arg << " ";
 
 		if (std::strcmp(arg, "-E") == 0) {
 			*m_log << "Preprocessor argument found\n";
@@ -143,24 +157,8 @@ InstrumentFrontend::process_cmdline()
 
 		save_if_srcfile(arg);
 	}
-
-	*m_log << "Object arg = " << object_arg << ", "
-		<< "compile arg = " << compile_arg << "\n";
-
-	if (is_link_cmd(object_arg, compile_arg)) {
-		*m_log << "Link detected, adding '";
-#ifndef __APPLE__
-		// OSX always links this.
-		m_args.push_back(const_cast<char *>("-pthread"));
-		*m_log << m_args.back() << " ";
-#endif
-#ifdef CITRUN_COVERAGE
-		// Needed because libcitrun.a will be instrumented with gcov.
-		m_args.push_back(const_cast<char *>("-coverage"));
-#endif
-		m_args.push_back(const_cast<char *>(STR(CITRUN_SHARE) "/libcitrun.a"));
-		*m_log << m_args.back() << "' to command line.\n";
-	}
+	*m_log << "Command line is '" << cmd_line.str() << "'.\n";
+	if_link_add_runtime(object_arg, compile_arg);
 
 	if (m_source_files.size() != 0)
 		return;
