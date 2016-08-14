@@ -1,38 +1,38 @@
 #
 # Script that counts events in citrun.log files.
+# Tries to be POSIX compatible.
 #
 function err {
 	echo "${1}"
 	exit 1
 }
 
-dir=.
+dir=`pwd`
 if [ $# -eq 1 ]; then
 	[[ ${1} = -* ]] && err "usage: citrun-check [dir]"
 	dir="${1}"
 fi
-[ -d $dir ] || err "$dir: no such directory"
+[ -d $dir ] || err "citrun-check: $dir: no such directory"
 
-GREP[1]="Found source file"
-GREP[2]="Tool called as "
-GREP[3]="Forked "
-GREP[4]="Instrumentation successful"
-GREP[5]="And the native compile failed"
-GREP[6]="But the native compile succeeded"
-GREP[7]="Link detected"
-GREP[8]="warning: "
-GREP[9]="error: "
+GREP[0]="Found source file"
+GREP[1]="Tool called as "
+GREP[2]="Forked "
+GREP[3]="Instrumentation successful"
+GREP[4]="And the native compile failed"
+GREP[5]="But the native compile succeeded"
+GREP[6]="Link detected"
+GREP[7]="warning: "
+GREP[8]="error: "
 
-DESC[0]="Log files found"
-DESC[1]="Source files input"
-DESC[2]="Calls to the instrumentation tool"
-DESC[3]="Forked compilers"
-DESC[4]="Instrument successes"
-DESC[5]="Both instrument and native compile failed (FP)"
-DESC[6]="Instrument failed but native compile succeeded (TP)!"
-DESC[7]="Application link commands"
-DESC[8]="Warnings during source parsing"
-DESC[9]="Errors during source parsing"
+DESC[0]="Source files input"
+DESC[1]="Calls to the instrumentation tool"
+DESC[2]="Forked compilers"
+DESC[3]="Instrument successes"
+DESC[4]="Both instrument and native compile failed (FP)"
+DESC[5]="Instrument failed but native compile succeeded (TP)!"
+DESC[6]="Application link commands"
+DESC[7]="Warnings during source parsing"
+DESC[8]="Errors during source parsing"
 desc_len=${#DESC[@]}
 
 FINE[0]="Lines of source code"
@@ -51,13 +51,13 @@ FINE[12]="Binary operators"
 FINE[13]="Errors rewriting source"
 fine_len=${#FINE[@]}
 
-[ -t 1 ] && echo -n Checking .
-let COUNT[0]=0
+[ -t 1 ] && echo -n Checking \'$dir\' .
+let log_files=0
 for d in `find $dir -name citrun.log`; do
 	[ -t 1 ] && echo -n .
-	let COUNT[0]++
+	let log_files++
 
-	let i=1
+	let i=0
 	while [ $i -lt $desc_len ]; do
 		tmp=`grep -c "${GREP[$i]}" $d`
 		let COUNT[$i]+=tmp
@@ -80,7 +80,9 @@ done
 [ -t 1 ] && echo
 
 echo Summary:
-[ ${COUNT[0]} -eq 0 ] && err "         0 ${DESC[0]}"
+printf "%10i %s\n" $log_files "Log files found"
+[ $log_files -eq 0 ] && exit 0
+
 let i=0
 while [ $i -lt $desc_len ]; do
 	if [ ${COUNT[$i]} -eq 0 ]; then
