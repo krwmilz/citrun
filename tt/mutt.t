@@ -121,18 +121,17 @@ $exp->hard_close();
 
 open( my $fh, ">", "check.good" );
 print $fh <<EOF;
-Checking ....done
-
 Summary:
          3 Log files found
-       218 Source files input
-       262 Calls to the instrumentation tool
-       218 Forked compilers
-       209 Instrument successes
-         9 Both instrument and native compile failed (FP)
+       262 Calls to the rewrite tool
+       218 Source files used as input
         73 Application link commands
-       339 Warnings during source parsing
-        10 Errors during source parsing
+       339 Rewrite parse warnings
+        10 Rewrite parse errors
+       209 Rewrite successes
+         9 Rewrite failures (False Positive)
+       194 Rewritten source compile successes
+        15 Rewritten source compile failues (False Positive)
 
 Totals:
      94664 Lines of source code

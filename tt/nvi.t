@@ -135,16 +135,14 @@ $viewer->close();
 
 open( my $fh, ">", "check.good" );
 print $fh <<EOF;
-Checking ...done
-
 Summary:
          2 Log files found
-       115 Source files input
-       116 Calls to the instrumentation tool
-       115 Forked compilers
-       115 Instrument successes
+       116 Calls to the rewrite tool
+       115 Source files used as input
          2 Application link commands
-        32 Warnings during source parsing
+        32 Rewrite parse warnings
+       115 Rewrite successes
+       115 Rewritten source compile successes
 
 Totals:
      47830 Lines of source code

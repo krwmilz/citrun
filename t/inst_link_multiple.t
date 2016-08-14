@@ -39,11 +39,11 @@ $TEST_TOOLS/citrun-check > check.out && echo ok
 cat <<EOF > check.good
 Summary:
          1 Log files found
-         3 Source files input
-         4 Calls to the instrumentation tool
-         3 Forked compilers
-         3 Instrument successes
+         4 Calls to the rewrite tool
+         3 Source files used as input
          1 Application link commands
+         3 Rewrite successes
+         3 Rewritten source compile successes
 
 Totals:
         18 Lines of source code

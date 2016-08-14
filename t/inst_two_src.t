@@ -21,11 +21,11 @@ EOF
 cat <<EOF > check.good
 Summary:
          1 Log files found
-         2 Source files input
-         1 Calls to the instrumentation tool
-         1 Forked compilers
-         1 Instrument successes
+         1 Calls to the rewrite tool
+         2 Source files used as input
          1 Application link commands
+         1 Rewrite successes
+         1 Rewritten source compile successes
 
 Totals:
          8 Lines of source code

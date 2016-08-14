@@ -63,29 +63,27 @@ $exp->hard_close();
 
 open( my $fh, ">", "check.good" );
 print $fh <<EOF;
-Checking ..done
-
 Summary:
          1 Log files found
-        23 Source files input
-        26 Calls to the instrumentation tool
-        23 Forked compilers
-        23 Instrument successes
+        28 Calls to the rewrite tool
+        25 Source files used as input
          3 Application link commands
-        10 Warnings during source parsing
+        15 Rewrite parse warnings
+        25 Rewrite successes
+        25 Rewritten source compile successes
 
 Totals:
-      5350 Lines of source code
+      5481 Lines of source code
          3 Functions called 'main'
-       222 Function definitions
-       205 If statements
+       238 Function definitions
+       207 If statements
         27 For loops
         12 While loops
          3 Switch statements
-        89 Return statement values
-      1097 Call expressions
-     16820 Total statements
-      1559 Binary operators
+       106 Return statement values
+      1043 Call expressions
+     16602 Total statements
+      1563 Binary operators
          6 Errors rewriting source
 EOF
 

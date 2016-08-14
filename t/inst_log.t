@@ -63,10 +63,10 @@ Instrumentation of '' finished:
     58 Total statements
     6 Binary operators
 Modified source written successfully.
-Instrumentation successful.
-Running native compiler on modified source code.
+Rewriting successful.
 Forked ''.
 '' exited 0.
+Rewritten source compile successful.
 Restored ''.
 citrun-inst 0.0 ()
 Tool called as ''.

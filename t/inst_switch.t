@@ -38,9 +38,9 @@ EOF
 cat <<EOF > check.good
 Summary:
          1 Log files found
-         1 Source files input
-         1 Calls to the instrumentation tool
-         1 Instrument successes
+         1 Calls to the rewrite tool
+         1 Source files used as input
+         1 Rewrite successes
 
 Totals:
         13 Lines of source code
