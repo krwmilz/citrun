@@ -53,6 +53,16 @@ ends_with(std::string const &value, std::string const &suffix)
 	return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
 }
 
+// Returns true if value ends with suffix, false otherwise.
+static bool
+starts_with(std::string const &value, std::string const &prefix)
+{
+	if (prefix.length() > value.length())
+		return false;
+
+	return std::equal(prefix.begin(), prefix.end(), value.begin());
+}
+
 // Copies one file to another preserving timestamps.
 static void
 copy_file(std::string const &dst_fn, std::string const &src_fn)
@@ -146,7 +156,8 @@ InstrumentFrontend::process_cmdline()
 	for (auto &arg : m_args) {
 		cmd_line << arg << " ";
 
-		if (std::strcmp(arg, "-E") == 0) {
+		if (std::strcmp(arg, "-E") == 0 ||
+		    starts_with(arg, "-M")) {
 			*m_log << "Preprocessor argument found\n";
 			exec_compiler();
 		}
