@@ -9,11 +9,11 @@
 
 class RewriteASTConsumer : public clang::ASTConsumer {
 public:
-	RewriteASTConsumer(clang::Rewriter &R) : Visitor(R) {}
+	explicit RewriteASTConsumer(clang::Rewriter &R) : Visitor(R) {}
 
 	// Override the method that gets called for each parsed top-level
 	// declaration.
-	bool HandleTopLevelDecl(clang::DeclGroupRef DR) override {
+	virtual bool HandleTopLevelDecl(clang::DeclGroupRef DR) {
 		for (auto &b : DR) {
 			// Traverse the declaration using our AST visitor.
 			Visitor.TraverseDecl(b);

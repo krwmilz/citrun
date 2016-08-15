@@ -20,7 +20,7 @@ enum counters {
 
 class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor> {
 public:
-	RewriteASTVisitor(clang::Rewriter &R) :
+	explicit RewriteASTVisitor(clang::Rewriter &R) :
 		m_counters(),
 		m_counter_descr({
 				"Functions called 'main'",
