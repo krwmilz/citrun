@@ -18,7 +18,7 @@
 .Os
 .Sh NAME
 .Nm citrun-check
-.Nd check directories for instrumentation artifacts
+.Nd check directories for log files
 .Sh SYNOPSIS
 .Nm
 .Op Ar dir
@@ -26,27 +26,84 @@
 The
 .Nm
 script recursively checks either
-.Ar dir
-or the current working directory for instrumentation artifacts.
+.Ar dir ,
+if given, or the current working directory for
+.Pa citrun.log
+files created by the rewrite tool.
 .Pp
-A summary is printed showing detailed counts of important events. The following
-is an example of what the output looks like:
+When
+.Nm
+does not have its stdout redirected it prints a
+.Qq Checking
+line that adds a single period for every file processed.
+.Pp
+Once checking is complete two sections are printed.
+The text below shows the output of
+.Nm
+after
+.Xr citrun-wrap 1
+had been used to instrument a simple project:
 .Bd -literal -offset indent
-Checking '/usr/ports/pobj/spidermonkey-24.2.0/'...
-       3  Log files found
-     185  Calls to the instrumentation tool
-     117  Forked compilers
-      97  Instrumentation successes
-      19  Instrumentation failures (false positive)
-       1  Instrumentation failures (true positive)
-      60  Application link commands
+Checking '/home/kyle/test' ..done
+
+Summary:
+         1 Calls to the rewrite tool
+         1 Source files used as input
+         1 Application link commands
+         1 Rewrite successes
+         1 Rewritten source compile successes
+
+Totals:
+         6 Lines of source code
+        53 Milliseconds spent rewriting source
+         1 Functions called 'main'
+         1 Function definitions
+         1 Return statement values
+         3 Total statements
 .Ed
 .Pp
-The value of
-.Qq Instrumentation failures (true positive)
-is important. If
-this value is more than 0 it means that instrumentation failed but a native
-compile of the same source succeeded.
+The first section is a summary. It has counts that are related to source files
+and source compilation. The most important counts are in this section.
+.Pp
+The second section contains rewriting totals. These counts are related to
+individual source code elements that were possibly rewritten during a previous
+.Xr citrun-wrap 1
+session.
+.Sh SUMMARY COUNTS
+.Pp
+The summary section contains the most important counts. The following table
+describes each of them in detail:
+.Pp
+.Bl -tag -width Ds
+.It Qq Calls to the rewrite tool
+The total number of times
+.Xr citrun-inst 1
+was called.
+.It Qq Source files used as input
+The total number of C/C++ source files that had rewriting attempted on them.
+.It Qq Application link commands
+Number of link commands detected and modified to include the runtime.
+.It Qq Rewrite parse {warnings,errors}
+The total number of parsing problems the rewriter had.
+.It Qq Rewrite successes
+The number of times the rewriter successfully transformed the entire source
+file.
+.It Qq Rewrite failures (False Positive)
+The number of times the rewriter encountered a fatal error however the native
+compiler also failed to compile the same code.
+.It Qq Rewrite failures (True Positive!)
+The number of times the rewriter encountered a fatal error but the native
+compiler succeeded on the same code. This is bad.
+.It Qq Rewritten source compile successes
+The number of times the rewritten source file is processed successfully by the
+native compiler.
+.It Qq Rewritten source compile failures (False Positive)
+Similar to rewrite failure false positives, the number of times the native
+compiler fails on both the rewritten source and the original source.
+.It Qq Rewritten source compile failures (True Positive!)
+The number of times the native compiler fails on the rewritten source and
+succeeds on the original source. This is bad.
+.El
 .Sh EXIT STATUS
 .Ex -std
 .Sh SEE ALSO
