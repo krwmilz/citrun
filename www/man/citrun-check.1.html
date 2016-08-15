@@ -29,7 +29,7 @@ CITRUN-CHECK(1)</td>
 </tbody>
 </table>
 <div class="section">
-<h1 id="NAME">NAME</h1> <b class="name">citrun-check</b> &#8212; <span class="desc">check directories for instrumentation artifacts</span></div>
+<h1 id="NAME">NAME</h1> <b class="name">citrun-check</b> &#8212; <span class="desc">check directories for log files</span></div>
 <div class="section">
 <h1 id="SYNOPSIS">SYNOPSIS</h1><table class="synopsis">
 <col style="width: 12.00ex;"/>
@@ -45,22 +45,78 @@ CITRUN-CHECK(1)</td>
 </table>
 </div>
 <div class="section">
-<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun-check</b> script recursively checks either <i class="arg">dir</i> or the current working directory for instrumentation artifacts.<div class="spacer">
+<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun-check</b> script recursively checks either <i class="arg">dir</i>, if given, or the current working directory for <i class="file">citrun.log</i> files created by the rewrite tool.<div class="spacer">
 </div>
-A summary is printed showing detailed counts of important events. The following is an example of what the output looks like:<div class="spacer">
+When <b class="name">citrun-check</b> does not have its stdout redirected it prints a &#8220;Checking&#8221; line that adds a single period for every file processed.<div class="spacer">
+</div>
+Once checking is complete two sections are printed. The text below shows the output of <b class="name">citrun-check</b> after <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
 </div>
 <pre style="margin-left: 5.00ex;" class="lit display">
-Checking '/usr/ports/pobj/spidermonkey-24.2.0/'... 
-       3  Log files found 
-     185  Calls to the instrumentation tool 
-     117  Forked compilers 
-      97  Instrumentation successes 
-      19  Instrumentation failures (false positive) 
-       1  Instrumentation failures (true positive) 
-      60  Application link commands</pre>
+Checking '/home/kyle/test' ..done 
+ 
+Summary: 
+         1 Calls to the rewrite tool 
+         1 Source files used as input 
+         1 Application link commands 
+         1 Rewrite successes 
+         1 Rewritten source compile successes 
+ 
+Totals: 
+         6 Lines of source code 
+        53 Milliseconds spent rewriting source 
+         1 Functions called 'main' 
+         1 Function definitions 
+         1 Return statement values 
+         3 Total statements</pre>
 <div class="spacer">
 </div>
-The value of &#8220;Instrumentation failures (true positive)&#8221; is important. If this value is more than 0 it means that instrumentation failed but a native compile of the same source succeeded.</div>
+The first section is a summary. It has counts that are related to source files and source compilation. The most important counts are in this section.<div class="spacer">
+</div>
+The second section contains rewriting totals. These counts are related to individual source code elements that were possibly rewritten during a previous <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> session.</div>
+<div class="section">
+<h1 id="SUMMARY_COUNTS">SUMMARY COUNTS</h1> The summary section contains the most important counts. The following table describes each of them in detail:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Calls to the rewrite tool&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The total number of times <a class="link-man" href="citrun-inst.1.html">citrun-inst(1)</a> was called.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Source files used as input&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The total number of C/C++ source files that had rewriting attempted on them.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Application link commands&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+Number of link commands detected and modified to include the runtime.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewrite parse {warnings,errors}&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The total number of parsing problems the rewriter had.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewrite successes&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The number of times the rewriter successfully transformed the entire source file.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewrite failures (False Positive)&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The number of times the rewriter encountered a fatal error however the native compiler also failed to compile the same code.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewrite failures (True Positive!)&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The number of times the rewriter encountered a fatal error but the native compiler succeeded on the same code. This is bad.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewritten source compile successes&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The number of times the rewritten source file is processed successfully by the native compiler.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewritten source compile failures (False Positive)&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+Similar to rewrite failure false positives, the number of times the native compiler fails on both the rewritten source and the original source.</dd>
+<dt class="list-tag" style="margin-top: 1.00em;">
+&#8220;Rewritten source compile failures (True Positive!)&#8221;</dt>
+<dd class="list-tag" style="margin-left: 6.00ex;">
+The number of times the native compiler fails on the rewritten source and succeeds on the original source. This is bad.</dd>
+</dl>
+</div>
 <div class="section">
 <h1 id="EXIT_STATUS">EXIT STATUS</h1> The <b class="utility">citrun-check</b> utility exits&#160;0 on success, and&#160;&gt;0 if an error occurs.</div>
 <div class="section">
