@@ -277,8 +277,6 @@ fork_viewer()
 		err(1, "fork");
 	else if (pid == 0)
 		execlp("citrun-gl", "citrun-gl", NULL);
-	else
-		warnx("socket not found, forking viewer");
 }
 
 /*
