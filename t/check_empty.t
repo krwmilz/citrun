@@ -8,8 +8,7 @@ echo 1..2
 $TEST_TOOLS/citrun-check > check.out
 
 cat <<EOF > check.good
-Summary:
-         0 Log files found
+No log files found.
 EOF
 
 diff -u check.good check.out && echo ok

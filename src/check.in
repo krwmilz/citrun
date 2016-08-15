@@ -9,7 +9,7 @@ function err {
 
 dir=`pwd`
 if [ $# -eq 1 ]; then
-	[[ ${1} = -* ]] && err "usage: citrun-check [dir]"
+	[[ ${1} = -* ]] && err "Usage: citrun-check [dir]"
 	dir="${1}"
 fi
 [ -d $dir ] || err "citrun-check: $dir: no such directory"
@@ -83,10 +83,9 @@ done
 [ -t 1 ] && echo done
 [ -t 1 ] && echo
 
-echo Summary:
-printf "%10i %s\n" $log_files "Log files found"
-[ $log_files -eq 0 ] && exit 0
+[ $log_files -eq 0 ] && err "No log files found."
 
+echo Summary:
 let i=0
 while [ $i -lt $desc_len ]; do
 	if [ ${COUNT[$i]} -eq 0 ]; then
