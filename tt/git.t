@@ -1,297 +1,15 @@
-use strict;
-use warnings;
-use Expect;
-use Test::More tests => 540 ;
-use test::package;
-use test::viewer;
-use Time::HiRes qw( usleep );
+#!/bin/sh -e
+#
+# Instruments git, checks logs, and makes sure the resulting program still
+# works.
+#
+echo 1..5
+. test/package.sh
 
-my $package = test::package->new("devel/git");
-my $viewer = test::viewer->new();
+pkg_instrument "devel/git"
 
-my $exp = Expect->spawn("/usr/ports/pobj/git-2.9.2/git-2.9.2/git", "clone", "http://git.0x30.net/citrun", "/usr/ports/pobj/git-*");
-$viewer->accept();
-$viewer->cmp_static_data([
-		["/abspath.c",181,228],
-		["/advice.c",120,196],
-		["/alias.c",78,189],
-		["/alloc.c",116,191],
-		["/archive-tar.c",454,349],
-		["/archive-zip.c",586,349],
-		["/archive.c",561,368],
-		["/argv-array.c",88,191],
-		["/attr.c",826,388],
-		["/base85.c",133,181],
-		["/bisect.c",1033,520],
-		["/blob.c",19,177],
-		["/branch.c",372,353],
-		["/builtin/add.c",444,397],
-		["/builtin/am.c",2429,1225],
-		["/builtin/annotate.c",23,179],
-		["/builtin/apply.c",4666,1724],
-		["/builtin/archive.c",110,229],
-		["/builtin/bisect--helper.c",32,179],
-		["/builtin/blame.c",2884,1035],
-		["/builtin/branch.c",876,621],
-		["/builtin/bundle.c",74,219],
-		["/builtin/cat-file.c",541,383],
-		["/builtin/check-attr.c",187,242],
-		["/builtin/check-ignore.c",188,262],
-		["/builtin/check-mailmap.c",67,200],
-		["/builtin/check-ref-format.c",89,215],
-		["/builtin/checkout-index.c",258,294],
-		["/builtin/checkout.c",1286,731],
-		["/builtin/clean.c",1001,545],
-		["/builtin/clone.c",1114,726],
-		["/builtin/column.c",60,197],
-		["/builtin/commit-tree.c",130,247],
-		["/builtin/commit.c",1830,1137],
-		["/builtin/config.c",723,502],
-		["/builtin/count-objects.c",158,237],
-		["/builtin/credential.c",32,191],
-		["/builtin/describe.c",483,429],
-		["/builtin/diff-files.c",72,215],
-		["/builtin/diff-index.c",58,212],
-		["/builtin/diff-tree.c",189,265],
-		["/builtin/diff.c",474,395],
-		["/builtin/fast-export.c",1074,585],
-		["/builtin/fetch-pack.c",222,260],
-		["/builtin/fetch.c",1243,691],
-		["/builtin/fmt-merge-msg.c",715,483],
-		["/builtin/for-each-ref.c",82,195],
-		["/builtin/fsck.c",695,454],
-		["/builtin/gc.c",446,405],
-		["/builtin/get-tar-commit-id.c",42,188],
-		["/builtin/grep.c",928,503],
-		["/builtin/hash-object.c",156,225],
-		["/builtin/help.c",501,413],
-		["/builtin/index-pack.c",1793,915],
-		["/builtin/init-db.c",580,467],
-		["/builtin/interpret-trailers.c",50,184],
-		["/builtin/log.c",1893,965],
-		["/builtin/ls-files.c",568,346],
-		["/builtin/ls-remote.c",115,217],
-		["/builtin/ls-tree.c",190,240],
-		["/builtin/mailinfo.c",62,205],
-		["/builtin/mailsplit.c",342,301],
-		["/builtin/merge-base.c",260,299],
-		["/builtin/merge-file.c",112,214],
-		["/builtin/merge-index.c",111,213],
-		["/builtin/merge-ours.c",35,181],
-		["/builtin/merge-recursive.c",81,214],
-		["/builtin/merge-tree.c",380,304],
-		["/builtin/merge.c",1640,982],
-		["/builtin/mktag.c",175,230],
-		["/builtin/mktree.c",192,232],
-		["/builtin/mv.c",287,348],
-		["/builtin/name-rev.c",414,311],
-		["/builtin/notes.c",1022,628],
-		["/builtin/pack-objects.c",2780,1114],
-		["/builtin/pack-redundant.c",696,395],
-		["/builtin/pack-refs.c",22,181],
-		["/builtin/patch-id.c",199,252],
-		["/builtin/prune-packed.c",68,196],
-		["/builtin/prune.c",158,266],
-		["/builtin/pull.c",929,622],
-		["/builtin/push.c",572,384],
-		["/builtin/read-tree.c",250,288],
-		["/builtin/receive-pack.c",1793,916],
-		["/builtin/reflog.c",751,522],
-		["/builtin/remote-ext.c",200,240],
-		["/builtin/remote-fd.c",80,203],
-		["/builtin/remote.c",1634,909],
-		["/builtin/repack.c",415,363],
-		["/builtin/replace.c",500,398],
-		["/builtin/rerere.c",117,253],
-		["/builtin/reset.c",390,391],
-		["/builtin/rev-list.c",404,353],
-		["/builtin/rev-parse.c",877,600],
-		["/builtin/revert.c",215,254],
-		["/builtin/rm.c",435,374],
-		["/builtin/send-pack.c",301,250],
-		["/builtin/shortlog.c",342,319],
-		["/builtin/show-branch.c",952,510],
-		["/builtin/show-ref.c",229,265],
-		["/builtin/stripspace.c",62,191],
-		["/builtin/submodule--helper.c",875,537],
-		["/builtin/symbolic-ref.c",77,209],
-		["/builtin/tag.c",498,430],
-		["/builtin/unpack-file.c",37,195],
-		["/builtin/unpack-objects.c",581,404],
-		["/builtin/update-index.c",1166,634],
-		["/builtin/update-ref.c",444,351],
-		["/builtin/update-server-info.c",26,180],
-		["/builtin/upload-archive.c",128,224],
-		["/builtin/var.c",94,208],
-		["/builtin/verify-commit.c",95,203],
-		["/builtin/verify-pack.c",83,197],
-		["/builtin/verify-tag.c",59,190],
-		["/builtin/worktree.c",478,441],
-		["/builtin/write-tree.c",57,188],
-		["/bulk-checkin.c",278,258],
-		["/bundle.c",494,416],
-		["/cache-tree.c",724,441],
-		["/color.c",396,302],
-		["/column.c",416,302],
-		["/combine-diff.c",1544,651],
-		["/commit.c",1697,793],
-		["/compat/obstack.c",414,114],
-		["/compat/terminal.c",148,108],
-		["/config.c",2452,1240],
-		["/connect.c",834,480],
-		["/connected.c",117,205],
-		["/convert.c",1414,615],
-		["/copy.c",68,208],
-		["/credential.c",374,345],
-		["/csum-file.c",187,237],
-		["/ctype.c",67,80],
-		["/date.c",1189,533],
-		["/decorate.c",86,191],
-		["/diff-delta.c",490,153],
-		["/diff-lib.c",536,345],
-		["/diff-no-index.c",304,309],
-		["/diff.c",5157,2177],
-		["/diffcore-break.c",305,252],
-		["/diffcore-delta.c",236,238],
-		["/diffcore-order.c",132,222],
-		["/diffcore-pickaxe.c",239,254],
-		["/diffcore-rename.c",680,373],
-		["/dir.c",2708,999],
-		["/editor.c",69,203],
-		["/entry.c",293,298],
-		["/environment.c",348,279],
-		["/ewah/bitmap.c",214,219],
-		["/ewah/ewah_bitmap.c",711,322],
-		["/ewah/ewah_io.c",210,172],
-		["/ewah/ewah_rlw.c",116,121],
-		["/exec_cmd.c",154,211],
-		["/fetch-pack.c",1062,668],
-		["/fsck.c",830,538],
-		["/gettext.c",180,143],
-		["/git.c",719,434],
-		["/gpg-interface.c",261,264],
-		["/graph.c",1332,440],
-		["/grep.c",1798,828],
-		["/hashmap.c",266,235],
-		["/help.c",474,352],
-		["/hex.c",91,185],
-		["/ident.c",518,353],
-		["/kwset.c",772,309],
-		["/levenshtein.c",87,181],
-		["/line-log.c",1254,551],
-		["/line-range.c",291,218],
-		["/list-objects.c",235,263],
-		["/ll-merge.c",413,290],
-		["/lockfile.c",208,265],
-		["/log-tree.c",888,531],
-		["/mailinfo.c",1038,583],
-		["/mailmap.c",365,295],
-		["/match-trees.c",345,280],
-		["/merge-blobs.c",93,198],
-		["/merge-recursive.c",2109,957],
-		["/merge.c",97,260],
-		["/mergesort.c",74,195],
-		["/name-hash.c",239,243],
-		["/notes-cache.c",96,219],
-		["/notes-merge.c",752,516],
-		["/notes-utils.c",177,272],
-		["/notes.c",1319,581],
-		["/object.c",428,315],
-		["/pack-bitmap-write.c",549,349],
-		["/pack-bitmap.c",1069,519],
-		["/pack-check.c",182,225],
-		["/pack-objects.c",110,201],
-		["/pack-revindex.c",201,193],
-		["/pack-write.c",372,286],
-		["/pager.c",179,237],
-		["/parse-options-cb.c",223,250],
-		["/parse-options.c",677,451],
-		["/patch-delta.c",87,108],
-		["/patch-ids.c",106,221],
-		["/path.c",1249,568],
-		["/pathspec.c",497,333],
-		["/pkt-line.c",251,256],
-		["/preload-index.c",114,211],
-		["/pretty.c",1818,864],
-		["/prio-queue.c",91,194],
-		["/progress.c",268,184],
-		["/prompt.c",76,196],
-		["/quote.c",456,297],
-		["/reachable.c",207,259],
-		["/read-cache.c",2327,957],
-		["/ref-filter.c",1713,871],
-		["/reflog-walk.c",339,291],
-		["/refs.c",1232,676],
-		["/refs/files-backend.c",3433,1323],
-		["/remote.c",2367,1172],
-		["/replace_object.c",123,211],
-		["/rerere.c",1252,663],
-		["/resolve-undo.c",193,242],
-		["/revision.c",3316,1457],
-		["/run-command.c",1197,578],
-		["/send-pack.c",582,419],
-		["/sequencer.c",1163,809],
-		["/server-info.c",286,292],
-		["/setup.c",1059,647],
-		["/sha1-array.c",60,185],
-		["/sha1-lookup.c",318,228],
-		["/sha1_file.c",3647,1492],
-		["/sha1_name.c",1515,777],
-		["/shallow.c",665,471],
-		["/sideband.c",153,205],
-		["/sigchain.c",62,193],
-		["/split-index.c",322,256],
-		["/strbuf.c",866,457],
-		["/streaming.c",554,302],
-		["/string-list.c",311,273],
-		["/submodule-config.c",508,361],
-		["/submodule.c",1164,689],
-		["/symlinks.c",324,222],
-		["/tag.c",196,263],
-		["/tempfile.c",306,282],
-		["/thread-utils.c",78,183],
-		["/trace.c",435,277],
-		["/trailer.c",916,573],
-		["/transport-helper.c",1388,753],
-		["/transport.c",1119,590],
-		["/tree-diff.c",708,306],
-		["/tree-walk.c",1063,481],
-		["/tree.c",254,263],
-		["/unpack-trees.c",1961,832],
-		["/url.c",132,214],
-		["/urlmatch.c",539,339],
-		["/usage.c",191,209],
-		["/userdiff.c",290,241],
-		["/utf8.c",668,294],
-		["/varint.c",31,88],
-		["/version.c",39,117],
-		["/versioncmp.c",144,194],
-		["/wildmatch.c",280,225],
-		["/worktree.c",306,328],
-		["/wrapper.c",699,428],
-		["/write_or_die.c",108,212],
-		["/ws.c",396,298],
-		["/wt-status.c",1756,1057],
-		["/xdiff-interface.c",323,279],
-		["/xdiff/xdiffi.c",645,166],
-		["/xdiff/xemit.c",268,100],
-		["/xdiff/xhistogram.c",364,97],
-		["/xdiff/xmerge.c",687,233],
-		["/xdiff/xpatience.c",359,95],
-		["/xdiff/xprepare.c",484,138],
-		["/xdiff/xutils.c",496,127],
-		["/zlib.c",274,241],
-]);
-
-$viewer->cmp_dynamic_data();
-
-$exp->hard_close();
-$viewer->close();
-
-open( my $fh, ">", "check.good" );
-print $fh <<EOF;
+cat <<EOF > check.good
 Summary:
-         1 Log files found
        448 Calls to the rewrite tool
        381 Source files used as input
         82 Application link commands
@@ -300,7 +18,7 @@ Summary:
        376 Rewrite successes
          5 Rewrite failures (False Positive)
        374 Rewritten source compile successes
-         2 Rewritten source compile failues (False Positive)
+         2 Rewritten source compile failures (False Positive)
 
 Totals:
     185689 Lines of source code
@@ -317,7 +35,286 @@ Totals:
      34625 Binary operators
       1530 Errors rewriting source
 EOF
+pkg_check 4
 
-system("$ENV{CITRUN_TOOLS}/citrun-check /usr/ports/pobj/git-* > check.out");
-system("diff -u check.good check.out");
-$package->clean();
+# Start git doing something that will take a while. At my own expense.
+$TEST_WRKDIST/git clone http://git.0x30.net/citrun citrun_TEST_CLONE &
+
+echo ok 5 - started git clone
+
+cat <<EOF> dump.good
+abspath.c
+advice.c
+alias.c
+alloc.c
+archive-tar.c
+archive-zip.c
+archive.c
+argv-array.c
+attr.c
+base85.c
+bisect.c
+blob.c
+branch.c
+builtin/add.c
+builtin/am.c
+builtin/annotate.c
+builtin/apply.c
+builtin/archive.c
+builtin/bisect--helper.c
+builtin/blame.c
+builtin/branch.c
+builtin/bundle.c
+builtin/cat-file.c
+builtin/check-attr.c
+builtin/check-ignore.c
+builtin/check-mailmap.c
+builtin/check-ref-format.c
+builtin/checkout-index.c
+builtin/checkout.c
+builtin/clean.c
+builtin/clone.c
+builtin/column.c
+builtin/commit-tree.c
+builtin/commit.c
+builtin/config.c
+builtin/count-objects.c
+builtin/credential.c
+builtin/describe.c
+builtin/diff-files.c
+builtin/diff-index.c
+builtin/diff-tree.c
+builtin/diff.c
+builtin/fast-export.c
+builtin/fetch-pack.c
+builtin/fetch.c
+builtin/fmt-merge-msg.c
+builtin/for-each-ref.c
+builtin/fsck.c
+builtin/gc.c
+builtin/get-tar-commit-id.c
+builtin/grep.c
+builtin/hash-object.c
+builtin/help.c
+builtin/index-pack.c
+builtin/init-db.c
+builtin/interpret-trailers.c
+builtin/log.c
+builtin/ls-files.c
+builtin/ls-remote.c
+builtin/ls-tree.c
+builtin/mailinfo.c
+builtin/mailsplit.c
+builtin/merge-base.c
+builtin/merge-file.c
+builtin/merge-index.c
+builtin/merge-ours.c
+builtin/merge-recursive.c
+builtin/merge-tree.c
+builtin/merge.c
+builtin/mktag.c
+builtin/mktree.c
+builtin/mv.c
+builtin/name-rev.c
+builtin/notes.c
+builtin/pack-objects.c
+builtin/pack-redundant.c
+builtin/pack-refs.c
+builtin/patch-id.c
+builtin/prune-packed.c
+builtin/prune.c
+builtin/pull.c
+builtin/push.c
+builtin/read-tree.c
+builtin/receive-pack.c
+builtin/reflog.c
+builtin/remote-ext.c
+builtin/remote-fd.c
+builtin/remote.c
+builtin/repack.c
+builtin/replace.c
+builtin/rerere.c
+builtin/reset.c
+builtin/rev-list.c
+builtin/rev-parse.c
+builtin/revert.c
+builtin/rm.c
+builtin/send-pack.c
+builtin/shortlog.c
+builtin/show-branch.c
+builtin/show-ref.c
+builtin/stripspace.c
+builtin/submodule--helper.c
+builtin/symbolic-ref.c
+builtin/tag.c
+builtin/unpack-file.c
+builtin/unpack-objects.c
+builtin/update-index.c
+builtin/update-ref.c
+builtin/update-server-info.c
+builtin/upload-archive.c
+builtin/var.c
+builtin/verify-commit.c
+builtin/verify-pack.c
+builtin/verify-tag.c
+builtin/worktree.c
+builtin/write-tree.c
+bulk-checkin.c
+bundle.c
+cache-tree.c
+color.c
+column.c
+combine-diff.c
+commit.c
+compat/obstack.c
+compat/terminal.c
+config.c
+connect.c
+connected.c
+convert.c
+copy.c
+credential.c
+csum-file.c
+ctype.c
+date.c
+decorate.c
+diff-delta.c
+diff-lib.c
+diff-no-index.c
+diff.c
+diffcore-break.c
+diffcore-delta.c
+diffcore-order.c
+diffcore-pickaxe.c
+diffcore-rename.c
+dir.c
+editor.c
+entry.c
+environment.c
+ewah/bitmap.c
+ewah/ewah_bitmap.c
+ewah/ewah_io.c
+ewah/ewah_rlw.c
+exec_cmd.c
+fetch-pack.c
+fsck.c
+gettext.c
+git.c
+gpg-interface.c
+graph.c
+grep.c
+hashmap.c
+help.c
+hex.c
+ident.c
+kwset.c
+levenshtein.c
+line-log.c
+line-range.c
+list-objects.c
+ll-merge.c
+lockfile.c
+log-tree.c
+mailinfo.c
+mailmap.c
+match-trees.c
+merge-blobs.c
+merge-recursive.c
+merge.c
+mergesort.c
+name-hash.c
+notes-cache.c
+notes-merge.c
+notes-utils.c
+notes.c
+object.c
+pack-bitmap-write.c
+pack-bitmap.c
+pack-check.c
+pack-objects.c
+pack-revindex.c
+pack-write.c
+pager.c
+parse-options-cb.c
+parse-options.c
+patch-delta.c
+patch-ids.c
+path.c
+pathspec.c
+pkt-line.c
+preload-index.c
+pretty.c
+prio-queue.c
+progress.c
+prompt.c
+quote.c
+reachable.c
+read-cache.c
+ref-filter.c
+reflog-walk.c
+refs.c
+refs/files-backend.c
+remote.c
+replace_object.c
+rerere.c
+resolve-undo.c
+revision.c
+run-command.c
+send-pack.c
+sequencer.c
+server-info.c
+setup.c
+sha1-array.c
+sha1-lookup.c
+sha1_file.c
+sha1_name.c
+shallow.c
+sideband.c
+sigchain.c
+split-index.c
+strbuf.c
+streaming.c
+string-list.c
+submodule-config.c
+submodule.c
+symlinks.c
+tag.c
+tempfile.c
+thread-utils.c
+trace.c
+trailer.c
+transport-helper.c
+transport.c
+tree-diff.c
+tree-walk.c
+tree.c
+unpack-trees.c
+url.c
+urlmatch.c
+usage.c
+userdiff.c
+utf8.c
+varint.c
+version.c
+versioncmp.c
+wildmatch.c
+worktree.c
+wrapper.c
+write_or_die.c
+ws.c
+wt-status.c
+xdiff-interface.c
+xdiff/xdiffi.c
+xdiff/xemit.c
+xdiff/xhistogram.c
+xdiff/xmerge.c
+xdiff/xpatience.c
+xdiff/xprepare.c
+xdiff/xutils.c
+zlib.c
+EOF
+
+$TEST_TOOLS/citrun-dump -f | sort > dump.out
+test_diff 6 "citrun-dump diff" dump.out dump.good
+
+pkg_clean
