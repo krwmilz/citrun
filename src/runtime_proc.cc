@@ -20,33 +20,34 @@
 #include "runtime.h"		// citrun_major
 #include "runtime_proc.h"
 
-RuntimeProcess::RuntimeProcess(af_unix &sock) :
-	m_socket(sock),
+RuntimeProcess::RuntimeProcess(shm &s) :
+	m_shm(s),
 	m_tus_with_execs(0)
 {
 	assert(sizeof(pid_t) == 4);
 
-	// Protocol defined in src/runtime.c send_static().
-	// This is the receive side of things.
-	m_socket.read_all(m_major);
+	m_shm.read_all(&m_major);
 	assert(m_major == citrun_major);
-	m_socket.read_all(m_minor);
-	m_socket.read_all(m_num_tus);
-	m_socket.read_all(m_pid);
-	m_socket.read_all(m_ppid);
-	m_socket.read_all(m_pgrp);
-	m_socket.read_string(m_progname);
-	m_socket.read_string(m_cwd);
+	m_shm.read_all(&m_minor);
+	m_shm.read_all(&m_pid);
+	m_shm.read_all(&m_ppid);
+	m_shm.read_all(&m_pgrp);
+	m_shm.read_string(m_progname);
+	m_shm.read_string(m_cwd);
 
-	m_tus.resize(m_num_tus);
-	for (auto &t : m_tus) {
-		m_socket.read_string(t.comp_file_path);
-		m_socket.read_string(t.abs_file_path);
-		m_socket.read_all(t.num_lines);
+	while (m_shm.at_end() == false) {
+		TranslationUnit t;
 
-		t.exec_diffs.resize(t.num_lines, 0);
+		m_shm.read_all(&t.num_lines);
+
+		m_shm.read_string(t.comp_file_path);
+		m_shm.read_string(t.abs_file_path);
+
+		t.exec_diffs = (uint64_t *)m_shm.get_block(t.num_lines * 8);
 		t.source.resize(t.num_lines);
 		read_source(t);
+
+		m_tus.push_back(t);
 	}
 }
 
@@ -56,8 +57,9 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 	std::string line;
 	std::ifstream file_stream(t.abs_file_path);
 
-	if (file_stream.is_open() == 0)
-		errx(1, "ifstream.open()");
+	if (file_stream.is_open() == 0) {
+		warnx("ifstream.open(%s)", t.abs_file_path.c_str());
+	}
 
 	for (auto &l : t.source)
 		std::getline(file_stream, l);
@@ -66,22 +68,4 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 void
 RuntimeProcess::read_executions()
 {
-	m_tus_with_execs = 0;
-
-	for (auto &t : m_tus) {
-		m_socket.read_all(t.has_execs);
-
-		if (t.has_execs == 0) {
-			std::fill(t.exec_diffs.begin(), t.exec_diffs.end(), 0);
-			continue;
-		}
-
-		m_tus_with_execs += 1;
-		size_t bytes_total = t.num_lines * sizeof(uint32_t);
-		m_socket.read_all((uint8_t *)&t.exec_diffs[0], bytes_total);
-	}
-
-	// Send response back
-	uint8_t msg_type = 1;
-	assert(m_socket.write_all(&msg_type, 1) == 1);
 }

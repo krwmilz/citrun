@@ -14,7 +14,7 @@ MakeLocate citrun-check : $(LOCATE_SOURCE) ;
 Shell citrun-check : check.in ;
 
 # utils.a
-Library utils : af_unix.cc runtime_proc.cc ;
+Library utils : shm.cc runtime_proc.cc ;
 
 #
 # citrun-term

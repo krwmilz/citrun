@@ -3,7 +3,6 @@
 #include <clang/Rewrite/Core/Rewriter.h>
 
 enum counters {
-	FUNC_MAIN,
 	FUNC_DEF,
 	IF_STMT,
 	FOR_STMT,
@@ -23,7 +22,6 @@ public:
 	explicit RewriteASTVisitor(clang::Rewriter &R) :
 		m_counters(),
 		m_counter_descr({
-				"Functions called 'main'",
 				"Function definitions",
 				"If statements",
 				"For loops",

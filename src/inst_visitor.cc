@@ -142,7 +142,7 @@ RewriteASTVisitor::modify_stmt(clang::Stmt *s, int &counter)
 	// If x = y is the original statement on line 19 then we try rewriting
 	// as (++_citrun[19], x = y).
 	std::stringstream ss;
-	ss << "(++_citrun["
+	ss << "(++_citrun_node.data["
 		<< m_SM.getPresumedLineNumber(s->getLocStart()) - 1
 		<< "], ";
 
@@ -166,13 +166,6 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 
 	std::stringstream rewrite_text;
 
-	// main() is a special case because it must start the runtime thread.
-	clang::DeclarationName DeclName = f->getNameInfo().getName();
-	if (DeclName.getAsString() == "main") {
-		++m_counters[FUNC_MAIN];
-		rewrite_text << "citrun_start();";
-	}
-
 	clang::Stmt *FuncBody = f->getBody();
 	clang::SourceLocation curly_brace(FuncBody->getLocStart().getLocWithOffset(1));
 
@@ -180,7 +173,7 @@ RewriteASTVisitor::VisitFunctionDecl(clang::FunctionDecl *f)
 	int decl_start = m_SM.getPresumedLineNumber(f->getLocStart());
 	int decl_end = m_SM.getPresumedLineNumber(curly_brace);
 	for (int i = decl_start; i <= decl_end; ++i)
-		rewrite_text << "++_citrun[" << i - 1 << "];";
+		rewrite_text << "++_citrun_node.data[" << i - 1 << "];";
 
 	// Rewrite the function source right after the beginning curly brace.
 	m_TheRewriter.InsertTextBefore(curly_brace, rewrite_text.str());

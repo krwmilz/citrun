@@ -13,137 +13,52 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <sys/socket.h>		/* socket */
-#include <sys/un.h>		/* sockaddr_un */
-#if __APPLE__
-#include <sys/types.h>		/* read */
-#include <sys/uio.h>		/* read */
-#endif
+#include <sys/mman.h>		/* shm_open, mmap */
+#include <sys/stat.h>		/* S_*USR */
 
 #include <assert.h>
-#include <err.h>		/* err, errx, warn */
+#include <err.h>
+#include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
-#include <pthread.h>		/* pthread_create */
 #include <stdlib.h>		/* getenv */
-#include <string.h>		/* strlcpy, strnlen */
-#include <unistd.h>		/* access, get{cwd,pid,ppid,pgrp}, read, write */
+#include <stdio.h>
+#include <string.h>		/* strnlen */
+#include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
 
 #include "runtime.h"
 
-static struct citrun_node	*nodes_head;
-static uint32_t			 nodes_total;
+#define SHM_PATH "/tmp/citrun.shared"
 
-static void *relay_thread(void *);
+static int init = 0;
+static int shm_fd = 0;
+static size_t shm_len = 0;
 
-/*
- * Public interface: Insert a node into the sorted translation unit list.
- */
-void
-citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
+size_t
+add_1(uint8_t *shm, size_t shm_pos, uint8_t data)
 {
-	struct citrun_node *walk = nodes_head;
+	shm[shm_pos] = data;
+	return shm_pos + 1;
+}
 
-	/* Instrumented code and the runtime it links to are tightly bound. */
-	if (node_major != citrun_major || node_minor != citrun_minor) {
-		warnx("libcitrun %i.%i: node with version %i.%i skipped",
-			citrun_major, citrun_minor,
-			node_major, node_minor);
-		return;
-	}
+size_t
+add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
+{
+	memcpy(shm + shm_pos, &data, 4);
+	return shm_pos + 4;
+}
 
-	/* Zeroed memory for double buffering line counts. */
-	n->data_old = calloc(n->size, sizeof(uint64_t));
-	if (n->data_old == NULL)
-		err(1, "calloc");
+size_t
+add_str(uint8_t *shm, size_t shm_pos, const char *data, uint16_t data_sz)
+{
+	memcpy(shm + shm_pos, &data_sz, 2);
+	shm_pos += 2;
 
-	/* Memory for buffering line differences. */
-	n->data_diff = malloc(n->size * sizeof(uint32_t));
-	if (n->data_diff == NULL)
-		err(1, "malloc");
-
-	nodes_total++;
-
-	/* If the list is empty or we need to replace the list head */
-	if (nodes_head == NULL || nodes_head->size >= n->size) {
-		n->next = nodes_head;
-		nodes_head = n;
-		return;
-	}
-
-	/* Search for a next element that n->size is greater than */
-	while (walk->next != NULL && walk->next->size < n->size)
-		walk = walk->next;
-
-	/* Splice in the new element after walk but before walk->next */
-	n->next = walk->next;
-	walk->next = n;
+	memcpy(shm + shm_pos, data, data_sz);
+	return shm_pos + data_sz;
 }
 
 /*
- * Public interface: Called from instrumented main(), starts the relay thread.
- */
-void
-citrun_start()
-{
-	pthread_t		 tid;
-	pthread_create(&tid, NULL, relay_thread, NULL);
-}
-
-/*
- * Read an exact amount of bytes. Returns number of bytes read.
- */
-static int
-xread(int d, const void *buf, size_t bytes_total)
-{
-	ssize_t	 bytes_left = bytes_total;
-	size_t	 bytes_read = 0;
-	ssize_t	 n;
-
-	while (bytes_left > 0) {
-		n = read(d, (uint8_t *)buf + bytes_read, bytes_left);
-
-		if (n == 0) {
-			/* Disconnect */
-			warnx("citrun: viewer disconnected, reconnecting..");
-			return 0;
-		}
-		if (n < 0)
-			err(1, "read()");
-
-		bytes_read += n;
-		bytes_left -= n;
-	}
-
-	return bytes_read;
-}
-
-/*
- * Write an exact amount of bytes. Returns number of bytes written.
- */
-static int
-xwrite(int d, const void *buf, size_t bytes_total)
-{
-	int	 bytes_left = bytes_total;
-	int	 bytes_wrote = 0;
-	ssize_t	 n;
-
-	while (bytes_left > 0) {
-		n = write(d, (uint8_t *)buf + bytes_wrote, bytes_left);
-
-		if (n < 0)
-			err(1, "write()");
-
-		bytes_wrote += n;
-		bytes_left -= n;
-	}
-
-	return bytes_wrote;
-}
-
-/*
- * Send static information contained in each instrumented node.
- *
- * Sent program wide values:
+ * These are written into shared memory, offset 0:
  * - version major and minor
  * - total number of translation units
  * - process id, parent process id, group process id
@@ -151,179 +66,121 @@ xwrite(int d, const void *buf, size_t bytes_total)
  * - program name
  * - length of current working directory
  * - current working directory
- * Sent for each instrumented translation unit:
- * - length of compiler source file path
- * - compiler source file path
- * - length of absolute source file path
- * - absolute source file path
- * - size of the execution counters
  */
 static void
-send_static(int fd)
+write_header()
 {
-	struct citrun_node	 node;
-	pid_t			 pids[3];
-	struct citrun_node	*w;
-	const char		*progname;
-	char			*cwd_buf;
-	int			 i;
-	uint16_t		 sz;
-
-	assert(sizeof(pid_t) == 4);
-
-	xwrite(fd, &citrun_major, sizeof(citrun_major));
-	xwrite(fd, &citrun_minor, sizeof(citrun_minor));
-	xwrite(fd, &nodes_total, sizeof(nodes_total));
-
-	pids[0] = getpid();
-	pids[1] = getppid();
-	pids[2] = getpgrp();
-	for (i = 0; i < (sizeof(pids) / sizeof(pids[0])); i++)
-		xwrite(fd, &pids[i], sizeof(pid_t));
+	char		*cwd_buf;
+	const char	*progname;
+	size_t		 sz = 0;
+	uint16_t	 prog_sz, cwd_sz;
 
 	progname = getprogname();
-	sz = strnlen(progname, PATH_MAX);
-	xwrite(fd, &sz, sizeof(sz));
-	xwrite(fd, progname, sz);
-
 	if ((cwd_buf = getcwd(NULL, 0)) == NULL)
 		err(1, "getcwd");
-	sz = strnlen(cwd_buf, PATH_MAX);
-	xwrite(fd, &sz, sizeof(sz));
-	xwrite(fd, cwd_buf, sz);
-	free(cwd_buf);
 
-	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
-		node = *w;
+	prog_sz = strnlen(progname, PATH_MAX);
+	cwd_sz = strnlen(cwd_buf, PATH_MAX);
 
-		sz = strnlen(node.comp_file_path, PATH_MAX);
-		xwrite(fd, &sz, sizeof(sz));
-		xwrite(fd, node.comp_file_path, sz);
+	sz += sizeof(uint8_t) * 2;
+	sz += sizeof(uint32_t) * 3;
+	sz += sizeof(uint16_t);
+	sz += prog_sz;
+	sz += sizeof(uint16_t);
+	sz += cwd_sz;
 
-		sz = strnlen(node.abs_file_path, PATH_MAX);
-		xwrite(fd, &sz, sizeof(sz));
-		xwrite(fd, node.abs_file_path, sz);
-		xwrite(fd, &node.size, sizeof(node.size));
-	}
-	assert(i == nodes_total);
-	assert(w == NULL);
+	if (ftruncate(shm_fd, sz) < 0)
+		err(1, "ftruncate");
+
+	uint8_t *shm = mmap(NULL, sz, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+	if (shm == MAP_FAILED)
+		err(1, "mmap");
+	shm_len = sz;
+
+	size_t shm_pos = 0;
+	shm_pos = add_1(shm, shm_pos, citrun_major);
+	shm_pos = add_1(shm, shm_pos, citrun_minor);
+
+	shm_pos = add_4(shm, shm_pos, getpid());
+	shm_pos = add_4(shm, shm_pos, getppid());
+	shm_pos = add_4(shm, shm_pos, getpgrp());
+
+	shm_pos = add_str(shm, shm_pos, progname, prog_sz);
+	shm_pos = add_str(shm, shm_pos, cwd_buf, cwd_sz);
+
+	assert(shm_pos == sz);
 }
 
 /*
- * For each instrumented translation unit this runtime knows about, send the
- * number of lines that have executed since this was called last.
- *
- * Sends:
- * - a one byte flag indicating if there were any executions in the translation
- *   unit at all
- * - if the flag is one, then a buffer with a size equal to the number of lines
- *   in the translation is sent, each index into the buffer is a line count
- *   difference.
+ * Operates on global shm_fd.
  */
-static void
-send_dynamic(int fd)
+static int
+get_shm_fd()
 {
-	struct citrun_node	*w;
-	uint64_t		 cur_lines;
-	uint64_t		 old_lines;
-	uint64_t		 diff64;
-	uint32_t		 diff;
-	int			 i;
-	int			 line;
-	uint8_t			 flag;
+	assert(shm_fd >= 0);
 
-	/* Walk each translation unit. */
-	for (w = nodes_head, i = 0; w != NULL; w = w->next, i++) {
+	if (shm_fd > 0)
+		return shm_fd;
 
-		/* Find execution differences line at a time. */
-		flag = 0;
-		for (line = 0; line < w->size; line++) {
-			cur_lines = w->data[line];
-			old_lines = w->data_old[line];
-			assert(cur_lines >= old_lines);
+	if ((shm_fd = shm_open(SHM_PATH, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)) < 0)
+		err(1, "shm_open");
 
-			diff64 = cur_lines - old_lines;
-			w->data_old[line] = cur_lines;
+	if (init > 0)
+		errx(1, "init > 0!");
 
-			if (diff64 > UINT32_MAX)
-				diff = UINT32_MAX;
-			else
-				diff = diff64;
+	write_header();
 
-			/* Store diffs so we can send a big buffer later. */
-			w->data_diff[line] = diff;
-			if (diff > 0)
-				flag = 1;
-		}
-
-		/* Always write the has_execs flag. */
-		xwrite(fd, &flag, sizeof(flag));
-
-		/* Sometimes write the diffs buffer. */
-		if (flag == 1)
-			xwrite(fd, w->data_diff, w->size * sizeof(diff));
-	}
-	assert(i == nodes_total);
-	assert(w == NULL);
+	init++;
+	return shm_fd;
 }
 
-static void
-fork_viewer()
-{
-	pid_t 		 pid;
-
-	pid = fork();
-	if (pid < 0)
-		err(1, "fork");
-	else if (pid == 0)
-		execlp("citrun-gl", "citrun-gl", NULL);
-}
 
 /*
- * Relays line count data over a Unix domain socket.
+ * Public interface: Add a node to shared memory.
  */
-static void *
-relay_thread(void *arg)
+void
+citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 {
-	struct sockaddr_un	 addr;
-	char			*viewer_sock = NULL;
-	int			 fd;
-	uint8_t			 response;
+	int fd;
+	size_t sz = 0;
+	size_t comp_sz, abs_sz;
+	uint8_t *shm;
+	size_t shm_pos = 0;
 
-	if ((viewer_sock = getenv("CITRUN_SOCKET")) == NULL) {
-		viewer_sock = "/tmp/citrun.socket";
-
-		/* Fork a viewer if the default socket path doesn't exist */
-		if (access(viewer_sock, F_OK) < 0)
-			fork_viewer();
+	if (node_major != citrun_major || node_minor != citrun_minor) {
+		warnx("libcitrun %i.%i: node with version %i.%i skipped",
+			citrun_major, citrun_minor,
+			node_major, node_minor);
+		return;
 	}
 
-	while (1) {
-		if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
-			err(1, "socket");
+	fd = get_shm_fd();
 
-		memset(&addr, 0, sizeof(addr));
-		addr.sun_family = AF_UNIX;
-		strlcpy(addr.sun_path, viewer_sock, sizeof(addr.sun_path));
+	comp_sz = strnlen(n->comp_file_path, PATH_MAX);
+	abs_sz = strnlen(n->abs_file_path, PATH_MAX);
 
-		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr))) {
-			/* warn("connect"); */
-			sleep(1);
-			continue;
-		}
+	sz += sizeof(uint32_t);
+	sz += sizeof(uint16_t);
+	sz += comp_sz;
+	sz += sizeof(uint16_t);
+	sz += abs_sz;
+	sz += n->size * sizeof(uint64_t);
 
-		/* Send static information first. */
-		send_static(fd);
+	/* Extend the file for new node + line counts. */
+	if (ftruncate(fd, shm_len + sz) < 0)
+		err(1, "ftruncate");
 
-		/* Synchronously send changing data. */
-		while (1) {
-			send_dynamic(fd);
-			if (xread(fd, &response, 1) == 0)
-				/* Viewer disconnected, go back to connect. */
-				break;
-		}
+	shm = mmap(NULL, sz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, shm_len);
+	if (shm == MAP_FAILED)
+		err(1, "mmap");
+	shm_len += sz;
 
-		shutdown(fd, SHUT_RDWR);
-		close(fd);
-	}
+	shm_pos = add_4(shm, shm_pos, n->size);
+	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
+	shm_pos = add_str(shm, shm_pos, n->abs_file_path, abs_sz);
+
+	n->data = (uint64_t *)&shm[shm_pos];
+	shm_pos += n->size * sizeof(uint64_t);
+
+	assert(shm_pos == sz);
 }

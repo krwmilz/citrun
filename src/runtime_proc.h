@@ -3,29 +3,27 @@
 #include <string>
 #include <vector>
 
-#include "af_unix.h"
+#include "shm.h"
 
 struct TranslationUnit {
 	std::string	comp_file_path;
 	std::string	abs_file_path;
 	uint32_t	num_lines;
 	uint8_t		has_execs;
-	std::vector<uint32_t> exec_diffs;
+	uint64_t	*exec_diffs;
 	std::vector<std::string> source;
 };
 
 class RuntimeProcess {
 public:
-	RuntimeProcess(af_unix &);
+	RuntimeProcess(shm &);
 	void read_executions();
 
-	// Protocol defined in src/runtime.c send_static().
 	uint8_t		m_major;
 	uint8_t		m_minor;
 	std::string	m_progname;
 	std::string	m_cwd;
-	uint32_t	m_num_tus;
-	pid_t		m_pid;
+	uint32_t	m_pid;
 	pid_t		m_ppid;
 	pid_t		m_pgrp;
 	std::vector<TranslationUnit> m_tus;
@@ -33,7 +31,7 @@ public:
 private:
 	void read_source(struct TranslationUnit &);
 
-	af_unix m_socket;
+	shm m_shm;
 };
 
 #endif

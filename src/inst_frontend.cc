@@ -133,11 +133,6 @@ InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 		return;
 
 	*m_log << "Link detected, adding '";
-#ifndef __APPLE__
-	// OSX always links this.
-	m_args.push_back(const_cast<char *>("-pthread"));
-	*m_log << m_args.back() << " ";
-#endif
 #ifdef CITRUN_COVERAGE
 	// Needed because libcitrun.a will be instrumented with gcov.
 	m_args.push_back(const_cast<char *>("-coverage"));
