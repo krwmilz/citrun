@@ -11,12 +11,12 @@
 #include <stdexcept>	// runtime_error
 #include <time.h>	// clock_gettime, nanosleep
 
-#include "af_unix.h"
 #include "runtime_proc.h"	// RuntimeProcess
+#include "shm.h"
 
 class CursesViewer : public RuntimeProcess {
 public:
-	CursesViewer(af_unix &socket);
+	CursesViewer(shm &);
 	void loop();
 
 private:
@@ -42,8 +42,8 @@ private:
 	int		 m_size_x;
 };
 
-CursesViewer::CursesViewer(af_unix &socket) :
-	RuntimeProcess(socket),
+CursesViewer::CursesViewer(shm &shm) :
+	RuntimeProcess(shm),
 	m_fps(0),
 	m_eps(0),
 	m_tu(0),
@@ -79,10 +79,10 @@ CursesViewer::loop()
 		assert(m_execution_history.size() == 33);
 
 		erase();
-		read_executions();
 		get_keyboard();
 		draw();
 		update_execs();
+		read_executions();
 		update_sleep();
 	}
 }
@@ -95,7 +95,7 @@ CursesViewer::get_keyboard()
 
 	if (ch == 'q')
 		throw std::runtime_error("quit");
-	else if (ch == 'l' && m_tu < (m_num_tus - 1))
+	else if (ch == 'l' && m_tu < (m_tus.size() - 1))
 		m_tu++;
 	else if (ch == 'h' && m_tu > 0)
 		m_tu--;
@@ -157,9 +157,9 @@ CursesViewer::print_statusbar()
 	}
 
 	printw(" [%s] [%s] [%i/%i] [%i fps] [%ik execs/s (%i)]",
-		m_progname.c_str(),
-		m_cur_tu.comp_file_path.c_str(),
-		m_tu + 1, m_num_tus,
+		m_progname,
+		m_cur_tu.comp_file_path,
+		m_tu + 1, m_tus.size(),
 		m_fps,
 		m_eps / 1000, m_tus_with_execs);
 
@@ -221,8 +221,7 @@ CursesViewer::update_sleep()
 int
 main(int argc, char *argv[])
 {
-	af_unix listen_sock;
-	std::string socket_path = listen_sock.set_listen();
+	shm shm_conn;
 
 	initscr();
 	if (has_colors() == FALSE) {
@@ -237,21 +236,10 @@ main(int argc, char *argv[])
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
 
-	printw("Waiting for connection on %s\n", socket_path.c_str());
 	refresh();
 
-	// Block SIGPIPE so that write() will generate errors.
-	sigset_t mask_set;
-	sigemptyset(&mask_set);
-	sigaddset(&mask_set, SIGPIPE);
-	sigprocmask(SIG_BLOCK, &mask_set, NULL);
-
-	af_unix *client = listen_sock.accept();
-	if (client == NULL)
-		errx(1, "client was NULL");
-
 	try {
-		CursesViewer conn(*client);
+		CursesViewer conn(shm_conn);
 		conn.loop();
 	} catch (const std::exception &e) {
 		std::cerr << "ERROR: " << e.what();
