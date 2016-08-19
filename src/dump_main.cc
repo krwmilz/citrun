@@ -1,5 +1,5 @@
 //
-// Tool used by the end to end tests.
+// Tool used by tests.
 //
 #include "shm.h"
 #include "runtime_proc.h"
