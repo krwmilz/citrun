@@ -76,9 +76,9 @@ for d in `find $dir -name citrun.log`; do
 	done
 done
 [ -t 1 ] && echo done
-[ -t 1 ] && echo
 
 [ $log_files -eq 0 ] && err "No log files found."
+[ -t 1 ] && echo
 
 echo Summary:
 let i=0
