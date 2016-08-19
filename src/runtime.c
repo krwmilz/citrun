@@ -36,8 +36,7 @@ static size_t shm_len = 0;
 __attribute__((destructor))
 static void clean_up()
 {
-	if (shm_fd > 0)
-		(void) shm_unlink(SHM_PATH);
+	(void) shm_unlink(SHM_PATH);
 }
 
 size_t
