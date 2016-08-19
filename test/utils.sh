@@ -1,3 +1,4 @@
+#
 # Automatically create a temporary directory and define some differencing
 # functions.
 
@@ -38,6 +39,9 @@ function check_diff
 	test_diff $test_num "$test_desc" check.good check.proc
 }
 
+#
+# Difference a file listing output from citrun-dump. Must be sorted first.
+#
 function filelist_diff
 {
 	test_num="${1}"
