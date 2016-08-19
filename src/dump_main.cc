@@ -11,7 +11,7 @@
 static void
 usage()
 {
-	std::cerr << "usage: citrun-dump [-f]" << std::endl;
+	std::cerr << "usage: citrun-dump [-ft]" << std::endl;
 	exit(1);
 }
 
@@ -20,11 +20,15 @@ main(int argc, char *argv[])
 {
 	int ch;
 	int fflag = 0;
+	int tflag = 0;
 
-	while ((ch = getopt(argc, argv, "f")) != -1) {
+	while ((ch = getopt(argc, argv, "ft")) != -1) {
 		switch (ch) {
 		case 'f':
 			fflag = 1;
+			break;
+		case 't':
+			tflag = 1;
 			break;
 		default:
 			usage();
@@ -42,6 +46,16 @@ main(int argc, char *argv[])
 			std::cout << t.comp_file_path << " "
 				<< t.num_lines << std::endl;
 		}
+
+		return 0;
+	}
+
+	if (tflag) {
+		uint64_t total = 0;
+		for (auto &t : rt.m_tus)
+			for (int i = 0; i < t.num_lines; ++i)
+				total += t.exec_diffs[i];
+		std::cout << total << std::endl;
 
 		return 0;
 	}
