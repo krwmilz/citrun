@@ -133,18 +133,19 @@ main(int argc, char *argv[])
 	if (is_citruninst)
 		return ret;
 	if (ret) {
+		// Rewriting failed. Original source files may be in an
+		// inconsistent state.
 		main.restore_original_src();
-		return main.try_compile("the native compile");
+		main.exec_compiler();
 	}
 
 	ret = main.fork_compiler();
 	llog << "Rewritten source compile "
 		<< (ret ? "failed.\n" : "successful.\n");
-
 	main.restore_original_src();
 
-	if (ret == 0)
-		return 0;
-
-	return main.try_compile("the unrewritten source compile");
+	if (ret)
+		// Rewritten compile failed. Run again without modified src.
+		main.exec_compiler();
+	return 0;
 }

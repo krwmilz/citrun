@@ -87,21 +87,17 @@ The total number of parsing problems the rewriter had.
 .It Qq Rewrite successes
 The number of times the rewriter successfully transformed the entire source
 file.
-.It Qq Rewrite failures (False Positive)
-The number of times the rewriter encountered a fatal error however the native
-compiler also failed to compile the same code.
-.It Qq Rewrite failures (True Positive!)
-The number of times the rewriter encountered a fatal error but the native
-compiler succeeded on the same code. This is bad.
+.It Qq Rewrite failures
+Rewriting a source file failed. There are two failure cases, either native
+parsing the original source file also fails, or, only citrun-inst failed parsing
+the source file.
 .It Qq Rewritten source compile successes
 The number of times the rewritten source file is processed successfully by the
 native compiler.
-.It Qq Rewritten source compile failures (False Positive)
-Similar to rewrite failure false positives, the number of times the native
-compiler fails on both the rewritten source and the original source.
-.It Qq Rewritten source compile failures (True Positive!)
-The number of times the native compiler fails on the rewritten source and
-succeeds on the original source. This is bad.
+.It Qq Rewritten source compile failures
+Compiling the rewritten source file failed. There are two failure cases, either
+compiling the original source file also fails or only compiling the
+rewritten source fails.
 .El
 .Sh EXIT STATUS
 .Ex -std

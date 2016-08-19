@@ -9,12 +9,11 @@ public:
 
 	void			process_cmdline();
 	int			instrument();
-	int			try_compile(std::string const &);
 	int			fork_compiler();
+	void			exec_compiler();
 	void			restore_original_src();
 
 private:
-	void			exec_compiler();
 	void			save_if_srcfile(char *);
 	void			if_link_add_runtime(bool, bool);
 

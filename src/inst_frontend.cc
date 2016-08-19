@@ -53,16 +53,6 @@ ends_with(std::string const &value, std::string const &suffix)
 	return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
 }
 
-// Returns true if value ends with suffix, false otherwise.
-static bool
-starts_with(std::string const &value, std::string const &prefix)
-{
-	if (prefix.length() > value.length())
-		return false;
-
-	return std::equal(prefix.begin(), prefix.end(), value.begin());
-}
-
 // Copies one file to another preserving timestamps.
 static void
 copy_file(std::string const &dst_fn, std::string const &src_fn)
@@ -211,20 +201,6 @@ InstrumentFrontend::instrument()
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
 
 	return Tool.run(f.get());
-}
-
-int
-InstrumentFrontend::try_compile(std::string const &variant)
-{
-	int ret = fork_compiler();
-
-	if (ret == 0) {
-		*m_log << "But " << variant << " succeeded!\n";
-		return 0;
-	}
-
-	*m_log << "And " << variant << " failed.\n";
-	return ret;
 }
 
 void
