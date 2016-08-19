@@ -20,16 +20,16 @@ int main(void) {
 EOF
 
 cat <<EOF > return.c.inst_good
-int foo() {++_citrun[0];
-	return (++_citrun[1], 0);
+int foo() {++_citrun.data[0];
+	return (++_citrun.data[1], 0);
 }
 
-int main(void) {citrun_start();++_citrun[4];
-	return (++_citrun[5], 10);
+int main(void) {++_citrun.data[4];
+	return (++_citrun.data[5], 10);
 
-	return (++_citrun[7], (++_citrun[7], 10 + 10));
+	return (++_citrun.data[7], (++_citrun.data[7], 10 + 10));
 
-	return (++_citrun[9], (++_citrun[9], foo()));
+	return (++_citrun.data[9], (++_citrun.data[9], foo()));
 }
 EOF
 
@@ -41,7 +41,6 @@ Summary:
 
 Totals:
         12 Lines of source code
-         1 Functions called 'main'
          2 Function definitions
          4 Return statement values
          1 Call expressions

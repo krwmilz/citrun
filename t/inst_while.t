@@ -16,12 +16,12 @@ int main(int argc, char *argv[]) {
 EOF
 
 cat <<EOF > while.c.inst_good
-int main(int argc, char *argv[]) {citrun_start();++_citrun[0];
-	while ((++_citrun[1], (++_citrun[1], argc < 17)))
+int main(int argc, char *argv[]) {++_citrun.data[0];
+	while ((++_citrun.data[1], (++_citrun.data[1], argc < 17)))
 		argc++;
 
-	while ((++_citrun[4], ((++_citrun[4], argc && argv))));
-	return (++_citrun[5], 0);
+	while ((++_citrun.data[4], ((++_citrun.data[4], argc && argv))));
+	return (++_citrun.data[5], 0);
 }
 EOF
 
@@ -33,7 +33,6 @@ Summary:
 
 Totals:
          8 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          2 While loops
          1 Return statement values

@@ -23,7 +23,7 @@ other(int a,
 	int b)
 
 
-{++_citrun[0];++_citrun[1];++_citrun[2];++_citrun[3];++_citrun[4];++_citrun[5];++_citrun[6];
+{++_citrun.data[0];++_citrun.data[1];++_citrun.data[2];++_citrun.data[3];++_citrun.data[4];++_citrun.data[5];++_citrun.data[6];
 }
 EOF
 

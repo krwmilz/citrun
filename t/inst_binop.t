@@ -39,9 +39,9 @@ static const struct {
 	unsigned char data[0 + 64 * 6];
 } blah;
 
-int main(void) {citrun_start();++_citrun[13];
-	if ((++_citrun[14], (++_citrun[14], 4 + 3)))
-		return (++_citrun[15], 0);
+int main(void) {++_citrun.data[13];
+	if ((++_citrun.data[14], (++_citrun.data[14], 4 + 3)))
+		return (++_citrun.data[15], 0);
 }
 EOF
 
@@ -53,7 +53,6 @@ Summary:
 
 Totals:
         18 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          1 If statements
          1 Return statement values

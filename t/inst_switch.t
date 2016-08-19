@@ -21,17 +21,17 @@ int main(void) {
 EOF
 
 cat <<EOF > switch.c.inst_good
-int main(void) {citrun_start();++_citrun[0];
+int main(void) {++_citrun.data[0];
 	int i;
 
-	switch ((++_citrun[3], i)) {
+	switch ((++_citrun.data[3], i)) {
 	case 0:
 		break;
 	case 1:
 		break;
 	}
 
-	return (++_citrun[10], 0);
+	return (++_citrun.data[10], 0);
 }
 EOF
 
@@ -43,7 +43,6 @@ Summary:
 
 Totals:
         13 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          1 Switch statements
          1 Return statement values

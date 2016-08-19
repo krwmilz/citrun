@@ -55,7 +55,6 @@ Command line is ''.
 Added clangtool argument ''.
 Instrumentation of '' finished:
     22 Lines of source code
-    1 Functions called ''
     2 Function definitions
     2 If statements
     4 Return statement values

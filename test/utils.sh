@@ -24,7 +24,7 @@ function inst_diff
 	test_num="${2}"
 	test_desc="instrumented source diff"
 
-	tail -n +33 $file.citrun > $file.inst_proc
+	tail -n +27 $file.citrun > $file.inst_proc
 	test_diff $test_num "$test_desc" $file.inst_good $file.inst_proc
 }
 

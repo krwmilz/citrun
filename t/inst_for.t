@@ -15,10 +15,10 @@ int main(int argc, char *argv[]) {
 EOF
 
 cat <<EOF > for.c.inst_good
-int main(int argc, char *argv[]) {citrun_start();++_citrun[0];
+int main(int argc, char *argv[]) {++_citrun.data[0];
 	for (;;);
 
-	for ((++_citrun[3], argc = 0); (++_citrun[3], (++_citrun[3], argc < 10)); argc++)
+	for ((++_citrun.data[3], argc = 0); (++_citrun.data[3], (++_citrun.data[3], argc < 10)); argc++)
 		argv++;
 }
 EOF
@@ -31,7 +31,6 @@ Summary:
 
 Totals:
          7 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          1 For loops
         15 Total statements

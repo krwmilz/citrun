@@ -20,16 +20,16 @@ int main(int argc, char *argv[]) {
 EOF
 
 cat <<EOF > if.c.inst_good
-int main(int argc, char *argv[]) {citrun_start();++_citrun[0];
-	if ((++_citrun[1], (++_citrun[1], argc == 1)))
-		return (++_citrun[2], 1);
+int main(int argc, char *argv[]) {++_citrun.data[0];
+	if ((++_citrun.data[1], (++_citrun.data[1], argc == 1)))
+		return (++_citrun.data[2], 1);
 	else
-		return(++_citrun[4], (14));
+		return(++_citrun.data[4], (14));
 
-	if ((++_citrun[6], ((++_citrun[6], argc = 2))))
-		return (++_citrun[7], 5);
+	if ((++_citrun.data[6], ((++_citrun.data[6], argc = 2))))
+		return (++_citrun.data[7], 5);
 	else
-		return(++_citrun[9], (0));
+		return(++_citrun.data[9], (0));
 }
 EOF
 
@@ -41,7 +41,6 @@ Summary:
 
 Totals:
         12 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          2 If statements
          4 Return statement values

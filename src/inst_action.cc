@@ -79,14 +79,14 @@ InstrumentAction::EndSourceFileAction()
 		<< "extern \"C\" {\n"
 		<< "#endif\n";
 	preamble << runtime_h << "\n";
-	preamble << "static struct citrun_node _citrun_node = {\n"
+	preamble << "static struct citrun_node _citrun = {\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"
 		<< "	\"" << getCurrentFile().str() << "\",\n";
 	preamble << "};\n";
 	preamble << "__attribute__((constructor))\n"
 		<< "static void citrun_constructor() {\n"
-		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun_node);\n"
+		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
 		<< "}\n";
 	preamble << "#ifdef __cplusplus\n"
 		<< "}\n"

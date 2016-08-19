@@ -28,7 +28,6 @@ Summary:
 
 Totals:
          8 Lines of source code
-         1 Functions called 'main'
          2 Function definitions
          2 Return statement values
          6 Total statements

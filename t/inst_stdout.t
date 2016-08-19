@@ -24,7 +24,6 @@ Summary:
 
 Totals:
          7 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          1 Return statement values
          1 Call expressions

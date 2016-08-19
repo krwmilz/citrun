@@ -1,6 +1,6 @@
 use strict;
 use Expect;
-use Test::More tests => 1;
+use Test::More skip_all => "Uses perl expect";
 use test::project;
 
 my $project = test::project->new();

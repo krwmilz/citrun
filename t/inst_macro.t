@@ -18,9 +18,9 @@ EOF
 cat <<EOF > macro.c.inst_good
 #define MAYBE 1023;
 
-int main(int argc, char *argv[]) {citrun_start();++_citrun[2];
+int main(int argc, char *argv[]) {++_citrun.data[2];
 	int abd = 1023 + MAYBE;
-	return (++_citrun[4], 0);
+	return (++_citrun.data[4], 0);
 }
 EOF
 
@@ -32,7 +32,6 @@ Summary:
 
 Totals:
          7 Lines of source code
-         1 Functions called 'main'
          1 Function definitions
          1 Return statement values
          7 Total statements
