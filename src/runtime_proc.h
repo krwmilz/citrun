@@ -25,8 +25,8 @@ public:
 	const char	*m_progname;
 	const char	*m_cwd;
 	uint32_t	 m_pid;
-	pid_t		 m_ppid;
-	pid_t		 m_pgrp;
+	uint32_t	 m_ppid;
+	uint32_t	 m_pgrp;
 	std::vector<TranslationUnit> m_tus;
 	int		m_tus_with_execs;
 private:
