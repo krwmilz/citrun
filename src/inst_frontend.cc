@@ -142,7 +142,7 @@ InstrumentFrontend::process_cmdline()
 		cmd_line << arg << " ";
 
 		if (std::strcmp(arg, "-E") == 0 ||
-		    starts_with(arg, "-M")) {
+		    std::strcmp(arg, "-MM") == 0) {
 			*m_log << "Preprocessor argument found\n";
 			exec_compiler();
 		}
