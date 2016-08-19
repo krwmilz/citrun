@@ -22,7 +22,7 @@ shm::shm() :
 	fstat(m_fd, &sb);
 
 	if (sb.st_size > 1024 * 1024 * 1024)
-		errx(1, "shared memory too large: %i", sb.st_size);
+		errx(1, "shared memory too large: %lli", sb.st_size);
 
 	m_mem = (uint8_t *)mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, m_fd, 0);
 	if (m_mem == MAP_FAILED)
@@ -35,7 +35,7 @@ shm::read_cstring(const char **c_str)
 {
 	size_t sz = strlen((const char *)m_mem + m_pos) + 1;
 	if (sz > 1025)
-		errx(1, "read_string: %i too long", sz);
+		errx(1, "read_string: %zu too long", sz);
 
 	*c_str = (const char *)m_mem + m_pos;
 	m_pos += sz;
