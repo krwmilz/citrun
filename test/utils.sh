@@ -3,11 +3,9 @@
 
 set -o nounset
 
-# Create temp dir and remove it whenever this script exits.
 tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
 trap "rm -rf $tmpdir" EXIT
 
-# Tests will use this variable to find the in tree tools.
 export TEST_TOOLS="`pwd`/src";
 
 cd $tmpdir
