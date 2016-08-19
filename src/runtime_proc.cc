@@ -17,7 +17,7 @@
 #include <err.h>
 #include <fstream>
 
-#include "runtime.h"		// citrun_major
+#include "version.h"		// citrun_major
 #include "runtime_proc.h"
 
 RuntimeProcess::RuntimeProcess(shm &s) :

@@ -20,12 +20,11 @@
 #include <err.h>
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
-#include <stdlib.h>		/* getenv */
-#include <stdio.h>
 #include <string.h>		/* strnlen */
 #include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
 
 #include "runtime.h"
+#include "version.h"
 
 #define SHM_PATH "/tmp/citrun.shared"
 

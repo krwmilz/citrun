@@ -13,8 +13,8 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
-#include "runtime.h"		// citrun_major, citrun_minor
 #include "inst_frontend.h"	// InstrumentFrontend
+#include "version.h"		// citrun_major, citrun_minor
 
 #include <sys/utsname.h>	// uname
 

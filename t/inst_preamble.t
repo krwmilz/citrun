@@ -14,8 +14,6 @@ cat <<EOF > preamble.c.good
 extern "" {
 #endif
 #include <stdint.h>
-static const uint8_t citrun_major =	 0;
-static const uint8_t citrun_minor =	 0;
 struct citrun_node {
 	uint32_t		 size;
 	const char		*comp_file_path;
@@ -23,7 +21,6 @@ struct citrun_node {
 	uint64_t		*data;
 };
 void citrun_node_add(uint8_t, uint8_t, struct citrun_node *);
-
 static struct citrun_node _citrun = {
 	1,
 	"",
@@ -31,7 +28,7 @@ static struct citrun_node _citrun = {
 };
 __attribute__((constructor))
 static void citrun_constructor() {
-	citrun_node_add(citrun_major, citrun_minor, &_citrun);
+	citrun_node_add(0, 0, &_citrun);
 }
 #ifdef __cplusplus
 }

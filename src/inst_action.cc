@@ -15,6 +15,7 @@
 //
 #include "inst_action.h"
 #include "runtime_h.h"
+#include "version.h"		// citrun_major, citrun_minor
 
 #include <clang/Frontend/CompilerInstance.h>
 #include <err.h>
@@ -78,7 +79,7 @@ InstrumentAction::EndSourceFileAction()
 	preamble << "#ifdef __cplusplus\n"
 		<< "extern \"C\" {\n"
 		<< "#endif\n";
-	preamble << runtime_h << "\n";
+	preamble << runtime_h;
 	preamble << "static struct citrun_node _citrun = {\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"
@@ -86,7 +87,8 @@ InstrumentAction::EndSourceFileAction()
 	preamble << "};\n";
 	preamble << "__attribute__((constructor))\n"
 		<< "static void citrun_constructor() {\n"
-		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
+		<< "	citrun_node_add(" << unsigned(citrun_major) << ", "
+		<< unsigned(citrun_minor) << ", &_citrun);\n"
 		<< "}\n";
 	preamble << "#ifdef __cplusplus\n"
 		<< "}\n"

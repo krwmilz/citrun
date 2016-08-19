@@ -1,6 +1,4 @@
 #include <stdint.h>
-static const uint8_t citrun_major =	 0;
-static const uint8_t citrun_minor =	 0;
 struct citrun_node {
 	uint32_t		 size;
 	const char		*comp_file_path;
