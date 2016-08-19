@@ -56,7 +56,7 @@ add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
 size_t
 add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t null_len)
 {
-	strlcpy(shm + shm_pos, str, null_len);
+	strlcpy((char *)shm + shm_pos, str, null_len);
 	return shm_pos + null_len;
 }
 
