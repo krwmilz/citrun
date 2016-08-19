@@ -33,6 +33,13 @@ static int init = 0;
 static int shm_fd = 0;
 static size_t shm_len = 0;
 
+__attribute__((destructor))
+static void clean_up()
+{
+	if (shm_fd > 0)
+		(void) shm_unlink(SHM_PATH);
+}
+
 size_t
 add_1(uint8_t *shm, size_t shm_pos, uint8_t data)
 {
@@ -48,13 +55,10 @@ add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
 }
 
 size_t
-add_str(uint8_t *shm, size_t shm_pos, const char *data, uint16_t data_sz)
+add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t null_len)
 {
-	memcpy(shm + shm_pos, &data_sz, 2);
-	shm_pos += 2;
-
-	memcpy(shm + shm_pos, data, data_sz);
-	return shm_pos + data_sz;
+	strlcpy(shm + shm_pos, str, null_len);
+	return shm_pos + null_len;
 }
 
 /*
@@ -79,14 +83,12 @@ write_header()
 	if ((cwd_buf = getcwd(NULL, 0)) == NULL)
 		err(1, "getcwd");
 
-	prog_sz = strnlen(progname, PATH_MAX);
-	cwd_sz = strnlen(cwd_buf, PATH_MAX);
+	prog_sz = strnlen(progname, PATH_MAX) + 1;
+	cwd_sz = strnlen(cwd_buf, PATH_MAX) + 1;
 
 	sz += sizeof(uint8_t) * 2;
 	sz += sizeof(uint32_t) * 3;
-	sz += sizeof(uint16_t);
 	sz += prog_sz;
-	sz += sizeof(uint16_t);
 	sz += cwd_sz;
 
 	if (ftruncate(shm_fd, sz) < 0)
@@ -122,7 +124,7 @@ get_shm_fd()
 	if (shm_fd > 0)
 		return shm_fd;
 
-	if ((shm_fd = shm_open(SHM_PATH, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)) < 0)
+	if ((shm_fd = shm_open(SHM_PATH, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) < 0)
 		err(1, "shm_open");
 
 	if (init > 0)
@@ -156,13 +158,12 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 
 	fd = get_shm_fd();
 
-	comp_sz = strnlen(n->comp_file_path, PATH_MAX);
-	abs_sz = strnlen(n->abs_file_path, PATH_MAX);
+	comp_sz = strnlen(n->comp_file_path, PATH_MAX) + 1;
+	abs_sz = strnlen(n->abs_file_path, PATH_MAX) + 1;
 
+	sz += sizeof(uint8_t);
 	sz += sizeof(uint32_t);
-	sz += sizeof(uint16_t);
 	sz += comp_sz;
-	sz += sizeof(uint16_t);
 	sz += abs_sz;
 	sz += n->size * sizeof(uint64_t);
 
@@ -175,6 +176,10 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 		err(1, "mmap");
 	shm_len += sz;
 
+	/* Skip past the 'ready' bit location. */
+	size_t ready_bit = shm_pos;
+	shm_pos += 1;
+
 	shm_pos = add_4(shm, shm_pos, n->size);
 	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
 	shm_pos = add_str(shm, shm_pos, n->abs_file_path, abs_sz);
@@ -183,4 +188,7 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 	shm_pos += n->size * sizeof(uint64_t);
 
 	assert(shm_pos == sz);
+
+	/* Flip the ready bit. */
+	shm[ready_bit] = 1;
 }

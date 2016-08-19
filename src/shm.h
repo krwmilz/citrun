@@ -15,7 +15,12 @@ public:
 		m_pos += sizeof(T);
 	};
 
-	void read_string(std::string &);
+	void read_pos(uint8_t *bit)
+	{
+		*bit = m_mem[m_pos];
+	}
+
+	void read_cstring(const char **);
 	void *get_block(size_t);
 	bool at_end();
 

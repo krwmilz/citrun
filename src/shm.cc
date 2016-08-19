@@ -31,16 +31,13 @@ shm::shm() :
 }
 
 void
-shm::read_string(std::string &str)
+shm::read_cstring(const char **c_str)
 {
-	uint16_t sz;
-	read_all(&sz);
-
-	if (sz > 1024)
+	size_t sz = strlen((const char *)m_mem + m_pos) + 1;
+	if (sz > 1025)
 		errx(1, "read_string: %i too long", sz);
 
-	str.resize(sz);
-	std::copy(m_mem + m_pos, m_mem + m_pos + sz, &str[0]);
+	*c_str = (const char *)m_mem + m_pos;
 	m_pos += sz;
 }
 

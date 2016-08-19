@@ -32,16 +32,22 @@ RuntimeProcess::RuntimeProcess(shm &s) :
 	m_shm.read_all(&m_pid);
 	m_shm.read_all(&m_ppid);
 	m_shm.read_all(&m_pgrp);
-	m_shm.read_string(m_progname);
-	m_shm.read_string(m_cwd);
+	m_shm.read_cstring(&m_progname);
+	m_shm.read_cstring(&m_cwd);
 
 	while (m_shm.at_end() == false) {
 		TranslationUnit t;
 
+		uint8_t ready = 0;
+		while (ready == 0)
+			m_shm.read_pos(&ready);
+		// Hack to increment the counter.
+		m_shm.read_all(&ready);
+
 		m_shm.read_all(&t.num_lines);
 
-		m_shm.read_string(t.comp_file_path);
-		m_shm.read_string(t.abs_file_path);
+		m_shm.read_cstring(&t.comp_file_path);
+		m_shm.read_cstring(&t.abs_file_path);
 
 		t.exec_diffs = (uint64_t *)m_shm.get_block(t.num_lines * 8);
 		t.source.resize(t.num_lines);
@@ -58,7 +64,8 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 	std::ifstream file_stream(t.abs_file_path);
 
 	if (file_stream.is_open() == 0) {
-		warnx("ifstream.open(%s)", t.abs_file_path.c_str());
+		warnx("ifstream.open(%s)", t.abs_file_path);
+		return;
 	}
 
 	for (auto &l : t.source)
