@@ -1,0 +1,68 @@
+# exports TEST_TOOLS and puts us in a temporary directory.
+. test/utils.sh
+
+cat <<EOF > one.c
+#include <err.h>
+#include <signal.h>
+#include <stdlib.h>
+
+long long fib(long long);
+void print_output(long long);
+
+void
+usr1_sig(int signal)
+{
+	exit(0);
+}
+
+int
+main(int argc, char *argv[])
+{
+	struct sigaction sa;
+	long long n;
+
+	if (argc != 2)
+		errx(1, "argc != 2");
+
+	sa.sa_handler = &usr1_sig;
+	sa.sa_flags = SA_RESTART;
+	sigfillset(&sa.sa_mask);
+	if (sigaction(SIGUSR1, &sa, NULL) == -1)
+		err(1, "sigaction");
+
+	n = atoi(argv[1]);
+
+	print_output(fib(n));
+	return 0;
+}
+EOF
+
+cat <<EOF > two.c
+long long
+fib(long long n)
+{
+	if (n == 0)
+		return 0;
+	else if (n == 1)
+		return 1;
+
+	return fib(n - 1) + fib(n - 2);
+}
+EOF
+
+cat <<EOF > three.c
+#include <stdio.h>
+
+void
+print_output(long long n)
+{
+	fprintf(stderr, "%lli", n);
+	return;
+}
+EOF
+
+cat <<EOF > Jamfile
+Main program : one.c two.c three.c ;
+EOF
+
+$TEST_TOOLS/citrun-wrap jam

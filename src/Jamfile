@@ -16,6 +16,10 @@ Shell citrun-check : check.in ;
 # utils.a
 Library utils : shm.cc runtime_proc.cc ;
 
+# citrun-dump
+LinkLibraries citrun-dump : utils ;
+Main citrun-dump : dump_main.cc ;
+
 #
 # citrun-term
 #

@@ -41,6 +41,16 @@ function check_diff
 	test_diff $test_num "$test_desc" check.good check.proc
 }
 
+function filelist_diff
+{
+	test_num="${1}"
+	test_desc="source file (path, length) diff"
+
+	sort filelist.out > filelist.proc
+	test_diff $test_num "$test_desc" filelist.good filelist.proc
+	rm filelist.proc
+}
+
 function test_diff
 {
 	test_num=${1}

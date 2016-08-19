@@ -41,6 +41,7 @@ if $(OS) = OPENBSD {
 	LINKLIBS on citrun-gl = -lestdc++ -lm -lglut ;
 	LINKLIBS on citrun-inst = -lestdc++ ;
 	LINKLIBS on citrun-term = -lestdc++ ;
+	LINKLIBS on citrun-dump = -L/usr/local/lib -lestdc++ ;
 }
 
 if $(OS) = MACOSX {

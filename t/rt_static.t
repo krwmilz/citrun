@@ -1,35 +1,31 @@
-use strict;
-use Cwd;
-use Test::More tests => 21;
-use test::project;
-use test::viewer;
+#!/bin/sh
+#
+# Test that the basic static structure of the shared memory region is what we
+# expect.
+#
+echo 1..4
+. test/project.sh
 
-my $project = test::project->new();
-my $viewer = test::viewer->new();
+./program 45 &
+pid=$!
 
-$project->run(45);
+$TEST_TOOLS/citrun-dump | grep -e "Versi" -e "Progr" -e "Translat" > dump.out
+$TEST_TOOLS/citrun-dump -f > filelist.out
 
-$viewer->accept();
-is( $viewer->{maj}, 	0,	"protocol major version" );
-is( $viewer->{min}, 	0,	"protocol minor version" );
-is( $viewer->{ntus},	3,	"translation unit count" );
-is( $viewer->{progname}, "program", "program name" );
-is( $viewer->{cwd},	getcwd,	"current working dir" );
-is( @{ $viewer->{pids} },	3,	"number of pids" );
-cmp_ok( $viewer->{pids}->[0],	">",	1,	"pid check lower" );
-cmp_ok( $viewer->{pids}->[0],	"<",	100000,	"pid check upper" );
-cmp_ok( $viewer->{pids}->[1],	">",	1,	"ppid check lower" );
-cmp_ok( $viewer->{pids}->[1],	"<",	100000,	"ppid check upper" );
-cmp_ok( $viewer->{pids}->[2],	">",	1,	"pgrp check lower" );
-cmp_ok( $viewer->{pids}->[2],	"<",	100000,	"pgrp check upper" );
+kill -USR1 $pid
+wait
+[ $? -eq 0 ] && echo ok 2 - program return code after SIGUSR1
 
-$viewer->cmp_static_data([
-		[ "one.c", 34 ],
-		[ "three.c", 9 ],
-		[ "two.c", 11 ],
-]);
+cat <<EOF > dump.good
+Version: 0.0
+Program name: program
+Translation units: 3
+EOF
+test_diff 3 "citrun-dump output" dump.out dump.good
 
-$project->kill();
-my ($ret, $err) = $project->wait();
-is( $ret, 0, "instrumented program check return code" );
-is( $err, undef, "instrumented program check stderr" );
+cat <<EOF > filelist.good
+one.c 34
+three.c 9
+two.c 11
+EOF
+filelist_diff 4
