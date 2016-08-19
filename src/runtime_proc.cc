@@ -72,6 +72,15 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 		std::getline(file_stream, l);
 }
 
+const TranslationUnit *
+RuntimeProcess::find_tu(std::string const &srcname) const
+{
+	for (auto &i : m_tus)
+		if (srcname == i.comp_file_path)
+			return &i;
+	return NULL;
+}
+
 void
 RuntimeProcess::read_executions()
 {

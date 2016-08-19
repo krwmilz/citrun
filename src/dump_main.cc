@@ -5,13 +5,14 @@
 #include "runtime_proc.h"
 
 #include <cstring>
+#include <err.h>
 #include <iostream>
 #include <unistd.h>		// getopt
 
 static void
 usage()
 {
-	std::cerr << "usage: citrun-dump [-ft]" << std::endl;
+	std::cerr << "usage: citrun-dump [-ft] [-s srcfile]" << std::endl;
 	exit(1);
 }
 
@@ -20,15 +21,19 @@ main(int argc, char *argv[])
 {
 	int ch;
 	int fflag = 0;
+	char *sarg = NULL;
 	int tflag = 0;
 
-	while ((ch = getopt(argc, argv, "ft")) != -1) {
+	while ((ch = getopt(argc, argv, "fs:t")) != -1) {
 		switch (ch) {
 		case 'f':
 			fflag = 1;
 			break;
 		case 't':
 			tflag = 1;
+			break;
+		case 's':
+			sarg = optarg;
 			break;
 		default:
 			usage();
@@ -59,6 +64,18 @@ main(int argc, char *argv[])
 
 		return 0;
 	}
+
+	if (sarg) {
+		const TranslationUnit *t;
+		if ((t = rt.find_tu(sarg)) == NULL)
+			errx(1, "no source named '%s'\n", sarg);
+
+		for (auto &l : t->source)
+			std::cout << l << std::endl;
+
+		return 0;
+	}
+
 
 	std::cout << "Version: "
 			<< unsigned(rt.m_major) << "."

@@ -17,6 +17,7 @@ struct TranslationUnit {
 class RuntimeProcess {
 public:
 	RuntimeProcess(shm &);
+	const TranslationUnit *find_tu(std::string const &) const;
 	void read_executions();
 
 	uint8_t		 m_major;
