@@ -1,7 +1,6 @@
 # Automatically create a temporary directory and define some differencing
 # functions.
 
-# Make calling functions easier?
 set -o nounset
 
 # Create temp dir and remove it whenever this script exits.
