@@ -1,33 +1,31 @@
 SubDir TOP src ;
 
 #
-# libcitrun.a
+# libraries
 #
 ObjectCcFlags runtime.c : -fPIC -ansi ;
 Library libcitrun : runtime.c ;
+
+Library utils : shm.cc runtime_proc.cc ;
+LinkLibraries citrun-dump citrun-term citrun-gl : utils ;
 
 #
 # citrun-wrap, citrun-check
 #
 MkWrap citrun-wrap : wrap.in ;
+
 MakeLocate citrun-check : $(LOCATE_SOURCE) ;
 Shell citrun-check : check.in ;
 
-# utils.a
-Library utils : shm.cc runtime_proc.cc ;
-
 #
-# citrun-dump
+# citrun-dump (not installed)
 #
-LinkLibraries citrun-dump : utils ;
 Main citrun-dump : dump_main.cc ;
 
 #
 # citrun-term
 #
 LINKLIBS on citrun-term += -lcurses ;
-
-LinkLibraries citrun-term : utils ;
 Main citrun-term : term_main.cc ;
 
 #
@@ -52,7 +50,7 @@ ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
 ObjectC++Flags $(GL_SRCS) : -I/usr/local/include ;
 
 LINKLIBS on citrun-gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
-LinkLibraries citrun-gl : libglyphy utils ;
+LinkLibraries citrun-gl : libglyphy ;
 
 Main citrun-gl : $(GL_SRCS) ;
 
