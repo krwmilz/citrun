@@ -6,7 +6,6 @@ echo 1..2
 
 touch preamble.c
 $TEST_TOOLS/citrun-inst -c preamble.c > citrun.log
-$TEST_TOOLS/citrun-check
 
 cat <<EOF > preamble.c.good
 #ifdef __cplusplus
