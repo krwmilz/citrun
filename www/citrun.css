@@ -2,7 +2,7 @@ p  { line-height: 1.5em; }
 li { line-height: 1.5em; }
 
 body {
-	max-width: 80ch;
+	max-width: 45em;
 	padding: 10px;
 	margin: auto;
 	font-family: sans-serif;
@@ -13,7 +13,5 @@ body {
 }
 
 .screenshot {
-	width: 90%;
-	margin-left: 5%;
-	margin-right: 5%;
+	width: 100%;
 }
