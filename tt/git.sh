@@ -1,12 +1,13 @@
-#!/bin/sh -e
 #
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
-echo 1..5
-. test/package.sh
+echo 1..8
+. test/package.sh "devel/git"
 
-pkg_instrument "devel/git"
+pkg_check_deps 2
+pkg_clean 3
+pkg_build 4
 
 cat <<EOF > check.good
 Summary:
@@ -34,19 +35,19 @@ Totals:
      34625 Binary operators
       1530 Errors rewriting source
 EOF
-pkg_check 4
+pkg_check 5
 
 # Start git doing something that will take a while. At my own expense.
 $TEST_WRKDIST/git clone http://git.0x30.net/citrun citrun_TEST_CLONE &
 pid=$!
 
-echo ok 5 - started git clone
+echo ok 6 - started git clone
 sleep 1
 
-cat <<EOF> dump.good
+cat <<EOF > dump.good
 EOF
 
-cat <<EOF> filelist.good
+cat <<EOF > filelist.good
 abspath.c 181
 advice.c 120
 alias.c 78
@@ -320,9 +321,9 @@ EOF
 
 $TEST_TOOLS/citrun-dump
 $TEST_TOOLS/citrun-dump -f > filelist.out
-filelist_diff 6
+filelist_diff 7
 
 kill $pid
 wait
 
-pkg_clean
+pkg_clean 8
