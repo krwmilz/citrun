@@ -38,10 +38,9 @@ RuntimeProcess::RuntimeProcess(shm &s) :
 	while (m_shm.at_end() == false) {
 		TranslationUnit t;
 
-		uint8_t ready = 0;
-		while (ready == 0)
-			m_shm.read_pos(&ready);
+		while (m_shm.get_pos() == 0);
 		// Hack to increment the counter.
+		uint8_t ready;
 		m_shm.read_all(&ready);
 
 		m_shm.read_all(&t.num_lines);

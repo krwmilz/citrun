@@ -15,15 +15,14 @@ public:
 		m_pos += sizeof(T);
 	};
 
-	void read_pos(uint8_t *bit)
+	uint8_t get_pos()
 	{
-		*bit = m_mem[m_pos];
+		return m_mem[m_pos];
 	}
 
 	void read_cstring(const char **);
 	void *get_block(size_t);
 	bool at_end();
-
 
 	//void read_string(std::string &);
 private:
