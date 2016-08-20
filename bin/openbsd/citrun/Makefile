@@ -12,7 +12,7 @@ PERMIT_PACKAGE_CDROM =	Yes
 
 MASTER_SITES =		${HOMEPAGE}/
 
-WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
+WANTLIB +=		curses GL GLU GLEW glut c freetype m pthread z
 
 # -std=c++11
 MODULES =		gcc4
@@ -25,16 +25,10 @@ LIB_DEPENDS =		graphics/freeglut \
 BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
-TEST_DEPENDS =		devel/p5-Expect \
-			devel/p5-List-MoreUtils \
-			devel/p5-Test-Differences \
-			sysutils/p5-File-Which
+TEST_DEPENDS =		devel/p5-Expect
 
 do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q -j4
-
-do-test:
-	cd ${WRKSRC} && prove
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q
 
 do-install:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${ALL_FAKE_FLAGS} jam install
