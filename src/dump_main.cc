@@ -4,6 +4,8 @@
 #include "shm.h"
 #include "runtime_proc.h"
 
+#include <sys/mman.h>		// shm_unlink
+
 #include <cstring>
 #include <err.h>
 #include <iostream>
@@ -12,7 +14,7 @@
 static void
 usage()
 {
-	std::cerr << "usage: citrun-dump [-ft] [-s srcfile]" << std::endl;
+	std::cerr << "usage: citrun-dump [-ft] [-s srcfile] [-u shm path]" << std::endl;
 	exit(1);
 }
 
@@ -32,11 +34,12 @@ int
 main(int argc, char *argv[])
 {
 	int ch;
+	int orig_argc = argc;
 	int fflag = 0;
 	char *sarg = NULL;
 	int tflag = 0;
 
-	while ((ch = getopt(argc, argv, "fs:t")) != -1) {
+	while ((ch = getopt(argc, argv, "fs:tu:")) != -1) {
 		switch (ch) {
 		case 'f':
 			fflag = 1;
@@ -47,6 +50,9 @@ main(int argc, char *argv[])
 		case 's':
 			sarg = optarg;
 			break;
+		case 'u':
+			shm_unlink(optarg);
+			return 0;
 		default:
 			usage();
 			break;
@@ -58,20 +64,31 @@ main(int argc, char *argv[])
 	shm shm_conn;
 	RuntimeProcess rt(shm_conn);
 
+	if (orig_argc == 1) {
+		std::cout << "Version:           "
+			<< unsigned(rt.m_major) << "."
+			<< unsigned(rt.m_minor) << "\n"
+			<< "Program name:      " << rt.m_progname << "\n"
+			<< "Translation units: " << rt.m_tus.size() << "\n";
+	}
+
 	if (fflag) {
 		for (auto &t : rt.m_tus) {
 			std::cout << t.comp_file_path << " "
 				<< t.num_lines << std::endl;
 		}
+	}
 
-		return 0;
+	if (0) {
+		std::cout << "Working directory:\t" << rt.m_cwd << "\n"
+		<< "Process ID:\t" << rt.m_pid << "\n"
+		<< "Parent process ID:\t" << rt.m_ppid << "\n"
+		<< "Process group ID:\t" << rt.m_pgrp << "\n";
 	}
 
 	if (tflag) {
 		for (int i = 0; i < 60; i++)
 			count_execs(rt);
-
-		return 0;
 	}
 
 	if (sarg) {
@@ -81,21 +98,7 @@ main(int argc, char *argv[])
 
 		for (auto &l : t->source)
 			std::cout << l << std::endl;
-
-		return 0;
 	}
-
-
-	std::cout
-		<< "Version:\t"
-			<< unsigned(rt.m_major) << "."
-			<< unsigned(rt.m_minor) << "\n"
-		<< "Program name:\t" << rt.m_progname << "\n"
-		<< "Working directory:\t" << rt.m_cwd << "\n"
-		<< "Translation units:\t" << rt.m_tus.size() << "\n"
-		<< "Process ID:\t" << rt.m_pid << "\n"
-		<< "Parent process ID:\t" << rt.m_ppid << "\n"
-		<< "Process group ID:\t" << rt.m_pgrp << "\n";
 
 	return 0;
 }
