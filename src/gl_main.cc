@@ -4,11 +4,11 @@
 #include <sstream>
 #include <vector>
 
-#include "af_unix.h"
 #include "demo-font.h"
 #include "gl_buffer.h"
 #include "gl_view.h"
 #include "runtime_proc.h"
+#include "shm.h"
 
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
@@ -34,7 +34,7 @@ public:
 	static demo_buffer_t *buffer;
 
 	static View *static_vu;
-	static af_unix socket;
+	static shm m_shm;
 	static std::vector<RuntimeProcess*> drawables;
 private:
 	static void display();
@@ -48,7 +48,7 @@ private:
 };
 
 std::vector<RuntimeProcess*> window::drawables;
-af_unix window::socket;
+shm window::m_shm;
 View *window::static_vu;
 
 FT_Library window::ft_library;
@@ -90,14 +90,51 @@ window::window(int argc, char *argv[])
 
 	static_vu->setup();
 
-	socket.set_nonblock();
-	socket.set_listen();
-
 	static_vu->toggle_animation();
 
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, "waiting...", font, 1);
+	//demo_buffer_add_text(buffer, "waiting...", font, 1);
+
+	// Now check if there's any new connections pending.
+	// demo_buffer_clear(buffer);
+	RuntimeProcess *conn = new RuntimeProcess(m_shm);
+	window::drawables.push_back(conn);
+
+	std::stringstream ss;
+	ss << "program name:\t" << conn->m_progname << std::endl;
+	ss << "trnsltn units:\t" << conn->m_tus.size() << std::endl;
+	ss << "process id:\t" << conn->m_pid << std::endl;
+	ss << "parent pid:\t" << conn->m_ppid << std::endl;
+	ss << "process group:\t" << conn->m_pgrp << std::endl;
+
+	glyphy_point_t cur_pos = { 0, 0 };
+	demo_buffer_move_to(buffer, &cur_pos);
+
+	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
+
+	demo_buffer_current_point(buffer, &cur_pos);
+	double y_margin = cur_pos.y;
+
+	/*
+	 * T: total lines, known
+	 * W: number of 80 char columns
+	 * H: number of rows
+	 *
+	 * (1 ) W * 80 * H = T
+	 * (2 ) W * 80 = H
+	 * (2a) W = H / 80
+	 * (1a) (H / 80) * 80 * H = T
+	 * (1b) H^2 = T
+	 * (1c) H = sqrt(T)
+	 */
+	// int rows_per_col = std::sqrt(lines_total) * 4;
+
+	cur_pos.x = 0;
+	glyphy_point_t tmp;
+	for (auto &t : conn->m_tus) {
+		demo_buffer_add_text(buffer, t.comp_file_path, font, 1);
+	}
 }
 
 void
@@ -170,50 +207,6 @@ window::next_frame(View *vu)
 			}
 		}
 		std::cout << "tick" << std::endl;
-	}
-
-	// Now check if there's any new connections pending.
-	af_unix *temp_socket = window::socket.accept();
-	if (temp_socket) {
-		temp_socket->set_block();
-		demo_buffer_clear(buffer);
-		RuntimeProcess *conn = new RuntimeProcess(*temp_socket);
-		window::drawables.push_back(conn);
-
-		std::stringstream ss;
-		ss << "program name:\t" << conn->m_progname << std::endl;
-		ss << "trnsltn units:\t" << conn->m_num_tus << std::endl;
-		ss << "process id:\t" << conn->m_pid << std::endl;
-		ss << "parent pid:\t" << conn->m_ppid << std::endl;
-		ss << "process group:\t" << conn->m_pgrp << std::endl;
-
-		glyphy_point_t cur_pos = { 0, 0 };
-		demo_buffer_move_to(buffer, &cur_pos);
-
-		demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
-
-		demo_buffer_current_point(buffer, &cur_pos);
-		double y_margin = cur_pos.y;
-
-		/*
-		 * T: total lines, known
-		 * W: number of 80 char columns
-		 * H: number of rows
-		 *
-		 * (1 ) W * 80 * H = T
-		 * (2 ) W * 80 = H
-		 * (2a) W = H / 80
-		 * (1a) (H / 80) * 80 * H = T
-		 * (1b) H^2 = T
-		 * (1c) H = sqrt(T)
-		 */
-		// int rows_per_col = std::sqrt(lines_total) * 4;
-
-		cur_pos.x = 0;
-		glyphy_point_t tmp;
-		for (auto &t : conn->m_tus) {
-			demo_buffer_add_text(buffer, t.comp_file_path.c_str(), font, 1);
-		}
 	}
 
 	glutPostRedisplay ();
