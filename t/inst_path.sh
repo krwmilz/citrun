@@ -27,11 +27,11 @@ cd $tmpdir
 grep=`which grep`
 
 unset PATH
-$TEST_TOOLS/gcc -c nomatter.c
+$TEST_TOOLS/cc -c nomatter.c
 [ $? -eq 1 ] && echo ok 2
 
 export PATH=""
-$TEST_TOOLS/gcc -c nomatter.c 2> /dev/null
+$TEST_TOOLS/cc -c nomatter.c 2> /dev/null
 [ $? -eq 1 ] && echo ok 3
 
 $cat <<EOF > citrun.log.good
