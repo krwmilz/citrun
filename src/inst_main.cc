@@ -70,7 +70,7 @@ clean_PATH(InstrumentLogger &llog)
 }
 
 void
-print_toolinfo(InstrumentLogger &llog, const char *argv0)
+print_toolinfo(InstrumentLogger &llog)
 {
 	struct utsname utsname;
 
@@ -78,15 +78,13 @@ print_toolinfo(InstrumentLogger &llog, const char *argv0)
 		<< unsigned(citrun_major) << "."
 		<< unsigned(citrun_minor) << " ";
 	if (uname(&utsname) == -1)
-		llog << "(Unknown OS)\n";
+		llog << "(Unknown OS) ";
 	else {
 		llog << "(" << utsname.sysname << "-"
 			<< utsname.release << " "
-			<< utsname.machine << ")\n";
+			<< utsname.machine << ") ";
 	}
-
-	llog << "Tool called as '" << argv0 << "'.\n";
-	llog << "Resource directory is '" << CITRUN_SHARE << "'\n";
+	llog << "'" << CITRUN_SHARE << "'\n";
 }
 
 int
@@ -104,18 +102,22 @@ main(int argc, char *argv[])
 		is_citruninst = true;
 
 	InstrumentLogger llog(is_citruninst);
-	print_toolinfo(llog, argv[0]);
+	print_toolinfo(llog);
 
+	llog << "Tool called as '" << argv[0] << "'";
 	if (std::strcmp(base_name, argv[0]) != 0) {
-		llog << "Changing '" << argv[0] << "' to '" << base_name << "'.\n";
+		llog << ", changing to '" << base_name << "'";
 		argv[0] = base_name;
 	}
+	llog << ".\n";
 
-	setprogname("citrun-inst");
-
-	if (is_citruninst == false && clean_PATH(llog) != 0)
-		// We were not called as citrun-inst and PATH cleaning failed.
-		return 1;
+	if (!is_citruninst) {
+		// There's extra work to do if we're not running as citrun-inst.
+		setprogname("citrun-inst");
+		if (clean_PATH(llog) != 0)
+			// PATH cleaning failed, exiting is advisable.
+			return 1;
+	}
 
 	InstrumentFrontend main(argc, argv, &llog, is_citruninst);
 	main.process_cmdline();

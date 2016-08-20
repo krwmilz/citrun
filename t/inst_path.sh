@@ -35,15 +35,11 @@ $TEST_TOOLS/cc -c nomatter.c 2> /dev/null
 [ $? -eq 1 ] && echo ok 3
 
 $cat <<EOF > citrun.log.good
-citrun-inst 0.0 ()
+citrun-inst 0.0 () ''
 Tool called as ''.
-Resource directory is ''
-Changing ''.
 PATH is not set.
-citrun-inst 0.0 ()
+citrun-inst 0.0 () ''
 Tool called as ''.
-Resource directory is ''
-Changing ''.
 PATH=''
 '' not in PATH.
 EOF

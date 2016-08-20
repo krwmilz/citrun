@@ -45,9 +45,8 @@ sed	-e "s,^.*: ,,"	\
 	&& echo "ok 5 - processed citrun.log"
 
 cat <<EOF > citrun.log.good
-citrun-inst 0.0 ()
+citrun-inst 0.0 () ''
 Tool called as ''.
-Resource directory is ''
 PATH=''
 Found source file ''.
 Command line is ''.
@@ -66,9 +65,8 @@ Forked ''.
 '' exited 0.
 Rewritten source compile successful.
 Restored ''.
-citrun-inst 0.0 ()
+citrun-inst 0.0 () ''
 Tool called as ''.
-Resource directory is ''
 PATH=''
 Command line is ''.
 Link detected, adding '' to command line.
