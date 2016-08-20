@@ -107,16 +107,18 @@ actions MkWrap
 	chmod 755 $(1) ;
 }
 
-rule InstLink
+rule InstallSyms
 {
-	MakeLocate $(1) : $(LOCATE_SOURCE) ;
-	SEARCH on $(2) = $(SEARCH_SOURCE) ;
-	Depends files : $(<) ;
-	Depends $(<) : $(>) ;
-	Clean clean : $(<) ;
+	Depends install : $(PREFIX)/share/citrun/$(>) ;
+	MakeLocate $(PREFIX)/share/citrun/$(>) : $(<) ;
+
+	for i in $(>)
+	{
+		SymLink $(PREFIX)/share/citrun/$(i) ;
+	}
 }
 
-actions InstLink
+actions SymLink
 {
-	$(RM) $(<) && $(LN) -s citrun-inst $(<) ;
+	$(RM) $(<) && $(LN) -s ../../bin/citrun-inst $(<) ;
 }
