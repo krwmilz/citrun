@@ -12,10 +12,11 @@ LinkLibraries citrun-dump citrun-term citrun-gl : utils ;
 #
 # citrun-wrap, citrun-check
 #
-MkWrap citrun-wrap : wrap.in ;
-
-MakeLocate citrun-check : $(LOCATE_SOURCE) ;
+MakeLocate citrun-check citrun-wrap : $(LOCATE_SOURCE) ;
 Shell citrun-check : check.in ;
+Shell citrun-wrap : wrap.in ;
+
+ReplaceTokens citrun-wrap ;
 
 #
 # citrun-dump (not installed)

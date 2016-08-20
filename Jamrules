@@ -3,14 +3,13 @@
 # instrumentation. If PREFIX is set, assume we're building a package.
 #
 if $(PREFIX) {
-	BUILD_MODE = "RELEASE" ;
+	echo ...build citrun (RELEASE) on $(OS)... ;
 	CITRUN_SHARE = $(PREFIX)/share/citrun ;
 }
 else {
-	BUILD_MODE = "DEBUG" ;
+	echo ...build citrun (DEBUG) on $(OS)... ;
 	CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
 }
-echo ...build citrun ($(BUILD_MODE)) on $(OS)... ;
 
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
@@ -72,13 +71,6 @@ if $(CITRUN_COVERAGE) {
 # automatically.
 LINK = $(C++) ;
 
-actions Test {
-	prove ;
-}
-
-Test test : ;
-Test regress : ;
-
 rule Stringize
 {
 	MakeLocate $(1) : $(LOCATE_SOURCE) ;
@@ -92,19 +84,9 @@ actions Stringize
 	$(TOP)/bin/stringize "static const char *$(1:B)" $(2) > $(1) ;
 }
 
-rule MkWrap
+actions ReplaceTokens
 {
-	MakeLocate $(1) : $(LOCATE_SOURCE) ;
-	SEARCH on $(2) = $(SEARCH_SOURCE) ;
-	Depends $(1) : $(2) ;
-	Depends exe : $(1) ;
-	Clean clean : $(1) ;
-}
-
-actions MkWrap
-{
-	sed -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), < $(2) > $(1) ;
-	chmod 755 $(1) ;
+	sed -i -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), $(<) ;
 }
 
 rule InstallSyms
