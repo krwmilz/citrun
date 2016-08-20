@@ -74,7 +74,6 @@ LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 
 LLVM_LIBS = bitreader mcparser transformutils option ;
 
-LINKLIBS on citrun-inst += $(CLANG_LIBS) ;
 LINKLIBS on citrun-inst += `llvm-config --libs $(LLVM_LIBS) --system-libs` ;
 
 Main citrun-inst : $(INST_SRCS) ;
