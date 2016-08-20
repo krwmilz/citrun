@@ -123,7 +123,7 @@ get_shm_fd()
 	if (shm_fd > 0)
 		return shm_fd;
 
-	if ((shm_fd = shm_open(SHM_PATH, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR)) < 0)
+	if ((shm_fd = shm_open(SHM_PATH, O_CREAT | O_EXCL | O_CLOEXEC | O_RDWR, S_IRUSR | S_IWUSR)) < 0)
 		err(1, "shm_open");
 
 	if (init > 0)
