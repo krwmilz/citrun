@@ -149,7 +149,7 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 	size_t shm_pos = 0;
 
 	if (node_major != citrun_major || node_minor != citrun_minor) {
-		warnx("libcitrun %i.%i: node with version %i.%i skipped",
+		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
 			citrun_major, citrun_minor,
 			node_major, node_minor);
 		return;
