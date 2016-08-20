@@ -70,6 +70,7 @@ if $(CITRUN_COVERAGE) {
 	LINKLIBS on citrun-gl += $(LIBEGCOV) ;
 	LINKLIBS on citrun-inst += $(LIBEGCOV) ;
 	LINKLIBS on citrun-term += $(LIBEGCOV) ;
+	LINKLIBS on citrun-dump += $(LIBEGCOV) ;
 	LinkLibraries libcitrun : /usr/lib/gcc-lib/amd64-unknown-openbsd6.0/4.2.1/libgcov.a ;
 }
 
