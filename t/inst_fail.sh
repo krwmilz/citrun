@@ -13,7 +13,6 @@ grep -q "error: expected" err.out && echo ok 3
 
 cat <<EOF > check.good
 Summary:
-         1 Calls to the rewrite tool
          1 Source files used as input
          1 Rewrite parse errors
          1 Rewrite failures

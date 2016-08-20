@@ -14,7 +14,6 @@ echo "ok 3 - source compiled"
 
 cat <<EOF > check.good
 Summary:
-         1 Calls to the rewrite tool
          1 Source files used as input
          1 Application link commands
          1 Rewrite successes

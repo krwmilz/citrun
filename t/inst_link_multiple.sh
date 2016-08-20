@@ -37,7 +37,6 @@ $TEST_TOOLS/citrun-check > check.out && echo ok
 
 cat <<EOF > check.good
 Summary:
-         4 Calls to the rewrite tool
          3 Source files used as input
          1 Application link commands
          3 Rewrite successes

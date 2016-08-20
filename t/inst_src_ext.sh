@@ -14,7 +14,6 @@ $TEST_TOOLS/citrun-wrap cc -c main.C
 
 cat <<EOF > check.good
 Summary:
-         5 Calls to the rewrite tool
          4 Source files used as input
          4 Rewrite successes
          4 Rewritten source compile successes

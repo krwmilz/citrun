@@ -70,7 +70,7 @@ Tool called as ''.
 PATH=''
 Command line is ''.
 Link detected, adding '' to command line.
-No source files found. Executing command line.
+No source files found on command line.
 EOF
 
 diff -u citrun.log.good citrun.log.proc && echo "ok 6 - citrun.log diff"

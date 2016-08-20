@@ -156,7 +156,10 @@ InstrumentFrontend::process_cmdline()
 	if (m_source_files.size() != 0)
 		return;
 
-	*m_log << "No source files found. Executing command line.\n";
+	*m_log << "No source files found on command line.\n";
+	if (m_is_citruninst)
+		exit(0);
+
 	exec_compiler();
 }
 

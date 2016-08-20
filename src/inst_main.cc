@@ -104,15 +104,17 @@ main(int argc, char *argv[])
 	InstrumentLogger llog(is_citruninst);
 	print_toolinfo(llog);
 
-	llog << "Tool called as '" << argv[0] << "'";
-	if (std::strcmp(base_name, argv[0]) != 0) {
-		llog << ", changing to '" << base_name << "'";
-		argv[0] = base_name;
-	}
-	llog << ".\n";
-
-	if (!is_citruninst) {
+	if (is_citruninst) {
+		llog << ">> Welcome to C It Run! Have a nice day.\n";
+	} else {
 		// There's extra work to do if we're not running as citrun-inst.
+		llog << "Tool called as '" << argv[0] << "'";
+		if (std::strcmp(base_name, argv[0]) != 0) {
+			llog << ", changing to '" << base_name << "'";
+			argv[0] = base_name;
+		}
+		llog << ".\n";
+
 		setprogname("citrun-inst");
 		if (clean_PATH(llog) != 0)
 			// PATH cleaning failed, exiting is advisable.
