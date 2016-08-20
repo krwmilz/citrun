@@ -52,8 +52,6 @@ When <b class="name">citrun-check</b> does not have its stdout redirected it pri
 Once checking is complete two sections are printed. The text below shows the output of <b class="name">citrun-check</b> after <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
 </div>
 <pre style="margin-left: 5.00ex;" class="lit display">
-Checking '/home/kyle/test' ..done 
- 
 Summary: 
          1 Calls to the rewrite tool 
          1 Source files used as input 
@@ -64,17 +62,18 @@ Summary:
 Totals: 
          6 Lines of source code 
         53 Milliseconds spent rewriting source 
-         1 Functions called 'main' 
          1 Function definitions 
          1 Return statement values 
          3 Total statements</pre>
 <div class="spacer">
 </div>
-The first section is a summary. It has counts that are related to source files and source compilation. The most important counts are in this section.<div class="spacer">
+The first section is a summary regarding how thoroughly the project was instrumented. The most important counts are in this section.<div class="spacer">
 </div>
-The second section contains rewriting totals. These counts are related to individual source code elements that were possibly rewritten during a previous <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> session.</div>
+The second section contains rewriting totals. These are the total number of visited source code elements from the source files used as input.</div>
 <div class="section">
-<h1 id="SUMMARY_COUNTS">SUMMARY COUNTS</h1> The summary section contains the most important counts. The following table describes each of them in detail:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
+<h1 id="SUMMARY_COUNTS">SUMMARY COUNTS</h1> The most important counts are failures. Source rewriting can fail for a few reasons and is not always a bad thing.<div class="spacer">
+</div>
+The following table shows all of the possible counts, and describes them:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
 <dt class="list-tag" style="margin-top: 1.00em;">
 &#8220;Calls to the rewrite tool&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
@@ -96,25 +95,17 @@ The total number of parsing problems the rewriter had.</dd>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 The number of times the rewriter successfully transformed the entire source file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewrite failures (False Positive)&#8221;</dt>
+&#8220;Rewrite failures&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
-The number of times the rewriter encountered a fatal error however the native compiler also failed to compile the same code.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewrite failures (True Positive!)&#8221;</dt>
-<dd class="list-tag" style="margin-left: 6.00ex;">
-The number of times the rewriter encountered a fatal error but the native compiler succeeded on the same code. This is bad.</dd>
+Rewriting a source file failed. There are two failure cases, either native parsing the original source file also fails, or, only citrun-inst failed parsing the source file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
 &#8220;Rewritten source compile successes&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 The number of times the rewritten source file is processed successfully by the native compiler.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewritten source compile failures (False Positive)&#8221;</dt>
+&#8220;Rewritten source compile failures&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
-Similar to rewrite failure false positives, the number of times the native compiler fails on both the rewritten source and the original source.</dd>
-<dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewritten source compile failures (True Positive!)&#8221;</dt>
-<dd class="list-tag" style="margin-left: 6.00ex;">
-The number of times the native compiler fails on the rewritten source and succeeds on the original source. This is bad.</dd>
+Compiling the rewritten source file failed. There are two failure cases, either compiling the original source file also fails or only compiling the rewritten source fails.</dd>
 </dl>
 </div>
 <div class="section">

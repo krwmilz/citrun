@@ -44,8 +44,6 @@ after
 .Xr citrun-wrap 1
 had been used to instrument a simple project:
 .Bd -literal -offset indent
-Checking '/home/kyle/test' ..done
-
 Summary:
          1 Calls to the rewrite tool
          1 Source files used as input
@@ -61,17 +59,17 @@ Totals:
          3 Total statements
 .Ed
 .Pp
-The first section is a summary. It has counts that are related to source files
-and source compilation. The most important counts are in this section.
+The first section is a summary regarding how thoroughly the project was
+instrumented. The most important counts are in this section.
 .Pp
-The second section contains rewriting totals. These counts are related to
-individual source code elements that were possibly rewritten during a previous
-.Xr citrun-wrap 1
-session.
+The second section contains rewriting totals. These are the total number of
+visited source code elements from the source files used as input.
 .Sh SUMMARY COUNTS
 .Pp
-The summary section contains the most important counts. The following table
-describes each of them in detail:
+The most important counts are failures. Source rewriting can fail for a few
+reasons and is not always a bad thing.
+.Pp
+The following table shows all of the possible counts, and describes them:
 .Pp
 .Bl -tag -width Ds
 .It Qq Calls to the rewrite tool
