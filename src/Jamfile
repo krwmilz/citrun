@@ -23,7 +23,7 @@ Main citrun-dump : dump_main.cc ;
 #
 # citrun-term
 #
-LINKLIBS on citrun-term += -lcurses -L/usr/local/lib ;
+LINKLIBS on citrun-term += -lcurses ;
 
 LinkLibraries citrun-term : utils ;
 Main citrun-term : term_main.cc ;

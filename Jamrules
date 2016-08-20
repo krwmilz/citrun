@@ -35,8 +35,6 @@ CLANG_LIBS =
 
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
-	# This adds libestdc++ automatically.
-	LINK = eg++ ;
 
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lm -lglut ;
@@ -44,16 +42,12 @@ if $(OS) = OPENBSD {
 }
 
 if $(OS) = MACOSX {
-	LINK = c++ ;
-
 	PKG_CONFIG_LIBS = glew freetype2 ;
 	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lm ;
 	LINKLIBS on citrun-inst = $(CLANG_LIBS) ;
 }
 
 if $(OS) = LINUX {
-	LINK = c++ ;
-
 	# llvm version is 3.5 on Debian, which is too old.
 	PKG_CONFIG_LIBS = gl glew freetype2 ;
 	LINKLIBS on citrun-gl = -lbsd -lm -lglut ;
@@ -62,6 +56,7 @@ if $(OS) = LINUX {
 }
 
 if $(CITRUN_SA) {
+	# scan-build sets these expecting us to pick up the new values.
 	CC = $(CC) ;
 	C++ = $(CXX) ;
 }
@@ -72,6 +67,10 @@ if $(CITRUN_COVERAGE) {
 	LINKLIBS on citrun-term += -coverage ;
 	LINKLIBS on citrun-dump += -coverage ;
 }
+
+# Link with the c++ compiler so that the matching c++ runtime library gets added
+# automatically.
+LINK = $(C++) ;
 
 actions Test {
 	prove ;
