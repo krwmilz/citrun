@@ -11,3 +11,5 @@ test_total_execs 2
 
 kill -USR1 $pid
 wait
+
+unlink_shm

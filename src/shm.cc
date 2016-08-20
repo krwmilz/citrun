@@ -6,16 +6,19 @@
 #include <cassert>
 #include <err.h>
 #include <fcntl.h>		// O_RDONLY
+#include <stdlib.h>		// getenv
 #include <unistd.h>
-
-#define SHM_PATH "/tmp/citrun.shared"
 
 shm::shm() :
 	m_fd(0),
 	m_mem(NULL),
 	m_pos(0)
 {
-	if ((m_fd = shm_open(SHM_PATH, O_RDONLY, S_IRUSR | S_IWUSR)) < 0)
+	const char *shm_path;
+	if ((shm_path = getenv("CITRUN_SHMPATH")) == NULL)
+		shm_path = "/tmp/citrun.shared";
+
+	if ((m_fd = shm_open(shm_path, O_RDONLY, S_IRUSR | S_IWUSR)) < 0)
 		err(1, "shm_open");
 
 	struct stat sb;
@@ -27,6 +30,7 @@ shm::shm() :
 	m_mem = (uint8_t *)mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, m_fd, 0);
 	if (m_mem == MAP_FAILED)
 		err(1, "mmap");
+
 	m_size = sb.st_size;
 }
 

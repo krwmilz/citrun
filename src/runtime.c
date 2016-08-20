@@ -20,7 +20,7 @@
 #include <err.h>
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
-#include <stdlib.h>		/* getprogname */
+#include <stdlib.h>		/* get{env,progname} */
 #include <string.h>		/* strnlen */
 #include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
 
@@ -32,12 +32,6 @@
 static int init = 0;
 static int shm_fd = 0;
 static size_t shm_len = 0;
-
-__attribute__((destructor))
-static void clean_up()
-{
-	(void) shm_unlink(SHM_PATH);
-}
 
 size_t
 add_1(uint8_t *shm, size_t shm_pos, uint8_t data)
@@ -118,12 +112,18 @@ write_header()
 static int
 get_shm_fd()
 {
+	char *shm_path;
+
 	assert(shm_fd >= 0);
 
 	if (shm_fd > 0)
 		return shm_fd;
 
-	if ((shm_fd = shm_open(SHM_PATH, O_CREAT | O_EXCL | O_CLOEXEC | O_RDWR, S_IRUSR | S_IWUSR)) < 0)
+	if ((shm_path = getenv("CITRUN_SHMPATH")) == NULL)
+		shm_path = SHM_PATH;
+
+	if ((shm_fd = shm_open(shm_path, O_CREAT | O_CLOEXEC | O_RDWR,
+			S_IRUSR | S_IWUSR)) < 0)
 		err(1, "shm_open");
 
 	if (init > 0)
@@ -152,7 +152,6 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
 			citrun_major, citrun_minor,
 			node_major, node_minor);
-		return;
 	}
 
 	fd = get_shm_fd();

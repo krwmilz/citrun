@@ -28,3 +28,5 @@ three.c 9
 two.c 11
 EOF
 filelist_diff 4
+
+unlink_shm
