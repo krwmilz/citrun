@@ -17,21 +17,11 @@ echo "ok 1 - tmp dir created"
 #
 function test_total_execs
 {
-	test_num=${1}
+	$TEST_TOOLS/citrun-dump -t > execs.out
 
-	let n=0
-	let lst=0
-	let cur=0
-	let bad=0
-	while [ $n -lt 60 ]; do
-		cur=`$TEST_TOOLS/citrun-dump -t`
-		[ $cur -le $lst ] && let bad++
-		let lst=cur
-		let n++
-	done
-	[ $bad -eq 0 ] && echo ok $test_num - program count increased 60 times
+	sort -n execs.out > execs.sorted
+	test_diff ${1} "executions strictly increasing" execs.sorted execs.out
 }
-
 
 #
 # Differences two instrumented files. Knocks the header off of the "*.citrun"

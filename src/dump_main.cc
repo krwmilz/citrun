@@ -16,6 +16,18 @@ usage()
 	exit(1);
 }
 
+static void
+count_execs(RuntimeProcess &rt)
+{
+	uint64_t total = 0;
+
+	for (auto &t : rt.m_tus)
+		for (int i = 0; i < t.num_lines; ++i)
+			total += t.exec_diffs[i];
+
+	std::cout << total << std::endl;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -56,11 +68,8 @@ main(int argc, char *argv[])
 	}
 
 	if (tflag) {
-		uint64_t total = 0;
-		for (auto &t : rt.m_tus)
-			for (int i = 0; i < t.num_lines; ++i)
-				total += t.exec_diffs[i];
-		std::cout << total << std::endl;
+		for (int i = 0; i < 60; i++)
+			count_execs(rt);
 
 		return 0;
 	}
@@ -77,15 +86,15 @@ main(int argc, char *argv[])
 	}
 
 
-	std::cout << "Version: "
+	std::cout << "Version:         "
 			<< unsigned(rt.m_major) << "."
 			<< unsigned(rt.m_minor) << "\n"
-		<< "Program name: " << rt.m_progname << "\n"
+		<< "Program name:      " << rt.m_progname << "\n"
 		<< "Working directory: " << rt.m_cwd << "\n"
 		<< "Translation units: " << rt.m_tus.size() << "\n"
-		<< "Process ID: " << rt.m_pid << "\n"
+		<< "Process ID:        " << rt.m_pid << "\n"
 		<< "Parent process ID: " << rt.m_ppid << "\n"
-		<< "Process group ID: " << rt.m_pgrp << "\n";
+		<< "Process group ID:  " << rt.m_pgrp << "\n";
 
 	return 0;
 }
