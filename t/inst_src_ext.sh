@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that the advertised source file extensions work.
 #

@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Verify the output when 0 citrun.log files are found.
 #

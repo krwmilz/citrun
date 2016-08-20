@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Verify that passing a bad directory to citrun-check errors out.
 #

@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that return statement values (if any) are instrumented correctly.
 #

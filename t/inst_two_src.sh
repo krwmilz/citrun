@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that two source files given on the same command line both get
 # instrumented fully.

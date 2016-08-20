@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that linking more than one instrumented object file together works.
 #

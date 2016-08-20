@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Test that the source files the runtime passed us and we loaded are identical
 # to the original source files on disk.

@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that a program that won't compile natively is handled properly.
 #

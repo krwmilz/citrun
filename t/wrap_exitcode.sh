@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Make sure that citrun-wrap exits with the same code as the native build.
 #

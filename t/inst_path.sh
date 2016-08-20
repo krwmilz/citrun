@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Test that:
 # - not having PATH set errors

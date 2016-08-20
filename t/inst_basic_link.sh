@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that the most basic of compile command lines works.
 #

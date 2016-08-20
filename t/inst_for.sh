@@ -1,4 +1,3 @@
-#!/bin/sh -e
 #
 # Test that for loop condition instrumenting works.
 #

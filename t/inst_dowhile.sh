@@ -1,27 +1,24 @@
-#!/bin/sh -e
 #
-# Make sure that while loop condition instrumentation works.
+# Make sure that do while loop condition instrumentation works.
 #
 echo 1..3
 . test/utils.sh
 
 cat <<EOF > while.c
 int main(int argc, char *argv[]) {
-	while (argc < 17)
+	do {
 		argc++;
-
-	while ((argc && argv));
+	} while (argc != 10);
 	return 0;
 }
 EOF
 
 cat <<EOF > while.c.inst_good
 int main(int argc, char *argv[]) {++_citrun.data[0];
-	while ((++_citrun.data[1], (++_citrun.data[1], argc < 17)))
+	do {
 		argc++;
-
-	while ((++_citrun.data[4], ((++_citrun.data[4], argc && argv))));
-	return (++_citrun.data[5], 0);
+	} while ((++_citrun.data[3], (++_citrun.data[3], argc != 10)));
+	return (++_citrun.data[4], 0);
 }
 EOF
 
@@ -32,12 +29,12 @@ Summary:
          1 Rewrite successes
 
 Totals:
-         8 Lines of source code
+         7 Lines of source code
          1 Function definitions
-         2 While loops
+         1 Do while loops
          1 Return statement values
-        18 Total statements
-         2 Binary operators
+        11 Total statements
+         1 Binary operators
 EOF
 
 $TEST_TOOLS/citrun-inst -c while.c > citrun.log

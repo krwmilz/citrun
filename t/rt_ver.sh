@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that linking object files of one citrun version with libcitrun of
 # another shows a warning message.

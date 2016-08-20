@@ -1,4 +1,3 @@
-#!/bin/sh
 echo 1..2
 
 out=`src/citrun-wrap -v`

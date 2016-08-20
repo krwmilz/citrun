@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Simple program that prints output.
 #

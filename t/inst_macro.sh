@@ -1,4 +1,3 @@
-#!/bin/sh -e
 #
 # Test for some tricky macro situations. In particular macro expansions at the
 # end of binary operators.

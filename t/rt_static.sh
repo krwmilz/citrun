@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Test that the basic static structure of the shared memory region is what we
 # expect.

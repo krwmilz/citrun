@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that really long function declarations are instrumented properly.
 #

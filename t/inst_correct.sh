@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that a simple program can execute successfully with instrumentation.
 #

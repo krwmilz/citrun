@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Check that if statement conditions are instrumented properly.
 #

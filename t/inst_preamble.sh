@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Test that the instrumentation preamble is what we think it is.
 #

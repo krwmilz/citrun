@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Test that we can count an executing program as its running.
 #

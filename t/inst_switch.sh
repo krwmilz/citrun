@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Make sure that switch statement condition instrumentation works.
 #
