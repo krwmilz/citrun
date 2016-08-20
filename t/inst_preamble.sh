@@ -33,5 +33,5 @@ static void citrun_constructor() {
 #endif
 EOF
 
-sed -i "s/\".*\"/\"\"/" preamble.c.citrun
+sed -i -e 's/".*"/""/' preamble.c.citrun
 diff -u preamble.c.good preamble.c.citrun && echo ok 2
