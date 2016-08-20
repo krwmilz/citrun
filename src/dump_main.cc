@@ -86,15 +86,16 @@ main(int argc, char *argv[])
 	}
 
 
-	std::cout << "Version:         "
+	std::cout
+		<< "Version:\t"
 			<< unsigned(rt.m_major) << "."
 			<< unsigned(rt.m_minor) << "\n"
-		<< "Program name:      " << rt.m_progname << "\n"
-		<< "Working directory: " << rt.m_cwd << "\n"
-		<< "Translation units: " << rt.m_tus.size() << "\n"
-		<< "Process ID:        " << rt.m_pid << "\n"
-		<< "Parent process ID: " << rt.m_ppid << "\n"
-		<< "Process group ID:  " << rt.m_pgrp << "\n";
+		<< "Program name:\t" << rt.m_progname << "\n"
+		<< "Working directory:\t" << rt.m_cwd << "\n"
+		<< "Translation units:\t" << rt.m_tus.size() << "\n"
+		<< "Process ID:\t" << rt.m_pid << "\n"
+		<< "Parent process ID:\t" << rt.m_ppid << "\n"
+		<< "Process group ID:\t" << rt.m_pgrp << "\n";
 
 	return 0;
 }
