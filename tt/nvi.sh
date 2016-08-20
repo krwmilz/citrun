@@ -1,11 +1,12 @@
-#!/bin/sh -e
 #
 # Tests that nvi works with C It Run.
 #
-echo 1..4
-. test/package.sh
+echo 1..6
+. test/package.sh "editors/nvi"
 
-pkg_instrument "editors/nvi"
+pkg_check_deps 2
+pkg_clean 3
+pkg_build 4
 
 cat <<EOF > check.good
 Summary:
@@ -18,7 +19,6 @@ Summary:
 
 Totals:
      47830 Lines of source code
-         2 Functions called 'main'
        658 Function definitions
       1711 If statements
        176 For loops
@@ -31,8 +31,8 @@ Totals:
       4008 Binary operators
        353 Errors rewriting source
 EOF
-pkg_check 4
+pkg_check 5
 
 # $TEST_WRKDIST/build/nvi
 
-pkg_clean
+pkg_clean 6
