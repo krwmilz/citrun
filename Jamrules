@@ -81,7 +81,12 @@ rule Stringize
 
 actions Stringize
 {
-	$(TOP)/bin/stringize "static const char *$(1:B)" $(2) > $(1) ;
+	# Quote the entire original source file and put it in the destination.
+	sed -e ' s/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/\\n"/; ' < $(>) > $(<)
+	echo ";" >> $(<)
+
+	# Add the declaration to the start of the file.
+	sed -i -e '1s/^/static const char *$(1:B) = /' $(<)
 }
 
 actions ReplaceTokens
