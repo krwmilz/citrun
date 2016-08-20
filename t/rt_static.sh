@@ -16,11 +16,11 @@ wait
 [ $? -eq 0 ] && echo ok 2 - program return code after SIGUSR1
 
 cat <<EOF > dump.good
-Version:	0.0
-Program name:	program
-Translation units:	3
+Version:           0.0
+Program name:      program
+Translation units: 3
 EOF
-test_diff 3 "citrun-dump output" dump.out dump.good
+test_diff 3 "citrun-dump output" dump.good dump.out
 
 cat <<EOF > filelist.good
 one.c 34
