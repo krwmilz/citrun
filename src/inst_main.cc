@@ -24,8 +24,6 @@
 #include <libgen.h>		// basename
 #include <sstream>		// stringstream
 
-#define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
 
 int
 clean_PATH(InstrumentLogger &llog)
@@ -46,7 +44,7 @@ clean_PATH(InstrumentLogger &llog)
 	bool found_citrun_path = 0;
 
 	while (std::getline(path_ss, component, ':')) {
-		if (component.compare(STR(CITRUN_SHARE)) == 0) {
+		if (component.compare(CITRUN_SHARE) == 0) {
 			found_citrun_path = 1;
 			continue;
 		}
@@ -60,7 +58,7 @@ clean_PATH(InstrumentLogger &llog)
 	}
 
 	if (!found_citrun_path) {
-		llog << "Error: '" << STR(CITRUN_SHARE) << "' not in PATH.\n";
+		llog << "Error: '" << CITRUN_SHARE << "' not in PATH.\n";
 		return 1;
 	}
 
@@ -88,7 +86,7 @@ print_toolinfo(InstrumentLogger &llog, const char *argv0)
 	}
 
 	llog << "Tool called as '" << argv0 << "'.\n";
-	llog << "Resource directory is '" << STR(CITRUN_SHARE) << "'\n";
+	llog << "Resource directory is '" << CITRUN_SHARE << "'\n";
 }
 
 int

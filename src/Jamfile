@@ -47,7 +47,6 @@ Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
 Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
 
 ObjectC++Flags $(GL_SRCS) : `pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
-ObjectC++Flags $(GL_SRCS) : -I/usr/local/include ;
 
 LINKLIBS on citrun-gl += `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
 LinkLibraries citrun-gl : libglyphy ;
@@ -67,8 +66,8 @@ INST_SRCS =
 Stringize runtime_h.h : runtime.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
-ObjectC++Flags $(INST_SRCS) : -DCITRUN_SHARE=$(CITRUN_SHARE)
-	-DCITRUN_COVERAGE=$(CITRUN_COVERAGE) ;
+ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\"
+	CITRUN_COVERAGE=$(CITRUN_COVERAGE) ;
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 

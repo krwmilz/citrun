@@ -30,9 +30,6 @@
 #include <sstream>		// ostringstream
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
-#define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
-
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
 InstrumentFrontend::InstrumentFrontend(int argc, char *argv[],
@@ -127,7 +124,7 @@ InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 	// Needed because libcitrun.a will be instrumented with gcov.
 	m_args.push_back(const_cast<char *>("-coverage"));
 #endif
-	m_args.push_back(const_cast<char *>(STR(CITRUN_SHARE) "/libcitrun.a"));
+	m_args.push_back(const_cast<char *>(CITRUN_SHARE "/libcitrun.a"));
 	*m_log << m_args.back() << "' to command line.\n";
 }
 
