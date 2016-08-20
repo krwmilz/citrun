@@ -32,7 +32,6 @@ EOF
 $TEST_TOOLS/citrun-wrap cc -o hello hello.c
 $TEST_TOOLS/citrun-check > check.out
 
-export CITRUN_SOCKET=
 [ "`./hello`" = "hello, world!" ] && echo ok program prints
 
 check_diff 3

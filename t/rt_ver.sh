@@ -18,7 +18,6 @@ EOF
 /usr/bin/cc -c main.c
 /usr/bin/cc -o main main.o $TEST_TOOLS/libcitrun.a
 
-export CITRUN_SOCKET=
 main 2> out
 
 cat <<EOF > good

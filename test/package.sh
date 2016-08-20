@@ -1,8 +1,6 @@
 # exports TEST_TOOLS and puts us in a temporary directory.
 . test/utils.sh
 
-export CITRUN_SOCKET="test.socket";
-
 function pkg_instrument
 {
 	port="/usr/ports/${1}"

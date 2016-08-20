@@ -50,7 +50,6 @@ $TEST_TOOLS/citrun-check > check.out
 
 check_diff 2
 
-export CITRUN_SOCKET=
 ./fib
 [ $? -eq 255 ] && echo ok
 
