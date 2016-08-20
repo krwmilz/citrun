@@ -1,11 +1,12 @@
-#!/bin/sh -e
 #
 # Instruments Nmap and checks that the instrumented program still runs.
 #
-echo 1..5
-. test/package.sh
+echo 1..7
+. test/package.sh "net/nmap"
 
-pkg_instrument "net/nmap"
+pkg_check_deps 2
+pkg_clean 3
+pkg_build 4
 
 cat <<EOF > check.good
 Summary:
@@ -33,7 +34,7 @@ Totals:
      20377 Binary operators
        586 Errors rewriting source
 EOF
-pkg_check 4
+pkg_check 5
 
 cat <<EOF > filelist.good
 ./fad-getad.c 281
@@ -138,12 +139,12 @@ EOF
 $TEST_WRKDIST/nmap krwm.net &
 pid=$!
 
-sleep 1
+sleep 2
 $TEST_TOOLS/citrun-dump
 $TEST_TOOLS/citrun-dump -f > filelist.out
-filelist_diff 5
+filelist_diff 6
 
 kill $pid
 wait
 
-pkg_clean
+pkg_clean 7
