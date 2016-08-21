@@ -1,0 +1,63 @@
+.\"
+.\" Copyright (c) 2016 Kyle Milz <kyle@0x30.net>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: August 13 2016 $
+.Dt CITRUN-INST 1
+.Os
+.Sh NAME
+.Nm citrun-inst
+.Nd rewrite source code
+.Sh SYNOPSIS
+.Nm
+.Ar compile_cmd
+.Sh DESCRIPTION
+.Pp
+Warning:
+.Nm
+is not usually called directly. Use
+.Xr citrun-wrap 1
+instead.
+.Pp
+The
+.Nm
+utility performs source code rewriting. It visits statements in source files and
+adds extra code to some of them.
+.Pp
+.Nm
+should accept any
+.Ar compile_cmd
+that the compilers listed in
+.Xr citrun-wrap 1
+would accept.
+.Sh CALLING DIRECTLY
+When
+.Nm
+is called directly it only performs its source code rewriting
+step. That means it does not perform its usual call to compile the (possibly)
+rewritten source file.
+.Pp
+Calling directly is useful for debugging rewrite failures and rewritten source
+compile
+failures.
+.Pp
+In this mode, successfully rewritten source files have
+.Qq .citrun
+appended to their file name and diagnostic information is printed to standard
+output instead of
+.Pa citrun.log .
+.Sh EXIT STATUS
+.Ex -std
+.Sh SEE ALSO
+.Xr citrun-wrap 1
