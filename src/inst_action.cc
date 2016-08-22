@@ -65,7 +65,6 @@ InstrumentAction::EndSourceFileAction()
 	clang::SourceManager &sm = m_TheRewriter.getSourceMgr();
 	const clang::FileID main_fid = sm.getMainFileID();
 
-	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
 	clang::SourceLocation end = sm.getLocForEndOfFile(main_fid);
 	unsigned int num_lines = sm.getPresumedLineNumber(end);
 
@@ -94,6 +93,7 @@ InstrumentAction::EndSourceFileAction()
 		<< "}\n"
 		<< "#endif\n";
 
+	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
 	if (m_TheRewriter.InsertTextAfter(start, preamble.str())) {
 		*m_log << "Failed to insert the instrumentation preabmle.";
 		return;
