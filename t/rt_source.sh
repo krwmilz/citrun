@@ -5,15 +5,11 @@
 echo 1..4
 . test/project.sh
 
-./program 45 &
-pid=$!
+./program 3
 
 $TEST_TOOLS/citrun-dump -s one.c > one.c.runtime
 $TEST_TOOLS/citrun-dump -s two.c > two.c.runtime
 $TEST_TOOLS/citrun-dump -s three.c > three.c.runtime
-
-kill -USR1 $pid
-wait
 
 # Bug in parsing source line by line in c++
 echo >> one.c
