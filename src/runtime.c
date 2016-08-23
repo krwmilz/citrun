@@ -14,10 +14,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <sys/mman.h>		/* shm_open, mmap */
-#include <sys/stat.h>		/* S_*USR */
+#include <sys/stat.h>		/* S_IRUSR, S_IWUSR, mkdir */
 
 #include <assert.h>
 #include <err.h>
+#include <errno.h>
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
 #include <stdlib.h>		/* get{env,progname} */
@@ -54,14 +55,34 @@ add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t null_len)
 	return shm_pos + null_len;
 }
 
+static uint8_t *
+add_new_region(int bytes)
+{
+	uint8_t		*shm;
+	int		 page_size = getpagesize();
+	int		 page_mask = page_size - 1;
+	int		 aligned_bytes;
+
+	aligned_bytes = ((bytes) + page_mask) & ~page_mask;
+
+	if (ftruncate(shm_fd, shm_len + aligned_bytes) < 0)
+		err(1, "ftruncate from %i to %i", shm_len, shm_len + aligned_bytes);
+
+	shm = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
+			shm_fd, shm_len);
+
+	if (shm == MAP_FAILED)
+		err(1, "mmap %i bytes @ %i", bytes, shm_len);
+
+	shm_len += aligned_bytes;
+	return shm;
+}
+
 /*
  * These are written into shared memory, offset 0:
  * - version major and minor
- * - total number of translation units
  * - process id, parent process id, group process id
- * - length of program name
  * - program name
- * - length of current working directory
  * - current working directory
  */
 static void
@@ -84,13 +105,7 @@ write_header()
 	sz += prog_sz;
 	sz += cwd_sz;
 
-	if (ftruncate(shm_fd, sz) < 0)
-		err(1, "ftruncate");
-
-	uint8_t *shm = mmap(NULL, sz, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-	if (shm == MAP_FAILED)
-		err(1, "mmap");
-	shm_len = sz;
+	uint8_t *shm = add_new_region(sz);
 
 	size_t shm_pos = 0;
 	shm_pos = add_1(shm, shm_pos, citrun_major);
@@ -106,33 +121,28 @@ write_header()
 	assert(shm_pos == sz);
 }
 
-/*
- * Operates on global shm_fd.
- */
-static int
-get_shm_fd()
+static void
+create_memory_file()
 {
-	char *shm_path;
+	assert(shm_fd == 0);
+	assert(shm_len == 0);
 
-	assert(shm_fd >= 0);
-
-	if (shm_fd > 0)
-		return shm_fd;
-
+#if 0
 	if ((shm_path = getenv("CITRUN_SHMPATH")) == NULL)
 		shm_path = SHM_PATH;
+#endif
 
-	if ((shm_fd = shm_open(shm_path, O_CREAT | O_CLOEXEC | O_RDWR,
-			S_IRUSR | S_IWUSR)) < 0)
-		err(1, "shm_open");
+	/* Existing directory is OK. */
+	if (mkdir("/tmp/citrun", S_IRWXU) && errno != EEXIST)
+		err(1, "mkdir");
 
-	if (init > 0)
-		errx(1, "init > 0!");
-
-	write_header();
+	char shm_path[23];
+	strlcpy(shm_path, "/tmp/citrun/pid.XXXXXX", sizeof(shm_path));
+	if ((shm_fd = mkstemp(shm_path)) == -1)
+		err(1, "mkstemp");
 
 	init++;
-	return shm_fd;
+	write_header();
 }
 
 
@@ -142,7 +152,6 @@ get_shm_fd()
 void
 citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 {
-	int fd;
 	size_t sz = 0;
 	size_t comp_sz, abs_sz;
 	uint8_t *shm;
@@ -150,11 +159,11 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 
 	if (node_major != citrun_major || node_minor != citrun_minor) {
 		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
-			citrun_major, citrun_minor,
-			node_major, node_minor);
+			citrun_major, citrun_minor, node_major, node_minor);
 	}
 
-	fd = get_shm_fd();
+	if (!init)
+		create_memory_file();
 
 	comp_sz = strnlen(n->comp_file_path, PATH_MAX) + 1;
 	abs_sz = strnlen(n->abs_file_path, PATH_MAX) + 1;
@@ -165,14 +174,7 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 	sz += abs_sz;
 	sz += n->size * sizeof(uint64_t);
 
-	/* Extend the file for new node + line counts. */
-	if (ftruncate(fd, shm_len + sz) < 0)
-		err(1, "ftruncate");
-
-	shm = mmap(NULL, sz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, shm_len);
-	if (shm == MAP_FAILED)
-		err(1, "mmap");
-	shm_len += sz;
+	shm = add_new_region(sz);
 
 	/* Skip past the 'ready' bit location. */
 	size_t ready_bit = shm_pos;
