@@ -57,5 +57,3 @@ check_diff 2
 
 ./fib 12 # = 6765
 [ $? -eq 144 ] && echo ok
-
-unlink_shm
