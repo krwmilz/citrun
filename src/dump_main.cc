@@ -1,10 +1,7 @@
 //
 // Tool used by tests.
 //
-#include "shm.h"
-#include "runtime_proc.h"
-
-#include <sys/mman.h>		// shm_unlink
+#include "process_dir.h"
 
 #include <cstring>
 #include <err.h>
@@ -14,32 +11,45 @@
 static void
 usage()
 {
-	std::cerr << "usage: citrun-dump [-ft] [-s srcfile] [-u shm path]" << std::endl;
+	std::cerr << "usage: citrun-dump [-ft] [-s srcfile]" << std::endl;
 	exit(1);
 }
 
 static void
-count_execs(RuntimeProcess &rt)
+print_summary(ProcessDir const &pdir)
 {
-	uint64_t total = 0;
+	for (auto &f : pdir.m_procfiles) {
+		std::cout << "Found " << (f.is_alive() ? "alive" : "dead")
+			<< " program with PID '" << f.m_pid << "'\n";
+		std::cout << "  Runtime version: "
+			<< unsigned(f.m_major) << "."
+			<< unsigned(f.m_minor) << "\n";
+		std::cout << "  Translation units: " << f.m_tus.size() << "\n";
+		std::cout << "  Lines of code: " << f.m_program_loc << "\n";
+		std::cout << "  Working directory: '" << f.m_cwd << "'\n";
+	}
 
-	for (auto &t : rt.m_tus)
-		for (int i = 0; i < t.num_lines; ++i)
-			total += t.exec_diffs[i];
-
-	std::cout << total << std::endl;
+	exit(0);
 }
 
 int
 main(int argc, char *argv[])
 {
+	ProcessDir pdir;
 	int ch;
-	int orig_argc = argc;
 	int fflag = 0;
 	char *sarg = NULL;
 	int tflag = 0;
 
-	while ((ch = getopt(argc, argv, "fs:tu:")) != -1) {
+	if (argc == 1)
+		print_summary(pdir);
+
+	if (pdir.m_procfiles.size() > 1)
+		errx(1, "more than 1 process file found in directory!");
+
+	ProcessFile f = pdir.m_procfiles[0];
+
+	while ((ch = getopt(argc, argv, "fs:t")) != -1) {
 		switch (ch) {
 		case 'f':
 			fflag = 1;
@@ -50,9 +60,6 @@ main(int argc, char *argv[])
 		case 's':
 			sarg = optarg;
 			break;
-		case 'u':
-			shm_unlink(optarg);
-			return 0;
 		default:
 			usage();
 			break;
@@ -61,39 +68,21 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	shm shm_conn;
-	RuntimeProcess rt(shm_conn);
-
-	if (orig_argc == 1) {
-		std::cout << "Version:           "
-			<< unsigned(rt.m_major) << "."
-			<< unsigned(rt.m_minor) << "\n"
-			<< "Program name:      " << rt.m_progname << "\n"
-			<< "Translation units: " << rt.m_tus.size() << "\n";
-	}
-
 	if (fflag) {
-		for (auto &t : rt.m_tus) {
+		for (auto &t : f.m_tus) {
 			std::cout << t.comp_file_path << " "
 				<< t.num_lines << std::endl;
 		}
 	}
 
-	if (0) {
-		std::cout << "Working directory:\t" << rt.m_cwd << "\n"
-		<< "Process ID:\t" << rt.m_pid << "\n"
-		<< "Parent process ID:\t" << rt.m_ppid << "\n"
-		<< "Process group ID:\t" << rt.m_pgrp << "\n";
-	}
-
 	if (tflag) {
 		for (int i = 0; i < 60; i++)
-			count_execs(rt);
+			f.total_execs();
 	}
 
 	if (sarg) {
 		const TranslationUnit *t;
-		if ((t = rt.find_tu(sarg)) == NULL)
+		if ((t = f.find_tu(sarg)) == NULL)
 			errx(1, "no source named '%s'\n", sarg);
 
 		for (auto &l : t->source)

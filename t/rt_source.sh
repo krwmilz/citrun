@@ -23,5 +23,3 @@ echo >> three.c
 test_diff 2 "one.c diff runtime and disk" one.c one.c.runtime
 test_diff 3 "two.c diff runtime and disk" two.c two.c.runtime
 test_diff 4 "three.c diff runtime and disk" three.c three.c.runtime
-
-unlink_shm

@@ -66,13 +66,13 @@ add_new_region(int bytes)
 	aligned_bytes = ((bytes) + page_mask) & ~page_mask;
 
 	if (ftruncate(shm_fd, shm_len + aligned_bytes) < 0)
-		err(1, "ftruncate from %i to %i", shm_len, shm_len + aligned_bytes);
+		err(1, "ftruncate from %zu to %zu", shm_len, shm_len + aligned_bytes);
 
 	shm = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
 			shm_fd, shm_len);
 
 	if (shm == MAP_FAILED)
-		err(1, "mmap %i bytes @ %i", bytes, shm_len);
+		err(1, "mmap %i bytes @ %zu", bytes, shm_len);
 
 	shm_len += aligned_bytes;
 	return shm;
@@ -124,21 +124,27 @@ write_header()
 static void
 create_memory_file()
 {
+	char memfile_path[23];
+	char *template;
+	char *process_dir;
+
 	assert(shm_fd == 0);
 	assert(shm_len == 0);
 
-#if 0
-	if ((shm_path = getenv("CITRUN_SHMPATH")) == NULL)
-		shm_path = SHM_PATH;
-#endif
+	if (getenv("CITRUN_TESTING") != NULL) {
+		template = "runtime/XXXXXXXXXX";
+		process_dir = "runtime";
+	} else {
+		template = "/tmp/citrun/XXXXXXXXXX";
+		process_dir = "/tmp/citrun";
+	}
 
 	/* Existing directory is OK. */
-	if (mkdir("/tmp/citrun", S_IRWXU) && errno != EEXIST)
-		err(1, "mkdir");
+	if (mkdir(process_dir, S_IRWXU) && errno != EEXIST)
+		err(1, "mkdir '%s'", process_dir);
 
-	char shm_path[23];
-	strlcpy(shm_path, "/tmp/citrun/pid.XXXXXX", sizeof(shm_path));
-	if ((shm_fd = mkstemp(shm_path)) == -1)
+	strlcpy(memfile_path, template, sizeof(memfile_path));
+	if ((shm_fd = mkstemp(memfile_path)) == -1)
 		err(1, "mkstemp");
 
 	init++;
