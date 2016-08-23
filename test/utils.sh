@@ -7,16 +7,11 @@ set -o nounset
 tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
 trap "rm -rf $tmpdir" EXIT
 
-export TEST_TOOLS="`pwd`/src";
-export CITRUN_SHMPATH="$tmpdir"
+export TEST_TOOLS="`pwd`/src"
+export CITRUN_TESTING=1
 
 cd $tmpdir
 echo "ok 1 - tmp dir created"
-
-function unlink_shm
-{
-	$TEST_TOOLS/citrun-dump -u $CITRUN_SHMPATH
-}
 
 #
 # Run citrun-dump -t 60 times and check that each time was greater than the last
