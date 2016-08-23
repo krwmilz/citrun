@@ -34,5 +34,3 @@ $TEST_TOOLS/citrun-check > check.out
 [ "`./hello`" = "hello, world!" ] && echo ok program prints
 
 check_diff 3
-
-unlink_shm
