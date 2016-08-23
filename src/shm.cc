@@ -1,6 +1,6 @@
 #include "shm.h"
 
-#include <sys/mman.h>		// shm_open, mmap
+#include <sys/mman.h>		// mmap
 #include <sys/stat.h>		// S_IRUSR
 
 #include <cassert>
@@ -9,16 +9,13 @@
 #include <stdlib.h>		// getenv
 #include <unistd.h>
 
-shm::shm() :
+Shm::Shm(std::string const &path) :
+	m_path(path),
 	m_fd(0),
 	m_mem(NULL),
 	m_pos(0)
 {
-	const char *shm_path;
-	if ((shm_path = getenv("CITRUN_SHMPATH")) == NULL)
-		shm_path = "/tmp/citrun.shared";
-
-	if ((m_fd = shm_open(shm_path, O_RDONLY, S_IRUSR | S_IWUSR)) < 0)
+	if ((m_fd = open(m_path.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) < 0)
 		err(1, "shm_open");
 
 	struct stat sb;
@@ -35,7 +32,7 @@ shm::shm() :
 }
 
 void
-shm::read_cstring(const char **c_str)
+Shm::read_cstring(const char **c_str)
 {
 	size_t sz = strlen((const char *)m_mem + m_pos) + 1;
 	if (sz > 1025)
@@ -46,7 +43,7 @@ shm::read_cstring(const char **c_str)
 }
 
 void *
-shm::get_block(size_t inc)
+Shm::get_block(size_t inc)
 {
 	void *block = m_mem + m_pos;
 	m_pos += inc;
@@ -55,7 +52,7 @@ shm::get_block(size_t inc)
 }
 
 bool
-shm::at_end()
+Shm::at_end()
 {
 	assert(m_pos <= m_size);
 	return (m_pos == m_size ? true : false);

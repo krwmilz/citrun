@@ -1,5 +1,3 @@
-#ifndef TEXT_H
-#define TEXT_H
 #include <string>
 #include <vector>
 
@@ -14,10 +12,17 @@ struct TranslationUnit {
 	std::vector<std::string> source;
 };
 
-class RuntimeProcess {
+class ProcessFile {
+private:
+	void read_source(struct TranslationUnit &);
+
+	Shm m_shm;
 public:
-	RuntimeProcess(shm &);
+	ProcessFile(std::string const &);
+
 	const TranslationUnit *find_tu(std::string const &) const;
+	uint64_t total_execs();
+	bool		 is_alive();
 	void read_executions();
 
 	uint8_t		 m_major;
@@ -28,11 +33,7 @@ public:
 	uint32_t	 m_ppid;
 	uint32_t	 m_pgrp;
 	std::vector<TranslationUnit> m_tus;
-	int		m_tus_with_execs;
-private:
-	void read_source(struct TranslationUnit &);
+	int		 m_tus_with_execs;
 
-	shm m_shm;
+	uint32_t	 m_program_loc;
 };
-
-#endif

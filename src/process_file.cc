@@ -14,15 +14,17 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include <cassert>
+#include <csignal>		// kill
 #include <err.h>
 #include <fstream>
 
+#include "process_file.h"
 #include "version.h"		// citrun_major
-#include "runtime_proc.h"
 
-RuntimeProcess::RuntimeProcess(shm &s) :
-	m_shm(s),
-	m_tus_with_execs(0)
+ProcessFile::ProcessFile(std::string const &path) :
+	m_shm(path),
+	m_tus_with_execs(0),
+	m_program_loc(0)
 {
 	assert(sizeof(pid_t) == 4);
 
@@ -34,12 +36,11 @@ RuntimeProcess::RuntimeProcess(shm &s) :
 	m_shm.read_all(&m_pgrp);
 	m_shm.read_cstring(&m_progname);
 	m_shm.read_cstring(&m_cwd);
+	m_shm.next_page();
 
 	while (m_shm.at_end() == false) {
 		TranslationUnit t;
 
-		while (m_shm.get_pos() == 0);
-		// Hack to increment the counter.
 		uint8_t ready;
 		m_shm.read_all(&ready);
 
@@ -50,16 +51,27 @@ RuntimeProcess::RuntimeProcess(shm &s) :
 
 		t.exec_diffs = (uint64_t *)m_shm.get_block(t.num_lines * 8);
 		t.source.resize(t.num_lines);
+		m_program_loc += t.num_lines;
 		read_source(t);
 
 		m_tus.push_back(t);
+
+		m_shm.next_page();
 	}
 }
 
-void
-RuntimeProcess::read_source(struct TranslationUnit &t)
+bool
+ProcessFile::is_alive()
 {
-	std::string line;
+	if (kill(m_pid, 0) == 0)
+		return 1;
+	return 0;
+}
+
+
+void
+ProcessFile::read_source(struct TranslationUnit &t)
+{
 	std::ifstream file_stream(t.abs_file_path);
 
 	if (file_stream.is_open() == 0) {
@@ -71,8 +83,20 @@ RuntimeProcess::read_source(struct TranslationUnit &t)
 		std::getline(file_stream, l);
 }
 
+uint64_t
+ProcessFile::total_execs()
+{
+	uint64_t count = 0;
+
+	for (auto &t : m_tus)
+		for (unsigned int i = 0; i < t.num_lines; ++i)
+			count += t.exec_diffs[i];
+
+	return count;
+}
+
 const TranslationUnit *
-RuntimeProcess::find_tu(std::string const &srcname) const
+ProcessFile::find_tu(std::string const &srcname) const
 {
 	for (auto &i : m_tus)
 		if (srcname == i.comp_file_path)
@@ -81,6 +105,6 @@ RuntimeProcess::find_tu(std::string const &srcname) const
 }
 
 void
-RuntimeProcess::read_executions()
+ProcessFile::read_executions()
 {
 }

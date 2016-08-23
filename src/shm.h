@@ -3,10 +3,11 @@
 
 #include <string.h>
 #include <string>
+#include <unistd.h>		// getpagesize
 
-class shm {
+class Shm {
 public:
-	shm();
+	Shm(std::string const &);
 
 	template<typename T>
 	void read_all(T *buf)
@@ -15,21 +16,22 @@ public:
 		m_pos += sizeof(T);
 	};
 
-	uint8_t get_pos()
+	void next_page()
 	{
-		return m_mem[m_pos];
+		int page_size = getpagesize();
+		m_pos += page_size - (m_pos % page_size);
 	}
 
 	void read_cstring(const char **);
 	void *get_block(size_t);
 	bool at_end();
 
-	//void read_string(std::string &);
 private:
+	std::string	 m_path;
 	int		 m_fd;
 	uint8_t		*m_mem;
 	size_t		 m_pos;
-	off_t		 m_size;
+	size_t		 m_size;
 };
 
 #endif // SHM_H
