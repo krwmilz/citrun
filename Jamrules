@@ -86,12 +86,14 @@ actions Stringize
 	echo ";" >> $(<)
 
 	# Add the declaration to the start of the file.
-	sed -i -e '1s/^/static const char *$(1:B) = /' $(<)
+	sed -e '1s/^/static const char *$(1:B) = /' -i.bak $(<)
+	rm $(<).bak
 }
 
 actions ReplaceTokens
 {
-	sed -i -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), $(<) ;
+	sed -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), -i.bak $(<) ;
+	rm $(<).bak
 }
 
 rule InstallSyms
