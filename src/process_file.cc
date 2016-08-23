@@ -61,7 +61,7 @@ ProcessFile::ProcessFile(std::string const &path) :
 }
 
 bool
-ProcessFile::is_alive()
+ProcessFile::is_alive() const
 {
 	if (kill(m_pid, 0) == 0)
 		return 1;

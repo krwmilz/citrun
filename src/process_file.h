@@ -22,7 +22,7 @@ public:
 
 	const TranslationUnit *find_tu(std::string const &) const;
 	uint64_t total_execs();
-	bool		 is_alive();
+	bool		 is_alive() const;
 	void read_executions();
 
 	uint8_t		 m_major;
