@@ -9,6 +9,7 @@ if $(PREFIX) {
 else {
 	echo ...build citrun (DEBUG) on $(OS)... ;
 	CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
+	CFLAGS += -Wall -Wextra -g ;
 }
 
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
