@@ -16,7 +16,7 @@ Shm::Shm(std::string const &path) :
 	m_pos(0)
 {
 	if ((m_fd = open(m_path.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) < 0)
-		err(1, "shm_open");
+		err(1, "open");
 
 	struct stat sb;
 	fstat(m_fd, &sb);
