@@ -8,7 +8,7 @@ echo 1..2
 pid=$!
 wait
 
-cat <<EOF  | sed -e "s,%PID%,$pid," -e "s,%CWD%,`pwd`," > dump.good
+cat <<EOF  | sed -e "s,%PID%,$pid," -e "s,%CWD%,`pwd -P`," > dump.good
 Found dead program with PID '%PID%'
   Runtime version: 0.0
   Translation units: 3
