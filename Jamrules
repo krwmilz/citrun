@@ -3,11 +3,11 @@
 # instrumentation. If PREFIX is set, assume we're building a package.
 #
 if $(PREFIX) {
-	echo ...build citrun (RELEASE) on $(OS)... ;
+	echo ...build citrun-RELEASE on $(OS)... ;
 	CITRUN_SHARE = $(PREFIX)/share/citrun ;
 }
 else {
-	echo ...build citrun (DEBUG) on $(OS)... ;
+	echo ...build citrun-DEBUG on $(OS)... ;
 	CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
 	CFLAGS += -Wall -g ;
 }
@@ -15,7 +15,7 @@ else {
 # Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
 OPTIM = $(CFLAGS) ;
 
-C++FLAGS += -std=c++11 ;
+C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti ;
 
 CLANG_LIBS =
 	-lclangAST
