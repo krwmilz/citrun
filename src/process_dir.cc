@@ -1,35 +1,46 @@
 #include "process_dir.h"
 
-#include <sys/types.h>
-
 #include <err.h>
 #include <cstdlib>		// getenv
 #include <cstring>
 #include <iostream>
-#include <dirent.h>		// opendir, readdir
 
 ProcessDir::ProcessDir()
 {
-	const char *process_dir;
 	if (std::getenv("CITRUN_TESTING") != NULL)
-		process_dir = "runtime/";
+		m_procdir = "runtime/";
 	else
-		process_dir = "/tmp/citrun/";
+		m_procdir = "/tmp/citrun/";
 
-	DIR *dirp;
-	if ((dirp = opendir(process_dir)) == NULL)
+	if ((m_dirp = opendir(m_procdir)) == NULL)
 		err(1, "opendir");
+}
 
+ProcessDir::~ProcessDir()
+{
+	closedir(m_dirp);
+}
+
+void
+ProcessDir::scan()
+{
 	struct dirent *dp;
-	while ((dp = readdir(dirp)) != NULL) {
+
+	rewinddir(m_dirp);
+	while ((dp = readdir(m_dirp)) != NULL) {
 
 		if (std::strcmp(dp->d_name, ".") == 0 ||
 		    std::strcmp(dp->d_name, "..") == 0)
 			continue;
 
-		std::string p(process_dir);
+		std::string p(m_procdir);
 		p.append(dp->d_name);
 
+		if (m_known_files.find(p) != m_known_files.end())
+			// We already know this file.
+			continue;
+
+		m_known_files.insert(p);
 		m_procfiles.push_back(ProcessFile(p));
 	}
 }

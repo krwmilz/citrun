@@ -41,6 +41,7 @@ main(int argc, char *argv[])
 	char *sarg = NULL;
 	int tflag = 0;
 
+	pdir.scan();
 	if (argc == 1)
 		print_summary(pdir);
 
