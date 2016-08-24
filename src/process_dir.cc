@@ -16,11 +16,6 @@ ProcessDir::ProcessDir()
 		err(1, "opendir");
 }
 
-ProcessDir::~ProcessDir()
-{
-	closedir(m_dirp);
-}
-
 void
 ProcessDir::scan()
 {

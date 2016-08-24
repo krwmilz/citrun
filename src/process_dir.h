@@ -9,7 +9,6 @@
 class ProcessDir {
 public:
 	ProcessDir();
-	~ProcessDir();
 	void	scan();
 
 	std::vector<ProcessFile> m_procfiles;
