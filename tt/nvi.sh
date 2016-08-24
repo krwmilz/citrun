@@ -1,7 +1,7 @@
 #
 # Tests that nvi works with C It Run.
 #
-echo 1..6
+echo 1..7
 . test/package.sh "editors/nvi"
 
 pkg_check_deps 2
@@ -10,7 +10,6 @@ pkg_build 4
 
 cat <<EOF > check.good
 Summary:
-       116 Calls to the rewrite tool
        115 Source files used as input
          2 Application link commands
         32 Rewrite parse warnings
@@ -33,6 +32,22 @@ Totals:
 EOF
 pkg_check 5
 
-# $TEST_WRKDIST/build/nvi
+$TEST_WRKDIST/build/nvi > out
 
-pkg_clean 6
+cat <<EOF > dump.good
+Found dead program with PID ''
+  Runtime version: 0.0
+  Translation units: 114
+  Lines of code: 47268
+  Working directory: ''
+EOF
+
+$TEST_TOOLS/citrun-dump | sed -e "s,'.*',''," > dump.out
+test_diff 6 "citrun-dump output" dump.good dump.out
+
+# Compiler file names are full paths so this is useless atm.
+#cat <<EOF > filelist.good
+#EOF
+#$TEST_TOOLS/citrun-dump -f > filelist.out
+
+pkg_clean 7
