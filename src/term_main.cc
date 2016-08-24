@@ -8,24 +8,25 @@
 #include <iostream>
 #include <ncurses.h>
 #include <queue>
-#include <stdexcept>	// runtime_error
 #include <time.h>	// clock_gettime, nanosleep
 
-#include "runtime_proc.h"	// RuntimeProcess
+#include "process_dir.h" // ProcessDir
 #include "shm.h"
 
-class CursesViewer : public RuntimeProcess {
+class CursesViewer {
 public:
-	CursesViewer(shm &);
+	CursesViewer(ProcessDir &pdir);
 	void loop();
 
 private:
-	void get_keyboard();
+	int get_keyboard();
 	void draw();
 	void print_statusbar();
 	void update_execs();
 	void update_sleep();
 
+	ProcessDir	 m_pdir;
+	ProcessFile	*m_cur_pfile;
 	std::queue<uint64_t> m_execution_history;
 	std::queue<struct timespec> m_frame_deltas;
 	TranslationUnit	 m_cur_tu;
@@ -42,20 +43,21 @@ private:
 	int		 m_size_x;
 };
 
-CursesViewer::CursesViewer(shm &shm) :
-	RuntimeProcess(shm),
+CursesViewer::CursesViewer(ProcessDir &pdir) :
+	m_pdir(pdir),
+	m_floating_avg({ 1, 0 }),
+	m_sleep({ 0, 1 * 1000 * 1000 * 1000 / 66 }),
+	m_exec_floating_avg(0),
+	m_total_executions(0),
 	m_fps(0),
 	m_eps(0),
 	m_tu(0),
-	m_offset(0),
-	m_floating_avg({ 1, 0 }),
-	m_exec_floating_avg(0),
-	m_sleep({ 0, 1 * 1000 * 1000 * 1000 / 66 }),
-	m_total_executions(0)
+	m_offset(0)
 {
 	getmaxyx(stdscr, m_size_y, m_size_x);
 
-	m_cur_tu = m_tus[0];
+	m_cur_pfile = &m_pdir.m_procfiles[0];
+	m_cur_tu = m_cur_pfile->m_tus[0];
 
 	struct timespec one_thirtythird = { 0, 1 * 1000 * 1000 * 1000 / 33 };
 	for (int i = 0; i < 33; i++) {
@@ -79,33 +81,35 @@ CursesViewer::loop()
 		assert(m_execution_history.size() == 33);
 
 		erase();
-		get_keyboard();
+		if (get_keyboard())
+			return;
 		draw();
 		update_execs();
-		read_executions();
 		update_sleep();
 	}
 }
 
-void
+int
 CursesViewer::get_keyboard()
 {
 	// Non-blocking due to nodelay().
 	int ch = getch();
 
 	if (ch == 'q')
-		throw std::runtime_error("quit");
-	else if (ch == 'l' && m_tu < (m_tus.size() - 1))
+		return 1;
+	else if (ch == 'l' && m_tu < (m_cur_pfile->m_tus.size() - 1))
 		m_tu++;
 	else if (ch == 'h' && m_tu > 0)
 		m_tu--;
 
-	m_cur_tu = m_tus[m_tu];
+	m_cur_tu = m_cur_pfile->m_tus[m_tu];
 
 	if (ch == 'j' && m_offset < (m_cur_tu.num_lines - m_size_y - 1))
 		m_offset++;
 	else if (ch == 'k' && m_offset > 0)
 		m_offset--;
+
+	return 0;
 }
 
 void
@@ -156,12 +160,12 @@ CursesViewer::print_statusbar()
 		attroff(COLOR_PAIR(i));
 	}
 
-	printw(" [%s] [%s] [%i/%i] [%i fps] [%ik execs/s (%i)]",
-		m_progname,
+	printw(" [%s] [%s] [%i/%i] [%i fps] [%ik execs/s]",
+		m_cur_pfile->m_progname,
 		m_cur_tu.comp_file_path,
-		m_tu + 1, m_tus.size(),
+		m_tu + 1, m_cur_pfile->m_tus.size(),
 		m_fps,
-		m_eps / 1000, m_tus_with_execs);
+		m_eps / 1000);
 
 	printw("\n");
 }
@@ -187,7 +191,6 @@ CursesViewer::update_sleep()
 #ifndef __APPLE__
 	struct timespec tmp, delta;
 	struct timespec one = { 1, 0 };
-	struct timespec zero = { 0, 0 };
 	struct timespec shift = { 0, 50 * 1000 };
 
 	// Get last frames duration and update last_frame time.
@@ -221,7 +224,7 @@ CursesViewer::update_sleep()
 int
 main(int argc, char *argv[])
 {
-	shm shm_conn;
+	ProcessDir pdir;
 
 	initscr();
 	if (has_colors() == FALSE) {
@@ -236,14 +239,18 @@ main(int argc, char *argv[])
 	init_pair(4, COLOR_CYAN, COLOR_BLACK);
 	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
 
+	printw(">> Welcome to C It Run!\n");
+	printw(">> Waiting for programs..\n");
+
 	refresh();
 
-	try {
-		CursesViewer conn(shm_conn);
-		conn.loop();
-	} catch (const std::exception &e) {
-		std::cerr << "ERROR: " << e.what();
+	while (pdir.m_procfiles.size() == 0) {
+		sleep(1);
+		pdir.scan();
 	}
+
+	CursesViewer viewer(pdir);
+	viewer.loop();
 
 	endwin();
 
