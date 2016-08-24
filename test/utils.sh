@@ -14,17 +14,6 @@ cd $tmpdir
 echo "ok 1 - tmp dir created"
 
 #
-# Run citrun-dump -t 60 times and check that each time was greater than the last
-#
-function test_total_execs
-{
-	$TEST_TOOLS/citrun-dump -t > execs.out
-
-	sort -n execs.out > execs.sorted
-	test_diff ${1} "executions strictly increasing" execs.sorted execs.out
-}
-
-#
 # Differences two instrumented files. Knocks the header off of the "*.citrun"
 # file.
 #

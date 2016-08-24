@@ -78,7 +78,7 @@ main(int argc, char *argv[])
 
 	if (tflag) {
 		for (int i = 0; i < 60; i++)
-			f.total_execs();
+			std::cout << f.total_execs() << std::endl;
 	}
 
 	if (sarg) {
