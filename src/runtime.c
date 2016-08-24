@@ -151,25 +151,13 @@ create_memory_file()
 	write_header();
 }
 
-
-/*
- * Public interface: Add a node to shared memory.
- */
-void
-citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
+static void
+node_add(struct citrun_node *n)
 {
 	size_t sz = 0;
 	size_t comp_sz, abs_sz;
 	uint8_t *shm;
 	size_t shm_pos = 0;
-
-	if (node_major != citrun_major || node_minor != citrun_minor) {
-		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
-			citrun_major, citrun_minor, node_major, node_minor);
-	}
-
-	if (!init)
-		create_memory_file();
 
 	comp_sz = strnlen(n->comp_file_path, PATH_MAX) + 1;
 	abs_sz = strnlen(n->abs_file_path, PATH_MAX) + 1;
@@ -197,4 +185,21 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 
 	/* Flip the ready bit. */
 	shm[ready_bit] = 1;
+}
+
+/*
+ * Public interface: Add a node to shared memory.
+ */
+void
+citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
+{
+	if (node_major != citrun_major || node_minor != citrun_minor) {
+		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
+			citrun_major, citrun_minor, node_major, node_minor);
+	}
+
+	if (!init)
+		create_memory_file();
+
+	node_add(n);
 }
