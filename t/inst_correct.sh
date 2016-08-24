@@ -44,8 +44,8 @@ Totals:
          7 Binary operators
 EOF
 
-$TEST_TOOLS/citrun-wrap cc -o fib fib.c
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-wrap cc -o fib fib.c
+$CITRUN_TOOLS/citrun-check > check.out
 
 check_diff 2
 

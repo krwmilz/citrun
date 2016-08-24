@@ -41,7 +41,7 @@ pid=$!
 
 sleep 3
 
-$TEST_TOOLS/citrun-dump
+$CITRUN_TOOLS/citrun-dump
 
 test_total_execs 6
 
@@ -730,7 +730,7 @@ x_x509a.c 197
 xcbc_enc.c 217
 xts128.c 205
 EOF
-$TEST_TOOLS/citrun-dump -f > filelist.out
+$CITRUN_TOOLS/citrun-dump -f > filelist.out
 filelist_diff 7
 
 kill -INT $pid

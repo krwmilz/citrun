@@ -4,7 +4,7 @@
 echo 1..2
 . test/utils.sh
 
-$TEST_TOOLS/citrun-check some_nonexistent_dir > check.out
+$CITRUN_TOOLS/citrun-check some_nonexistent_dir > check.out
 
 cat <<EOF > check.good
 citrun-check: some_nonexistent_dir: no such directory

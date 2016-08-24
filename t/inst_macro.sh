@@ -35,8 +35,8 @@ Totals:
          7 Total statements
 EOF
 
-$TEST_TOOLS/citrun-inst -c macro.c > citrun.log
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-inst -c macro.c > citrun.log
+$CITRUN_TOOLS/citrun-check > check.out
 
 inst_diff macro.c 2
 check_diff 3

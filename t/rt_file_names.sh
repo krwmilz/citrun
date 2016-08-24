@@ -6,7 +6,7 @@ echo 1..2
 
 ./program 1
 
-$TEST_TOOLS/citrun-dump -f > filelist.out
+$CITRUN_TOOLS/citrun-dump -f > filelist.out
 
 cat <<EOF > filelist.good
 one.c 26

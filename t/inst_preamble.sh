@@ -5,7 +5,7 @@ echo 1..2
 . test/utils.sh
 
 touch preamble.c
-$TEST_TOOLS/citrun-inst -c preamble.c > citrun.log
+$CITRUN_TOOLS/citrun-inst -c preamble.c > citrun.log
 
 cat <<EOF > preamble.c.good
 #ifdef __cplusplus

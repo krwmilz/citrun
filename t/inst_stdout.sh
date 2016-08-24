@@ -28,8 +28,8 @@ Totals:
          9 Total statements
 EOF
 
-$TEST_TOOLS/citrun-wrap cc -o hello hello.c
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-wrap cc -o hello hello.c
+$CITRUN_TOOLS/citrun-check > check.out
 
 [ "`./hello`" = "hello, world!" ] && echo ok program prints
 

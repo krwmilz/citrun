@@ -31,7 +31,7 @@ Totals:
          6 Total statements
 EOF
 
-$TEST_TOOLS/citrun-wrap cc -o main main.c other.c && echo "ok - source compiled"
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-wrap cc -o main main.c other.c && echo "ok - source compiled"
+$CITRUN_TOOLS/citrun-check > check.out
 
 check_diff 3

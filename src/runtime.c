@@ -131,7 +131,7 @@ create_memory_file()
 	assert(shm_fd == 0);
 	assert(shm_len == 0);
 
-	if (getenv("CITRUN_TESTING") != NULL) {
+	if (getenv("CITRUN_TOOLS") != NULL) {
 		template = "runtime/XXXXXXXXXX";
 		process_dir = "runtime";
 	} else {

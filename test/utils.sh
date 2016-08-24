@@ -7,8 +7,7 @@ set -o nounset
 tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
 trap "rm -rf $tmpdir" EXIT
 
-export TEST_TOOLS="`pwd`/src"
-export CITRUN_TESTING=1
+export CITRUN_TOOLS="`pwd`/src"
 
 cd $tmpdir
 echo "ok 1 - tmp dir created"

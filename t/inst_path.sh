@@ -20,18 +20,18 @@ tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
 trap "$rm -rf $tmpdir" EXIT
 echo "ok 1 - tmp dir created"
 
-export TEST_TOOLS="`pwd`/src";
+export CITRUN_TOOLS="`pwd`/src";
 cd $tmpdir
 
 # Save locations to tools because after unset PATH they are not available.
 grep=`which grep`
 
 unset PATH
-$TEST_TOOLS/cc -c nomatter.c
+$CITRUN_TOOLS/cc -c nomatter.c
 [ $? -eq 1 ] && echo ok 2
 
 export PATH=""
-$TEST_TOOLS/cc -c nomatter.c 2> /dev/null
+$CITRUN_TOOLS/cc -c nomatter.c 2> /dev/null
 [ $? -eq 1 ] && echo ok 3
 
 $cat <<EOF > citrun.log.good

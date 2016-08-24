@@ -40,4 +40,4 @@ pkg_check 5
 #echo ok 5 - bash started
 #
 #sleep 1
-#$TEST_TOOLS/citrun-dump
+#$CITRUN_TOOLS/citrun-dump

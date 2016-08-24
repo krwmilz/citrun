@@ -42,12 +42,12 @@ Found dead program with PID ''
   Working directory: ''
 EOF
 
-$TEST_TOOLS/citrun-dump | sed -e "s,'.*',''," > dump.out
+$CITRUN_TOOLS/citrun-dump | sed -e "s,'.*',''," > dump.out
 test_diff 6 "citrun-dump output" dump.good dump.out
 
 # Compiler file names are full paths so this is useless atm.
 #cat <<EOF > filelist.good
 #EOF
-#$TEST_TOOLS/citrun-dump -f > filelist.out
+#$CITRUN_TOOLS/citrun-dump -f > filelist.out
 
 pkg_clean 7

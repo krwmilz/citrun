@@ -319,8 +319,8 @@ xdiff/xutils.c 496
 zlib.c 274
 EOF
 
-$TEST_TOOLS/citrun-dump
-$TEST_TOOLS/citrun-dump -f > filelist.out
+$CITRUN_TOOLS/citrun-dump
+$CITRUN_TOOLS/citrun-dump -f > filelist.out
 filelist_diff 7
 
 kill $pid

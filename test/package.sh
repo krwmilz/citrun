@@ -1,4 +1,4 @@
-# exports TEST_TOOLS and puts us in a temporary directory.
+# exports CITRUN_TOOLS and puts us in a temporary directory.
 . test/utils.sh
 
 # $1 is passed in by the source ('.') statements in the tests.
@@ -21,18 +21,18 @@ function pkg_check_deps
 
 function pkg_build
 {
-	make -C $TEST_PORT PORTPATH="$TEST_TOOLS:\${WRKDIR}/bin:$PATH" build
+	make -C $TEST_PORT PORTPATH="$CITRUN_TOOLS:\${WRKDIR}/bin:$PATH" build
 	test_ret ${1} "instrumented build exit code" $?
 }
 
 function pkg_test
 {
-	#make -C $TEST_PORT PORTPATH="$TEST_TOOLS:\${WRKDIR}/bin:$PATH" test || true
+	#make -C $TEST_PORT PORTPATH="$CITRUN_TOOLS:\${WRKDIR}/bin:$PATH" test || true
 }
 
 function pkg_check
 {
-	$TEST_TOOLS/citrun-check $TEST_WRKDIST > check.out
+	$CITRUN_TOOLS/citrun-check $TEST_WRKDIST > check.out
 	check_diff ${1}
 }
 

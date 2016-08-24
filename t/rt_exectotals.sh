@@ -7,7 +7,7 @@ echo 1..3
 ./program 45 &
 pid=$!
 
-$TEST_TOOLS/citrun-dump -t > execs.out
+$CITRUN_TOOLS/citrun-dump -t > execs.out
 [ `grep -c "." execs.out` -eq 60 ] && echo ok 2 - citrun-dump -t output enough lines
 
 sort -n execs.out > execs.sorted

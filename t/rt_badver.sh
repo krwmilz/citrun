@@ -15,8 +15,8 @@ main(int argc, char *argv[])
 }
 EOF
 
-/usr/bin/cc -include $TEST_TOOLS/runtime.h -c main.c
-/usr/bin/cc -o main main.o $TEST_TOOLS/libcitrun.a
+/usr/bin/cc -include $CITRUN_TOOLS/runtime.h -c main.c
+/usr/bin/cc -o main main.o $CITRUN_TOOLS/libcitrun.a
 
 ./main 2> out
 [ $? -eq 1 ] && echo ok 2 - runtime errored program out

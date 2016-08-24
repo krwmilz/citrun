@@ -7,9 +7,9 @@ echo 1..4
 
 ./program 3
 
-$TEST_TOOLS/citrun-dump -s one.c > one.c.runtime
-$TEST_TOOLS/citrun-dump -s two.c > two.c.runtime
-$TEST_TOOLS/citrun-dump -s three.c > three.c.runtime
+$CITRUN_TOOLS/citrun-dump -s one.c > one.c.runtime
+$CITRUN_TOOLS/citrun-dump -s two.c > two.c.runtime
+$CITRUN_TOOLS/citrun-dump -s three.c > three.c.runtime
 
 # Bug in parsing source line by line in c++
 echo >> one.c

@@ -16,5 +16,5 @@ Found dead program with PID '%PID%'
   Working directory: '%CWD%'
 EOF
 
-$TEST_TOOLS/citrun-dump > dump.out
+$CITRUN_TOOLS/citrun-dump > dump.out
 test_diff 2 "citrun-dump diff" dump.good dump.out

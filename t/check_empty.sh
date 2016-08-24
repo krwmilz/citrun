@@ -4,7 +4,7 @@
 echo 1..2
 . test/utils.sh
 
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-check > check.out
 
 cat <<EOF > check.good
 No log files found.

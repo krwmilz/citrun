@@ -1,4 +1,4 @@
-# exports TEST_TOOLS and puts us in a temporary directory.
+# exports CITRUN_TOOLS and puts us in a temporary directory.
 . test/utils.sh
 
 cat <<EOF > one.c
@@ -57,4 +57,4 @@ cat <<EOF > Jamfile
 Main program : one.c two.c three.c ;
 EOF
 
-$TEST_TOOLS/citrun-wrap jam
+$CITRUN_TOOLS/citrun-wrap jam

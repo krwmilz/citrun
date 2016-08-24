@@ -5,12 +5,12 @@ echo 1..2
 . test/utils.sh
 
 touch main.{c,cc,cxx,cpp,C}
-$TEST_TOOLS/citrun-wrap cc -c main.c
-$TEST_TOOLS/citrun-wrap c++ -c main.cc
-$TEST_TOOLS/citrun-wrap c++ -c main.cxx
-$TEST_TOOLS/citrun-wrap c++ -c main.cpp
+$CITRUN_TOOLS/citrun-wrap cc -c main.c
+$CITRUN_TOOLS/citrun-wrap c++ -c main.cc
+$CITRUN_TOOLS/citrun-wrap c++ -c main.cxx
+$CITRUN_TOOLS/citrun-wrap c++ -c main.cpp
 # This one isn't supported
-$TEST_TOOLS/citrun-wrap cc -c main.C
+$CITRUN_TOOLS/citrun-wrap cc -c main.C
 
 cat <<EOF > check.good
 Summary:
@@ -22,5 +22,5 @@ Totals:
          4 Lines of source code
 EOF
 
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-check > check.out
 check_diff 2

@@ -47,8 +47,8 @@ Totals:
         14 Total statements
 EOF
 
-$TEST_TOOLS/citrun-inst -c switch.c > citrun.log
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-inst -c switch.c > citrun.log
+$CITRUN_TOOLS/citrun-check > check.out
 
 inst_diff switch.c 2
 check_diff 3

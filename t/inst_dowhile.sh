@@ -36,8 +36,8 @@ Totals:
          1 Binary operators
 EOF
 
-$TEST_TOOLS/citrun-inst -c while.c > citrun.log
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-inst -c while.c > citrun.log
+$CITRUN_TOOLS/citrun-check > check.out
 
 inst_diff while.c 2
 check_diff 3

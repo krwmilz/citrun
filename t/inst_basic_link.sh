@@ -9,7 +9,7 @@ int main(void) { return 0; }
 EOF
 echo "ok 2 - source files wrote"
 
-$TEST_TOOLS/citrun-wrap cc main.c
+$CITRUN_TOOLS/citrun-wrap cc main.c
 echo "ok 3 - source compiled"
 
 cat <<EOF > check.good
@@ -25,5 +25,5 @@ Totals:
          1 Return statement values
          3 Total statements
 EOF
-$TEST_TOOLS/citrun-check > check.out
+$CITRUN_TOOLS/citrun-check > check.out
 check_diff 4
