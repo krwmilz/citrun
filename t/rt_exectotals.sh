@@ -13,5 +13,5 @@ $TEST_TOOLS/citrun-dump -t > execs.out
 sort -n execs.out > execs.sorted
 test_diff 3 "executions strictly increasing" execs.sorted execs.out
 
-kill -USR1 $pid
+kill $pid
 wait

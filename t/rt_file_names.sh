@@ -9,7 +9,7 @@ echo 1..2
 $TEST_TOOLS/citrun-dump -f > filelist.out
 
 cat <<EOF > filelist.good
-one.c 34
+one.c 26
 three.c 9
 two.c 11
 EOF

@@ -12,7 +12,7 @@ cat <<EOF  | sed -e "s,%PID%,$pid," -e "s,%CWD%,`pwd -P`," > dump.good
 Found dead program with PID '%PID%'
   Runtime version: 0.0
   Translation units: 3
-  Lines of code: 54
+  Lines of code: 46
   Working directory: '%CWD%'
 EOF
 

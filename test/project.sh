@@ -3,7 +3,6 @@
 
 cat <<EOF > one.c
 #include <err.h>
-#include <signal.h>
 #include <stdlib.h>
 
 long long fib(long long);
@@ -18,17 +17,10 @@ usr1_sig(int signal)
 int
 main(int argc, char *argv[])
 {
-	struct sigaction sa;
 	long long n;
 
 	if (argc != 2)
 		errx(1, "argc != 2");
-
-	sa.sa_handler = &usr1_sig;
-	sa.sa_flags = SA_RESTART;
-	sigfillset(&sa.sa_mask);
-	if (sigaction(SIGUSR1, &sa, NULL) == -1)
-		err(1, "sigaction");
 
 	n = atoi(argv[1]);
 
