@@ -7,7 +7,7 @@
 #include "demo-font.h"
 #include "gl_buffer.h"
 #include "gl_view.h"
-#include "runtime_proc.h"
+#include "process_dir.h"
 #include "shm.h"
 
 #if defined(__OpenBSD__)
@@ -34,8 +34,8 @@ public:
 	static demo_buffer_t *buffer;
 
 	static View *static_vu;
-	static shm m_shm;
-	static std::vector<RuntimeProcess*> drawables;
+	static ProcessDir m_pdir;
+	static std::vector<ProcessFile *> drawables;
 private:
 	static void display();
 	static void reshape_func(int, int);
@@ -47,8 +47,8 @@ private:
 	demo_glstate_t *st;
 };
 
-std::vector<RuntimeProcess*> window::drawables;
-shm window::m_shm;
+std::vector<ProcessFile *> window::drawables;
+ProcessDir window::m_pdir;
 View *window::static_vu;
 
 FT_Library window::ft_library;
@@ -94,19 +94,24 @@ window::window(int argc, char *argv[])
 
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
-	//demo_buffer_add_text(buffer, "waiting...", font, 1);
+	demo_buffer_add_text(buffer, "waiting...", font, 1);
+
+	while (m_pdir.m_procfiles.size() == 0) {
+		sleep(1);
+		m_pdir.scan();
+	}
 
 	// Now check if there's any new connections pending.
-	// demo_buffer_clear(buffer);
-	RuntimeProcess *conn = new RuntimeProcess(m_shm);
-	window::drawables.push_back(conn);
+	demo_buffer_clear(buffer);
+	ProcessFile *pfile = &m_pdir.m_procfiles[0];
+	window::drawables.push_back(pfile);
 
 	std::stringstream ss;
-	ss << "program name:\t" << conn->m_progname << std::endl;
-	ss << "trnsltn units:\t" << conn->m_tus.size() << std::endl;
-	ss << "process id:\t" << conn->m_pid << std::endl;
-	ss << "parent pid:\t" << conn->m_ppid << std::endl;
-	ss << "process group:\t" << conn->m_pgrp << std::endl;
+	ss << "program name:\t" << pfile->m_progname << std::endl;
+	ss << "trnsltn units:\t" << pfile->m_tus.size() << std::endl;
+	ss << "process id:\t" << pfile->m_pid << std::endl;
+	ss << "parent pid:\t" << pfile->m_ppid << std::endl;
+	ss << "process group:\t" << pfile->m_pgrp << std::endl;
 
 	glyphy_point_t cur_pos = { 0, 0 };
 	demo_buffer_move_to(buffer, &cur_pos);
@@ -132,7 +137,7 @@ window::window(int argc, char *argv[])
 
 	cur_pos.x = 0;
 	glyphy_point_t tmp;
-	for (auto &t : conn->m_tus) {
+	for (auto &t : pfile->m_tus) {
 		demo_buffer_add_text(buffer, t.comp_file_path, font, 1);
 	}
 }
