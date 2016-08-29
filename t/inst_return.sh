@@ -1,8 +1,9 @@
+#!/bin/sh
 #
 # Check that return statement values (if any) are instrumented correctly.
 #
-echo 1..3
 . test/utils.sh
+plan 4
 
 cat <<EOF > return.c
 int foo() {
@@ -46,8 +47,9 @@ Totals:
          1 Binary operators
 EOF
 
-$CITRUN_TOOLS/citrun-inst -c return.c > citrun.log
-$CITRUN_TOOLS/citrun-check > check.out
+ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c return.c
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
 
-inst_diff return.c 2
-check_diff 3
+remove_preamble return.c
+ok "instrumented src diff" diff -u return.c.inst_good return.c.citrun_nohdr
+ok "citrun-check diff" diff -u check.good check.out

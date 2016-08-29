@@ -1,9 +1,10 @@
+#!/bin/sh
 #
 # Check that linking object files of one citrun version with libcitrun of
 # another errors.
 #
-echo 1..3
 . test/utils.sh
+plan 3
 
 cat <<EOF > main.c
 #include <stddef.h>
@@ -15,14 +16,8 @@ main(int argc, char *argv[])
 }
 EOF
 
-/usr/bin/cc -include $CITRUN_TOOLS/runtime.h -c main.c
-/usr/bin/cc -o main main.o $CITRUN_TOOLS/libcitrun.a
+ok "compile fake node" cc -include $CITRUN_TOOLS/runtime.h -c main.c
+ok "link fake node to libcitrun.a" cc -o main main.o $CITRUN_TOOLS/libcitrun.a
 
-./main 2> out
-[ $? -eq 1 ] && echo ok 2 - runtime errored program out
-
-cat <<EOF > good
-main: libcitrun 0.0: incompatible node version 0.255
-EOF
-
-diff -u good out && echo ok 3 - error message
+output_good="main: libcitrun 0.0: incompatible node version 0.255"
+ok_program "running fake node" 1 "$output_good" main

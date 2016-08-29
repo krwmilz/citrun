@@ -1,16 +1,16 @@
+#!/bin/sh
 #
 # Check that the advertised source file extensions work.
 #
-echo 1..2
 . test/utils.sh
+plan 7
 
 touch main.{c,cc,cxx,cpp,C}
-$CITRUN_TOOLS/citrun-wrap cc -c main.c
-$CITRUN_TOOLS/citrun-wrap c++ -c main.cc
-$CITRUN_TOOLS/citrun-wrap c++ -c main.cxx
-$CITRUN_TOOLS/citrun-wrap c++ -c main.cpp
-# This one isn't supported
-$CITRUN_TOOLS/citrun-wrap cc -c main.C
+ok "extension .c" $CITRUN_TOOLS/citrun-wrap cc -c main.c
+ok "extension .cc" $CITRUN_TOOLS/citrun-wrap c++ -c main.cc
+ok "extension .cxx" $CITRUN_TOOLS/citrun-wrap c++ -c main.cxx
+ok "extension .cpp" $CITRUN_TOOLS/citrun-wrap c++ -c main.cpp
+ok "extension .C (not supported)" $CITRUN_TOOLS/citrun-wrap c++ -c main.C
 
 cat <<EOF > check.good
 Summary:
@@ -22,5 +22,5 @@ Totals:
          4 Lines of source code
 EOF
 
-$CITRUN_TOOLS/citrun-check > check.out
-check_diff 2
+ok "citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check diff" diff -u check.good check.out

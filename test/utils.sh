@@ -1,69 +1,19 @@
-#
-# Automatically create a temporary directory and define some differencing
-# functions.
+. test/libtap.sh
 
 set -o nounset
-
-tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
-trap "rm -rf $tmpdir" EXIT
-
 export CITRUN_TOOLS="`pwd`/src"
 
-cd $tmpdir
-echo "ok 1 - tmp dir created"
-
-#
-# Differences two instrumented files. Knocks the header off of the "*.citrun"
-# file.
-#
-function inst_diff
+function remove_preamble
 {
 	file="${1}"
-	test_num="${2}"
-	test_desc="instrumented source diff"
-
-	tail -n +24 $file.citrun > $file.inst_proc
-	test_diff $test_num "$test_desc" $file.inst_good $file.inst_proc
+	tail -n +24 $file.citrun > $file.citrun_nohdr
 }
 
-#
-# Differences two citrun-check outputs. Removes the "Milliseconds spent .." line
-# because it always changes.
-#
-function check_diff
+function strip_log
 {
-	test_num=${1}
-	test_desc="citrun-check diff"
-
-	grep -v "Milliseconds" check.out > check.proc
-	test_diff $test_num "$test_desc" check.good check.proc
-}
-
-#
-# Difference a file listing output from citrun-dump. Must be sorted first.
-#
-function filelist_diff
-{
-	test_num="${1}"
-	test_desc="source file (path, length) diff"
-
-	sort filelist.out > filelist.proc
-	test_diff $test_num "$test_desc" filelist.good filelist.proc
-	rm filelist.proc
-}
-
-function test_diff
-{
-	test_num=${1}
-	test_desc="${2}"
-	file_one="${3}"
-	file_two="${4}"
-
-	if diff -u $file_one $file_two > _diff.out; then
-		echo ok $test_num - $test_desc
-	else
-		echo not ok $test_num - $test_desc
-		cat _diff.out
-	fi
-	rm _diff.out
+	sed	-e "s,^.*: ,,"	\
+		-e "s,'.*','',"	\
+		-e "s,(.*),()," \
+		-e "/Milliseconds/d" \
+		< ${1} > ${1}.stripped
 }

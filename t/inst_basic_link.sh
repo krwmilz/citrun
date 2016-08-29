@@ -1,16 +1,15 @@
+#!/bin/sh
 #
 # Check that the most basic of compile command lines works.
 #
-echo 1..4
 . test/utils.sh
+plan 3
 
 cat <<EOF > main.c
 int main(void) { return 0; }
 EOF
-echo "ok 2 - source files wrote"
 
-$CITRUN_TOOLS/citrun-wrap cc main.c
-echo "ok 3 - source compiled"
+ok "wrapping simple build command" $CITRUN_TOOLS/citrun-wrap cc main.c
 
 cat <<EOF > check.good
 Summary:
@@ -25,5 +24,6 @@ Totals:
          1 Return statement values
          3 Total statements
 EOF
-$CITRUN_TOOLS/citrun-check > check.out
-check_diff 4
+
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check diff" diff -u check.good check.out

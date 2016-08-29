@@ -1,13 +1,11 @@
+#!/bin/sh
 #
 # Verify the output when 0 citrun.log files are found.
 #
-echo 1..2
 . test/utils.sh
+plan 1
 
-$CITRUN_TOOLS/citrun-check > check.out
+output_good="No log files found."
 
-cat <<EOF > check.good
-No log files found.
-EOF
-
-diff -u check.good check.out && echo ok
+ok_program "no logs found message" 1 "$output_good" \
+	$CITRUN_TOOLS/citrun-check

@@ -1,8 +1,10 @@
+#!/bin/sh
 #
 # Make sure that citrun-wrap exits with the same code as the native build.
 #
-echo 1..1
+. test/utils.sh
+plan 1
 
-src/citrun-wrap ls asdfasdfsaf 2> /dev/null
-
-[ $? -eq 1 ] && echo ok 1 - return code
+output_good="ls: asdfasdfsaf: No such file or directory"
+ok_program "build command exit code" 1 "$output_good" \
+	$CITRUN_TOOLS/citrun-wrap ls asdfasdfsaf

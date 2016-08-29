@@ -1,8 +1,9 @@
+#!/bin/sh
 #
 # Make sure that switch statement condition instrumentation works.
 #
-echo 1..3
 . test/utils.sh
+plan 4
 
 cat <<EOF > switch.c
 int main(void) {
@@ -47,8 +48,9 @@ Totals:
         14 Total statements
 EOF
 
-$CITRUN_TOOLS/citrun-inst -c switch.c > citrun.log
-$CITRUN_TOOLS/citrun-check > check.out
+ok "citrun-inst" $CITRUN_TOOLS/citrun-inst -c switch.c
+ok "citrun-check" $CITRUN_TOOLS/citrun-check -f
 
-inst_diff switch.c 2
-check_diff 3
+remove_preamble switch.c
+ok "citrun-inst output diff" diff -u switch.c.inst_good switch.c.citrun_nohdr
+ok "citrun-check diff" diff -u check.good check.out

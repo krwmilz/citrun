@@ -1,15 +1,19 @@
+#!/bin/sh
 #
 # Check that a program that won't compile natively is handled properly.
 #
-echo 1..4
 . test/utils.sh
+plan 3
 
 echo "int main(void) { return 0; " > bad.c
 
-$CITRUN_TOOLS/citrun-wrap cc -c bad.c 2> err.out
-[ $? -eq 1 ] && echo ok 2
+output_good="1 error generated.
+Error while processing $tmpdir/bad.c.
+bad.c: In function 'main':
+bad.c:1: error: expected declaration or statement at end of input"
 
-grep -q "error: expected" err.out && echo ok 3
+ok_program "wrapped failing native compile" 1 "$output_good" \
+	$CITRUN_TOOLS/citrun-wrap cc -c bad.c
 
 cat <<EOF > check.good
 Summary:
@@ -24,5 +28,5 @@ Totals:
          3 Total statements
 EOF
 
-$CITRUN_TOOLS/citrun-check > check.out
-check_diff 4
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check diff" diff -u check.good check.out

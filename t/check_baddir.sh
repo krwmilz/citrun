@@ -1,13 +1,11 @@
+#!/bin/sh
 #
 # Verify that passing a bad directory to citrun-check errors out.
 #
-echo 1..2
 . test/utils.sh
+plan 1
 
-$CITRUN_TOOLS/citrun-check some_nonexistent_dir > check.out
+output_good="citrun-check: some_nonexistent_dir: no such directory"
 
-cat <<EOF > check.good
-citrun-check: some_nonexistent_dir: no such directory
-EOF
-
-check_diff 2
+ok_program "error on bad dir" 1 "$output_good" \
+	$CITRUN_TOOLS/citrun-check some_nonexistent_dir

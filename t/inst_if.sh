@@ -1,8 +1,9 @@
+#!/bin/sh
 #
 # Check that if statement conditions are instrumented properly.
 #
-echo 1..3
 . test/utils.sh
+plan 4
 
 cat <<EOF > if.c
 int main(int argc, char *argv[]) {
@@ -46,8 +47,9 @@ Totals:
          2 Binary operators
 EOF
 
-$CITRUN_TOOLS/citrun-inst -c if.c > citrun.log
-$CITRUN_TOOLS/citrun-check > check.out
+ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c if.c
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
 
-inst_diff if.c 2
-check_diff 3
+remove_preamble if.c
+ok "known good instrumented diff" diff -u if.c.inst_good if.c.citrun_nohdr
+ok "citrun-check diff" diff -u check.good check.out

@@ -1,6 +1,7 @@
-echo 1..2
+#!/bin/sh
 
-out=`src/citrun-wrap -v`
+. test/utils.sh
+plan 1
 
-[ $? -eq 1 ] && echo ok 1 - return code
-[ "$out" = "usage: citrun-wrap <build cmd>" ] && echo ok 2 - stdout
+output_good="usage: citrun-wrap <build cmd>"
+ok_program "citrun-wrap -ASD" 1 "$output_good" $CITRUN_TOOLS/citrun-wrap -ASD

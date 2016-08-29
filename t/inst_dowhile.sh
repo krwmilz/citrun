@@ -1,8 +1,9 @@
+#!/bin/sh
 #
 # Make sure that do while loop condition instrumentation works.
 #
-echo 1..3
 . test/utils.sh
+plan 4
 
 cat <<EOF > while.c
 int main(int argc, char *argv[]) {
@@ -36,8 +37,9 @@ Totals:
          1 Binary operators
 EOF
 
-$CITRUN_TOOLS/citrun-inst -c while.c > citrun.log
-$CITRUN_TOOLS/citrun-check > check.out
+ok "citrun-inst rewrite" $CITRUN_TOOLS/citrun-inst -c while.c
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
 
-inst_diff while.c 2
-check_diff 3
+remove_preamble while.c
+ok "instrumented source diff" diff -u while.c.inst_good while.c.citrun_nohdr
+ok "citrun-check diff" diff -u check.good check.out

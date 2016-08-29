@@ -1,9 +1,10 @@
+#!/bin/sh
 #
 # Test for some tricky macro situations. In particular macro expansions at the
 # end of binary operators.
 #
-echo 1..3
 . test/utils.sh
+plan 4
 
 cat <<EOF > macro.c
 #define MAYBE 1023;
@@ -35,8 +36,9 @@ Totals:
          7 Total statements
 EOF
 
-$CITRUN_TOOLS/citrun-inst -c macro.c > citrun.log
-$CITRUN_TOOLS/citrun-check > check.out
+ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c macro.c
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
 
-inst_diff macro.c 2
-check_diff 3
+remove_preamble macro.c
+ok "known good instrumented diff" diff -u macro.c.inst_good macro.c.citrun_nohdr
+ok "citrun-check diff" diff -u check.good check.out

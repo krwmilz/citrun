@@ -1,9 +1,10 @@
+#!/bin/sh
 #
 # Check that a raw citrun.log file is in good shape.
 # citrun-check relies on this output, and citrun-check is used quite a bit.
 #
-echo 1..6
 . test/utils.sh
+plan 2
 
 cat <<EOF > source_0.c
 #include <stdlib.h>
@@ -28,21 +29,14 @@ main(int argc, char *argv[])
 	return fibonacci(n);
 }
 EOF
-echo "ok 2 - source file wrote"
 
 cat <<EOF > Jamfile
 Main program : source_0.c ;
 EOF
-echo "ok 3 - Jamfile wrote"
 
-$CITRUN_TOOLS/citrun-wrap jam && echo "ok 4 - source compiled"
+ok "source compiled with jam" $CITRUN_TOOLS/citrun-wrap jam
 
-sed	-e "s,^.*: ,,"	\
-	-e "s,'.*','',"	\
-	-e "s,(.*),()," \
-	-e "/Milliseconds/d" \
-	< citrun.log > citrun.log.proc \
-	&& echo "ok 5 - processed citrun.log"
+strip_log citrun.log
 
 cat <<EOF > citrun.log.good
 citrun-inst 0.0 () ''
@@ -73,4 +67,4 @@ Link detected, adding '' to command line.
 No source files found on command line.
 EOF
 
-diff -u citrun.log.good citrun.log.proc && echo "ok 6 - citrun.log diff"
+ok "log file diff" diff -u citrun.log.good citrun.log.stripped

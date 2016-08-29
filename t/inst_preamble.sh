@@ -1,11 +1,12 @@
+#!/bin/sh
 #
 # Test that the instrumentation preamble is what we think it is.
 #
-echo 1..2
 . test/utils.sh
+plan 2
 
 touch preamble.c
-$CITRUN_TOOLS/citrun-inst -c preamble.c > citrun.log
+ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c preamble.c
 
 cat <<EOF > preamble.c.good
 #ifdef __cplusplus
@@ -34,4 +35,4 @@ static void citrun_constructor() {
 EOF
 
 sed -i -e 's/".*"/""/' preamble.c.citrun
-diff -u preamble.c.good preamble.c.citrun && echo ok 2
+ok "preamble diff" diff -u preamble.c.good preamble.c.citrun

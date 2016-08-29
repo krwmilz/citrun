@@ -4,6 +4,8 @@
 echo 1..2
 . test/project.sh
 
+env
+
 ./program 1 &
 pid=$!
 wait
