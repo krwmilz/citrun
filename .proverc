@@ -1,2 +1,2 @@
--e '/bin/sh'
+--ext '.t'
 --ext '.sh'
