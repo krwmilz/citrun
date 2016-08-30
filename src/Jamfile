@@ -3,11 +3,11 @@ SubDir TOP src ;
 #
 # libcitrun.a and utils.a
 #
-ObjectCcFlags runtime.c : -fPIC -ansi ;
+ObjectCcFlags runtime.c : -fPIC -ansi -pedantic ;
 Library libcitrun : runtime.c ;
 
 Library utils : shm.cc process_file.cc process_dir.cc ;
-LinkLibraries citrun-dump citrun-term citrun-gl : utils ;
+LinkLibraries citrun-term citrun-gl : utils ;
 
 #
 # citrun-wrap, citrun-check
@@ -17,11 +17,6 @@ Shell citrun-check : check.in ;
 Shell citrun-wrap : wrap.in ;
 
 ReplaceTokens citrun-wrap ;
-
-#
-# citrun-dump (not installed)
-#
-Main citrun-dump : dump_main.cc ;
 
 #
 # citrun-term
@@ -80,9 +75,9 @@ Main citrun-inst : $(INST_SRCS) ;
 #
 # install
 #
-InstallLib $(PREFIX)/share/citrun : libcitrun.a ;
-InstallShell $(PREFIX)/bin : citrun-wrap citrun-check ;
-InstallBin $(PREFIX)/bin : citrun-term citrun-gl citrun-inst ;
-InstallSyms $(PREFIX)/share/citrun : cc gcc clang clang++ g++ c++ egcc eg++ ;
+InstallLib	$(PREFIX)/share/citrun	: libcitrun.a ;
+InstallShell	$(PREFIX)/bin		: citrun-wrap citrun-check ;
+InstallBin	$(PREFIX)/bin		: citrun-term citrun-gl citrun-inst ;
+InstallSyms	$(PREFIX)/share/citrun	: cc gcc clang clang++ g++ c++ egcc eg++ ;
 
 SubInclude TOP src glyphy ;
