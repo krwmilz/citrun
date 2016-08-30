@@ -1,0 +1,12 @@
+SubDir TOP test ;
+
+PROG_SRCS = one.c two.c three.c ;
+MakeLocate $(PROG_SRCS) : $(LOCATE_SOURCE) ;
+
+Depends $(PROG_SRCS) : $(TOP)/src/inst_main.cc ;
+Depends program : $(TOP)/src/runtime.h $(TOP)/src/runtime.c ;
+
+CC on program = $(TOP)/src/citrun-wrap cc ;
+LINK on program = $(TOP)/src/citrun-wrap cc ;
+
+Main program : one.c two.c three.c ;
