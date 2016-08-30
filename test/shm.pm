@@ -39,7 +39,7 @@ sub new {
 		xread($fh, $tu{size} * 8);
 		$self->next_page();
 
-		push @translation_units, (%tu);
+		push @translation_units, (\%tu);
 	}
 	$self->{translation_units} = \@translation_units;
 
