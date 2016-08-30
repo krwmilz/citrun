@@ -70,7 +70,7 @@ if $(CITRUN_COVERAGE) {
 
 # Link with the c++ compiler so that the matching c++ runtime library gets added
 # automatically.
-LINK = $(C++) ;
+LINK on citrun-inst citrun-term citrun-dump = $(C++) ;
 
 rule Stringize
 {
