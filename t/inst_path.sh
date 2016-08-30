@@ -7,9 +7,8 @@
 . test/utils.sh
 plan 3
 
-diff=`which diff`
-alias sed=`which sed`
-alias expr=`which expr`
+# Save the PATH to restore later.
+OLDPATH="${PATH}"
 
 cat <<EOF > citrun.log.good
 citrun-inst 0.0 () ''
@@ -21,6 +20,9 @@ PATH=''
 '' not in PATH.
 EOF
 
+# Hang onto an absolute reference to 'expr' for libtap.sh
+alias expr=`which expr`
+
 unset PATH
 ok_program "run citrun-inst as cc with no PATH" 1 "" \
 	$CITRUN_TOOLS/cc -c nomatter.c
@@ -29,9 +31,8 @@ export PATH=""
 ok_program "run citrun-inst as cc with empty PATH" 1 "" \
 	$CITRUN_TOOLS/cc -c nomatter.c 2> /dev/null
 
-sed	-e "s,^.*: ,,"	\
-	-e "s,'.*','',"	\
-	-e "s,(.*),()," \
-	< citrun.log > citrun.log.proc
+# Restore the path so the commands below work.
+PATH="${OLDPATH}"
 
-ok "citrun.log diff" $diff -u citrun.log.good citrun.log.proc
+strip_log citrun.log
+ok "citrun.log diff" diff -u citrun.log.good citrun.log.stripped
