@@ -2,4 +2,3 @@ SubDir TOP ;
 
 SubInclude TOP man ;
 SubInclude TOP src ;
-SubInclude TOP test ;

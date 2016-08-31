@@ -5,6 +5,7 @@ use POSIX;
 
 # Triggers runtime to use alternate shm path.
 $ENV{CITRUN_TOOLS} = 1;
+system("cd test && ../src/citrun-wrap jam");
 
 sub new {
 	my ($class) = @_;
