@@ -49,10 +49,13 @@ add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
 }
 
 size_t
-add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t null_len)
+add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t len)
 {
-	strlcpy((char *)shm + shm_pos, str, null_len);
-	return shm_pos + null_len;
+	memcpy(shm + shm_pos, &len, sizeof(len));
+	shm_pos += sizeof(len);
+
+	memcpy(shm + shm_pos, str, len);
+	return shm_pos + len;
 }
 
 static uint8_t *
@@ -97,12 +100,14 @@ write_header()
 	if ((cwd_buf = getcwd(NULL, 0)) == NULL)
 		err(1, "getcwd");
 
-	prog_sz = strnlen(progname, PATH_MAX) + 1;
-	cwd_sz = strnlen(cwd_buf, PATH_MAX) + 1;
+	prog_sz = strnlen(progname, PATH_MAX);
+	cwd_sz = strnlen(cwd_buf, PATH_MAX);
 
 	sz += sizeof(uint8_t) * 2;
 	sz += sizeof(uint32_t) * 3;
+	sz += sizeof(prog_sz);
 	sz += prog_sz;
+	sz += sizeof(cwd_sz);
 	sz += cwd_sz;
 
 	uint8_t *shm = add_new_region(sz);
@@ -125,27 +130,26 @@ static void
 create_memory_file()
 {
 	char memfile_path[23];
-	char *template;
-	char *process_dir;
+	char *template = "/tmp/citrun/XXXXXXXXXX";
+	char *process_dir  = "/tmp/citrun";
 
 	assert(shm_fd == 0);
 	assert(shm_len == 0);
 
 	if (getenv("CITRUN_TOOLS") != NULL) {
-		template = "runtime/XXXXXXXXXX";
-		process_dir = "runtime";
+		if ((shm_fd = open("procfile.shm", O_RDWR | O_CREAT,
+		    S_IRUSR | S_IWUSR)) == -1)
+			err(1, "open");
 	} else {
-		template = "/tmp/citrun/XXXXXXXXXX";
-		process_dir = "/tmp/citrun";
+		/* Existing directory is OK. */
+		if (mkdir(process_dir, S_IRWXU) && errno != EEXIST)
+			err(1, "mkdir '%s'", process_dir);
+
+		strlcpy(memfile_path, template, sizeof(memfile_path));
+
+		if ((shm_fd = mkstemp(memfile_path)) == -1)
+			err(1, "mkstemp");
 	}
-
-	/* Existing directory is OK. */
-	if (mkdir(process_dir, S_IRWXU) && errno != EEXIST)
-		err(1, "mkdir '%s'", process_dir);
-
-	strlcpy(memfile_path, template, sizeof(memfile_path));
-	if ((shm_fd = mkstemp(memfile_path)) == -1)
-		err(1, "mkstemp");
 
 	init++;
 	write_header();
@@ -155,24 +159,21 @@ static void
 node_add(struct citrun_node *n)
 {
 	size_t sz = 0;
-	size_t comp_sz, abs_sz;
+	uint16_t comp_sz, abs_sz;
 	uint8_t *shm;
 	size_t shm_pos = 0;
 
-	comp_sz = strnlen(n->comp_file_path, PATH_MAX) + 1;
-	abs_sz = strnlen(n->abs_file_path, PATH_MAX) + 1;
+	comp_sz = strnlen(n->comp_file_path, PATH_MAX);
+	abs_sz = strnlen(n->abs_file_path, PATH_MAX);
 
-	sz += sizeof(uint8_t);
 	sz += sizeof(uint32_t);
+	sz += sizeof(comp_sz);
 	sz += comp_sz;
+	sz += sizeof(abs_sz);
 	sz += abs_sz;
 	sz += n->size * sizeof(uint64_t);
 
 	shm = add_new_region(sz);
-
-	/* Skip past the 'ready' bit location. */
-	size_t ready_bit = shm_pos;
-	shm_pos += 1;
 
 	shm_pos = add_4(shm, shm_pos, n->size);
 	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
@@ -182,9 +183,6 @@ node_add(struct citrun_node *n)
 	shm_pos += n->size * sizeof(uint64_t);
 
 	assert(shm_pos == sz);
-
-	/* Flip the ready bit. */
-	shm[ready_bit] = 1;
 }
 
 /*
