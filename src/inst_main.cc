@@ -25,14 +25,12 @@
 #include <sstream>		// stringstream
 
 
-int
+void
 clean_PATH(InstrumentLogger &llog)
 {
 	char *path;
-	if ((path = std::getenv("PATH")) == NULL) {
-		llog << "Error: PATH is not set.\n";
-		return 1;
-	}
+	if ((path = std::getenv("PATH")) == NULL)
+		errx(1, "Error: PATH is not set.");
 
 	llog << "PATH='" << path << "'\n";
 
@@ -57,16 +55,11 @@ clean_PATH(InstrumentLogger &llog)
 		first_component = 0;
 	}
 
-	if (!found_citrun_path) {
-		llog << "Error: '" << CITRUN_SHARE << "' not in PATH.\n";
-		return 1;
-	}
+	if (!found_citrun_path)
+		errx(1, "Error: '%s' not in PATH.", CITRUN_SHARE);
 
-	// Set new $PATH
 	if (setenv("PATH", new_path.str().c_str(), 1))
 		err(1, "setenv");
-
-	return 0;
 }
 
 void
@@ -116,9 +109,7 @@ main(int argc, char *argv[])
 		llog << ".\n";
 
 		setprogname("citrun-inst");
-		if (clean_PATH(llog) != 0)
-			// PATH cleaning failed, exiting is advisable.
-			return 1;
+		clean_PATH(llog);
 	}
 
 	InstrumentFrontend main(argc, argv, &llog, is_citruninst);
