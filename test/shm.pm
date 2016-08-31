@@ -1,10 +1,10 @@
 package test::shm;
 use strict;
 use warnings;
-use Cwd;
 use POSIX;
 
-$ENV{CITRUN_TOOLS} = cwd . '/src';
+# Triggers runtime to use alternate shm path.
+$ENV{CITRUN_TOOLS} = 1;
 
 sub new {
 	my ($class) = @_;
@@ -82,6 +82,10 @@ sub xread {
 	}
 
 	return $data;
+}
+
+sub DESTROY {
+	unlink "procfile.shm";
 }
 
 1;

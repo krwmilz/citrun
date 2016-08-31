@@ -11,9 +11,10 @@ use test::shm;
 my $child_pid = fork();
 if ($child_pid == 0) {
 	# Child.
-	exec ("test/program", "45");
+	exec ("test/program", "45") or die $!;
 }
 
+# Give the runtime time to set up.
 sleep 1;
 my $shm = test::shm->new();
 
