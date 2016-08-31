@@ -3,7 +3,7 @@
 # Check that a program that won't compile natively is handled properly.
 #
 . test/utils.sh
-plan 3
+plan 4
 
 echo "int main(void) { return 0; " > bad.c
 
@@ -28,5 +28,6 @@ Totals:
          3 Total statements
 EOF
 
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

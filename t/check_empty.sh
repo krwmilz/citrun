@@ -7,5 +7,5 @@ plan 1
 
 output_good="No log files found."
 
-ok_program "no logs found message" 1 "$output_good" \
+ok_program "is no logs found message printed" 1 "$output_good" \
 	$CITRUN_TOOLS/citrun-check

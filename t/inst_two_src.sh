@@ -4,7 +4,7 @@
 # instrumented fully.
 #
 . test/utils.sh
-plan 3
+plan 4
 
 cat <<EOF > main.c
 int main(void) {
@@ -33,6 +33,7 @@ Totals:
 EOF
 
 ok "citrun-wrap compile" $CITRUN_TOOLS/citrun-wrap cc -o main main.c other.c
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

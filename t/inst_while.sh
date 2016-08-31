@@ -3,7 +3,7 @@
 # Make sure that while loop condition instrumentation works.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > while.c
 int main(int argc, char *argv[]) {
@@ -40,8 +40,10 @@ Totals:
 EOF
 
 ok "citrun-inst" $CITRUN_TOOLS/citrun-inst -c while.c
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble while.c
+strip_preamble while.c
+strip_millis check.out
+
 ok "citrun-inst diff" diff -u while.c.inst_good while.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out

@@ -3,7 +3,7 @@
 # Check that the advertised source file extensions work.
 #
 . test/utils.sh
-plan 7
+plan 8
 
 touch main.{c,cc,cxx,cpp,C}
 ok "extension .c" $CITRUN_TOOLS/citrun-wrap cc -c main.c
@@ -22,5 +22,6 @@ Totals:
          4 Lines of source code
 EOF
 
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

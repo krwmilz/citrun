@@ -3,7 +3,7 @@
 # Check that a simple program can execute successfully with instrumentation.
 #
 . test/utils.sh
-plan 6
+plan 7
 
 cat <<EOF > fib.c
 #include <stdio.h>
@@ -49,8 +49,9 @@ Totals:
 EOF
 
 ok "wrapped source compile" $CITRUN_TOOLS/citrun-wrap cc -o fib fib.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out
 
 ok_program "fib with no args" 1 "" fib

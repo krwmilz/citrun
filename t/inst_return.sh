@@ -3,7 +3,7 @@
 # Check that return statement values (if any) are instrumented correctly.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > return.c
 int foo() {
@@ -48,8 +48,10 @@ Totals:
 EOF
 
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c return.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble return.c
+strip_preamble return.c
+strip_millis check.out
+
 ok "instrumented src diff" diff -u return.c.inst_good return.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out

@@ -3,7 +3,7 @@
 # Check that if statement conditions are instrumented properly.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > if.c
 int main(int argc, char *argv[]) {
@@ -48,8 +48,10 @@ Totals:
 EOF
 
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c if.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble if.c
+strip_preamble if.c
+strip_millis check.out
+
 ok "known good instrumented diff" diff -u if.c.inst_good if.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out

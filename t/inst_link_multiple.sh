@@ -3,7 +3,7 @@
 # Check that linking more than one instrumented object file together works.
 #
 . test/utils.sh
-plan 3
+plan 4
 
 cat <<EOF > one.c
 void second_func();
@@ -34,7 +34,7 @@ Main program : one.c two.c three.c ;
 EOF
 
 ok "compiling source w/ jam" $CITRUN_TOOLS/citrun-wrap jam
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
 cat <<EOF > check.good
 Summary:
@@ -51,4 +51,5 @@ Totals:
         13 Total statements
 EOF
 
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

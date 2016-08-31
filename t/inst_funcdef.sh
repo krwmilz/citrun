@@ -3,7 +3,7 @@
 # Check that really long function declarations are instrumented properly.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > funcdef.c
 void
@@ -39,8 +39,10 @@ Totals:
 EOF
 
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c funcdef.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble funcdef.c
+strip_preamble funcdef.c
+strip_millis check.out
+
 ok "known good instrumented diff" diff -u funcdef.c.inst_good funcdef.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out

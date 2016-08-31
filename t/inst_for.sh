@@ -3,7 +3,7 @@
 # Test that for loop condition instrumenting works.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > for.c
 int main(int argc, char *argv[]) {
@@ -37,8 +37,10 @@ Totals:
 EOF
 
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c for.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble for.c
+strip_preamble for.c
+strip_millis check.out
+
 ok "known good instrumented diff" diff -u for.c.inst_good for.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out

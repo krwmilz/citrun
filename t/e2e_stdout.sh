@@ -3,7 +3,7 @@
 # Simple program that prints output.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > hello.c
 #include <stdio.h>
@@ -31,7 +31,8 @@ EOF
 
 ok "wrapped compile" $CITRUN_TOOLS/citrun-wrap cc -o hello hello.c
 
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out
 
 ok_program "stdout compare" 0 "hello, world!" hello

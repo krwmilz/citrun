@@ -3,7 +3,7 @@
 # Test that binary operators in strange cases work. Includes enums and globals.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > enum.c
 enum ASDF {
@@ -60,8 +60,10 @@ Totals:
 EOF
 
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c enum.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble enum.c
+strip_preamble enum.c
+strip_millis check.out
+
 ok "instrumented src file diff" diff -u enum.c.inst_good enum.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out

@@ -3,7 +3,7 @@
 # Test that the instrumentation preamble is what we think it is.
 #
 . test/utils.sh
-plan 2
+plan 3
 
 touch preamble.c
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c preamble.c
@@ -34,5 +34,5 @@ static void citrun_constructor() {
 #endif
 EOF
 
-sed -i -e 's/".*"/""/' preamble.c.citrun
-ok "preamble diff" diff -u preamble.c.good preamble.c.citrun
+ok "remove os specific paths" sed -i -e 's/".*"/""/' preamble.c.citrun
+ok "diff against known good" diff -u preamble.c.good preamble.c.citrun

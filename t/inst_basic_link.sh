@@ -3,7 +3,7 @@
 # Check that the most basic of compile command lines works.
 #
 . test/utils.sh
-plan 3
+plan 4
 
 cat <<EOF > main.c
 int main(void) { return 0; }
@@ -25,5 +25,6 @@ Totals:
          3 Total statements
 EOF
 
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

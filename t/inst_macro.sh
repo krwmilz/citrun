@@ -4,7 +4,7 @@
 # end of binary operators.
 #
 . test/utils.sh
-plan 4
+plan 5
 
 cat <<EOF > macro.c
 #define MAYBE 1023;
@@ -37,8 +37,10 @@ Totals:
 EOF
 
 ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c macro.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -f
+ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 
-remove_preamble macro.c
+strip_preamble macro.c
+strip_millis check.out
+
 ok "known good instrumented diff" diff -u macro.c.inst_good macro.c.citrun_nohdr
 ok "citrun-check diff" diff -u check.good check.out
