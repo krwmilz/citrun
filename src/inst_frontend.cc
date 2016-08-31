@@ -193,7 +193,7 @@ InstrumentFrontend::instrument()
 	clang::DiagnosticOptions diags;
 	clang::TextDiagnosticPrinter *log;
 
-	log = new clang::TextDiagnosticPrinter(*m_log->m_output, &diags, false);
+	log = new clang::TextDiagnosticPrinter(m_log->m_outfile, &diags, false);
 	log->setPrefix(std::to_string(m_log->m_pid));
 	Tool.setDiagnosticConsumer(log);
 
@@ -218,7 +218,7 @@ void
 InstrumentFrontend::exec_compiler()
 {
 	// XXX: Need to destroy log here.
-	m_log->m_output->flush();
+	m_log->m_outfile.flush();
 
 	if (m_is_citruninst) {
 		*m_log << "Running as citrun-inst, not re-exec()'ing\n";
@@ -234,7 +234,7 @@ int
 InstrumentFrontend::fork_compiler()
 {
 	// Otherwise we'll get two copies of buffers after fork().
-	m_log->m_output->flush();
+	m_log->m_outfile.flush();
 
 	pid_t child_pid;
 	if ((child_pid = fork()) < 0)
