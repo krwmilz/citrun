@@ -20,4 +20,4 @@ ok "compile fake node" cc -include $CITRUN_TOOLS/rt.h -c main.c
 ok "link fake node to libcitrun.a" cc -o main main.o $CITRUN_TOOLS/libcitrun.a
 
 output_good="main: libcitrun 0.0: incompatible node version 0.255"
-ok_program "running fake node" 1 "$output_good" main
+ok_program "running fake node" 1 "$output_good" ./main
