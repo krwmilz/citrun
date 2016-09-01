@@ -18,27 +18,28 @@
 .Os
 .Sh NAME
 .Nm citrun-check
-.Nd check directories for log files
+.Nd check for rewrite activity
 .Sh SYNOPSIS
 .Nm
+.Op Fl o Ar output
 .Op Ar dir
 .Sh DESCRIPTION
 The
 .Nm
-script recursively checks either
+utility recursively checks either
 .Ar dir ,
 if given, or the current working directory for
-.Pa citrun.log
-files created by
+activity logs created by
 .Xr citrun-wrap 1 .
 .Pp
-When
+If the
+.Fl o
+option is specified then
 .Nm
-does not have its standard output redirected it prints a
-.Qq Checking
-line that adds a single period for every file processed.
+will write to
+.Ar output
+instead of standard output.
 .Pp
-Once checking is complete two sections are printed.
 The text below shows the output of
 .Nm
 after
@@ -59,17 +60,14 @@ Totals:
          3 Total statements
 .Ed
 .Pp
-The first section is a summary regarding how thoroughly the project was
-instrumented. The most important counts are in this section.
-.Pp
-The second section contains rewriting totals. These are the total number of
-visited source code elements from the source files used as input.
+The first section shows how thoroughly the project was instrumented, while
+the second section contains rewriting totals.
 .Sh SUMMARY COUNTS
 .Pp
-The most important counts are failures. Source rewriting can fail for a few
-reasons and is not always a bad thing.
+The most important summary events are failures. Source rewriting can fail for a
+few reasons and is not always a bad thing.
 .Pp
-The following table shows all of the possible counts, and describes them:
+The following table lists all possible events and describes them:
 .Pp
 .Bl -tag -width Ds
 .It Qq Source files used as input
