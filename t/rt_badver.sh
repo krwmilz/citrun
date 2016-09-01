@@ -16,7 +16,7 @@ main(int argc, char *argv[])
 }
 EOF
 
-ok "compile fake node" cc -include $CITRUN_TOOLS/runtime.h -c main.c
+ok "compile fake node" cc -include $CITRUN_TOOLS/rt.h -c main.c
 ok "link fake node to libcitrun.a" cc -o main main.o $CITRUN_TOOLS/libcitrun.a
 
 output_good="main: libcitrun 0.0: incompatible node version 0.255"

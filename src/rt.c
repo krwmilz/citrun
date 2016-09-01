@@ -25,7 +25,7 @@
 #include <string.h>		/* strnlen */
 #include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
 
-#include "runtime.h"
+#include "rt.h"
 #include "version.h"
 
 #define SHM_PATH "/tmp/citrun.shared"

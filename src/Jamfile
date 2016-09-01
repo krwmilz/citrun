@@ -3,8 +3,8 @@ SubDir TOP src ;
 #
 # libcitrun.a and utils.a
 #
-ObjectCcFlags runtime.c : -fPIC -ansi ;
-Library libcitrun : runtime.c ;
+ObjectCcFlags rt.c : -fPIC -ansi ;
+Library libcitrun : rt.c ;
 
 Library utils : shm.cc process_file.cc process_dir.cc ;
 LinkLibraries citrun-term citrun-gl : utils ;
@@ -59,7 +59,7 @@ INST_SRCS =
 	inst_action.cc
 	inst_visitor.cc ;
 
-Stringize runtime_h.h : runtime.h ;
+Stringize rt_h.h : rt.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
 ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\"

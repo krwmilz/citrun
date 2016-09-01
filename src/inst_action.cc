@@ -14,7 +14,7 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include "inst_action.h"
-#include "runtime_h.h"
+#include "rt_h.h"
 #include "version.h"		// citrun_major, citrun_minor
 
 #include <clang/Frontend/CompilerInstance.h>
@@ -78,7 +78,7 @@ InstrumentAction::EndSourceFileAction()
 	preamble << "#ifdef __cplusplus\n"
 		<< "extern \"C\" {\n"
 		<< "#endif\n";
-	preamble << runtime_h;
+	preamble << rt_h;
 	preamble << "static struct citrun_node _citrun = {\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"
