@@ -35,4 +35,4 @@ ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out
 
-ok_program "stdout compare" 0 "hello, world!" hello
+ok_program "stdout compare" 0 "hello, world!" ./hello

@@ -54,6 +54,6 @@ ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
 strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out
 
-ok_program "fib with no args" 1 "" fib
-ok_program "fib of 10" 0 "55" fib 10
-ok_program "fib of 20" 0 "6765" fib 20
+ok_program "fib with no args" 1 "" ./fib
+ok_program "fib of 10" 0 "55" ./fib 10
+ok_program "fib of 20" 0 "6765" ./fib 20
