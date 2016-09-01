@@ -20,5 +20,5 @@ function strip_log
 
 function strip_millis
 {
-	ok "stripping milliseconds" sed -e "/Milliseconds spent/d" -i $1
+	ok "stripping milliseconds" sed -i -e "/Milliseconds spent/d" $1
 }
