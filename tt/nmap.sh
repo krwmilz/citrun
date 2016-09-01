@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Instruments Nmap and checks that the instrumented program still runs.
 #

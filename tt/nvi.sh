@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Tests that nvi works with C It Run.
 #

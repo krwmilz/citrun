@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Instrument openssl, run its testsuite, check the logs and do a quick runtime
 # sanity test on it.

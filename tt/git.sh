@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.

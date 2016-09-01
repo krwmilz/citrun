@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Test that building Mutt works.
 #
