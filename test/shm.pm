@@ -5,7 +5,6 @@ use POSIX;
 
 # Triggers runtime to use alternate shm path.
 $ENV{CITRUN_TOOLS} = 1;
-system("cd test && ../src/citrun-wrap jam");
 
 sub new {
 	my ($class) = @_;
@@ -62,6 +61,17 @@ sub execs_for {
 	seek $self->{fh}, $tu->{exec_buf_pos}, 0;
 	my @execs = unpack("Q$tu->{size}", xread($self->{fh}, $tu->{size} * 8));
 	return \@execs;
+}
+
+sub print_tus {
+	my ($self) = @_;
+
+	my $transl_units = $self->{translation_units};
+	for (@$transl_units) {
+		my %tu = %$_;
+
+		print "$tu{comp_file_name} $tu{size}\n";
+	}
 }
 
 #
