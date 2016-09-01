@@ -13,8 +13,8 @@ LinkLibraries citrun-term citrun-gl : utils ;
 # citrun-wrap, citrun-check
 #
 MakeLocate citrun-check citrun-wrap : $(LOCATE_SOURCE) ;
-Shell citrun-check : check.in ;
-Shell citrun-wrap : wrap.in ;
+Shell citrun-check : check.sh ;
+Shell citrun-wrap : wrap.sh ;
 
 ReplaceTokens citrun-wrap ;
 
