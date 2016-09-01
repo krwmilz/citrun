@@ -1,16 +1,17 @@
+#!/bin/sh
 #
 # Try and instrument spidermonkey.
 #
-echo 1..6
-. test/package.sh "devel/spidermonkey"
+. test/package.sh
+plan 6
 
-pkg_check_deps 2
-pkg_clean 3
-pkg_build 4
+pkg_set "devel/spidermonkey"
+pkg_check_deps
+pkg_clean
+pkg_build
 
 cat <<EOF > check.good
 Summary:
-       438 Calls to the rewrite tool
        366 Source files used as input
         64 Application link commands
      58239 Rewrite parse warnings
@@ -34,6 +35,6 @@ Totals:
      13491 Binary operators
       1888 Errors rewriting source
 EOF
-pkg_check 5
+pkg_check
 
-pkg_clean 6
+pkg_clean
