@@ -29,7 +29,7 @@ CITRUN-CHECK(1)</td>
 </tbody>
 </table>
 <div class="section">
-<h1 id="NAME">NAME</h1> <b class="name">citrun-check</b> &#8212; <span class="desc">check directories for log files</span></div>
+<h1 id="NAME">NAME</h1> <b class="name">citrun-check</b> &#8212; <span class="desc">check for rewrite activity</span></div>
 <div class="section">
 <h1 id="SYNOPSIS">SYNOPSIS</h1><table class="synopsis">
 <col style="width: 12.00ex;"/>
@@ -39,17 +39,17 @@ CITRUN-CHECK(1)</td>
 <td>
 <b class="name">citrun-check</b></td>
 <td>
-[<span class="opt"><i class="arg">dir</i></span>]</td>
+[<span class="opt"><b class="flag">-o</b> <i class="arg">output</i></span>] [<span class="opt"><i class="arg">dir</i></span>]</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section">
-<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun-check</b> script recursively checks either <i class="arg">dir</i>, if given, or the current working directory for <i class="file">citrun.log</i> files created by the rewrite tool.<div class="spacer">
+<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun-check</b> utility recursively checks either <i class="arg">dir</i>, if given, or the current working directory for activity logs created by <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a>.<div class="spacer">
 </div>
-When <b class="name">citrun-check</b> does not have its stdout redirected it prints a &#8220;Checking&#8221; line that adds a single period for every file processed.<div class="spacer">
+If the <b class="flag">-o</b> option is specified then <b class="name">citrun-check</b> will write to <i class="arg">output</i> instead of standard output.<div class="spacer">
 </div>
-Once checking is complete two sections are printed. The text below shows the output of <b class="name">citrun-check</b> after <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
+The text below shows the output of <b class="name">citrun-check</b> after <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
 </div>
 <pre style="margin-left: 5.00ex;" class="lit display">
 Summary: 
@@ -66,13 +66,11 @@ Totals:
          3 Total statements</pre>
 <div class="spacer">
 </div>
-The first section is a summary regarding how thoroughly the project was instrumented. The most important counts are in this section.<div class="spacer">
-</div>
-The second section contains rewriting totals. These are the total number of visited source code elements from the source files used as input.</div>
+The first section shows how thoroughly the project was instrumented, while the second section contains rewriting totals.</div>
 <div class="section">
-<h1 id="SUMMARY_COUNTS">SUMMARY COUNTS</h1> The most important counts are failures. Source rewriting can fail for a few reasons and is not always a bad thing.<div class="spacer">
+<h1 id="SUMMARY_COUNTS">SUMMARY COUNTS</h1> The most important summary events are failures. Source rewriting can fail for a few reasons and is not always a bad thing.<div class="spacer">
 </div>
-The following table shows all of the possible counts, and describes them:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
+The following table lists all possible events and describes them:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
 <dt class="list-tag" style="margin-top: 1.00em;">
 &#8220;Source files used as input&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
