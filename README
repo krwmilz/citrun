@@ -4,16 +4,16 @@
 
 Build dependencies:
 - C++11 capable compiler
+- Curses
 - DejaVu Sans Mono
 - freeglut and glew
 - FreeType2
 - Jam
 - LLVM and Clang > 3.7
 - OpenGLES >= 2.0
-- Curses
 
 Compile:
 $ jam
 
-Run tests:
+Run the tests with any TAP harness:
 $ prove
