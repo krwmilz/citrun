@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use Test::Cmd;
 use Test::More tests => 14;
+use test::program;
 use test::shm;
 
-my $test_prog = Test::Cmd->new( prog => 'test/program', workdir => '');
+my $test_prog = Test::Cmd->new( prog => 'test/program/program', workdir => '');
 $test_prog->run( args => "1" );
 is $? >> 8,	0,	'did test program exit 0';
 

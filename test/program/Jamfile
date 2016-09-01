@@ -1,0 +1,6 @@
+PROG_SRCS = one.c two.c three.c ;
+
+Depends one.o two.o three.o : ../../src/citrun-inst ;
+Depends program : ../../src/libcitrun.a ;
+
+Main program : one.c two.c three.c ;

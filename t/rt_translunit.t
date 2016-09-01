@@ -6,9 +6,10 @@ use warnings;
 use POSIX;
 use Test::Cmd;
 use Test::More tests => 7;
+use test::program;
 use test::shm;
 
-my $test_prog = Test::Cmd->new( prog => 'test/program', workdir => '');
+my $test_prog = Test::Cmd->new( prog => 'test/program/program', workdir => '');
 $test_prog->run( args => "10" );
 is $? >> 8,	0,	'is test program exit code 0';
 

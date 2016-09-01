@@ -6,12 +6,13 @@ use warnings;
 use POSIX;
 use Test::More tests => 100;
 use Time::HiRes qw( usleep );
+use test::program;
 use test::shm;
 
 my $child_pid = fork();
 if ($child_pid == 0) {
 	# Child.
-	exec ("test/program", "45") or die $!;
+	exec ("test/program/program", "45") or die $!;
 }
 
 # Give the runtime time to set up.
