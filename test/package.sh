@@ -1,12 +1,14 @@
-# exports CITRUN_TOOLS and puts us in a temporary directory.
+# exports CITRUN_TOOLS and sources libtap.sh.
 . test/utils.sh
 
-# $1 is passed in by the source ('.') statements in the tests.
-port="/usr/ports/${1}"
-wrkdist=`make -C $port show=WRKDIST`
+function pkg_set
+{
+	port="/usr/ports/$1"
+	wrkdist=`make -C $port show=WRKDIST`
 
-export TEST_PORT="$port"
-export TEST_WRKDIST="$wrkdist"
+	export TEST_PORT="$port"
+	export TEST_WRKDIST="$wrkdist"
+}
 
 function pkg_check_deps
 {
@@ -14,15 +16,14 @@ function pkg_check_deps
 	make -C $TEST_PORT full-test-depends >> deps
 	sort deps | uniq > deps.uniq
 	pkg_info -q > installed
-
 	comm -2 -3 deps.uniq installed > deps_needed
-	test_diff ${1} "build and test dependencies" /dev/null deps_needed
+
+	ok "build and test dependencies" diff -u /dev/null deps_needed
 }
 
 function pkg_build
 {
-	make -C $TEST_PORT PORTPATH="$CITRUN_TOOLS:\${WRKDIR}/bin:$PATH" build
-	test_ret ${1} "instrumented build exit code" $?
+	ok "port build" make -C $TEST_PORT PORTPATH="$CITRUN_TOOLS:\${WRKDIR}/bin:$PATH" build
 }
 
 function pkg_test
@@ -32,26 +33,28 @@ function pkg_test
 
 function pkg_check
 {
-	$CITRUN_TOOLS/citrun-check $TEST_WRKDIST > check.out
-	check_diff ${1}
+	$CITRUN_TOOLS/citrun-check -o check.out $TEST_WRKDIST
+	strip_millis check.out
+	ok "citrun-check output diff" diff -u check.good check.out
 }
 
 function pkg_clean
 {
-	make -C $TEST_PORT clean=all
-	test_ret ${1} "clean exit code" $?
+	ok "port clean" make -C $TEST_PORT clean=all
 }
 
-function test_ret
+function pkg_write_tus
 {
-	test_num=${1}
-	test_desc="${2}"
-	int=${3}
+	cat <<'EOF' > tu_printer.pl
+use strict;
+use warnings;
+use test::shm;
 
-	if [ $int -eq 0 ]; then
-		echo ok $test_num - $test_desc
-	else
-		echo not ok $test_num - $test_desc
-		echo === got $int, expected 0
-	fi
+open(my $out, '>', 'filelist.out') or die $!;
+my $shm = test::shm->new();
+
+select $out;
+$shm->print_tus();
+EOF
+	ok "is tu printer exit code 0" perl -I $CITRUN_TOOLS/.. tu_printer.pl
 }

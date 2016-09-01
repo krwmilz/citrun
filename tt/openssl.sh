@@ -2,13 +2,13 @@
 # Instrument openssl, run its testsuite, check the logs and do a quick runtime
 # sanity test on it.
 #
-echo 1..8
+. test/package.sh
+plan 8
 
-. test/package.sh "security/openssl"
-
-pkg_check_deps 2
-pkg_clean 3
-pkg_build 4
+pkg_set "security/openssl"
+pkg_check_deps
+pkg_clean
+pkg_build
 
 cat <<EOF > check.good
 Summary:
@@ -33,17 +33,13 @@ Totals:
      27553 Binary operators
       2912 Errors rewriting source
 EOF
-pkg_check 5
+pkg_check
 
 LD_LIBRARY_PATH="$TEST_WRKDIST" \
 	$TEST_WRKDIST/apps/openssl genrsa -out KEY 16384 &
 pid=$!
 
-sleep 3
-
-$CITRUN_TOOLS/citrun-dump
-
-test_total_execs 6
+sleep 1
 
 cat <<EOF >filelist.good
 a_bitstr.c 263
@@ -730,10 +726,12 @@ x_x509a.c 197
 xcbc_enc.c 217
 xts128.c 205
 EOF
-$CITRUN_TOOLS/citrun-dump -f > filelist.out
-filelist_diff 7
+
+pkg_write_tus
+sort -o filelist.out filelist.out
+ok "translation unit manifest" diff -u filelist.good filelist.out
 
 kill -INT $pid
 wait
 
-pkg_clean 8
+pkg_clean

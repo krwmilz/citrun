@@ -2,16 +2,16 @@
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
-echo 1..8
-. test/package.sh "devel/git"
+. test/package.sh
+plan 8
 
-pkg_check_deps 2
-pkg_clean 3
-pkg_build 4
+pkg_set "devel/git"
+pkg_check_deps
+pkg_clean
+pkg_build
 
 cat <<EOF > check.good
 Summary:
-       448 Calls to the rewrite tool
        381 Source files used as input
         82 Application link commands
         45 Rewrite parse warnings
@@ -35,17 +35,13 @@ Totals:
      34625 Binary operators
       1530 Errors rewriting source
 EOF
-pkg_check 5
+pkg_check
 
 # Start git doing something that will take a while. At my own expense.
 $TEST_WRKDIST/git clone http://git.0x30.net/citrun citrun_TEST_CLONE &
 pid=$!
 
-echo ok 6 - started git clone
 sleep 1
-
-cat <<EOF > dump.good
-EOF
 
 cat <<EOF > filelist.good
 abspath.c 181
@@ -319,11 +315,14 @@ xdiff/xutils.c 496
 zlib.c 274
 EOF
 
-$CITRUN_TOOLS/citrun-dump
-$CITRUN_TOOLS/citrun-dump -f > filelist.out
-filelist_diff 7
+# Writes filelist.out
+pkg_write_tus
+
+# man page says output file can be same as input file
+sort -o filelist.out filelist.out
+ok "translation unit manifest" diff -u filelist.good filelist.out
 
 kill $pid
 wait
 
-pkg_clean 8
+pkg_clean

@@ -1,16 +1,17 @@
+#!/bin/sh
 #
 # Check that Bash can be instrumented and still works after.
 #
-echo 1..5
-. test/package.sh "shells/bash"
+. test/package.sh
+plan 5
 
-pkg_check_deps 2
-pkg_clean 3
-pkg_build 4
+pkg_set "shells/bash"
+pkg_check_deps
+pkg_clean
+pkg_build
 
 cat <<EOF > check.good
 Summary:
-       384 Calls to the rewrite tool
        347 Source files used as input
         96 Application link commands
        190 Rewrite parse warnings
@@ -34,9 +35,9 @@ Totals:
      18704 Binary operators
        549 Errors rewriting source
 EOF
-pkg_check 5
+pkg_check
 
-#$TEST_WRKDIST/bash &
+#$TEST_WRKDIST/bash > out
 #echo ok 5 - bash started
 #
 #sleep 1
