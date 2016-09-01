@@ -1,16 +1,16 @@
 #
 # Instruments Nmap and checks that the instrumented program still runs.
 #
-echo 1..7
-. test/package.sh "net/nmap"
+. test/package.sh
+plan 8
 
-pkg_check_deps 2
-pkg_clean 3
-pkg_build 4
+pkg_set "net/nmap"
+pkg_check_deps
+pkg_clean
+pkg_build
 
 cat <<EOF > check.good
 Summary:
-       528 Calls to the rewrite tool
        388 Source files used as input
         78 Application link commands
        598 Rewrite parse warnings
@@ -34,7 +34,7 @@ Totals:
      20377 Binary operators
        586 Errors rewriting source
 EOF
-pkg_check 5
+pkg_check
 
 cat <<EOF > filelist.good
 ./fad-getad.c 281
@@ -139,12 +139,13 @@ EOF
 $TEST_WRKDIST/nmap krwm.net &
 pid=$!
 
-sleep 2
-$CITRUN_TOOLS/citrun-dump
-$CITRUN_TOOLS/citrun-dump -f > filelist.out
-filelist_diff 6
+sleep 1
+
+pkg_write_tus
+sort -o filelist.out filelist.out
+ok "translation unit manifest" diff -u filelist.good filelist.out
 
 kill $pid
 wait
 
-pkg_clean 7
+pkg_clean
