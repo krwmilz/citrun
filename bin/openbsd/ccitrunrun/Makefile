@@ -13,7 +13,7 @@ PERMIT_PACKAGE_CDROM =	Yes
 
 MASTER_SITES =		${HOMEPAGE}/
 
-WANTLIB +=		GL GLU GLEW glut c freetype m pthread z
+WANTLIB +=		GL GLU GLEW curses glut c freetype m pthread z
 
 # -std=c++11
 MODULES =		gcc4
@@ -32,14 +32,14 @@ do-build:
 		-e "s,citrun_node_add,ccitrunrun_node_add," \
 		-e "s,citrun_major,ccitrunrun_major,g" \
 		-e "s,citrun_minor,ccitrunrun_minor,g" \
-		src/runtime.h src/runtime.c \
-		src/inst_action.cc src/inst_main.cc src/runtime_proc.cc
+		src/rt.h src/rt.c src/version.h \
+		src/inst_action.cc src/inst_main.cc src/process_file.cc
 	cd ${WRKSRC} && sed -i \
 		-e "s,citrun-inst,ccitrunrun-inst," \
 		-e "s,citrun-term,ccitrunrun-term," \
 		-e "s,citrun-gl,ccitrunrun-gl," \
 		-e "s,libcitrun,libccitrunrun," \
-		Jamrules src/runtime.c src/Jamfile src/inst_main.cc src/check.in
+		Jamrules src/rt.c src/Jamfile src/inst_main.cc src/check.sh
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -j4
 
 do-test:
