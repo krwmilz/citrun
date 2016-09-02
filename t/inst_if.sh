@@ -2,7 +2,7 @@
 #
 # Check that if statement conditions are instrumented properly.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 5
 
 cat <<EOF > if.c

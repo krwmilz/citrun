@@ -2,7 +2,7 @@
 #
 # Make sure that do while loop condition instrumentation works.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 5
 
 cat <<EOF > while.c

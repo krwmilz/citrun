@@ -2,7 +2,7 @@
 #
 # Check that really long function declarations are instrumented properly.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 5
 
 cat <<EOF > funcdef.c

@@ -6,14 +6,14 @@ use warnings;
 use POSIX;
 use Test::Cmd;
 use Test::More tests => 7;
-use test::program;
-use test::shm;
+use tlib::program;
+use tlib::shm;
 
-my $test_prog = Test::Cmd->new( prog => 'test/program/program', workdir => '');
+my $test_prog = Test::Cmd->new( prog => 'tlib/program/program', workdir => '');
 $test_prog->run( args => "10" );
 is $? >> 8,	0,	'is test program exit code 0';
 
-my $shm = test::shm->new();
+my $shm = tlib::shm->new();
 
 my ($tu1, $tu2, $tu3) = @{ $shm->{translation_units} };
 is	$tu1->{size},	9,	"is transl unit 1 9 lines";

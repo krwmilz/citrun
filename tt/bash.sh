@@ -2,7 +2,7 @@
 #
 # Check that Bash can be instrumented and still works after.
 #
-. test/package.sh
+. tlib/package.sh
 plan 5
 
 pkg_set "shells/bash"

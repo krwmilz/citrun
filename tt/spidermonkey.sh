@@ -2,7 +2,7 @@
 #
 # Try and instrument spidermonkey.
 #
-. test/package.sh
+. tlib/package.sh
 plan 6
 
 pkg_set "devel/spidermonkey"

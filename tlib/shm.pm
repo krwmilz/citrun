@@ -1,4 +1,4 @@
-package test::shm;
+package tlib::shm;
 use strict;
 use warnings;
 use POSIX;

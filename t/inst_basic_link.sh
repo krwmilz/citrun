@@ -2,7 +2,7 @@
 #
 # Check that the most basic of compile command lines works.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 4
 
 cat <<EOF > main.c

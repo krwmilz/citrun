@@ -1,4 +1,4 @@
-. test/libtap.sh
+. tlib/libtap.sh
 
 set -o nounset
 export CITRUN_TOOLS="`pwd`/src"

@@ -2,7 +2,7 @@
 #
 # Tests that nvi works with C It Run.
 #
-. test/package.sh
+. tlib/package.sh
 plan 10
 
 pkg_set "editors/nvi"

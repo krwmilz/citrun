@@ -1,5 +1,5 @@
 # exports CITRUN_TOOLS and sources libtap.sh.
-. test/utils.sh
+. tlib/utils.sh
 
 function pkg_set
 {
@@ -48,10 +48,10 @@ function pkg_write_tus
 	cat <<'EOF' > tu_printer.pl
 use strict;
 use warnings;
-use test::shm;
+use tlib::shm;
 
 open(my $out, '>', 'filelist.out') or die $!;
-my $shm = test::shm->new();
+my $shm = tlib::shm->new();
 
 select $out;
 $shm->print_tus();

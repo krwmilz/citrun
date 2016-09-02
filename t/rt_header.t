@@ -5,14 +5,14 @@ use strict;
 use warnings;
 use Test::Cmd;
 use Test::More tests => 14;
-use test::program;
-use test::shm;
+use tlib::program;
+use tlib::shm;
 
-my $test_prog = Test::Cmd->new( prog => 'test/program/program', workdir => '');
+my $test_prog = Test::Cmd->new( prog => 'tlib/program/program', workdir => '');
 $test_prog->run( args => "1" );
 is $? >> 8,	0,	'did test program exit 0';
 
-my $shm = test::shm->new();
+my $shm = tlib::shm->new();
 is $shm->{major}, 0, "is major correct";
 is $shm->{minor}, 0, "is minor correct";
 

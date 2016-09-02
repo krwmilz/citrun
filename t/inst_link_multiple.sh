@@ -2,7 +2,7 @@
 #
 # Check that linking more than one instrumented object file together works.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 4
 
 cat <<EOF > one.c

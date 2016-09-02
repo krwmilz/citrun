@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 use Test::More tests => 1;
-use test::program;
-use test::shm;
+use tlib::program;
+use tlib::shm;
 #
 # Test that the runtime shared file size is what we expect.
 #
 
-system("test/program/program 1");
+system("tlib/program/program 1");
 
-my $procfile = test::shm->new();
+my $procfile = tlib::shm->new();
 is($procfile->{size}, 16384, "size of memory file");

@@ -2,7 +2,7 @@
 #
 # Make sure that switch statement condition instrumentation works.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 5
 
 cat <<EOF > switch.c

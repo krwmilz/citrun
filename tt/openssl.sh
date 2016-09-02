@@ -3,7 +3,7 @@
 # Instrument openssl, run its testsuite, check the logs and do a quick runtime
 # sanity test on it.
 #
-. test/package.sh
+. tlib/package.sh
 plan 8
 
 pkg_set "security/openssl"

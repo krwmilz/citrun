@@ -2,7 +2,7 @@
 #
 # Instruments Nmap and checks that the instrumented program still runs.
 #
-. test/package.sh
+. tlib/package.sh
 plan 8
 
 pkg_set "net/nmap"

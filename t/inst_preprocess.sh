@@ -2,7 +2,7 @@
 #
 # Make sure preprocessor flags -E, -MM cause no instrumentation to be done.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 3
 
 echo "int main(void) { return 0; }" > prepro.c

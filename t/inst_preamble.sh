@@ -2,7 +2,7 @@
 #
 # Test that the instrumentation preamble is what we think it is.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 3
 
 touch preamble.c

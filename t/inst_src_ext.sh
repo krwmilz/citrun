@@ -2,7 +2,7 @@
 #
 # Check that the advertised source file extensions work.
 #
-. test/utils.sh
+. tlib/utils.sh
 plan 8
 
 touch main.{c,cc,cxx,cpp,C}
