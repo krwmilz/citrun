@@ -56,7 +56,7 @@ clean_PATH(InstrumentLogger &llog)
 	}
 
 	if (!found_citrun_path)
-		errx(1, "Error: '%s' not in PATH.", CITRUN_SHARE);
+		errx(1, "Error: CITRUN_SHARE not in PATH.");
 
 	if (setenv("PATH", new_path.str().c_str(), 1))
 		err(1, "setenv");

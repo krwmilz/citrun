@@ -18,7 +18,7 @@ ok_program "run citrun-inst as cc with no PATH" 1 "$output_good" \
 	$CITRUN_TOOLS/cc -c nomatter.c
 
 export PATH=""
-output_good="citrun-inst: Error: '/home/kyle/citrun/src' not in PATH."
+output_good="citrun-inst: Error: CITRUN_SHARE not in PATH."
 ok_program "run citrun-inst as cc with empty PATH" 1 "$output_good" \
 	$CITRUN_TOOLS/cc -c nomatter.c 2> /dev/null
 
