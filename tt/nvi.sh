@@ -19,7 +19,7 @@ Summary:
        115 Rewritten source compile successes
 
 Totals:
-     47830 Lines of source code
+     47813 Lines of source code
        658 Function definitions
       1711 If statements
        176 For loops

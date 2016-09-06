@@ -14,7 +14,7 @@ cat <<EOF > check.good
 Summary:
        218 Source files used as input
         73 Application link commands
-       339 Rewrite parse warnings
+        75 Rewrite parse warnings
         10 Rewrite parse errors
        209 Rewrite successes
          9 Rewrite failures
