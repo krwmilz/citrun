@@ -4,12 +4,6 @@
 long long fib(long long);
 void print_output(long long);
 
-void
-usr1_sig(int signal)
-{
-	exit(0);
-}
-
 int
 main(int argc, char *argv[])
 {
