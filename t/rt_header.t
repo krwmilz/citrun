@@ -3,14 +3,12 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
 use Test::More tests => 14;
 use tlib::program;
 use tlib::shm;
 
-my $test_prog = Test::Cmd->new( prog => 'tlib/program/program', workdir => '');
-$test_prog->run( args => "1" );
-is $? >> 8,	0,	'did test program exit 0';
+my $ret = system('tlib/program/program 1');
+is $ret >> 8,	0,	"is program exit code 0";
 
 my $shm = tlib::shm->new();
 is $shm->{major}, 0, "is major correct";

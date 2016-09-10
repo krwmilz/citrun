@@ -3,15 +3,12 @@
 #
 use strict;
 use warnings;
-use POSIX;
-use Test::Cmd;
 use Test::More tests => 7;
 use tlib::program;
 use tlib::shm;
 
-my $test_prog = Test::Cmd->new( prog => 'tlib/program/program', workdir => '');
-$test_prog->run( args => "10" );
-is $? >> 8,	0,	'is test program exit code 0';
+my $ret = system('tlib/program/program 10');
+is $ret >> 8,	0,	"is program exit code 0";
 
 my $shm = tlib::shm->new();
 
