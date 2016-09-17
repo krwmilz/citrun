@@ -46,7 +46,7 @@ ProcessFile::ProcessFile(std::string const &path) :
 		m_shm.read_string(t.comp_file_path);
 		m_shm.read_string(t.abs_file_path);
 
-		t.exec_diffs = (uint64_t *)m_shm.get_block(t.num_lines * 8);
+		t.exec_counts = (uint64_t *)m_shm.get_block(t.num_lines * 8);
 		t.source.resize(t.num_lines);
 		m_program_loc += t.num_lines;
 		read_source(t);
@@ -87,7 +87,7 @@ ProcessFile::total_execs()
 
 	for (auto &t : m_tus)
 		for (unsigned int i = 0; i < t.num_lines; ++i)
-			count += t.exec_diffs[i];
+			count += t.exec_counts[i];
 
 	return count;
 }

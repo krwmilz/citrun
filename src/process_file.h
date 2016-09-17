@@ -8,7 +8,7 @@ struct TranslationUnit {
 	std::string	 abs_file_path;
 	uint32_t	 num_lines;
 	uint8_t		 has_execs;
-	uint64_t	*exec_diffs;
+	uint64_t	*exec_counts;
 	std::vector<std::string> source;
 };
 

@@ -118,7 +118,7 @@ CursesViewer::draw()
 	int upper_bound = m_size_y - 2 + m_offset;
 
 	for (int i = m_offset; i < upper_bound && i < m_cur_tu.num_lines; i++) {
-		uint32_t e = m_cur_tu.exec_diffs[i];
+		uint32_t e = m_cur_tu.exec_counts[i];
 		std::string l = m_cur_tu.source[i];
 
 		m_total_executions += e;
