@@ -32,14 +32,23 @@ Shm::Shm(std::string const &path) :
 }
 
 void
-Shm::read_cstring(const char **c_str)
+Shm::next_page()
 {
-	size_t sz = strlen((const char *)m_mem + m_pos) + 1;
-	if (sz > 1025)
-		errx(1, "read_string: %zu too long", sz);
+	int page_size = getpagesize();
+	m_pos += page_size - (m_pos % page_size);
+}
 
-	*c_str = (const char *)m_mem + m_pos;
-	m_pos += sz;
+void
+Shm::read_string(std::string &str)
+{
+	uint16_t len;
+
+	memcpy(&len, m_mem + m_pos, sizeof(len));
+	m_pos += sizeof(len);
+
+	str.resize(len);
+	memcpy(&str[0], m_mem + m_pos, len);
+	m_pos += len;
 }
 
 void *

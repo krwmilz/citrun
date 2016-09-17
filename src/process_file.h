@@ -4,8 +4,8 @@
 #include "shm.h"
 
 struct TranslationUnit {
-	const char	*comp_file_path;
-	const char	*abs_file_path;
+	std::string	 comp_file_path;
+	std::string	 abs_file_path;
 	uint32_t	 num_lines;
 	uint8_t		 has_execs;
 	uint64_t	*exec_diffs;
@@ -27,8 +27,8 @@ public:
 
 	uint8_t		 m_major;
 	uint8_t		 m_minor;
-	const char	*m_progname;
-	const char	*m_cwd;
+	std::string	 m_progname;
+	std::string	 m_cwd;
 	uint32_t	 m_pid;
 	uint32_t	 m_ppid;
 	uint32_t	 m_pgrp;

@@ -161,8 +161,8 @@ CursesViewer::print_statusbar()
 	}
 
 	printw(" [%s] [%s] [%i/%i] [%i fps] [%ik execs/s]",
-		m_cur_pfile->m_progname,
-		m_cur_tu.comp_file_path,
+		m_cur_pfile->m_progname.c_str(),
+		m_cur_tu.comp_file_path.c_str(),
 		m_tu + 1, m_cur_pfile->m_tus.size(),
 		m_fps,
 		m_eps / 1000);

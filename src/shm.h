@@ -16,13 +16,8 @@ public:
 		m_pos += sizeof(T);
 	};
 
-	void next_page()
-	{
-		int page_size = getpagesize();
-		m_pos += page_size - (m_pos % page_size);
-	}
-
-	void read_cstring(const char **);
+	void next_page();
+	void read_string(std::string &);
 	void *get_block(size_t);
 	bool at_end();
 
