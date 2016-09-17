@@ -244,6 +244,7 @@ main(int argc, char *argv[])
 
 	refresh();
 
+	pdir.scan();
 	while (pdir.m_procfiles.size() == 0) {
 		sleep(1);
 		pdir.scan();
