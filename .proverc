@@ -2,6 +2,3 @@
 # once.
 --ext '.t'
 --ext '.sh'
-
-# Shuffle tests to try and protect against state leaks between tests.
--s
