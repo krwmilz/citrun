@@ -9,6 +9,7 @@ struct TranslationUnit {
 	uint32_t	 num_lines;
 	uint8_t		 has_execs;
 	uint64_t	*exec_counts;
+	uint64_t	*exec_counts_last;
 	std::vector<std::string> source;
 };
 
@@ -21,9 +22,9 @@ public:
 	ProcessFile(std::string const &);
 
 	const TranslationUnit *find_tu(std::string const &) const;
-	uint64_t total_execs();
 	bool		 is_alive() const;
-	void read_executions();
+	void		 read_executions();
+	void		 save_executions();
 
 	uint8_t		 m_major;
 	uint8_t		 m_minor;

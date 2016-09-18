@@ -118,7 +118,8 @@ CursesViewer::draw()
 	int upper_bound = m_size_y - 2 + m_offset;
 
 	for (int i = m_offset; i < upper_bound && i < m_cur_tu.num_lines; i++) {
-		uint32_t e = m_cur_tu.exec_counts[i];
+		uint64_t e = m_cur_tu.exec_counts[i] - m_cur_tu.exec_counts_last[i];
+
 		std::string l = m_cur_tu.source[i];
 
 		m_total_executions += e;
@@ -144,6 +145,7 @@ CursesViewer::draw()
 			attroff(COLOR_PAIR(color));
 	}
 
+	m_cur_pfile->save_executions();
 	print_statusbar();
 	refresh();
 }

@@ -47,6 +47,8 @@ ProcessFile::ProcessFile(std::string const &path) :
 		m_shm.read_string(t.abs_file_path);
 
 		t.exec_counts = (uint64_t *)m_shm.get_block(t.num_lines * 8);
+		t.exec_counts_last = new uint64_t[t.num_lines]();
+
 		t.source.resize(t.num_lines);
 		m_program_loc += t.num_lines;
 		read_source(t);
@@ -80,18 +82,6 @@ ProcessFile::read_source(struct TranslationUnit &t)
 		std::getline(file_stream, l);
 }
 
-uint64_t
-ProcessFile::total_execs()
-{
-	uint64_t count = 0;
-
-	for (auto &t : m_tus)
-		for (unsigned int i = 0; i < t.num_lines; ++i)
-			count += t.exec_counts[i];
-
-	return count;
-}
-
 const TranslationUnit *
 ProcessFile::find_tu(std::string const &srcname) const
 {
@@ -99,6 +89,13 @@ ProcessFile::find_tu(std::string const &srcname) const
 		if (srcname == i.comp_file_path)
 			return &i;
 	return NULL;
+}
+
+void
+ProcessFile::save_executions()
+{
+	for (auto &t : m_tus)
+		memcpy(t.exec_counts_last, t.exec_counts, t.num_lines * 8);
 }
 
 void
