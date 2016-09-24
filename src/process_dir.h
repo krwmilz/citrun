@@ -1,5 +1,3 @@
-#include "process_file.h"
-
 #include <sys/types.h>
 
 #include <dirent.h>		// DIR, opendir, readdir
@@ -9,12 +7,10 @@
 class ProcessDir {
 public:
 	ProcessDir();
-	void	scan();
-
-	std::vector<ProcessFile> m_procfiles;
+	std::vector<std::string>	*scan();
 
 private:
-	const char	*m_procdir;
-	DIR		*m_dirp;
-	std::unordered_set<std::string> m_known_files;
+	const char			*m_procdir;
+	DIR				*m_dirp;
+	std::unordered_set<std::string>	 m_known_files;
 };

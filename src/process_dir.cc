@@ -16,10 +16,13 @@ ProcessDir::ProcessDir()
 		err(1, "opendir");
 }
 
-void
+std::vector<std::string> *
 ProcessDir::scan()
 {
-	struct dirent *dp;
+	std::vector<std::string>	*new_files;
+	struct dirent			*dp;
+
+	new_files = new std::vector<std::string>();
 
 	rewinddir(m_dirp);
 	while ((dp = readdir(m_dirp)) != NULL) {
@@ -36,6 +39,8 @@ ProcessDir::scan()
 			continue;
 
 		m_known_files.insert(p);
-		m_procfiles.push_back(ProcessFile(p));
+		new_files->push_back(p);
 	}
+
+	return new_files;
 }

@@ -8,6 +8,7 @@
 #include "gl_buffer.h"
 #include "gl_view.h"
 #include "process_dir.h"
+#include "process_file.h"
 #include "shm.h"
 
 #if defined(__OpenBSD__)
@@ -35,8 +36,9 @@ public:
 
 	static View *static_vu;
 	static ProcessDir m_pdir;
-	static std::vector<ProcessFile *> drawables;
+	static std::vector<ProcessFile> drawables;
 private:
+	static void add_new_process(std::string const &);
 	static void display();
 	static void reshape_func(int, int);
 	static void keyboard_func(unsigned char, int, int);
@@ -47,7 +49,7 @@ private:
 	demo_glstate_t *st;
 };
 
-std::vector<ProcessFile *> window::drawables;
+std::vector<ProcessFile> window::drawables;
 ProcessDir window::m_pdir;
 View *window::static_vu;
 
@@ -62,7 +64,7 @@ window::window(int argc, char *argv[])
 	glutInit(&argc, argv);
 	glutInitWindowSize(1600, 1200);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	int window = glutCreateWindow("Source Code Visualizer");
+	glutCreateWindow("C It Run");
 	glutReshapeFunc(reshape_func);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard_func);
@@ -95,51 +97,6 @@ window::window(int argc, char *argv[])
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);
 	demo_buffer_add_text(buffer, "waiting...", font, 1);
-
-	while (m_pdir.m_procfiles.size() == 0) {
-		sleep(1);
-		m_pdir.scan();
-	}
-
-	// Now check if there's any new connections pending.
-	demo_buffer_clear(buffer);
-	ProcessFile *pfile = &m_pdir.m_procfiles[0];
-	window::drawables.push_back(pfile);
-
-	std::stringstream ss;
-	ss << "program name:\t" << pfile->m_progname << std::endl;
-	ss << "trnsltn units:\t" << pfile->m_tus.size() << std::endl;
-	ss << "process id:\t" << pfile->m_pid << std::endl;
-	ss << "parent pid:\t" << pfile->m_ppid << std::endl;
-	ss << "process group:\t" << pfile->m_pgrp << std::endl;
-
-	glyphy_point_t cur_pos = { 0, 0 };
-	demo_buffer_move_to(buffer, &cur_pos);
-
-	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
-
-	demo_buffer_current_point(buffer, &cur_pos);
-	double y_margin = cur_pos.y;
-
-	/*
-	 * T: total lines, known
-	 * W: number of 80 char columns
-	 * H: number of rows
-	 *
-	 * (1 ) W * 80 * H = T
-	 * (2 ) W * 80 = H
-	 * (2a) W = H / 80
-	 * (1a) (H / 80) * 80 * H = T
-	 * (1b) H^2 = T
-	 * (1c) H = sqrt(T)
-	 */
-	// int rows_per_col = std::sqrt(lines_total) * 4;
-
-	cur_pos.x = 0;
-	glyphy_point_t tmp;
-	for (auto &t : pfile->m_tus) {
-		demo_buffer_add_text(buffer, t.comp_file_path, font, 1);
-	}
 }
 
 void
@@ -193,19 +150,51 @@ current_time(void)
 }
 
 void
+window::add_new_process(std::string const &file_name)
+{
+	window::drawables.push_back(ProcessFile(file_name));
+	ProcessFile *pfile = &window::drawables.back();
+
+	demo_buffer_clear(buffer);
+
+	std::stringstream ss;
+	ss << "program name:\t" << pfile->m_progname << std::endl;
+	ss << "trnsltn units:\t" << pfile->m_tus.size() << std::endl;
+	ss << "process id:\t" << pfile->m_pid << std::endl;
+	ss << "parent pid:\t" << pfile->m_ppid << std::endl;
+	ss << "process group:\t" << pfile->m_pgrp << std::endl;
+
+	glyphy_point_t cur_pos = { 0, 0 };
+	demo_buffer_move_to(buffer, &cur_pos);
+
+	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
+
+	demo_buffer_current_point(buffer, &cur_pos);
+
+	cur_pos.x = 0;
+	for (auto &t : pfile->m_tus) {
+		demo_buffer_add_text(buffer, t.comp_file_path.c_str(), font, 1);
+	}
+}
+
+void
 window::next_frame(View *vu)
 {
-	// First update everything that's already known.
+	std::vector<std::string> *new_files = m_pdir.scan();
+	for (std::string &file_name : *new_files)
+		add_new_process(file_name);
+
+	delete new_files;
+
 	for (auto &rp : window::drawables) {
+		rp.read_executions();
 
-		rp->read_executions();
-
-		glyphy_point_t tmp;
-		for (auto &t : rp->m_tus) {
-			size_t bytes_total = t.num_lines * sizeof(uint64_t);
+		//glyphy_point_t tmp;
+		for (auto &t : rp.m_tus) {
+			//size_t bytes_total = t.num_lines * sizeof(uint64_t);
 
 			for (int i = 0; i < t.num_lines; i++) {
-				if (t.exec_diffs[i] == 0)
+				if (t.exec_counts[i] == 0)
 					continue;
 
 				// demo_buffer_add_text(buffer, ">>", font, 1);
