@@ -34,21 +34,21 @@ static int init = 0;
 static int shm_fd = 0;
 static size_t shm_len = 0;
 
-size_t
+static size_t
 add_1(uint8_t *shm, size_t shm_pos, uint8_t data)
 {
 	shm[shm_pos] = data;
-	return shm_pos + 1;
+	return shm_pos + sizeof(data);
 }
 
-size_t
+static size_t
 add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
 {
-	memcpy(shm + shm_pos, &data, 4);
-	return shm_pos + 4;
+	memcpy(shm + shm_pos, &data, sizeof(data));
+	return shm_pos + sizeof(data);
 }
 
-size_t
+static size_t
 add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t len)
 {
 	memcpy(shm + shm_pos, &len, sizeof(len));
@@ -191,10 +191,13 @@ node_add(struct citrun_node *n)
 void
 citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 {
-	if (node_major != citrun_major || node_minor != citrun_minor) {
+	/*
+	 * Binary compatibility between versions is not guaranteed.
+	 * A user is forced to rebuild their project in this case.
+	 */
+	if (node_major != citrun_major || node_minor != citrun_minor)
 		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
 			citrun_major, citrun_minor, node_major, node_minor);
-	}
 
 	if (!init)
 		create_memory_file();
