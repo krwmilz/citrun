@@ -58,8 +58,14 @@ add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t len)
 	return shm_pos + len;
 }
 
+/*
+ * Extends the memory mapping of shm_fd some number of bytes rounded up to the
+ * next page size.
+ * Exits on error, returns a pointer to the beginning of the extended memory
+ * region on success.
+ */
 static uint8_t *
-add_new_region(int bytes)
+shm_extend(int bytes)
 {
 	uint8_t		*shm;
 	int		 page_size = getpagesize();
@@ -68,32 +74,39 @@ add_new_region(int bytes)
 
 	aligned_bytes = ((bytes) + page_mask) & ~page_mask;
 
+	/* Increase the length of the file descriptor. */
 	if (ftruncate(shm_fd, shm_len + aligned_bytes) < 0)
 		err(1, "ftruncate from %zu to %zu", shm_len, shm_len + aligned_bytes);
 
+	/* Increase the size of the memory mapping. */
 	shm = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
 			shm_fd, shm_len);
 
 	if (shm == MAP_FAILED)
 		err(1, "mmap %i bytes @ %zu", bytes, shm_len);
 
+	/* Increase internal length field. */
 	shm_len += aligned_bytes;
 	return shm;
 }
 
 /*
- * These are written into shared memory, offset 0:
+ * Add a header region to a newly created shared memory file.
+ * The header contains:
  * - version major and minor
  * - process id, parent process id, group process id
  * - program name
  * - current working directory
+ * Exits or asserts on error.
  */
 static void
-write_header()
+shm_add_header()
 {
 	char		*cwd_buf;
 	const char	*progname;
-	size_t		 sz = 0;
+	uint8_t		*shm;
+	size_t		 sz;
+	size_t		 shm_pos;
 	uint16_t	 prog_sz, cwd_sz;
 
 	progname = getprogname();
@@ -103,6 +116,7 @@ write_header()
 	prog_sz = strnlen(progname, PATH_MAX);
 	cwd_sz = strnlen(cwd_buf, PATH_MAX);
 
+	sz = 0;
 	sz += sizeof(uint8_t) * 2;
 	sz += sizeof(uint32_t) * 3;
 	sz += sizeof(prog_sz);
@@ -110,9 +124,9 @@ write_header()
 	sz += sizeof(cwd_sz);
 	sz += cwd_sz;
 
-	uint8_t *shm = add_new_region(sz);
+	shm = shm_extend(sz);
 
-	size_t shm_pos = 0;
+	shm_pos = 0;
 	shm_pos = add_1(shm, shm_pos, citrun_major);
 	shm_pos = add_1(shm, shm_pos, citrun_minor);
 
@@ -126,12 +140,55 @@ write_header()
 	assert(shm_pos == sz);
 }
 
+/*
+ * Adds a new memory region for a given citrun_node.
+ * The data format is described in the instrumentation header generation code.
+ * Exits on failure.
+ */
 static void
-create_memory_file()
+shm_add_node(struct citrun_node *n)
 {
-	char memfile_path[23];
-	char *template = "/tmp/citrun/XXXXXXXXXX";
-	char *process_dir  = "/tmp/citrun";
+	uint8_t		*shm;
+	size_t		 sz;
+	size_t		 shm_pos;
+	uint16_t	 comp_sz, abs_sz;
+
+	comp_sz = strnlen(n->comp_file_path, PATH_MAX);
+	abs_sz = strnlen(n->abs_file_path, PATH_MAX);
+
+	sz = 0;
+	sz += sizeof(uint32_t);
+	sz += sizeof(comp_sz);
+	sz += comp_sz;
+	sz += sizeof(abs_sz);
+	sz += abs_sz;
+	sz += n->size * sizeof(uint64_t);
+
+	shm = shm_extend(sz);
+
+	shm_pos = 0;
+	shm_pos = add_4(shm, shm_pos, n->size);
+	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
+	shm_pos = add_str(shm, shm_pos, n->abs_file_path, abs_sz);
+
+	n->data = (uint64_t *)&shm[shm_pos];
+	shm_pos += n->size * sizeof(uint64_t);
+
+	assert(shm_pos == sz);
+}
+
+/*
+ * Usually opens a file descriptor with a random file name in a known directory.
+ * Should only ever be called once per process.  Adds a header to the created
+ * file containing program meta information.
+ * Exits on failure.
+ */
+static void
+shm_create()
+{
+	char	 memfile_path[23];
+	char	*template = "/tmp/citrun/XXXXXXXXXX";
+	char	*process_dir  = "/tmp/citrun";
 
 	assert(shm_fd == 0);
 	assert(shm_len == 0);
@@ -152,37 +209,7 @@ create_memory_file()
 	}
 
 	init++;
-	write_header();
-}
-
-static void
-node_add(struct citrun_node *n)
-{
-	size_t sz = 0;
-	uint16_t comp_sz, abs_sz;
-	uint8_t *shm;
-	size_t shm_pos = 0;
-
-	comp_sz = strnlen(n->comp_file_path, PATH_MAX);
-	abs_sz = strnlen(n->abs_file_path, PATH_MAX);
-
-	sz += sizeof(uint32_t);
-	sz += sizeof(comp_sz);
-	sz += comp_sz;
-	sz += sizeof(abs_sz);
-	sz += abs_sz;
-	sz += n->size * sizeof(uint64_t);
-
-	shm = add_new_region(sz);
-
-	shm_pos = add_4(shm, shm_pos, n->size);
-	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
-	shm_pos = add_str(shm, shm_pos, n->abs_file_path, abs_sz);
-
-	n->data = (uint64_t *)&shm[shm_pos];
-	shm_pos += n->size * sizeof(uint64_t);
-
-	assert(shm_pos == sz);
+	shm_add_header();
 }
 
 /*
@@ -200,7 +227,7 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 			citrun_major, citrun_minor, node_major, node_minor);
 
 	if (!init)
-		create_memory_file();
+		shm_create();
 
-	node_add(n);
+	shm_add_node(n);
 }
