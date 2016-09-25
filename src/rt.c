@@ -42,6 +42,13 @@ add_1(uint8_t *shm, size_t shm_pos, uint8_t data)
 }
 
 static size_t
+add_2(uint8_t *shm, size_t shm_pos, uint16_t data)
+{
+	memcpy(shm + shm_pos, &data, sizeof(data));
+	return shm_pos + sizeof(data);
+}
+
+static size_t
 add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
 {
 	memcpy(shm + shm_pos, &data, sizeof(data));
@@ -51,9 +58,6 @@ add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
 static size_t
 add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t len)
 {
-	memcpy(shm + shm_pos, &len, sizeof(len));
-	shm_pos += sizeof(len);
-
 	memcpy(shm + shm_pos, str, len);
 	return shm_pos + len;
 }
@@ -102,6 +106,7 @@ shm_extend(int bytes)
 static void
 shm_add_header()
 {
+	char		 magic[6] = "citrun";
 	char		*cwd_buf;
 	const char	*progname;
 	uint8_t		*shm;
@@ -117,6 +122,7 @@ shm_add_header()
 	cwd_sz = strnlen(cwd_buf, PATH_MAX);
 
 	sz = 0;
+	sz += sizeof(magic);
 	sz += sizeof(uint8_t) * 2;
 	sz += sizeof(uint32_t) * 3;
 	sz += sizeof(prog_sz);
@@ -127,6 +133,8 @@ shm_add_header()
 	shm = shm_extend(sz);
 
 	shm_pos = 0;
+	shm_pos = add_str(shm, shm_pos, magic, sizeof(magic));
+
 	shm_pos = add_1(shm, shm_pos, citrun_major);
 	shm_pos = add_1(shm, shm_pos, citrun_minor);
 
@@ -134,7 +142,10 @@ shm_add_header()
 	shm_pos = add_4(shm, shm_pos, getppid());
 	shm_pos = add_4(shm, shm_pos, getpgrp());
 
+	shm_pos = add_2(shm, shm_pos, prog_sz);
 	shm_pos = add_str(shm, shm_pos, progname, prog_sz);
+
+	shm_pos = add_2(shm, shm_pos, cwd_sz);
 	shm_pos = add_str(shm, shm_pos, cwd_buf, cwd_sz);
 
 	assert(shm_pos == sz);
@@ -168,7 +179,9 @@ shm_add_node(struct citrun_node *n)
 
 	shm_pos = 0;
 	shm_pos = add_4(shm, shm_pos, n->size);
+	shm_pos = add_2(shm, shm_pos, comp_sz);
 	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
+	shm_pos = add_2(shm, shm_pos, abs_sz);
 	shm_pos = add_str(shm, shm_pos, n->abs_file_path, abs_sz);
 
 	n->data = (uint64_t *)&shm[shm_pos];

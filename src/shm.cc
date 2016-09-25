@@ -39,6 +39,15 @@ Shm::next_page()
 }
 
 void
+Shm::read_magic(std::string &magic)
+{
+	magic.resize(6);
+
+	memcpy(&magic[0], m_mem + m_pos, 6);
+	m_pos += 6;
+}
+
+void
 Shm::read_string(std::string &str)
 {
 	uint16_t len;

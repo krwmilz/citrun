@@ -16,10 +16,11 @@ public:
 		m_pos += sizeof(T);
 	};
 
-	void next_page();
-	void read_string(std::string &);
-	void *get_block(size_t);
-	bool at_end();
+	void		 next_page();
+	void		 read_string(std::string &);
+	void		 read_magic(std::string &);
+	void		*get_block(size_t);
+	bool		 at_end();
 
 private:
 	std::string	 m_path;

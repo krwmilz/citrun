@@ -16,6 +16,7 @@ sub new {
 	$self->{fh} = $fh;
 	$self->{size} = (stat "procfile.shm")[7];
 
+	($self->{magic}) = xread($fh, 6);
 	($self->{major}, $self->{minor}) = unpack("C2", xread($fh, 2));
 	@{ $self->{pids} } = unpack("L3", xread($fh, 12));
 
@@ -85,8 +86,8 @@ sub xread {
 	while ($bytes_total > 0) {
 		my $read = read($fh, $data, $bytes_total, $bytes_read);
 
-		die "error: read failed: $!" if (!defined $read);
-		die "disconnected!\n" if ($read == 0);
+		die "read failed: $!" if (!defined $read);
+		die "end of file\n" if ($read == 0);
 
 		$bytes_total -= $read;
 		$bytes_read += $read;

@@ -26,8 +26,11 @@ ProcessFile::ProcessFile(std::string const &path) :
 	m_tus_with_execs(0),
 	m_program_loc(0)
 {
+	std::string magic;
 	assert(sizeof(pid_t) == 4);
 
+	m_shm.read_magic(magic);
+	assert(magic == "citrun");
 	m_shm.read_all(&m_major);
 	assert(m_major == citrun_major);
 	m_shm.read_all(&m_minor);
