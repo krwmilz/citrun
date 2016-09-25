@@ -18,7 +18,7 @@
 
 #include <assert.h>
 #include <err.h>
-#include <errno.h>
+#include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
 #include <stdlib.h>		/* get{env,progname} */
@@ -80,7 +80,7 @@ shm_extend(int bytes)
 
 	/* Increase the size of the memory mapping. */
 	shm = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
-			shm_fd, shm_len);
+		shm_fd, shm_len);
 
 	if (shm == MAP_FAILED)
 		err(1, "mmap %i bytes @ %zu", bytes, shm_len);
