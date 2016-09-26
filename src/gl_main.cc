@@ -9,7 +9,6 @@
 #include "gl_view.h"
 #include "process_dir.h"
 #include "process_file.h"
-#include "shm.h"
 
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"

@@ -1,23 +1,41 @@
 #include <string>
+#include <string.h>		// memcpy
 #include <vector>
 
-#include "shm.h"
 
 struct TranslationUnit {
+	std::vector<std::string> source;
 	std::string	 comp_file_path;
 	std::string	 abs_file_path;
-	uint32_t	 num_lines;
-	uint8_t		 has_execs;
 	uint64_t	*exec_counts;
 	uint64_t	*exec_counts_last;
-	std::vector<std::string> source;
+	uint32_t	 num_lines;
+	uint8_t		 has_execs;
 };
 
 class ProcessFile {
 private:
 	void read_source(struct TranslationUnit &);
 
-	Shm m_shm;
+	template<typename T>
+	void shm_read_all(T *buf)
+	{
+		memcpy(buf, m_mem + m_pos, sizeof(T));
+		m_pos += sizeof(T);
+	};
+
+	void		 shm_next_page();
+	void		 shm_read_string(std::string &);
+	void		 shm_read_magic(std::string &);
+	void		*shm_get_block(size_t);
+	bool		 shm_at_end();
+
+	std::string	 m_path;
+	int		 m_fd;
+	uint8_t		*m_mem;
+	size_t		 m_pos;
+	size_t		 m_size;
+
 public:
 	ProcessFile(std::string const &);
 
