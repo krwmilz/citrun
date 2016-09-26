@@ -125,7 +125,6 @@ RewriteASTVisitor::VisitCallExpr(clang::CallExpr *c)
 bool
 RewriteASTVisitor::VisitBinaryOperator(clang::BinaryOperator *b)
 {
-
 	// If we can't rewrite the last token, don't even start.
 	if (b->getLocEnd().isMacroID())
 		return true;
@@ -139,21 +138,19 @@ RewriteASTVisitor::modify_stmt(clang::Stmt *s, int &counter)
 	if (s == NULL)
 		return false;
 
-	// If x = y is the original statement on line 19 then we try rewriting
-	// as (++_citrun[19], x = y).
 	std::stringstream ss;
 	ss << "(++_citrun.data["
 		<< m_SM.getPresumedLineNumber(s->getLocStart()) - 1
 		<< "], ";
 
 	if (m_TheRewriter.InsertTextBefore(s->getLocStart(), ss.str())) {
-		// writing failed, don't attempt to add ")"
 		++m_counters[REWRITE_ERROR];
 		return false;
 	}
-	m_TheRewriter.InsertTextAfter(real_loc_end(s), ")");
 
+	m_TheRewriter.InsertTextAfter(real_loc_end(s), ")");
 	++counter;
+
 	return true;
 }
 
