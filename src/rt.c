@@ -13,7 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <sys/mman.h>		/* shm_open, mmap */
+#include <sys/mman.h>		/* mmap */
 #include <sys/stat.h>		/* S_IRUSR, S_IWUSR, mkdir */
 
 #include <assert.h>
@@ -95,13 +95,13 @@ shm_extend(int bytes)
 }
 
 /*
- * Add a header region to a newly created shared memory file.
- * The header contains:
- * - version major and minor
- * - process id, parent process id, group process id
- * - program name
- * - current working directory
- * Exits or asserts on error.
+ * Add a header region to a newly created shared memory file. It contains:
+ * - 6 byte magic value
+ * - 2 bytes for major and minor versions
+ * - 12 bytes for process id, parent process id, group process id
+ * - 2 + N bytes for program name prefixed with its length
+ * - 2 + N bytes for current working directory prefixed with its length
+ * Header size is rounded up to next page size multiple. Exits on error.
  */
 static void
 shm_add_header()
@@ -152,9 +152,14 @@ shm_add_header()
 }
 
 /*
- * Adds a new memory region for a given citrun_node.
- * The data format is described in the instrumentation header generation code.
- * Exits on failure.
+ * Adds a new citrun_node to the shared memory file. Contains:
+ * - 4 bytes for the number of source code lines
+ * - 2 + N bytes for the file name used when compiling the source code
+ * - 2 + N bytes for the source code's absolute file path
+ * - 8 * L bytes (L = total number of source code lines) for the execution
+ *   count buffers that store how many times each source code line executed.
+ * Node size is rounded up to the next page size multiple.
+ * Function exits on failure.
  */
 static void
 shm_add_node(struct citrun_node *n)
@@ -191,10 +196,9 @@ shm_add_node(struct citrun_node *n)
 }
 
 /*
- * Usually opens a file descriptor with a random file name in a known directory.
- * Should only ever be called once per process.  Adds a header to the created
- * file containing program meta information.
- * Exits on failure.
+ * Creates a new shared memory file and header.
+ * Then citrun_node's are added as their constructors are executed.
+ * This function should only be called once per process. Exits on failure.
  */
 static void
 shm_create()
@@ -227,6 +231,7 @@ shm_create()
 
 /*
  * Public interface: Add a node to shared memory.
+ * Exits on failure.
  */
 void
 citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
