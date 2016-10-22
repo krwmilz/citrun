@@ -1,13 +1,16 @@
-use strict;
-use warnings;
-use Test::More tests => 1;
-use tlib::program;
-use tlib::shm;
 #
 # Test that the runtime shared file size is what we expect.
 #
+use strict;
+use warnings;
+use POSIX;
+use Test::More tests => 1;
+use tlib::program;
+use tlib::shm;
 
 system("tlib/program/program 1");
 
 my $procfile = tlib::shm->new();
-is($procfile->{size}, 16384, "size of memory file");
+
+my $pagesize = POSIX::sysconf(POSIX::_SC_PAGESIZE);
+is($procfile->{size}, $pagesize * 4, "is memory file 4 pages long");
