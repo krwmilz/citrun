@@ -3,7 +3,6 @@
 #
 use strict;
 use warnings;
-use POSIX;
 use Test::More tests => 100;
 use Time::HiRes qw( usleep );
 use tlib::program;
