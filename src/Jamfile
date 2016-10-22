@@ -22,7 +22,8 @@ ReplaceTokens citrun-wrap ;
 # citrun-term
 #
 LINKLIBS on citrun-term += -lcurses ;
-Main citrun-term : term_main.cc ;
+# XXX: Not the main focus right now.
+# Main citrun-term : term_main.cc ;
 
 #
 # citrun-gl
