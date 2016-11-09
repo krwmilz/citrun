@@ -21,6 +21,7 @@
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
+#include <stddef.h>		/* offsetof */
 #include <stdlib.h>		/* get{env,progname} */
 #include <string.h>		/* strnlen */
 #include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
@@ -33,34 +34,6 @@
 static int init = 0;
 static int shm_fd = 0;
 static size_t shm_len = 0;
-
-static size_t
-add_1(uint8_t *shm, size_t shm_pos, uint8_t data)
-{
-	shm[shm_pos] = data;
-	return shm_pos + sizeof(data);
-}
-
-static size_t
-add_2(uint8_t *shm, size_t shm_pos, uint16_t data)
-{
-	memcpy(shm + shm_pos, &data, sizeof(data));
-	return shm_pos + sizeof(data);
-}
-
-static size_t
-add_4(uint8_t *shm, size_t shm_pos, uint32_t data)
-{
-	memcpy(shm + shm_pos, &data, sizeof(data));
-	return shm_pos + sizeof(data);
-}
-
-static size_t
-add_str(uint8_t *shm, size_t shm_pos, const char *str, uint16_t len)
-{
-	memcpy(shm + shm_pos, str, len);
-	return shm_pos + len;
-}
 
 /*
  * Extends the memory mapping of shm_fd some number of bytes rounded up to the
@@ -94,105 +67,41 @@ shm_extend(int bytes)
 	return shm;
 }
 
+struct citrun_header {
+	char		 magic[6];
+	uint8_t		 major;
+	uint8_t		 minor;
+	uint32_t	 pids[3];
+	char		 progname[PATH_MAX];
+	char		 cwd[PATH_MAX];
+};
+
 /*
- * Add a header region to a newly created shared memory file. It contains:
- * - 6 byte magic value
- * - 2 bytes for major and minor versions
- * - 12 bytes for process id, parent process id, group process id
- * - 2 + N bytes for program name prefixed with its length
- * - 2 + N bytes for current working directory prefixed with its length
- * Header size is rounded up to next page size multiple. Exits on error.
+ * Add a header region to a newly created shared memory file.  Header size is
+ * rounded up to next page size multiple. Exits on error.
  */
 static void
 shm_add_header()
 {
-	char		 magic[6] = "citrun";
-	char		*cwd_buf;
-	const char	*progname;
 	uint8_t		*shm;
-	size_t		 sz;
-	size_t		 shm_pos;
-	uint16_t	 prog_sz, cwd_sz;
 
-	progname = getprogname();
-	if ((cwd_buf = getcwd(NULL, 0)) == NULL)
+	struct citrun_header header = {
+		"citrun",
+		citrun_major,
+		citrun_minor
+	};
+
+	header.pids[0] = getpid();
+	header.pids[1] = getppid();
+	header.pids[2] = getpgrp();
+
+	strlcpy(header.progname, getprogname(), PATH_MAX);
+
+	if (getcwd(header.cwd, PATH_MAX) == NULL)
 		err(1, "getcwd");
 
-	prog_sz = strnlen(progname, PATH_MAX);
-	cwd_sz = strnlen(cwd_buf, PATH_MAX);
-
-	sz = 0;
-	sz += sizeof(magic);
-	sz += sizeof(uint8_t) * 2;
-	sz += sizeof(uint32_t) * 3;
-	sz += sizeof(prog_sz);
-	sz += prog_sz;
-	sz += sizeof(cwd_sz);
-	sz += cwd_sz;
-
-	shm = shm_extend(sz);
-
-	shm_pos = 0;
-	shm_pos = add_str(shm, shm_pos, magic, sizeof(magic));
-
-	shm_pos = add_1(shm, shm_pos, citrun_major);
-	shm_pos = add_1(shm, shm_pos, citrun_minor);
-
-	shm_pos = add_4(shm, shm_pos, getpid());
-	shm_pos = add_4(shm, shm_pos, getppid());
-	shm_pos = add_4(shm, shm_pos, getpgrp());
-
-	shm_pos = add_2(shm, shm_pos, prog_sz);
-	shm_pos = add_str(shm, shm_pos, progname, prog_sz);
-
-	shm_pos = add_2(shm, shm_pos, cwd_sz);
-	shm_pos = add_str(shm, shm_pos, cwd_buf, cwd_sz);
-
-	assert(shm_pos == sz);
-}
-
-/*
- * Adds a new citrun_node to the shared memory file. Contains:
- * - 4 bytes for the number of source code lines
- * - 2 + N bytes for the file name used when compiling the source code
- * - 2 + N bytes for the source code's absolute file path
- * - 8 * L bytes (L = total number of source code lines) for the execution
- *   count buffers that store how many times each source code line executed.
- * Node size is rounded up to the next page size multiple.
- * Function exits on failure.
- */
-static void
-shm_add_node(struct citrun_node *n)
-{
-	uint8_t		*shm;
-	size_t		 sz;
-	size_t		 shm_pos;
-	uint16_t	 comp_sz, abs_sz;
-
-	comp_sz = strnlen(n->comp_file_path, PATH_MAX);
-	abs_sz = strnlen(n->abs_file_path, PATH_MAX);
-
-	sz = 0;
-	sz += sizeof(uint32_t);
-	sz += sizeof(comp_sz);
-	sz += comp_sz;
-	sz += sizeof(abs_sz);
-	sz += abs_sz;
-	sz += n->size * sizeof(uint64_t);
-
-	shm = shm_extend(sz);
-
-	shm_pos = 0;
-	shm_pos = add_4(shm, shm_pos, n->size);
-	shm_pos = add_2(shm, shm_pos, comp_sz);
-	shm_pos = add_str(shm, shm_pos, n->comp_file_path, comp_sz);
-	shm_pos = add_2(shm, shm_pos, abs_sz);
-	shm_pos = add_str(shm, shm_pos, n->abs_file_path, abs_sz);
-
-	n->data = (uint64_t *)&shm[shm_pos];
-	shm_pos += n->size * sizeof(uint64_t);
-
-	assert(shm_pos == sz);
+	shm = shm_extend(sizeof(struct citrun_header));
+	memcpy(shm, &header, sizeof(struct citrun_header));
 }
 
 /*
@@ -230,22 +139,36 @@ shm_create()
 }
 
 /*
- * Public interface: Add a node to shared memory.
+ * Public interface, called by instrumented translation units.
+ *
+ * Copies the passed in citrun_node into the shared memory file.
+ * Care is taken to allocate enough memory for the execution buffers which are
+ * 8 * L bytes (L = total number of source code lines).
+ * Node size is rounded up to the next page size multiple.
  * Exits on failure.
  */
 void
 citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 {
-	/*
-	 * Binary compatibility between versions is not guaranteed.
-	 * A user is forced to rebuild their project in this case.
-	 */
+	uint8_t		*shm;
+	size_t		 sz = 0;
+
+	/* Binary compatibility between versions not guaranteed.  */
 	if (node_major != citrun_major || node_minor != citrun_minor)
-		errx(1, "libcitrun %i.%i: incompatible node version %i.%i",
+		errx(1, "libcitrun-%i.%i: incompatible version %i.%i, "
+			"try cleaning and rebuilding your project",
 			citrun_major, citrun_minor, node_major, node_minor);
 
 	if (!init)
 		shm_create();
 
-	shm_add_node(n);
+	sz += sizeof(struct citrun_node);
+	sz += n->size * sizeof(uint64_t);
+
+	shm = shm_extend(sz);
+
+	/* n->data = (uint64_t *)(shm + offsetof(struct citrun_node,data)); */
+	n->data = 0xF0F0F0F0F0F0F0F0;
+	memcpy(shm, n, sizeof(struct citrun_node));
+	n->data = (uint64_t *)(shm + sizeof(struct citrun_node));
 }

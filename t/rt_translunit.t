@@ -13,10 +13,10 @@ is $ret >> 8,	0,	"is program exit code 0";
 my $shm = tlib::shm->new();
 
 my ($tu1, $tu2, $tu3) = @{ $shm->{translation_units} };
-is	$tu1->{size},	9,	"is transl unit 1 9 lines";
-cmp_ok	$tu1->{cmp_sz},	'<',	1024,	'is size of compiler file name less than 1024';
-cmp_ok	$tu1->{cmp_sz},	'>',	0,	'is size of compiler file name greater than 0';
-#is	$tu1->{comp_file_name},	'three.c',	'is compiler file name right';
-cmp_ok	$tu1->{abs_sz},	'<',	1024,	'is size of absolute file path less than 1024';
-cmp_ok	$tu1->{abs_sz},	'>',	0,	'is size of absolute file path greater than 0';
+is	$tu1->{size},	9,	"is translation unit 1 9 lines";
+is	$tu1->{comp_file_name},	'three.c',	'is compiler file name right';
 like	$tu1->{abs_file_path},	qr/.*three.c/,	'is absolute file path believable';
+
+is	$tu2->{size},	11,	"is translation unit 2 9 lines";
+is	$tu2->{comp_file_name},	'two.c',	'is compiler file name right';
+like	$tu2->{abs_file_path},	qr/.*two.c/,	'is absolute file path believable';

@@ -27,7 +27,9 @@ for (0..99) {
 		my $execs = $shm->execs_for($_);
 		$total += $_ for (@$execs);
 	}
+
 	cmp_ok $total, '>', $last_total, "new total > old total";
+	$last_total = $total;
 }
 
 kill 'TERM', $child_pid;
