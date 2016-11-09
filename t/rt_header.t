@@ -5,12 +5,12 @@ use strict;
 use warnings;
 use Test::More tests => 11;
 use tlib::program;
-use tlib::shm;
+use t::shm;
 
 my $ret = system('tlib/program/program 1');
 is $ret >> 8,	0,	"is program exit code 0";
 
-my $shm = tlib::shm->new();
+my $shm = t::shm->new();
 is $shm->{magic}, "citrun", "is file magic correct";
 is $shm->{major}, 0, "is major correct";
 is $shm->{minor}, 0, "is minor correct";

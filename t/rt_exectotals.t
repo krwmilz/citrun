@@ -6,7 +6,7 @@ use warnings;
 use Test::More tests => 100;
 use Time::HiRes qw( usleep );
 use tlib::program;
-use tlib::shm;
+use t::shm;
 
 my $child_pid = fork();
 if ($child_pid == 0) {
@@ -16,7 +16,7 @@ if ($child_pid == 0) {
 
 # Give the runtime time to set up.
 sleep 1;
-my $shm = tlib::shm->new();
+my $shm = t::shm->new();
 
 my $last_total = 0;
 for (0..99) {

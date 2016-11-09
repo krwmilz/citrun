@@ -5,12 +5,12 @@ use strict;
 use warnings;
 use Test::More tests => 7;
 use tlib::program;
-use tlib::shm;
+use t::shm;
 
 my $ret = system('tlib/program/program 10');
 is $ret >> 8,	0,	"is program exit code 0";
 
-my $shm = tlib::shm->new();
+my $shm = t::shm->new();
 
 my ($tu1, $tu2, $tu3) = @{ $shm->{translation_units} };
 is	$tu1->{size},	9,	"is translation unit 1 9 lines";
