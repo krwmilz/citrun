@@ -5,13 +5,13 @@ use strict;
 use warnings;
 use Test::More tests => 100;
 use Time::HiRes qw( usleep );
-use tlib::program;
+use t::program;
 use t::shm;
 
 my $child_pid = fork();
 if ($child_pid == 0) {
 	# Child.
-	exec ("tlib/program/program", "45") or die $!;
+	exec ("t/program/program", "45") or die $!;
 }
 
 # Give the runtime time to set up.

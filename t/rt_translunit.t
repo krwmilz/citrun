@@ -4,10 +4,10 @@
 use strict;
 use warnings;
 use Test::More tests => 7;
-use tlib::program;
+use t::program;
 use t::shm;
 
-my $ret = system('tlib/program/program 10');
+my $ret = system('t/program/program 10');
 is $ret >> 8,	0,	"is program exit code 0";
 
 my $shm = t::shm->new();

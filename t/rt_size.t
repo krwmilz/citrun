@@ -5,10 +5,10 @@ use strict;
 use warnings;
 use POSIX;
 use Test::More tests => 1;
-use tlib::program;
+use t::program;
 use t::shm;
 
-system("tlib/program/program 1");
+system("t/program/program 1");
 
 my $procfile = t::shm->new();
 
