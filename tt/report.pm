@@ -1,4 +1,4 @@
-package tlib::report;
+package tt::report;
 use strict;
 
 use List::MoreUtils qw( each_array );
