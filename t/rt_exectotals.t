@@ -3,7 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 100;
+use Test::More tests => 50;
 use Time::HiRes qw( usleep );
 use t::program;
 use t::shm;
@@ -19,8 +19,8 @@ sleep 1;
 my $shm = t::shm->new();
 
 my $last_total = 0;
-for (0..99) {
-	usleep 10 * 1000;
+for (0..49) {
+	usleep 100 * 1000;
 	my $total = 0;
 
 	for (0..2) {
