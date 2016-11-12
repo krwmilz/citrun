@@ -1,6 +1,10 @@
 #
-# Knowing the absolute path to citrun resources is necessary for
-# instrumentation. If PREFIX is set, assume we're building a package.
+# Knowing the absolute path to citrun resources is necessary because:
+# - instrumented programs must be linked to the runtime library
+# - the PATH compiler interception mechanism needs to remove itself from PATH
+#
+# If PREFIX is set we're building a package, so trust that will be the final
+# (after installation) location.
 #
 if $(PREFIX) {
 	echo ...build citrun-RELEASE on $(OS)... ;
