@@ -26,7 +26,7 @@
 #include <string.h>		/* strnlen */
 #include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
 
-#include "rt.h"
+#include "rt.h"			/* struct citrun_{header,node} */
 #include "version.h"
 
 #define SHM_PATH "/tmp/citrun.shared"
@@ -66,15 +66,6 @@ shm_extend(int bytes)
 	shm_len += aligned_bytes;
 	return shm;
 }
-
-struct citrun_header {
-	char		 magic[6];
-	uint8_t		 major;
-	uint8_t		 minor;
-	uint32_t	 pids[3];
-	char		 progname[PATH_MAX];
-	char		 cwd[PATH_MAX];
-};
 
 /*
  * Add a header region to a newly created shared memory file.  Header size is
