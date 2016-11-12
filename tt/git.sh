@@ -3,7 +3,7 @@
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
-. tlib/package.sh
+. tt/package.subr
 plan 8
 
 pkg_set "devel/git"

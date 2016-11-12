@@ -2,7 +2,7 @@
 #
 # Test that building Mutt works.
 #
-. tlib/package.sh
+. tt/package.subr
 plan 5
 
 pkg_set "mail/mutt"

@@ -48,10 +48,10 @@ function pkg_write_tus
 	cat <<'EOF' > tu_printer.pl
 use strict;
 use warnings;
-use tlib::shm;
+use t::shm;
 
 open(my $out, '>', 'filelist.out') or die $!;
-my $shm = tlib::shm->new();
+my $shm = t::shm->new();
 
 select $out;
 $shm->print_tus();

@@ -2,7 +2,7 @@
 #
 # Test that citrun run on itself works and the resulting binaries run.
 #
-. tlib/package.sh
+. tt/package.subr
 
 rm -rf /usr/ports/devel/ccitrunrun
 # Port contains some.. "customizations"
