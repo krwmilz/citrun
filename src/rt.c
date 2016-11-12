@@ -20,7 +20,6 @@
 #include <err.h>
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
-#include <limits.h>		/* PATH_MAX */
 #include <stddef.h>		/* offsetof */
 #include <stdlib.h>		/* get{env,progname} */
 #include <string.h>		/* strnlen */
@@ -41,10 +40,10 @@ static size_t shm_len = 0;
  * Exits on error, returns a pointer to the beginning of the extended memory
  * region on success.
  */
-static uint8_t *
+static char *
 shm_extend(int bytes)
 {
-	uint8_t		*shm;
+	char		*shm;
 	int		 page_size = getpagesize();
 	int		 page_mask = page_size - 1;
 	int		 aligned_bytes;
@@ -74,10 +73,10 @@ shm_extend(int bytes)
 static void
 shm_add_header()
 {
-	uint8_t		*shm;
+	char		*shm;
 
 	struct citrun_header header = {
-		"citrun",
+		"ctrn",
 		citrun_major,
 		citrun_minor
 	};
@@ -86,9 +85,9 @@ shm_add_header()
 	header.pids[1] = getppid();
 	header.pids[2] = getpgrp();
 
-	strlcpy(header.progname, getprogname(), PATH_MAX);
+	strlcpy(header.progname, getprogname(), CITRUN_PATH_MAX);
 
-	if (getcwd(header.cwd, PATH_MAX) == NULL)
+	if (getcwd(header.cwd, CITRUN_PATH_MAX) == NULL)
 		err(1, "getcwd");
 
 	shm = shm_extend(sizeof(struct citrun_header));
@@ -139,25 +138,25 @@ shm_create()
  * Exits on failure.
  */
 void
-citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
+citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 {
-	uint8_t		*shm;
+	char		*shm;
 	size_t		 sz = 0;
 
 	/* Binary compatibility between versions not guaranteed.  */
-	if (node_major != citrun_major || node_minor != citrun_minor)
+	if (major != citrun_major || minor != citrun_minor)
 		errx(1, "libcitrun-%i.%i: incompatible version %i.%i, "
 			"try cleaning and rebuilding your project",
-			citrun_major, citrun_minor, node_major, node_minor);
+			citrun_major, citrun_minor, major, minor);
 
 	if (!init)
 		shm_create();
 
 	sz += sizeof(struct citrun_node);
-	sz += n->size * sizeof(uint64_t);
+	sz += n->size * sizeof(unsigned long long);
 
 	shm = shm_extend(sz);
 
 	memcpy(shm, n, sizeof(struct citrun_node));
-	n->data = (uint64_t *)(shm + sizeof(struct citrun_node));
+	n->data = (unsigned long long *)(shm + sizeof(struct citrun_node));
 }

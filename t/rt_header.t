@@ -11,7 +11,7 @@ my $ret = system('t/program/program 1');
 is $ret >> 8,	0,	"is program exit code 0";
 
 my $shm = t::shm->new();
-is $shm->{magic}, "citrun", "is file magic correct";
+is $shm->{magic}, "ctrn", "is file magic correct";
 is $shm->{major}, 0, "is major correct";
 is $shm->{minor}, 0, "is minor correct";
 

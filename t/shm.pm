@@ -22,14 +22,14 @@ sub new {
 	( $self->{magic}, $self->{major}, $self->{minor},
 		$self->{pids}[0], $self->{pids}[1], $self->{pids}[2],
 		$self->{progname}, $self->{cwd}
-	) = unpack("Z6CCLLLZ" . PATH_MAX . "Z" . PATH_MAX, xread($fh, $pagesize));
+	) = unpack("Z4I5Z1024Z1024", xread($fh, $pagesize));
 
 	my @translation_units;
 	while (tell $fh < $self->{size}) {
 		my %tu;
 
 		($tu{size}, $tu{comp_file_name}, $tu{abs_file_path}) =
-			unpack("LZ" . PATH_MAX . "Z" . PATH_MAX, xread($fh, 4 + 2 * 1024 + 4 + 8));
+			unpack("IZ1024Z1024", xread($fh, 4 + 2 * 1024 + 4 + 8));
 
 		$tu{exec_buf_pos} = tell $fh;
 		xread($fh, $tu{size} * 8);

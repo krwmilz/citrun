@@ -12,26 +12,25 @@ cat <<EOF > preamble.c.good
 #ifdef __cplusplus
 extern "" {
 #endif
-#include <limits.h>		/* PATH_MAX */
-#include <stdint.h>		/* uint{64,32,8}_t */
+#define CITRUN_PATH_MAX		1024
 
 struct citrun_header {
-	char		 magic[6];
-	uint8_t		 major;
-	uint8_t		 minor;
-	uint32_t	 pids[3];
-	char		 progname[PATH_MAX];
-	char		 cwd[PATH_MAX];
+	char			 magic[4];
+	unsigned int		 major;
+	unsigned int		 minor;
+	unsigned int		 pids[3];
+	char			 progname[CITRUN_PATH_MAX];
+	char			 cwd[CITRUN_PATH_MAX];
 };
 
 struct citrun_node {
-	uint32_t	 size;
-	const char	 comp_file_path[PATH_MAX];
-	const char	 abs_file_path[PATH_MAX];
-	uint64_t	*data;
+	unsigned int		 size;
+	const char		 comp_file_path[CITRUN_PATH_MAX];
+	const char		 abs_file_path[CITRUN_PATH_MAX];
+	unsigned long long	*data;
 };
 
-void citrun_node_add(uint8_t, uint8_t, struct citrun_node *);
+void citrun_node_add(unsigned int, unsigned int, struct citrun_node *);
 static struct citrun_node _citrun = {
 	1,
 	"",
