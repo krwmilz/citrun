@@ -158,8 +158,6 @@ citrun_node_add(uint8_t node_major, uint8_t node_minor, struct citrun_node *n)
 
 	shm = shm_extend(sz);
 
-	/* n->data = (uint64_t *)(shm + offsetof(struct citrun_node,data)); */
-	n->data = 0xF0F0F0F0F0F0F0F0;
 	memcpy(shm, n, sizeof(struct citrun_node));
 	n->data = (uint64_t *)(shm + sizeof(struct citrun_node));
 }
