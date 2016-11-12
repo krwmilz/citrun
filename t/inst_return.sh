@@ -2,7 +2,7 @@
 #
 # Check that return statement values (if any) are instrumented correctly.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 5
 
 cat <<EOF > return.c

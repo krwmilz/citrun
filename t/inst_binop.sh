@@ -2,7 +2,7 @@
 #
 # Test that binary operators in strange cases work. Includes enums and globals.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 5
 
 cat <<EOF > enum.c

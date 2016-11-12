@@ -2,7 +2,7 @@
 #
 # Test that for loop condition instrumenting works.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 5
 
 cat <<EOF > for.c

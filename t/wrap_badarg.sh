@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. tlib/utils.sh
+. t/utils.subr
 plan 1
 
 output_good="usage: citrun-wrap <build cmd>"

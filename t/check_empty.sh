@@ -2,7 +2,7 @@
 #
 # Verify the output when 0 citrun.log files are found.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 1
 
 output_good="No log files found."

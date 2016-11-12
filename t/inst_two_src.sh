@@ -3,7 +3,7 @@
 # Check that two source files given on the same command line both get
 # instrumented fully.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 4
 
 cat <<EOF > main.c

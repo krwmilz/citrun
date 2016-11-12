@@ -4,7 +4,7 @@
 # - not having PATH set errors
 # - not having CITRUN_SHARE in PATH when using transparent compile mode errors
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 2
 
 OLDPATH=${PATH}

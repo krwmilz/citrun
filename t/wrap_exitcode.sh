@@ -2,7 +2,7 @@
 #
 # Make sure that citrun-wrap exits with the same code as the native build.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 1
 
 output_good="ls: asdfasdfsaf: No such file or directory"

@@ -2,7 +2,7 @@
 #
 # Check that a simple program can execute successfully with instrumentation.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 7
 
 cat <<EOF > fib.c

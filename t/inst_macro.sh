@@ -3,7 +3,7 @@
 # Test for some tricky macro situations. In particular macro expansions at the
 # end of binary operators.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 5
 
 cat <<EOF > macro.c

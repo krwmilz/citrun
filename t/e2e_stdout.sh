@@ -2,7 +2,7 @@
 #
 # Simple program that prints output.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 5
 
 cat <<EOF > hello.c

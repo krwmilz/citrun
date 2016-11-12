@@ -1,5 +1,5 @@
-# exports CITRUN_TOOLS and sources libtap.sh.
-. tlib/utils.sh
+# exports CITRUN_TOOLS and sources libtap.subr
+. t/utils.subr
 
 function pkg_set
 {

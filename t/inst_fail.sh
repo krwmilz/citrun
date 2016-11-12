@@ -2,7 +2,7 @@
 #
 # Check that a program that won't compile natively is handled properly.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 4
 
 echo "int main(void) { return 0; " > bad.c

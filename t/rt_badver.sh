@@ -3,7 +3,7 @@
 # Check that linking object files of one citrun version with libcitrun of
 # another errors.
 #
-. tlib/utils.sh
+. t/utils.subr
 plan 3
 
 cat <<EOF > main.c
