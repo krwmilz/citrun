@@ -3,13 +3,13 @@
 set -o nounset
 export CITRUN_TOOLS="`pwd`/src"
 
-function strip_preamble
+strip_preamble()
 {
 	file="${1}"
 	tail -n +35 $file.citrun > $file.citrun_nohdr
 }
 
-function strip_log
+strip_log()
 {
 	sed	-e "s,^.*: ,,"	\
 		-e "s,'.*','',"	\
@@ -18,7 +18,7 @@ function strip_log
 		< ${1} > ${1}.stripped
 }
 
-function strip_millis
+strip_millis()
 {
 	ok "stripping milliseconds" sed -i -e "/Milliseconds spent/d" $1
 }
