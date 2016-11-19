@@ -6,12 +6,11 @@
 # If PREFIX is set we're building a package, so trust that will be the final
 # (after installation) location.
 #
+echo ...build C It Run on $(OS)... ;
 if $(PREFIX) {
-	echo ...build citrun-RELEASE on $(OS)... ;
 	CITRUN_SHARE = $(PREFIX)/share/citrun ;
 }
 else {
-	echo ...build citrun-DEBUG on $(OS)... ;
 	CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
 	CFLAGS += -Wall -g ;
 }
@@ -58,6 +57,28 @@ if $(OS) = LINUX {
 	LINKLIBS on citrun-inst = -lbsd ;
 	LINKLIBS on citrun-inst += -Wl,--start-group $(CLANG_LIBS) -Wl,--end-group ;
 }
+
+actions StaticAnalysis
+{
+	export CITRUN_SA=1
+	scan-build -o html --use-c++=eg++ jam -j4
+	# scan-build -o html -v --use-c++=eg++ jam -j4
+}
+
+actions TestCoverage
+{
+	export CITRUN_COVERAGE=1
+	CFLAGS="-coverage -ggdb" jam -j4
+
+	prove || true
+	# prove tt
+
+	gcov -o src src/rt.c
+	egcov -r src/*.cc
+}
+
+StaticAnalysis static-analysis ;
+TestCoverage test-coverage ;
 
 if $(CITRUN_SA) {
 	# scan-build sets these expecting us to pick up the new values.
