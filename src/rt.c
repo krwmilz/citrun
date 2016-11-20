@@ -20,15 +20,13 @@
 #include <err.h>
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
-#include <stddef.h>		/* offsetof */
 #include <stdlib.h>		/* get{env,progname} */
-#include <string.h>		/* strnlen */
+#include <string.h>		/* strlcpy memcpy */
 #include <unistd.h>		/* get{cwd,pid,ppid,pgrp} */
 
 #include "rt.h"			/* struct citrun_{header,node} */
 #include "version.h"
 
-#define SHM_PATH "/tmp/citrun.shared"
 
 static int init = 0;
 static int shm_fd = 0;
