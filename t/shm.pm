@@ -42,11 +42,15 @@ sub new {
 	return $self;
 }
 
+# Skips to the next page boundary. If exactly on a page boundary then stay
+# there.
 sub next_page {
 	my ($self) = @_;
 
+	my $page_mask = $pagesize - 1;
 	my $cur_pos = tell $self->{fh};
-	xread($self->{fh}, $pagesize - ($cur_pos % $pagesize));
+
+	seek $self->{fh}, ($cur_pos + $page_mask) & ~$page_mask, 0;
 }
 
 sub execs_for {
