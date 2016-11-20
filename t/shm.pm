@@ -19,9 +19,11 @@ sub new {
 	$self->{fh} = $fh;
 	$self->{size} = (stat "procfile.shm")[7];
 
-	( $self->{magic}, $self->{major}, $self->{minor},
+	(	$self->{magic},
+		$self->{major}, $self->{minor},
 		$self->{pids}[0], $self->{pids}[1], $self->{pids}[2],
-		$self->{progname}, $self->{cwd}
+		$self->{progname},
+		$self->{cwd}
 	) = unpack("Z4I5Z1024Z1024", xread($fh, $pagesize));
 
 	my @translation_units;
