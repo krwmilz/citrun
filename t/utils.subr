@@ -6,7 +6,7 @@ export CITRUN_TOOLS="`pwd`/src"
 strip_preamble()
 {
 	file="${1}"
-	tail -n +35 $file.citrun > $file.citrun_nohdr
+	tail -n +33 $file.citrun > $file.citrun_nohdr
 }
 
 strip_log()
