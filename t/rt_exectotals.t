@@ -7,16 +7,20 @@ use Test::More tests => 50;
 use Time::HiRes qw( usleep );
 use t::program;
 use t::shm;
+use t::tmpdir;
+
+my $tmp_dir = t::tmpdir->new();
+t::program->new($tmp_dir);
 
 my $child_pid = fork();
 if ($child_pid == 0) {
 	# Child.
-	exec ("t/program/program", "45") or die $!;
+	exec ("$tmp_dir/program", "45") or die $!;
 }
 
 # Give the runtime time to set up.
 sleep 1;
-my $shm = t::shm->new();
+my $shm = t::shm->new($tmp_dir);
 
 my $last_total = 0;
 for (0..49) {
