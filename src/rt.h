@@ -9,8 +9,8 @@ struct citrun_header {
 
 struct citrun_node {
 	unsigned int		 size;
-	const char		 comp_file_path[1024];
-	const char		 abs_file_path[1024];
+	char			 comp_file_path[1024];
+	char			 abs_file_path[1024];
 	unsigned long long	*data;
 };
 

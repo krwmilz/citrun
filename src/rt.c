@@ -20,7 +20,7 @@
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
 #include <stdlib.h>		/* get{env,progname} */
-#include <string.h>		/* strlcpy memcpy */
+#include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
 
 #include "rt.h"			/* struct citrun_{header,node} */
@@ -34,7 +34,7 @@ static int shm_fd = 0;
  * bytes (rounded up to the next page size).
  * Returns a pointer to the extended region on success, exits on failure.
  */
-static char *
+static void *
 shm_extend(size_t requested_bytes)
 {
 	size_t	 aligned_bytes, page_mask;
@@ -42,7 +42,7 @@ shm_extend(size_t requested_bytes)
 	char	*shm;
 
 	page_mask = getpagesize() - 1;
-	aligned_bytes = ((requested_bytes) + page_mask) & ~page_mask;
+	aligned_bytes = (requested_bytes + page_mask) & ~page_mask;
 
 	/* Get current file length. */
 	if ((shm_len = lseek(shm_fd, 0, SEEK_END)) < 0)
@@ -63,44 +63,19 @@ shm_extend(size_t requested_bytes)
 }
 
 /*
- * Add a header region to a newly created shared memory file. Header size is
- * rounded up to next page size multiple. Exits on error.
- */
-static void
-shm_add_header()
-{
-	char	*shm;
-
-	struct citrun_header header = {
-		"ctrn",
-		citrun_major,
-		citrun_minor,
-		{ getpid(), getppid(), getpgrp() }
-	};
-
-	strlcpy(header.progname, getprogname(), sizeof(header.progname));
-
-	if (getcwd(header.cwd, sizeof(header.cwd)) == NULL)
-		err(1, "getcwd");
-
-	shm = shm_extend(sizeof(struct citrun_header));
-	memcpy(shm, &header, sizeof(struct citrun_header));
-}
-
-/*
- * Creates a new shared memory file and header.
- * Then citrun_node's are added as their constructors are executed.
- * This function should only be called once per process. Exits on failure.
+ * Creates a new shared memory file with a header. Exits on error.
  */
 static void
 shm_create()
 {
-	char	 memfile_path[23];
-	char	*template = "/tmp/citrun/XXXXXXXXXX";
-	char	*process_dir  = "/tmp/citrun";
+	char			*procfile;
+	char			 memfile_path[23];
+	char			*template = "/tmp/citrun/XXXXXXXXXX";
+	char			*process_dir  = "/tmp/citrun";
+	struct citrun_header	*header;
 
-	if (getenv("CITRUN_TOOLS") != NULL) {
-		if ((shm_fd = open("procfile.shm", O_RDWR | O_CREAT,
+	if ((procfile = getenv("CITRUN_PROCFILE")) != NULL) {
+		if ((shm_fd = open(procfile, O_RDWR | O_CREAT,
 		    S_IRUSR | S_IWUSR)) == -1)
 			err(1, "open");
 	} else {
@@ -113,6 +88,20 @@ shm_create()
 		if ((shm_fd = mkstemp(memfile_path)) == -1)
 			err(1, "mkstemp");
 	}
+
+	/* Add header. */
+	header = shm_extend(sizeof(struct citrun_header));
+
+	strncpy(header->magic, "ctrn", sizeof(header->magic));
+	header->major = citrun_major;
+	header->minor = citrun_minor;
+	header->pids[0] = getpid();
+	header->pids[1] = getppid();
+	header->pids[2] = getpgrp();
+	strlcpy(header->progname, getprogname(), sizeof(header->progname));
+
+	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
+		err(1, "getcwd");
 }
 
 /*
@@ -124,25 +113,26 @@ shm_create()
 void
 citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 {
-	char		*shm;
-	size_t		 sz = 0;
+	size_t			 sz;
+	struct citrun_node	*shm_node;
 
-	/* Binary compatibility between versions not guaranteed.  */
+	/* Binary compatibility between versions not guaranteed. */
 	if (major != citrun_major || minor != citrun_minor)
 		errx(1, "libcitrun-%i.%i: incompatible version %i.%i, "
 			"try cleaning and rebuilding your project",
 			citrun_major, citrun_minor, major, minor);
 
-	if (shm_fd == 0) {
+	if (shm_fd == 0)
 		shm_create();
-		shm_add_header();
-	}
 
-	sz += sizeof(struct citrun_node);
+	sz = sizeof(struct citrun_node);
 	sz += n->size * sizeof(unsigned long long);
 
-	shm = shm_extend(sz);
+	shm_node = shm_extend(sz);
 
-	memcpy(shm, n, sizeof(struct citrun_node));
-	n->data = (unsigned long long *)(shm + sizeof(struct citrun_node));
+	shm_node->size = n->size;
+	strlcpy(shm_node->comp_file_path, n->comp_file_path, 1024);
+	strlcpy(shm_node->abs_file_path, n->abs_file_path, 1024);
+
+	n->data = (unsigned long long *)(shm_node + 1);
 }
