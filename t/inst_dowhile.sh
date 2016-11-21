@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Make sure that do while loop condition instrumentation works.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > while.c
 int main(int argc, char *argv[]) {
@@ -37,8 +41,8 @@ Totals:
          1 Binary operators
 EOF
 
-ok "citrun-inst rewrite" $CITRUN_TOOLS/citrun-inst -c while.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "citrun-inst rewrite" citrun-inst -c while.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble while.c
 strip_millis check.out

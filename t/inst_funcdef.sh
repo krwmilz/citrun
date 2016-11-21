@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that really long function declarations are instrumented properly.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > funcdef.c
 void
@@ -38,8 +42,8 @@ Totals:
          1 Total statements
 EOF
 
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c funcdef.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-inst" citrun-inst -c funcdef.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble funcdef.c
 strip_millis check.out

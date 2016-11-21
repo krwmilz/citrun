@@ -1,12 +1,16 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Test that the instrumentation preamble is what we think it is.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 3
 
+modify_PATH
+enter_tmpdir
+
 touch preamble.c
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c preamble.c
+ok "running citrun-inst" citrun-inst -c preamble.c
 
 cat <<EOF > preamble.c.good
 #ifdef __cplusplus

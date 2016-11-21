@@ -1,15 +1,19 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that the most basic of compile command lines works.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 4
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > main.c
 int main(void) { return 0; }
 EOF
 
-ok "wrapping simple build command" $CITRUN_TOOLS/citrun-wrap cc main.c
+ok "wrapping simple build command" citrun-wrap cc main.c
 
 cat <<EOF > check.good
 Summary:
@@ -25,6 +29,6 @@ Totals:
          3 Total statements
 EOF
 
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-check" citrun-check -o check.out
 strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

@@ -38,9 +38,7 @@ plan () {
     planned="$1"
     failed=0
     echo "1..$1"
-    tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
-    trap "finish; rm -rf $tmpdir" 0
-    cd $tmpdir
+    trap finish 0
 }
 
 # Prepare for lazy planning.
@@ -88,6 +86,10 @@ finish () {
         else
             echo "# $planned test successful or skipped"
         fi
+    fi
+    # This is sometimes set by the `enter_tmpdir` function in utils.subr.
+    if [ ! -z ${tmpdir+x} ]; then
+        rm -rf $tmpdir
     fi
 }
 

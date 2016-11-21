@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that return statement values (if any) are instrumented correctly.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > return.c
 int foo() {
@@ -47,8 +51,8 @@ Totals:
          1 Binary operators
 EOF
 
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c return.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-inst" citrun-inst -c return.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble return.c
 strip_millis check.out

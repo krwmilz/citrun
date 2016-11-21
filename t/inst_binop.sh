@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Test that binary operators in strange cases work. Includes enums and globals.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > enum.c
 enum ASDF {
@@ -59,8 +63,8 @@ Totals:
          1 Binary operators
 EOF
 
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c enum.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-inst" citrun-inst -c enum.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble enum.c
 strip_millis check.out

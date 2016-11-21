@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that a raw citrun.log file is in good shape.
 # citrun-check relies on this output, and citrun-check is used quite a bit.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 2
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > source_0.c
 #include <stdlib.h>
@@ -34,7 +38,7 @@ cat <<EOF > Jamfile
 Main program : source_0.c ;
 EOF
 
-ok "source compiled with jam" $CITRUN_TOOLS/citrun-wrap jam
+ok "source compiled with jam" citrun-wrap jam
 
 strip_log citrun.log
 

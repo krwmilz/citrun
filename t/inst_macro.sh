@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Test for some tricky macro situations. In particular macro expansions at the
 # end of binary operators.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > macro.c
 #define MAYBE 1023;
@@ -36,8 +40,8 @@ Totals:
          7 Total statements
 EOF
 
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c macro.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-inst" citrun-inst -c macro.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble macro.c
 strip_millis check.out

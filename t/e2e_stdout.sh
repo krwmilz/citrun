@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Simple program that prints output.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > hello.c
 #include <stdio.h>
@@ -29,9 +33,9 @@ Totals:
          9 Total statements
 EOF
 
-ok "wrapped compile" $CITRUN_TOOLS/citrun-wrap cc -o hello hello.c
+ok "wrapped compile" citrun-wrap cc -o hello hello.c
 
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "citrun-check" citrun-check -o check.out
 strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out
 

@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Test that for loop condition instrumenting works.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > for.c
 int main(int argc, char *argv[]) {
@@ -36,8 +40,8 @@ Totals:
          2 Binary operators
 EOF
 
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c for.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-inst" citrun-inst -c for.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble for.c
 strip_millis check.out

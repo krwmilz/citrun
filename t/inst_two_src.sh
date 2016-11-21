@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that two source files given on the same command line both get
 # instrumented fully.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 4
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > main.c
 int main(void) {
@@ -32,8 +36,8 @@ Totals:
          6 Total statements
 EOF
 
-ok "citrun-wrap compile" $CITRUN_TOOLS/citrun-wrap cc -o main main.c other.c
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "citrun-wrap compile" citrun-wrap cc -o main main.c other.c
+ok "citrun-check" citrun-check -o check.out
 
 strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

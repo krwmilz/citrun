@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that if statement conditions are instrumented properly.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > if.c
 int main(int argc, char *argv[]) {
@@ -47,8 +51,8 @@ Totals:
          2 Binary operators
 EOF
 
-ok "running citrun-inst" $CITRUN_TOOLS/citrun-inst -c if.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "running citrun-inst" citrun-inst -c if.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_preamble if.c
 strip_millis check.out

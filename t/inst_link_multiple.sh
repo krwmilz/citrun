@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that linking more than one instrumented object file together works.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 4
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > one.c
 void second_func();
@@ -33,8 +37,8 @@ cat <<EOF > Jamfile
 Main program : one.c two.c three.c ;
 EOF
 
-ok "compiling source w/ jam" $CITRUN_TOOLS/citrun-wrap jam
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "compiling source w/ jam" citrun-wrap jam
+ok "running citrun-check" citrun-check -o check.out
 
 cat <<EOF > check.good
 Summary:

@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Check that a simple program can execute successfully with instrumentation.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 7
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > fib.c
 #include <stdio.h>
@@ -48,8 +52,8 @@ Totals:
          7 Binary operators
 EOF
 
-ok "wrapped source compile" $CITRUN_TOOLS/citrun-wrap cc -o fib fib.c
-ok "running citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "wrapped source compile" citrun-wrap cc -o fib fib.c
+ok "running citrun-check" citrun-check -o check.out
 
 strip_millis check.out
 ok "citrun-check diff" diff -u check.good check.out

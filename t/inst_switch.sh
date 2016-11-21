@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Make sure that switch statement condition instrumentation works.
 #
+. t/libtap.subr
 . t/utils.subr
 plan 5
+
+modify_PATH
+enter_tmpdir
 
 cat <<EOF > switch.c
 int main(void) {
@@ -48,8 +52,8 @@ Totals:
         14 Total statements
 EOF
 
-ok "citrun-inst" $CITRUN_TOOLS/citrun-inst -c switch.c
-ok "citrun-check" $CITRUN_TOOLS/citrun-check -o check.out
+ok "citrun-inst" citrun-inst -c switch.c
+ok "citrun-check" citrun-check -o check.out
 
 strip_preamble switch.c
 strip_millis check.out
