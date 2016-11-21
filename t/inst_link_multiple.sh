@@ -33,19 +33,15 @@ void third_func(void) {
 }
 EOF
 
-cat <<EOF > Jamfile
-Main program : one.c two.c three.c ;
-EOF
-
-ok "compiling source w/ jam" citrun-wrap jam
+ok "is compile ok" citrun-wrap cc -o main one.c two.c three.c
 ok "running citrun-check" citrun-check -o check.out
 
 cat <<EOF > check.good
 Summary:
          3 Source files used as input
          1 Application link commands
-         3 Rewrite successes
-         3 Rewritten source compile successes
+         1 Rewrite successes
+         1 Rewritten source compile successes
 
 Totals:
         18 Lines of source code

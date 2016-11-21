@@ -5,12 +5,12 @@
 #
 . t/libtap.subr
 . t/utils.subr
-plan 2
+plan 3
 
 modify_PATH
 enter_tmpdir
 
-cat <<EOF > source_0.c
+cat <<EOF > main.c
 #include <stdlib.h>
 
 long long
@@ -34,11 +34,8 @@ main(int argc, char *argv[])
 }
 EOF
 
-cat <<EOF > Jamfile
-Main program : source_0.c ;
-EOF
-
-ok "source compiled with jam" citrun-wrap jam
+ok "is compile ok" citrun-wrap cc -c main.c
+ok "is link ok" citrun-wrap cc -o main main.o
 
 strip_log citrun.log
 
