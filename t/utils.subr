@@ -26,6 +26,5 @@ modify_PATH()
 enter_tmpdir()
 {
 	tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
-	#trap "rm -rf $tmpdir" 0
 	cd $tmpdir
 }
