@@ -2,7 +2,6 @@
 bin/citrun-check
 @bin bin/citrun-inst
 @bin bin/citrun-gl
-@bin bin/citrun-term
 bin/citrun-wrap
 @man man/man1/citrun-check.1
 @man man/man1/citrun-gl.1
