@@ -1,40 +1,41 @@
-#!/bin/sh
+#!/bin/sh -u
 #
-# Tests that nvi works with C It Run.
+# Make sure we can see nvi run.
 #
-. tt/package.subr
-plan 10
+. tt/package.subr "editors/nvi"
+plan 11
 
-pkg_set "editors/nvi"
+enter_tmpdir
+
 pkg_check_deps
 pkg_clean
 pkg_build
 
 cat <<EOF > check.good
 Summary:
-       115 Source files used as input
-         2 Application link commands
+       116 Source files used as input
+         3 Application link commands
         32 Rewrite parse warnings
-       115 Rewrite successes
-       115 Rewritten source compile successes
+       116 Rewrite successes
+       116 Rewritten source compile successes
 
 Totals:
-     47813 Lines of source code
-       658 Function definitions
-      1711 If statements
-       176 For loops
+     47915 Lines of source code
+       660 Function definitions
+      1712 If statements
+       177 For loops
         33 While loops
          6 Do while loops
        100 Switch statements
-       979 Return statement values
-      1646 Call expressions
-     49384 Total statements
-      4008 Binary operators
+       981 Return statement values
+      1650 Call expressions
+     49441 Total statements
+      4009 Binary operators
        353 Errors rewriting source
 EOF
 pkg_check
 
-cat <<EOF > filelist.good
+cat <<EOF > tu_list.good
 /cl/cl_funcs.c 853
 /cl/cl_main.c 423
 /cl/cl_read.c 331
@@ -151,13 +152,17 @@ cat <<EOF > filelist.good
 /vi/vs_split.c 950
 EOF
 
-$TEST_WRKDIST/build/nvi > out
+# Redirect stdout so that nvi does not start up on the console when this script
+# is run interactively.
+$workdir/build/nvi > /dev/null
 
-pkg_write_tus
+ls -lah
+ok "is write_tus.pl exit code 0" \
+	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}nvi_*
 
 # nvi ends up using absolute paths to source files when compiling.
-ok "strip tu paths" sed -i -e "s,/usr/ports/pobj/nvi-[0-9.]*/nvi2-[0-9.]*,," filelist.out
-ok "sorting" sort -o filelist.out filelist.out
-ok "translation unit manifest" diff -u filelist.good filelist.out
+ok "strip tu paths" sed -i -e "s,/usr/ports/pobj/nvi-[0-9.]*/nvi2-[0-9.]*,," tu_list.out
+ok "sorting" sort -o tu_list.out tu_list.out
+ok "translation unit manifest" diff -u tu_list.good tu_list.out
 
 pkg_clean
