@@ -1,15 +1,18 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
-. tt/package.subr
-plan 8
+. tt/package.subr "devel/git"
+plan 9
 
-pkg_set "devel/git"
+enter_tmpdir
+
 pkg_check_deps
 pkg_clean
 pkg_build
+# Writes too many shared memory files and quickly fills /tmp.
+#pkg_test
 
 cat <<EOF > check.good
 Summary:
@@ -38,13 +41,7 @@ Totals:
 EOF
 pkg_check
 
-# Start git doing something that will take a while. At my own expense.
-$TEST_WRKDIST/git clone http://git.0x30.net/citrun citrun_TEST_CLONE &
-pid=$!
-
-sleep 1
-
-cat <<EOF > filelist.good
+cat <<EOF > tu_list.good
 abspath.c 181
 advice.c 120
 alias.c 78
@@ -316,14 +313,14 @@ xdiff/xutils.c 496
 zlib.c 274
 EOF
 
-# Writes filelist.out
-pkg_write_tus
+# Start git doing something that will take a while. At my own expense.
+$workdir/git < /dev/null > /dev/null
+
+ok "is write_tus.pl exit code 0" \
+	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}git_*
 
 # man page says output file can be same as input file
-sort -o filelist.out filelist.out
-ok "translation unit manifest" diff -u filelist.good filelist.out
-
-kill $pid
-wait
+sort -o tu_list.out tu_list.out
+ok "translation unit manifest" diff -u tu_list.good tu_list.out
 
 pkg_clean
