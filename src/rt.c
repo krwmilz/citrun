@@ -16,9 +16,11 @@
 #include <sys/mman.h>		/* mmap */
 #include <sys/stat.h>		/* S_IRUSR, S_IWUSR, mkdir */
 
+#include <assert.h>
 #include <err.h>
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
+#include <limits.h>		/* PATH_MAX */
 #include <stdlib.h>		/* get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
@@ -68,36 +70,38 @@ shm_extend(size_t requested_bytes)
 static void
 shm_create()
 {
-	char			*procfile;
-	char			 memfile_path[23];
-	char			*template = "/tmp/citrun/XXXXXXXXXX";
-	char			*process_dir  = "/tmp/citrun";
+	char			*procdir;
+	char			 procfile[PATH_MAX];
 	struct citrun_header	*header;
 
-	if ((procfile = getenv("CITRUN_PROCFILE")) != NULL) {
-		if ((shm_fd = open(procfile, O_RDWR | O_CREAT,
-		    S_IRUSR | S_IWUSR)) == -1)
-			err(1, "open");
-	} else {
-		/* Existing directory is OK. */
-		if (mkdir(process_dir, S_IRWXU) && errno != EEXIST)
-			err(1, "mkdir '%s'", process_dir);
+	/* User of this env var must give trailing slash */
+	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
+		procdir = "/tmp/citrun/";
 
-		strlcpy(memfile_path, template, sizeof(memfile_path));
+	if (mkdir(procdir, S_IRWXU) && errno != EEXIST)
+		err(1, "mkdir '%s'", procdir);
 
-		if ((shm_fd = mkstemp(memfile_path)) == -1)
-			err(1, "mkstemp");
-	}
+	strlcpy(procfile, procdir, PATH_MAX);
+	strlcat(procfile, getprogname(), PATH_MAX);
+	strlcat(procfile, "_XXXXXXXXXX", PATH_MAX);
+
+	if ((shm_fd = mkstemp(procfile)) < 0)
+		err(1, "mkstemp");
 
 	/* Add header. */
+	assert(sizeof(struct citrun_header) < getpagesize());
 	header = shm_extend(sizeof(struct citrun_header));
 
+	/* Purposefully not null terminated. */
 	strncpy(header->magic, "ctrn", sizeof(header->magic));
+
 	header->major = citrun_major;
 	header->minor = citrun_minor;
 	header->pids[0] = getpid();
 	header->pids[1] = getppid();
 	header->pids[2] = getpgrp();
+
+	/* getprogname() should never fail. */
 	strlcpy(header->progname, getprogname(), sizeof(header->progname));
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)

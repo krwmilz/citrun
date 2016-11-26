@@ -3,7 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use t::program;
 use t::shm;
 use t::tmpdir;
@@ -14,7 +14,10 @@ t::program->new($tmp_dir);
 my $ret = system("$tmp_dir/program 10");
 is $ret >> 8,	0,	"is program exit code 0";
 
-my $shm = t::shm->new($tmp_dir);
+my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
+is scalar @procfiles,	1,	"is one file in procdir";
+
+my $shm = t::shm->new($procfiles[0]);
 
 my ($tu1, $tu2, $tu3) = @{ $shm->{translation_units} };
 is	$tu1->{size},	9,	"is translation unit 1 9 lines";

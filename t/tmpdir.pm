@@ -5,7 +5,7 @@ use File::Temp qw( tempdir );
 
 sub new {
 	my $tmp_dir = tempdir( CLEANUP => 1 );
-	$ENV{CITRUN_PROCFILE} = "$tmp_dir/procfile.shm";
+	$ENV{CITRUN_PROCDIR} = "$tmp_dir/procdir/";
 
 	return $tmp_dir;
 }

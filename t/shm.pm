@@ -6,15 +6,15 @@ use POSIX;
 my $pagesize = POSIX::sysconf(POSIX::_SC_PAGESIZE);
 
 sub new {
-	my ($class, $tmpdir) = @_;
+	my ($class, $procfile) = @_;
 
 	my $self = {};
 	bless($self, $class);
 
-	open(my $fh, "<:mmap", "$tmpdir/procfile.shm") or die $!;
+	open(my $fh, "<:mmap", $procfile) or die $!;
 
 	$self->{fh} = $fh;
-	$self->{size} = (stat "$tmpdir/procfile.shm")[7];
+	$self->{size} = (stat $procfile)[7];
 
 	(	$self->{magic},
 		$self->{major}, $self->{minor},
