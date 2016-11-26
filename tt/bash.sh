@@ -3,7 +3,7 @@
 # Check that Bash works with C It Run.
 #
 . tt/package.subr "shells/bash"
-plan 10
+plan 11
 
 enter_tmpdir
 
@@ -204,9 +204,10 @@ zread.c 219
 zwrite.c 65
 EOF
 
-CITRUN_PROCFILE="$tmpdir/procfile.shm" $workdir/bash < /dev/null
+$workdir/bash < /dev/null
 
-perl -I$treedir $treedir/tt/write_tus.pl $tmpdir
+ok "is write_tus.pl exit code 0" \
+	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}bash_*
 
 ok "sorting" sort -o tu_list.out tu_list.out
 ok "translation unit manifest" diff -u tu_list.good tu_list.out
