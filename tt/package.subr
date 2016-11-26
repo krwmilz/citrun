@@ -44,3 +44,9 @@ pkg_clean()
 {
 	ok "port clean" make -C $portdir clean
 }
+
+pkg_check_manifest()
+{
+	ok "is manifest sort exit code 0" sort -o tu_list.out tu_list.out
+	ok "is tu manifest correct" diff -u tu_list.good tu_list.out
+}

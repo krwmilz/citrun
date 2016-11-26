@@ -1,43 +1,45 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Instruments Nmap and checks that the instrumented program still runs.
 #
-. tt/package.subr
-plan 8
+. tt/package.subr "net/nmap"
+plan 10
 
-pkg_set "net/nmap"
+enter_tmpdir
+
 pkg_check_deps
 pkg_clean
 pkg_build
+pkg_test
 
 cat <<EOF > check.good
 Summary:
-       388 Source files used as input
-        78 Application link commands
+       400 Source files used as input
+        83 Application link commands
        598 Rewrite parse warnings
         74 Rewrite parse errors
-       322 Rewrite successes
+       334 Rewrite successes
         66 Rewrite failures
-       299 Rewritten source compile successes
+       311 Rewritten source compile successes
         23 Rewritten source compile failures
 
 Totals:
-    171607 Lines of source code
-      3749 Function definitions
-      8003 If statements
-       822 For loops
-       403 While loops
-        56 Do while loops
-       282 Switch statements
-      4485 Return statement values
-     17229 Call expressions
-    294597 Total statements
-     20377 Binary operators
-       586 Errors rewriting source
+    173596 Lines of source code
+      3809 Function definitions
+      8083 If statements
+       876 For loops
+       410 While loops
+        58 Do while loops
+       286 Switch statements
+      4565 Return statement values
+     17515 Call expressions
+    298886 Total statements
+     20625 Binary operators
+       588 Errors rewriting source
 EOF
 pkg_check
 
-cat <<EOF > filelist.good
+cat <<EOF > tu_list.good
 ./fad-getad.c 281
 ./gencode.c 8905
 ./inet.c 1142
@@ -137,16 +139,12 @@ utils.cc 721
 xml.cc 463
 EOF
 
-$TEST_WRKDIST/nmap krwm.net &
-pid=$!
+$workdir/nmap > /dev/null
 
-sleep 1
+ok "is write_tus.pl exit code 0" \
+	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}nmap_*
 
-pkg_write_tus
-sort -o filelist.out filelist.out
-ok "translation unit manifest" diff -u filelist.good filelist.out
-
-kill $pid
-wait
+sort -o tu_list.out tu_list.out
+ok "translation unit manifest" diff -u tu_list.good tu_list.out
 
 pkg_clean

@@ -161,7 +161,6 @@ ok "is write_tus.pl exit code 0" \
 
 # nvi ends up using absolute paths to source files when compiling.
 ok "strip tu paths" sed -i -e "s,/usr/ports/pobj/nvi-[0-9.]*/nvi2-[0-9.]*,," tu_list.out
-ok "sorting" sort -o tu_list.out tu_list.out
-ok "translation unit manifest" diff -u tu_list.good tu_list.out
+pkg_check_manifest
 
 pkg_clean

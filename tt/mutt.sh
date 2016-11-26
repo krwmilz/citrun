@@ -146,7 +146,6 @@ EOF
 $workdir/mutt < /dev/null
 ok "is write_tus.pl exit code 0" \
 	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}mutt_*
-ok "sorting" sort -o tu_list.out tu_list.out
-ok "translation unit manifest" diff -u tu_list.good tu_list.out
+pkg_check_manifest
 
 pkg_clean
