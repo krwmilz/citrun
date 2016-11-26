@@ -1,4 +1,5 @@
 # The test suite is part Shell and part Perl, but everything needs to be run at
 # once.
+-j5
 --ext '.t'
 --ext '.sh'
