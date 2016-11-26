@@ -11,7 +11,8 @@ if $(PREFIX) {
 	CITRUN_SHARE = $(PREFIX)/share/citrun ;
 }
 else {
-	CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
+	#CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
+	CITRUN_SHARE = "`cd $(TOP)/src && pwd`" ;
 	CFLAGS += -Wall -g ;
 }
 
