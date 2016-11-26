@@ -2,8 +2,10 @@
 #
 # Test that citrun run on itself works and the resulting binaries run.
 #
-rm -rf /usr/ports/devel/ccitrunrun
-cp -R distrib/openbsd/ccitrunrun /usr/ports/devel/
+if [ `uname` = "OpenBSD" ]; then
+	rm -rf /usr/ports/devel/ccitrunrun
+	cp -R distrib/openbsd/ccitrunrun /usr/ports/devel/
+fi
 
 . tt/package.subr "devel/ccitrunrun"
 plan 13
