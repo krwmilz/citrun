@@ -11,13 +11,8 @@ enter_tmpdir
 
 echo "int main(void) { return 0; " > bad.c
 
-output_good="1 error generated.
-Error while processing $tmpdir/bad.c.
-bad.c: In function 'main':
-bad.c:1: error: expected declaration or statement at end of input"
-
-ok_program "wrapped failing native compile" 1 "$output_good" \
-	citrun-wrap cc -c bad.c
+citrun-wrap cc -c bad.c
+ok "is citrun-wrap exit code 1" test $? -eq 1
 
 cat <<EOF > check.good
 Summary:
