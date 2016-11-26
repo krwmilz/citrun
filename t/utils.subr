@@ -25,6 +25,10 @@ modify_PATH()
 
 enter_tmpdir()
 {
+	# Assume that a script wanting to enter a tmpdir also wants a local
+	# process file directory.
+	export CITRUN_PROCDIR="procdir/"
+
 	tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
 	cd $tmpdir
 }

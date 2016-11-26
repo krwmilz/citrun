@@ -42,6 +42,5 @@ EOF
 strip_millis check.out
 ok "is citrun-check output identical" diff -u check.good check.out
 
-export CITRUN_PROCFILE="procfile.shm"
-CITRUN_PROCDIR="procdir/" ok "does compiled program run" program
+ok "does compiled program run" program
 ok "is runtime shared memory file created" test -f procdir/program_*
