@@ -80,7 +80,7 @@ Main citrun-inst : $(INST_SRCS) ;
 #
 InstallLib	$(PREFIX)/share/citrun	: libcitrun.a ;
 InstallShell	$(PREFIX)/bin		: citrun-wrap citrun-check ;
-InstallBin	$(PREFIX)/bin		: citrun-term citrun-gl citrun-inst ;
+InstallBin	$(PREFIX)/bin		: citrun-gl citrun-inst ;
 InstallSyms	$(PREFIX)/share/citrun	: cc gcc clang clang++ g++ c++ egcc eg++ ;
 
 SubInclude TOP src glyphy ;
