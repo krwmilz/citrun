@@ -62,17 +62,6 @@ sub execs_for {
 	return \@execs;
 }
 
-sub print_tus {
-	my ($self) = @_;
-
-	my $transl_units = $self->{translation_units};
-	for (@$transl_units) {
-		my %tu = %$_;
-
-		print "$tu{comp_file_name} $tu{size}\n";
-	}
-}
-
 #
 # Read an exact amount of bytes.
 #
