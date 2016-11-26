@@ -2,8 +2,7 @@
 . t/utils.subr
 
 if [ `uname` != "OpenBSD" ]; then
-	echo End to end tests are not supported on this platform.
-	exit 0
+	skip_all "test not supported on this platform."
 fi
 
 portdir="/usr/ports/$1"
