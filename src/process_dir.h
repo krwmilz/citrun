@@ -1,6 +1,7 @@
 #include <sys/types.h>
 
 #include <dirent.h>		// DIR, opendir, readdir
+#include <string>
 #include <unordered_set>
 #include <vector>
 
