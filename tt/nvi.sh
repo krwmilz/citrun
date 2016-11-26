@@ -156,7 +156,6 @@ EOF
 # is run interactively.
 $workdir/build/nvi > /dev/null
 
-ls -lah
 ok "is write_tus.pl exit code 0" \
 	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}nvi_*
 
