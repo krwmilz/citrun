@@ -11,7 +11,7 @@ use t::tmpdir;
 my $tmp_dir = t::tmpdir->new();
 t::program->new($tmp_dir);
 
-my $ret = system("cd $tmp_dir && program 1");
+my $ret = system("cd $tmp_dir && ./program 1");
 is $ret >> 8,	0,	"is program exit code 0";
 
 my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
