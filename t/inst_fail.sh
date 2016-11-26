@@ -11,7 +11,7 @@ enter_tmpdir
 
 echo "int main(void) { return 0; " > bad.c
 
-citrun-wrap cc -c bad.c
+citrun-wrap cc -c bad.c 2> /dev/null
 ok "is citrun-wrap exit code 1" test $? -eq 1
 
 cat <<EOF > check.good
