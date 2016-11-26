@@ -722,7 +722,7 @@ xcbc_enc.c 217
 xts128.c 205
 EOF
 
-LD_LIBRARY_PATH="$workdir" $workdir/apps/openssl < /dev/null
+LD_LIBRARY_PATH="$workdir" $workdir/apps/openssl < /dev/null > /dev/null
 
 ok "is write_tus.pl exit code 0" \
 	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}openssl_*
