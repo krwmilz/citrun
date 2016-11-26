@@ -2,13 +2,18 @@
 #
 # Try and instrument spidermonkey.
 #
-. tt/package.subr
+. tt/package.subr "devel/spidermonkey"
+skip_all "too big a project right now"
 plan 6
 
-pkg_set "devel/spidermonkey"
+enter_tmpdir
+
 pkg_check_deps
 pkg_clean
 pkg_build
+pkg_test
+
+exit 0
 
 cat <<EOF > check.good
 Summary:
