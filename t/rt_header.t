@@ -30,5 +30,5 @@ cmp_ok $ppid,	'>',	1,		"is ppid > min pid";
 cmp_ok $pgrp,	'<',	100 * 1000,	"is pgrp < max pid";
 cmp_ok $pgrp,	'>',	1,		"is pgrp > min pid";
 
-is $shm->{progname},	"program",	'is test program name correct';
-is $shm->{cwd},		$tmp_dir,	'is working directory believable';
+is $shm->{progname},	"program",	"is test program name correct";
+like $shm->{cwd},	qr/.*$tmp_dir/,	"is working directory believable";
