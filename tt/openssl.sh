@@ -1,12 +1,13 @@
-#!/bin/sh
+#!/bin/sh -u
 #
 # Instrument openssl, run its testsuite, check the logs and do a quick runtime
 # sanity test on it.
 #
-. tt/package.subr
-plan 8
+. tt/package.subr "security/openssl"
+plan 10
 
-pkg_set "security/openssl"
+enter_tmpdir
+
 pkg_check_deps
 pkg_clean
 pkg_build
@@ -35,13 +36,7 @@ Totals:
 EOF
 pkg_check
 
-LD_LIBRARY_PATH="$TEST_WRKDIST" \
-	$TEST_WRKDIST/apps/openssl genrsa -out KEY 16384 &
-pid=$!
-
-sleep 1
-
-cat <<EOF >filelist.good
+cat <<EOF > tu_list.good
 a_bitstr.c 263
 a_bool.c 112
 a_bytes.c 307
@@ -727,11 +722,10 @@ xcbc_enc.c 217
 xts128.c 205
 EOF
 
-pkg_write_tus
-sort -o filelist.out filelist.out
-ok "translation unit manifest" diff -u filelist.good filelist.out
+LD_LIBRARY_PATH="$workdir" $workdir/apps/openssl < /dev/null
 
-kill -INT $pid
-wait
+ok "is write_tus.pl exit code 0" \
+	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}openssl_*
+pkg_check_manifest
 
 pkg_clean
