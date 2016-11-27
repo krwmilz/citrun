@@ -26,10 +26,7 @@ depends_build       port:pkgconfig \
 
 # Test dependencies
 depends_run         port:perl5 \
-                    port:p5.22-file-which \
-                    port:p5.22-expect \
-                    port:p5.22-list-moreutils \
-                    port:p5.22-test-differences
+                    port:p5-expect \
 
 depends_lib         port:llvm-3.8 \
                     port:clang-3.8 \
