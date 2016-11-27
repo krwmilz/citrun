@@ -52,14 +52,14 @@ shm_extend(size_t requested_bytes)
 
 	/* Increase file length. */
 	if (ftruncate(shm_fd, shm_len + aligned_bytes) < 0)
-		err(1, "ftruncate from %jd to %jd", shm_len, shm_len + aligned_bytes);
+		err(1, "ftruncate from %lld to %llu", shm_len, shm_len + aligned_bytes);
 
 	/* Increase memory mapping length. */
 	shm = mmap(NULL, requested_bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
 		shm_fd, shm_len);
 
 	if (shm == MAP_FAILED)
-		err(1, "mmap %zu bytes @ %jd", requested_bytes, shm_len);
+		err(1, "mmap %zu bytes @ %llu", requested_bytes, shm_len);
 
 	return shm;
 }
