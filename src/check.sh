@@ -15,13 +15,7 @@
 #
 # Counts events in citrun.log files.
 #
-set -e
-set -u
-
-err() {
-	1>&2 echo $@
-	exit 1
-}
+set -eu
 
 print_tty() {
 	if [ -t 1 ]; then
@@ -52,7 +46,7 @@ done
 
 dirs=$@
 if [ -z $dirs ]; then
-	err "Usage: citrun-check path"
+	dirs="."
 fi
 
 GREP[0]="Found source file"
@@ -121,8 +115,8 @@ print_tty
 
 echo Summary:
 
-printf "%10i %s\n" $log_files "citrun.log files processed"
 if [ $log_files -eq 0 ]; then
+	printf "%10i %s\n" $log_files "citrun.log files processed"
 	exit 0
 fi
 
