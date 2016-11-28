@@ -2,6 +2,9 @@
 # Script that counts events in citrun.log files.
 # Tries to be POSIX compatible.
 #
+set -e
+#set -u
+
 err() {
 	1>&2 echo $@
 	exit 1
@@ -29,6 +32,7 @@ while [ $# -ne 0 ]; do
 	esac
 done
 
+# Avoid angering set -u by checking if $1 is even there first.
 if [ -z "$1" ]; then
 	# Directory not found after argument list.
 	dir=`pwd`
@@ -79,20 +83,21 @@ tmpfile=`mktemp /tmp/citrun_check.XXXXXXXXXX`
 trap "rm -f $tmpfile" 0
 find $dir -name citrun.log > $tmpfile
 
-let log_files=0
+log_files=0
 while IFS= read -r line; do
 	d="$line"
 	print_tty -n .
-	let log_files++
+	log_files=1
 
-	let i=0
+	i=0
 	while [ $i -lt $desc_len ]; do
-		tmp=`grep -c "${GREP[$i]}" "$d"`
-		let COUNT[$i]+=tmp
-		let i++
+		# '|| true' because grep will exit non-zero if nothing is found.
+		tmp=`grep -c "${GREP[$i]}" "$d" || true`
+		COUNT[$i]=$((COUNT[$i] + tmp))
+		i=$((i + 1))
 	done
 
-	let i=0
+	i=0
 	typeset -i tmp
 	while [ $i -lt $fine_len ]; do
 		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" "$d"`
@@ -100,8 +105,8 @@ while IFS= read -r line; do
 			let i++
 			continue
 		fi
-		let FINE_COUNT[$i]+=tmp
-		let i++
+		FINE_COUNT[$i]=$((FINE_COUNT[$i] + tmp))
+		i=$((i + 1))
 	done
 done < $tmpfile
 rm $tmpfile
@@ -114,25 +119,25 @@ print_tty
 
 echo Summary:
 
-let i=0
+i=0
 while [ $i -lt $desc_len ]; do
 	if [ ${COUNT[$i]} -eq 0 ]; then
-		let i++
+		i=$((i + 1))
 		continue
 	fi
 	printf "%10i %s\n" ${COUNT[$i]} "${DESC[$i]}"
-	let i++
+	i=$((i + 1))
 done
 
 echo
 echo Totals:
 
-let i=0
+i=0
 while [ $i -lt $fine_len ]; do
 	if [ ${FINE_COUNT[$i]} -eq 0 ]; then
-		let i++
+		i=$((i + 1))
 		continue
 	fi
 	printf "%10i %s\n" ${FINE_COUNT[$i]} "${FINE[$i]}"
-	let i++
+	i=$((i + 1))
 done
