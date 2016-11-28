@@ -3,7 +3,7 @@
 # Tries to be POSIX compatible.
 #
 err() {
-	>2& echo $@
+	1>&2 echo $@
 	exit 1
 }
 
