@@ -16,7 +16,7 @@
 # Counts events in citrun.log files.
 #
 set -e
-#set -u
+set -u
 
 err() {
 	1>&2 echo $@
@@ -50,15 +50,9 @@ while [ $# -ne 0 ]; do
 	esac
 done
 
-# Avoid angering set -u by checking if $1 is even there first.
-if [ -z "$1" ]; then
-	# Directory not found after argument list.
-	dir=`pwd`
-else
-	dir="$1"
-fi
-if [ ! -d $dir ]; then
-	err "citrun-check: $dir: directory does not exist"
+dirs=$@
+if [ -z $dirs ]; then
+	err "Usage: citrun-check path"
 fi
 
 GREP[0]="Found source file"
@@ -95,16 +89,16 @@ FINE[11]="Binary operators"
 FINE[12]="Errors rewriting source"
 fine_len=${#FINE[@]}
 
-print_tty -n Checking \'$dir\' .
+print_tty -n "Checking '$dirs' ."
 
 tmpfile=`mktemp /tmp/citrun_check.XXXXXXXXXX`
 trap "rm -f $tmpfile" 0
-find $dir -name citrun.log > $tmpfile
+find $dirs -name citrun.log > $tmpfile
 
 log_files=0
 while IFS= read -r line; do
 	print_tty -n .
-	log_files=1
+	log_files=$((log_files + 1))
 
 	for i in `range $desc_len`; do
 		# '|| true' because grep will exit non-zero if nothing is found.
@@ -123,13 +117,14 @@ while IFS= read -r line; do
 done < $tmpfile
 rm $tmpfile
 print_tty "done"
-
-if [ $log_files -eq 0 ]; then
-	err "No log files found."
-fi
 print_tty
 
 echo Summary:
+
+printf "%10i %s\n" $log_files "citrun.log files processed"
+if [ $log_files -eq 0 ]; then
+	exit 0
+fi
 
 for i in `range $desc_len`; do
 	if [ ${COUNT[$i]} -eq 0 ]; then
