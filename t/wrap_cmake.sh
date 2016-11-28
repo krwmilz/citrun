@@ -24,22 +24,23 @@ add_executable(program main.c)
 EOF
 
 ok "is cmake successful" citrun-wrap cmake .
+find . -name citrun.log -print0 | xargs -0 rm
+
 ok "is make (from cmake) successful" citrun-wrap make
 ok "is citrun-check successful" citrun-check -o check.out
 
 cat <<EOF > check.good
 Summary:
-         3 Source files used as input
-         3 Application link commands
-         3 Rewrite successes
-         3 Rewritten source compile successes
+         1 Source files used as input
+         1 Application link commands
+         1 Rewrite successes
+         1 Rewritten source compile successes
 
 Totals:
-      1085 Lines of source code
-         3 Function definitions
-         3 Return statement values
-       101 Total statements
-         9 Binary operators
+         6 Lines of source code
+         1 Function definitions
+         1 Return statement values
+         3 Total statements
 EOF
 
 strip_millis check.out
