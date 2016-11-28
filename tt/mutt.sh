@@ -143,7 +143,7 @@ utf7.c 292
 util.c 852
 EOF
 
-$workdir/mutt < /dev/null
+$workdir/mutt < /dev/null > /dev/null
 ok "is write_tus.pl exit code 0" \
 	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}mutt_*
 pkg_check_manifest
