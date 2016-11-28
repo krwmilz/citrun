@@ -65,8 +65,7 @@ INST_SRCS =
 Stringize rt_h.h : rt.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
-ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\"
-	CITRUN_COVERAGE=$(CITRUN_COVERAGE) ;
+ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
 
 LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
 

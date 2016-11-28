@@ -119,13 +119,8 @@ InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 	if (!linking)
 		return;
 
-	*m_log << "Link detected, adding '";
-#ifdef CITRUN_COVERAGE
-	// Needed because libcitrun.a will be instrumented with gcov.
-	m_args.push_back(const_cast<char *>("-coverage"));
-#endif
 	m_args.push_back(const_cast<char *>(CITRUN_SHARE "/libcitrun.a"));
-	*m_log << m_args.back() << "' to command line.\n";
+	*m_log << "Link detected, adding '"<< m_args.back() << "' to command line.\n";
 }
 
 void
