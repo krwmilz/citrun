@@ -16,10 +16,9 @@ else {
 	CFLAGS += -Wall -g ;
 }
 
-# Try and respect this, {pkg,llvm}-config gives -O? too unfortunately
-OPTIM = $(CFLAGS) ;
-
-C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti ;
+CCFLAGS += $(CFLAGS) ;
+C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti $(CFLAGS) ;
+LINKFLAGS += $(LDFLAGS) ;
 
 CLANG_LIBS =
 	-lclangAST
@@ -68,10 +67,13 @@ actions StaticAnalysis
 
 actions TestCoverage
 {
-	export CITRUN_COVERAGE=1
-	CFLAGS="-coverage -ggdb" jam -j4
+	set -e
+	CFLAGS="-coverage -ggdb" LDFLAGS="-coverage" jam -j4
 
-	prove || true
+	# Roll libgcov.a into libcitrun.a.
+	ar -M < t/libcitrun_gcov.mri
+
+	prove
 	# prove tt
 
 	gcov -o src src/rt.c
@@ -85,13 +87,6 @@ if $(CITRUN_SA) {
 	# scan-build sets these expecting us to pick up the new values.
 	CC = $(CC) ;
 	C++ = $(CXX) ;
-}
-
-if $(CITRUN_COVERAGE) {
-	LINKLIBS on citrun-gl += -coverage ;
-	LINKLIBS on citrun-inst += -coverage ;
-	LINKLIBS on citrun-term += -coverage ;
-	LINKLIBS on citrun-dump += -coverage ;
 }
 
 # Link with the c++ compiler so that the matching c++ runtime library gets added

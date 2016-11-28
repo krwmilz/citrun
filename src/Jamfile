@@ -67,7 +67,7 @@ Stringize rt_h.h : rt.h ;
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
 ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
 
-LINKFLAGS on citrun-inst = `llvm-config --ldflags` ;
+LINKFLAGS on citrun-inst = $(LINKFLAGS) `llvm-config --ldflags` ;
 
 LLVM_LIBS = bitreader mcparser transformutils option ;
 LINKLIBS on citrun-inst += `llvm-config --libs $(LLVM_LIBS) --system-libs` ;
