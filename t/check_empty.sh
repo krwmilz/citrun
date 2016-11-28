@@ -9,5 +9,6 @@ plan 1
 modify_PATH
 enter_tmpdir
 
-output_good="No log files found."
-ok_program "is no logs found message printed" 1 "$output_good" citrun-check
+output_good="Summary:
+         0 citrun.log files processed"
+ok_program "is no logs found message printed" 0 "$output_good" citrun-check .

@@ -8,6 +8,6 @@ plan 1
 
 modify_PATH
 
-output_good="citrun-check: _nonexistent_dir_: directory does not exist"
+output_good="find: _nonexistent_dir_: No such file or directory"
 
 ok_program "error on bad dir" 1 "$output_good" citrun-check _nonexistent_dir_
