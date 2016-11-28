@@ -41,7 +41,7 @@ shm_extend(size_t requested_bytes)
 {
 	size_t	 aligned_bytes, page_mask;
 	off_t	 shm_len;
-	char	*shm;
+	void	*shm;
 
 	page_mask = getpagesize() - 1;
 	aligned_bytes = (requested_bytes + page_mask) & ~page_mask;
