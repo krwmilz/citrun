@@ -85,12 +85,11 @@ fine_len=${#FINE[@]}
 
 print_tty -n "Checking '$dirs' ."
 
-tmpfile=`mktemp /tmp/citrun_check.XXXXXXXXXX`
-trap "rm -f $tmpfile" 0
-find $dirs -name citrun.log > $tmpfile
-
 log_files=0
-while IFS= read -r line; do
+OIFS="$IFS"
+IFS='
+'
+for line in `find $dirs -name citrun.log`; do
 	print_tty -n .
 	log_files=$((log_files + 1))
 
@@ -108,8 +107,8 @@ while IFS= read -r line; do
 		fi
 		FINE_COUNT[$i]=$((FINE_COUNT[$i] + tmp))
 	done
-done < $tmpfile
-rm $tmpfile
+done
+export IFS="$OIFS"
 print_tty "done"
 print_tty
 
