@@ -16,6 +16,14 @@ print_tty() {
 	fi
 }
 
+range() {
+	i=0
+	while [ $i -lt $1 ]; do
+		echo $i
+		i=$((i + 1))
+	done
+}
+
 args=`getopt o: $*`
 if [ $? -ne 0 ]; then
 	err "Usage: citrun-check [-o output file] [dir]"
@@ -89,24 +97,19 @@ while IFS= read -r line; do
 	print_tty -n .
 	log_files=1
 
-	i=0
-	while [ $i -lt $desc_len ]; do
+	for i in `range $desc_len`; do
 		# '|| true' because grep will exit non-zero if nothing is found.
 		tmp=`grep -c "${GREP[$i]}" "$d" || true`
 		COUNT[$i]=$((COUNT[$i] + tmp))
-		i=$((i + 1))
 	done
 
-	i=0
 	typeset -i tmp
-	while [ $i -lt $fine_len ]; do
+	for i in `range $fine_len`; do
 		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" "$d"`
 		if [ "$tmp" = "" ]; then
-			let i++
 			continue
 		fi
 		FINE_COUNT[$i]=$((FINE_COUNT[$i] + tmp))
-		i=$((i + 1))
 	done
 done < $tmpfile
 rm $tmpfile
@@ -119,25 +122,19 @@ print_tty
 
 echo Summary:
 
-i=0
-while [ $i -lt $desc_len ]; do
+for i in `range $desc_len`; do
 	if [ ${COUNT[$i]} -eq 0 ]; then
-		i=$((i + 1))
 		continue
 	fi
 	printf "%10i %s\n" ${COUNT[$i]} "${DESC[$i]}"
-	i=$((i + 1))
 done
 
 echo
 echo Totals:
 
-i=0
-while [ $i -lt $fine_len ]; do
+for i in `range $fine_len`; do
 	if [ ${FINE_COUNT[$i]} -eq 0 ]; then
-		i=$((i + 1))
 		continue
 	fi
 	printf "%10i %s\n" ${FINE_COUNT[$i]} "${FINE[$i]}"
-	i=$((i + 1))
 done
