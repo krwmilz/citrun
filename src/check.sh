@@ -2,19 +2,23 @@
 # Script that counts events in citrun.log files.
 # Tries to be POSIX compatible.
 #
-function err {
-	echo "$1"
+err() {
+	>2& echo $@
 	exit 1
 }
 
+print_tty() {
+	if [ -t 1 ]; then
+		echo $@
+	fi
+}
+
 args=`getopt o: $*`
-if [ $? -ne 0 ]
-then
+if [ $? -ne 0 ]; then
 	err "Usage: citrun-check [-o output file] [dir]"
 fi
 set -- $args
-while [ $# -ne 0 ]
-do
+while [ $# -ne 0 ]; do
 	case "$1"
 	in
 		-o)
@@ -25,9 +29,15 @@ do
 	esac
 done
 
-dir="$1"
-[ -z "$1" ] && dir=`pwd`
-[ -d $dir ] || err "citrun-check: $dir: directory does not exist"
+if [ -z "$1" ]; then
+	# Directory not found after argument list.
+	dir=`pwd`
+else
+	dir="$1"
+fi
+if [ ! -d $dir ]; then
+	err "citrun-check: $dir: directory does not exist"
+fi
 
 GREP[0]="Found source file"
 GREP[1]="Link detected"
@@ -63,47 +73,50 @@ FINE[11]="Binary operators"
 FINE[12]="Errors rewriting source"
 fine_len=${#FINE[@]}
 
-[ -t 1 ] && echo -n Checking \'$dir\' .
+print_tty -n Checking \'$dir\' .
+
+tmpfile=`mktemp /tmp/citrun_check.XXXXXXXXXX`
+trap "rm -f $tmpfile" 0
+find $dir -name citrun.log > $tmpfile
+
 let log_files=0
-for d in `find $dir -name citrun.log`
-do
-	[ -t 1 ] && echo -n .
+while IFS= read -r line; do
+	d="$line"
+	print_tty -n .
 	let log_files++
 
 	let i=0
-	while [ $i -lt $desc_len ]
-	do
-		tmp=`grep -c "${GREP[$i]}" $d`
+	while [ $i -lt $desc_len ]; do
+		tmp=`grep -c "${GREP[$i]}" "$d"`
 		let COUNT[$i]+=tmp
 		let i++
 	done
 
 	let i=0
 	typeset -i tmp
-	while [ $i -lt $fine_len ]
-	do
-		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" $d`
-		if [ "$tmp" = "" ]
-		then
+	while [ $i -lt $fine_len ]; do
+		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" "$d"`
+		if [ "$tmp" = "" ]; then
 			let i++
 			continue
 		fi
 		let FINE_COUNT[$i]+=tmp
 		let i++
 	done
-done
-[ -t 1 ] && echo done
+done < $tmpfile
+rm $tmpfile
+print_tty "done"
 
-[ $log_files -eq 0 ] && err "No log files found."
-[ -t 1 ] && echo
+if [ $log_files -eq 0 ]; then
+	err "No log files found."
+fi
+print_tty
 
 echo Summary:
 
 let i=0
-while [ $i -lt $desc_len ]
-do
-	if [ ${COUNT[$i]} -eq 0 ]
-	then
+while [ $i -lt $desc_len ]; do
+	if [ ${COUNT[$i]} -eq 0 ]; then
 		let i++
 		continue
 	fi
@@ -115,10 +128,8 @@ echo
 echo Totals:
 
 let i=0
-while [ $i -lt $fine_len ]
-do
-	if [ ${FINE_COUNT[$i]} -eq 0 ]
-	then
+while [ $i -lt $fine_len ]; do
+	if [ ${FINE_COUNT[$i]} -eq 0 ]; then
 		let i++
 		continue
 	fi
