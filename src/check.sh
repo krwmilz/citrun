@@ -25,9 +25,6 @@ range() {
 }
 
 args=`getopt o: $*`
-if [ $? -ne 0 ]; then
-	err "Usage: citrun-check [-o output file] [dir]"
-fi
 set -- $args
 while [ $# -ne 0 ]; do
 	case "$1"
@@ -93,19 +90,18 @@ find $dir -name citrun.log > $tmpfile
 
 log_files=0
 while IFS= read -r line; do
-	d="$line"
 	print_tty -n .
 	log_files=1
 
 	for i in `range $desc_len`; do
 		# '|| true' because grep will exit non-zero if nothing is found.
-		tmp=`grep -c "${GREP[$i]}" "$d" || true`
+		tmp=`grep -c "${GREP[$i]}" "$line" || true`
 		COUNT[$i]=$((COUNT[$i] + tmp))
 	done
 
 	typeset -i tmp
 	for i in `range $fine_len`; do
-		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" "$d"`
+		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" "$line"`
 		if [ "$tmp" = "" ]; then
 			continue
 		fi
