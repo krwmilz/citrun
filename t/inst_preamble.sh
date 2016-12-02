@@ -38,8 +38,8 @@ static struct citrun_node _citrun = {
 	"",
 	"",
 };
-__attribute__((constructor))
-static void citrun_constructor() {
+__attribute__((constructor)) static void
+citrun_constructor() {
 	citrun_node_add(0, 0, &_citrun);
 }
 #ifdef __cplusplus

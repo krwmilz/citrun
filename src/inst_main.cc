@@ -67,9 +67,7 @@ print_toolinfo(InstrumentLogger &llog)
 {
 	struct utsname utsname;
 
-	llog << "citrun-inst "
-		<< unsigned(citrun_major) << "."
-		<< unsigned(citrun_minor) << " ";
+	llog << "citrun-inst " << citrun_major << "." << citrun_minor << " ";
 	if (uname(&utsname) == -1)
 		llog << "(Unknown OS) ";
 	else {
