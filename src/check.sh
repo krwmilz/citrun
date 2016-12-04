@@ -17,26 +17,6 @@
 #
 set -eu
 
-#
-# Function that echoes it's arguments when stdin is a tty.
-#
-print_tty() {
-	if [ -t 1 ]; then
-		echo $@
-	fi
-}
-
-#
-# Function that's called by for loops to allow easy iteration over integers.
-#
-range() {
-	i=0
-	while [ $i -lt $1 ]; do
-		echo $i
-		i=$((i + 1))
-	done
-}
-
 args=`getopt o: $*`
 set -- $args
 while [ $# -ne 0 ]; do
@@ -55,89 +35,74 @@ if [ -z $dirs ]; then
 	dirs="."
 fi
 
-GREP[0]="Found source file"
-GREP[1]="Link detected"
-GREP[2]="warning: "
-GREP[3]="error: "
-GREP[4]="Rewriting successful"
-GREP[5]="Rewriting failed"
-GREP[6]="Rewritten source compile successful"
-GREP[7]="Rewritten source compile failed"
+awk_script='
+$0~/Found source file/		{ summary[0] += 1 }
+$0~/Link detected/		{ summary[1] += 1 }
+$0~/warning:/			{ summary[2] += 1 }
+$0~/error:/			{ summary[3] += 1 }
+$0~/Rewriting successful/	{ summary[4] += 1 }
+$0~/Rewriting failed/		{ summary[5] += 1 }
+$0~/Rewritten source compile successful/ { summary[6] += 1 }
+$0~/Rewritten source compile failed/ { summary[7] += 1 }
 
-DESC[0]="Source files used as input"
-DESC[1]="Application link commands"
-DESC[2]="Rewrite parse warnings"
-DESC[3]="Rewrite parse errors"
-DESC[4]="Rewrite successes"
-DESC[5]="Rewrite failures"
-DESC[6]="Rewritten source compile successes"
-DESC[7]="Rewritten source compile failures"
-desc_len=${#DESC[@]}
+$0~/Lines of source code/	{ totals[0] += $2 }
+$0~/Milliseconds spent rewriting source/ { totals[1] += $2 }
+$0~/Function definitions/	{ totals[2] += $2 }
+$0~/If statements/		{ totals[3] += $2 }
+$0~/For loops/			{ totals[4] += $2 }
+$0~/While loops/		{ totals[5] += $2 }
+$0~/Do while loops/		{ totals[6] += $2 }
+$0~/Switch statements/		{ totals[7] += $2 }
+$0~/Return statement values/	{ totals[8] += $2 }
+$0~/Call expressions/		{ totals[9] += $2 }
+$0~/Total statements/		{ totals[10] += $2 }
+$0~/Binary operators/		{ totals[11] += $2 }
+$0~/Errors rewriting source/	{ totals[12] += $2 }
 
-FINE[0]="Lines of source code"
-FINE[1]="Milliseconds spent rewriting source"
-FINE[2]="Function definitions"
-FINE[3]="If statements"
-FINE[4]="For loops"
-FINE[5]="While loops"
-FINE[6]="Do while loops"
-FINE[7]="Switch statements"
-FINE[8]="Return statement values"
-FINE[9]="Call expressions"
-FINE[10]="Total statements"
-FINE[11]="Binary operators"
-FINE[12]="Errors rewriting source"
-fine_len=${#FINE[@]}
+END {
+	summary_desc[0] = "Source files used as input"
+	summary_desc[1] = "Application link commands"
+	summary_desc[2] = "Rewrite parse warnings"
+	summary_desc[3] = "Rewrite parse errors"
+	summary_desc[4] = "Rewrite successes"
+	summary_desc[5] = "Rewrite failures"
+	summary_desc[6] = "Rewritten source compile successes"
+	summary_desc[7] = "Rewritten source compile failures"
 
-print_tty -n "Checking '$dirs' ."
+	print "Summary:"
+	for (i = 0; i < 8; i++) {
+		if (i != 0 && summary[i] == 0) continue
+		printf "%10i %s\n", summary[i],	summary_desc[i]
+	}
 
-log_files=0
-OIFS="$IFS"
-IFS='
+	if (summary[0] == 0) exit 1
+
+	totals_desc[0] = "Lines of source code"
+	totals_desc[1] = "Milliseconds spent rewriting source"
+	totals_desc[2] = "Function definitions"
+	totals_desc[3] = "If statements"
+	totals_desc[4] = "For loops"
+	totals_desc[5] = "While loops"
+	totals_desc[6] = "Do while loops"
+	totals_desc[7] = "Switch statements"
+	totals_desc[8] = "Return statement values"
+	totals_desc[9] = "Call expressions"
+	totals_desc[10] = "Total statements"
+	totals_desc[11] = "Binary operators"
+	totals_desc[12] = "Errors rewriting source"
+
+	print ""
+	print "Totals:"
+	for (i = 0; i < 13; i++) {
+		if (i != 0 && totals[i] == 0) continue
+		printf "%10i %s\n", totals[i],	totals_desc[i]
+	}
+}
 '
-for line in `find $dirs -name citrun.log`; do
-	print_tty -n .
-	log_files=$((log_files + 1))
 
-	for i in `range $desc_len`; do
-		# '|| true' because grep will exit non-zero if nothing is found.
-		tmp=`grep -c "${GREP[$i]}" "$line" || true`
-		COUNT[$i]=$((COUNT[$i] + tmp))
-	done
-
-	typeset -i tmp
-	for i in `range $fine_len`; do
-		tmp=`awk "\\$0~/${FINE[$i]}/ { sum += \\$2 } END { print sum }" "$line"`
-		if [ "$tmp" = "" ]; then
-			continue
-		fi
-		FINE_COUNT[$i]=$((FINE_COUNT[$i] + tmp))
-	done
-done
-export IFS="$OIFS"
-print_tty "done"
-print_tty
-
-echo Summary:
-
-if [ $log_files -eq 0 ]; then
-	printf "%10i %s\n" $log_files "citrun.log files processed"
-	exit 0
+# If stdin is a tty.
+if [ -t 1 ]; then
+	echo "Checking '$dirs'"
 fi
 
-for i in `range $desc_len`; do
-	if [ ${COUNT[$i]} -eq 0 ]; then
-		continue
-	fi
-	printf "%10i %s\n" ${COUNT[$i]} "${DESC[$i]}"
-done
-
-echo
-echo Totals:
-
-for i in `range $fine_len`; do
-	if [ ${FINE_COUNT[$i]} -eq 0 ]; then
-		continue
-	fi
-	printf "%10i %s\n" ${FINE_COUNT[$i]} "${FINE[$i]}"
-done
+find $dirs -name citrun.log -print0 | xargs -0 awk "$awk_script"

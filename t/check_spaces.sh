@@ -9,7 +9,8 @@ plan 2
 modify_PATH
 enter_tmpdir
 
-ok "is dir with spaces in name created" mkdir dir\ a dir\ b
-touch dir\ a/citrun.log
-touch dir\ b/citrun.log
-ok "is citrun-check successful" citrun-check .
+ok "are dirs with spaces in name created" mkdir dir\ a dir\ b
+echo "Found source file" > dir\ a/citrun.log
+echo "Found source file" > dir\ b/citrun.log
+ok "is citrun-check successful" citrun-check
+#ok "is citrun-check with path successful" citrun-check dir\ a/
