@@ -313,13 +313,11 @@ xdiff/xutils.c 496
 zlib.c 274
 EOF
 
-# Start git doing something that will take a while. At my own expense.
 $workdir/git < /dev/null > /dev/null
 
 ok "is write_tus.pl exit code 0" \
 	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}git_*
 
-# man page says output file can be same as input file
 sort -o tu_list.out tu_list.out
 ok "translation unit manifest" diff -u tu_list.good tu_list.out
 
