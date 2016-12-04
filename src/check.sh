@@ -24,7 +24,7 @@ while [ $# -ne 0 ]; do
 	case "$1"
 	in
 		-o)
-			# Redirect standard output to argument of -o.
+			# Redirect stdout to argument of -o.
 			exec 1<&-; exec 1<>"$2"; shift; shift;;
 		--)
 			shift; break;;
@@ -37,12 +37,12 @@ if [ -z $@ ]; then
 	set -- "."
 fi
 
-# If stdin is a tty.
+# If stdout is a tty.
 if [ -t 1 ]; then
-	echo "Checking $@"
+	echo Checking "$@"
 fi
 
-awk_script='
+find $@ -name citrun.log -print0 | xargs -0 awk '
 $0~/Found source file/		{ summary[0] += 1 }
 $0~/Link detected/		{ summary[1] += 1 }
 $0~/warning:/			{ summary[2] += 1 }
@@ -106,5 +106,3 @@ END {
 	}
 }
 '
-
-find $@ -name citrun.log -print0 | xargs -0 awk "$awk_script"
