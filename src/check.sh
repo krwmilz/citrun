@@ -17,12 +17,18 @@
 #
 set -eu
 
+#
+# Function that echoes it's arguments when stdin is a tty.
+#
 print_tty() {
 	if [ -t 1 ]; then
 		echo $@
 	fi
 }
 
+#
+# Function that's called by for loops to allow easy iteration over integers.
+#
 range() {
 	i=0
 	while [ $i -lt $1 ]; do
