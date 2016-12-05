@@ -319,7 +319,7 @@ InstrumentFrontend::fork_compiler()
 		// In child.
 		exec_compiler();
 
-	m_log << "Forked '" << m_args[0] << "' "
+	m_log << "Forked compiler '" << m_args[0] << "' "
 	       << "pid is '" << child_pid << "'" << std::endl;
 
 	int status;
@@ -331,9 +331,8 @@ InstrumentFrontend::fork_compiler()
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
 
-	m_log << "'" << child_pid << "' exited " << exit << std::endl;
-
 	m_log << "Rewritten source compile "
-		<< (exit ? "failed." : "successful.") << std::endl;
+		<< (exit ? "failed" : "successful") << std::endl;
+
 	return exit;
 }

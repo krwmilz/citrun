@@ -56,8 +56,7 @@ Instrumentation of '' finished:
     6 Binary operators
 Modified source written successfully.
 Rewriting successful.
-Forked ''
-'' exited 0
+Forked compiler ''
 Rewritten source compile successful.
 Restored ''
 citrun-inst 0.0 () ''
