@@ -274,6 +274,7 @@ InstrumentFrontend::instrument()
 		<< " Milliseconds spent rewriting source." << std::endl;
 
 	if (m_is_citruninst)
+		// This is as far as we go in citrun-inst mode.
 		exit(ret);
 	if (ret) {
 		// Rewriting failed. Original source files may be in an
