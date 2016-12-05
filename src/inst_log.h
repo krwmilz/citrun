@@ -1,37 +1,51 @@
 #ifndef _INST_LOG_H
 #define _INST_LOG_H
 
+#include <iostream>
 #include <llvm/Support/raw_ostream.h>
-#include <unistd.h>		// pid_t
+#include <llvm/Support/FileSystem.h>	// llvm::sys::fs::F_Append
+#include <sstream>
+#include <unistd.h>			// pid_t
 
-class InstrumentLogger {
-private:
-	void		 	 print_prefix();
-	void		 	 check_newline(const std::string &);
-
-	bool			 m_iscitruninst;
-	bool	 	 	 m_needs_prefix;
-
-public:
-	InstrumentLogger(const bool &);
-
-	template <typename T>
-	friend InstrumentLogger& operator<<(InstrumentLogger& out, const T &rhs)
+class InstrumentLogger : public std::ostream
+{
+	class LogBuffer : public std::stringbuf
 	{
-		if (out.m_ec.value())
-			return out;
+		bool			 m_iscitruninst;
+		pid_t			 m_pid;
+		std::error_code		 m_ec;
+		llvm::raw_fd_ostream	 m_outfile;
+	public:
+		LogBuffer(const bool &is_citruninst) :
+			m_iscitruninst(is_citruninst),
+			m_pid(getpid()),
+			m_ec(),
+			m_outfile("citrun.log", m_ec, llvm::sys::fs::F_Append)
+		{
+			if (m_ec.value())
+			std::cerr << "Can't open citrun.log: " << m_ec.message();
+		}
 
-		out.print_prefix();
-		out.m_outfile << rhs;
-		if (out.m_iscitruninst)
-			llvm::outs() << rhs;
-		return out;
+		virtual int sync()
+		{
+			m_outfile << m_pid << ": " << str();
+
+			if (m_iscitruninst)
+				llvm::outs() << str();
+
+			str("");
+			m_outfile.flush();
+			return 0;
+		}
+	};
+
+	LogBuffer buffer;
+public:
+	InstrumentLogger(const bool &is_citruninst) :
+		std::ostream(&buffer),
+		buffer(is_citruninst)
+	{
 	}
-	friend InstrumentLogger& operator<<(InstrumentLogger&, const char *);
-
-	pid_t			 m_pid;
-	std::error_code		 m_ec;
-	llvm::raw_fd_ostream	 m_outfile;
 };
 
 #endif // _INST_LOG_H_

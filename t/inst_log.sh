@@ -41,11 +41,11 @@ strip_log citrun.log
 
 cat <<EOF > citrun.log.good
 citrun-inst 0.0 () ''
-Tool called as ''.
+Tool called as ''
 PATH=''
-Found source file ''.
-Command line is ''.
-Added clangtool argument ''.
+Found source file ''
+Command line is ''
+Added clangtool argument ''
 Instrumentation of '' finished:
     22 Lines of source code
     2 Function definitions
@@ -56,14 +56,14 @@ Instrumentation of '' finished:
     6 Binary operators
 Modified source written successfully.
 Rewriting successful.
-Forked ''.
+Forked ''
 '' exited 0.
 Rewritten source compile successful.
-Restored ''.
+Restored ''
 citrun-inst 0.0 () ''
-Tool called as ''.
+Tool called as ''
 PATH=''
-Command line is ''.
+Command line is ''
 Link detected, adding '' to command line.
 No source files found on command line.
 EOF

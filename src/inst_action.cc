@@ -43,20 +43,20 @@ InstrumentAction::write_modified_src(clang::FileID const &fid)
 
 	if (m_is_citruninst) {
 		out_file += ".citrun";
-		*m_log << "Writing modified source to '" << out_file << "'.\n";
+		*m_log << "Writing modified source to '" << out_file << "'" << std::endl;
 	}
 
 	std::error_code ec;
 	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
 	if (ec.value()) {
 		*m_log << "Error writing modified source '" << out_file
-			<< "': " << ec.message() << "\n";
+			<< "': " << ec.message() << std::endl;
 		return;
 	}
 
 	// Write the instrumented source file
 	m_TheRewriter.getEditBuffer(fid).write(output);
-	*m_log << "Modified source written successfully.\n";
+	*m_log << "Modified source written successfully." << std::endl;
 }
 
 void
@@ -99,8 +99,8 @@ InstrumentAction::EndSourceFileAction()
 		return;
 	}
 
-	*m_log << "Instrumentation of '" << m_compiler_file_name << "' finished:\n";
-	*m_log << "    " << num_lines << " Lines of source code\n";
+	*m_log << "Instrumentation of '" << m_compiler_file_name << "' finished:" << std::endl;
+	*m_log << "    " << num_lines << " Lines of source code" << std::endl;
 
 	//
 	// Write out statistics from the AST visitor.
@@ -110,7 +110,7 @@ InstrumentAction::EndSourceFileAction()
 		if (v.m_counters[i] == 0)
 			continue;
 		*m_log << "    " << v.m_counters[i] << " "
-			<< v.m_counter_descr[i] << "\n";
+			<< v.m_counter_descr[i] << std::endl;
 	}
 
 	write_modified_src(main_fid);

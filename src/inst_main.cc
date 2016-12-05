@@ -32,7 +32,7 @@ clean_PATH(InstrumentLogger &llog)
 	if ((path = std::getenv("PATH")) == NULL)
 		errx(1, "Error: PATH is not set.");
 
-	llog << "PATH='" << path << "'\n";
+	llog << "PATH='" << path << "'" << std::endl;
 
 	// Filter CITRUN_SHARE out of PATH
 	std::stringstream path_ss(path);
@@ -75,7 +75,7 @@ print_toolinfo(InstrumentLogger &llog)
 			<< utsname.release << " "
 			<< utsname.machine << ") ";
 	}
-	llog << "'" << CITRUN_SHARE << "'\n";
+	llog << "'" << CITRUN_SHARE << "'" << std::endl;
 }
 
 int
@@ -96,7 +96,7 @@ main(int argc, char *argv[])
 	print_toolinfo(llog);
 
 	if (is_citruninst) {
-		llog << ">> Welcome to C It Run! Have a nice day.\n";
+		llog << ">> Welcome to C It Run! Have a nice day." << std::endl;
 	} else {
 		// There's extra work to do if we're not running as citrun-inst.
 		llog << "Tool called as '" << argv[0] << "'";
@@ -104,7 +104,7 @@ main(int argc, char *argv[])
 			llog << ", changing to '" << base_name << "'";
 			argv[0] = base_name;
 		}
-		llog << ".\n";
+		llog << std::endl;
 
 		setprogname("citrun-inst");
 		clean_PATH(llog);
@@ -114,12 +114,12 @@ main(int argc, char *argv[])
 	main.process_cmdline();
 
 	int ret = main.instrument();
-	llog << "Rewriting " << (ret ? "failed.\n" : "successful.\n");
+	llog << "Rewriting " << (ret ? "failed." : "successful.") << std::endl;
 
 	std::chrono::high_resolution_clock::time_point now =
 		std::chrono::high_resolution_clock::now();
 	llog << std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count()
-		<< " Milliseconds spent rewriting source.\n";
+		<< " Milliseconds spent rewriting source." << std::endl;
 
 	if (is_citruninst)
 		return ret;
@@ -132,7 +132,7 @@ main(int argc, char *argv[])
 
 	ret = main.fork_compiler();
 	llog << "Rewritten source compile "
-		<< (ret ? "failed.\n" : "successful.\n");
+		<< (ret ? "failed." : "successful.") << std::endl;
 	main.restore_original_src();
 
 	if (ret)

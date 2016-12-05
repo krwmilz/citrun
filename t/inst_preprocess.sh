@@ -16,11 +16,11 @@ ok "wrapping compile w/ preprocessor arg -MM" citrun-wrap cc -E prepro.c
 
 cat <<EOF > citrun.log.good
 citrun-inst 0.0 () ''
-Tool called as ''.
+Tool called as ''
 PATH=''
 Preprocessor argument found
 citrun-inst 0.0 () ''
-Tool called as ''.
+Tool called as ''
 PATH=''
 Preprocessor argument found
 EOF

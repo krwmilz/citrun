@@ -87,7 +87,7 @@ InstrumentFrontend::save_if_srcfile(char *arg)
 		return;
 
 	m_source_files.push_back(arg);
-	*m_log << "Found source file '" << arg << "'.\n";
+	*m_log << "Found source file '" << arg << "'" << std::endl;
 
 	if (m_is_citruninst)
 		// In this mode the modified source file is written to a
@@ -119,8 +119,9 @@ InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 	if (!linking)
 		return;
 
+	*m_log << "Link detected, adding '"<< CITRUN_SHARE "/libcitrun.a"
+		<< "' to command line." << std::endl;
 	m_args.push_back(const_cast<char *>(CITRUN_SHARE "/libcitrun.a"));
-	*m_log << "Link detected, adding '"<< m_args.back() << "' to command line.\n";
 }
 
 void
@@ -135,7 +136,7 @@ InstrumentFrontend::process_cmdline()
 
 		if (std::strcmp(arg, "-E") == 0 ||
 		    std::strcmp(arg, "-MM") == 0) {
-			*m_log << "Preprocessor argument found\n";
+			*m_log << "Preprocessor argument found" << std::endl;
 			exec_compiler();
 		}
 		else if (std::strcmp(arg, "-o") == 0)
@@ -145,13 +146,13 @@ InstrumentFrontend::process_cmdline()
 
 		save_if_srcfile(arg);
 	}
-	*m_log << "Command line is '" << cmd_line.str() << "'.\n";
+	*m_log << "Command line is '" << cmd_line.str() << "'" << std::endl;
 	if_link_add_runtime(object_arg, compile_arg);
 
 	if (m_source_files.size() != 0)
 		return;
 
-	*m_log << "No source files found on command line.\n";
+	*m_log << "No source files found on command line." << std::endl;
 	if (m_is_citruninst)
 		exit(0);
 
@@ -176,7 +177,7 @@ InstrumentFrontend::instrument()
 	*m_log << "Added clangtool argument '" << clang_argv.back() << "'.\n";
 #elif defined(__APPLE__)
 	clang_argv.push_back("-I/opt/local/libexec/llvm-3.8/lib/clang/3.8.1/include");
-	*m_log << "Added clangtool argument '" << clang_argv.back() << "'.\n";
+	*m_log << "Added clangtool argument '" << clang_argv.back() << "'" << std::endl;
 #endif
 
 	int clang_argc = clang_argv.size();
@@ -188,9 +189,9 @@ InstrumentFrontend::instrument()
 	clang::DiagnosticOptions diags;
 	clang::TextDiagnosticPrinter *log;
 
-	log = new clang::TextDiagnosticPrinter(m_log->m_outfile, &diags, false);
-	log->setPrefix(std::to_string(m_log->m_pid));
-	Tool.setDiagnosticConsumer(log);
+	//log = new clang::TextDiagnosticPrinter(m_log, &diags, false);
+	// log->setPrefix(std::to_string(m_log->m_pid));
+	//Tool.setDiagnosticConsumer(log);
 
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
@@ -202,7 +203,7 @@ void
 InstrumentFrontend::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
-		*m_log << "Restored '" << tmp_file.first << "'.\n";
+		*m_log << "Restored '" << tmp_file.first << "'" << std::endl;
 
 		copy_file(tmp_file.first, tmp_file.second);
 		unlink(tmp_file.second.c_str());
@@ -213,10 +214,10 @@ void
 InstrumentFrontend::exec_compiler()
 {
 	// XXX: Need to destroy log here.
-	m_log->m_outfile.flush();
+	// m_log->m_outfile.flush();
 
 	if (m_is_citruninst) {
-		*m_log << "Running as citrun-inst, not re-exec()'ing\n";
+		*m_log << "Running as citrun-inst, not re-exec()'ing" << std::endl;
 		exit(0);
 	}
 
@@ -229,7 +230,7 @@ int
 InstrumentFrontend::fork_compiler()
 {
 	// Otherwise we'll get two copies of buffers after fork().
-	m_log->m_outfile.flush();
+	// m_log->m_outfile.flush();
 
 	pid_t child_pid;
 	if ((child_pid = fork()) < 0)
@@ -240,7 +241,7 @@ InstrumentFrontend::fork_compiler()
 		exec_compiler();
 
 	*m_log << "Forked '" << m_args[0] << "' "
-	       << "pid is '" << child_pid << "'.\n";
+	       << "pid is '" << child_pid << "'" << std::endl;
 
 	int status;
 	if (waitpid(child_pid, &status, 0) < 0)
@@ -251,6 +252,6 @@ InstrumentFrontend::fork_compiler()
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
 
-	*m_log << "'" << child_pid << "' exited " << exit << ".\n";
+	*m_log << "'" << child_pid << "' exited " << exit << "." << std::endl;
 	return exit;
 }
