@@ -57,7 +57,7 @@ Instrumentation of '' finished:
 Modified source written successfully.
 Rewriting successful.
 Forked ''
-'' exited 0.
+'' exited 0
 Rewritten source compile successful.
 Restored ''
 citrun-inst 0.0 () ''

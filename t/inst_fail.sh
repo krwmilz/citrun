@@ -17,7 +17,6 @@ ok "is citrun-wrap exit code 1" test $? -eq 1
 cat <<EOF > check.good
 Summary:
          1 Source files used as input
-         1 Rewrite parse errors
          1 Rewrite failures
 
 Totals:

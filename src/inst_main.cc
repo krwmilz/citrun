@@ -13,126 +13,18 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
+
 #include "inst_frontend.h"	// InstrumentFrontend
-#include "version.h"		// citrun_major, citrun_minor
-
-#include <sys/utsname.h>	// uname
-
-#include <chrono>		// std::chrono::high_resolution_clock
-#include <cstring>		// strcmp
-#include <err.h>
-#include <libgen.h>		// basename
-#include <sstream>		// stringstream
-
-
-void
-clean_PATH(InstrumentLogger &llog)
-{
-	char *path;
-	if ((path = std::getenv("PATH")) == NULL)
-		errx(1, "Error: PATH is not set.");
-
-	llog << "PATH='" << path << "'" << std::endl;
-
-	// Filter CITRUN_SHARE out of PATH
-	std::stringstream path_ss(path);
-	std::ostringstream new_path;
-	std::string component;
-	bool first_component = 1;
-	bool found_citrun_path = 0;
-
-	while (std::getline(path_ss, component, ':')) {
-		if (component.compare(CITRUN_SHARE) == 0) {
-			found_citrun_path = 1;
-			continue;
-		}
-
-		if (first_component == 0)
-			new_path << ":";
-
-		// It wasn't CITRUN_SHARE, keep it
-		new_path << component;
-		first_component = 0;
-	}
-
-	if (!found_citrun_path)
-		errx(1, "Error: CITRUN_SHARE not in PATH.");
-
-	if (setenv("PATH", new_path.str().c_str(), 1))
-		err(1, "setenv");
-}
-
-void
-print_toolinfo(InstrumentLogger &llog)
-{
-	struct utsname utsname;
-
-	llog << "citrun-inst " << citrun_major << "." << citrun_minor << " ";
-	if (uname(&utsname) == -1)
-		llog << "(Unknown OS) ";
-	else {
-		llog << "(" << utsname.sysname << "-"
-			<< utsname.release << " "
-			<< utsname.machine << ") ";
-	}
-	llog << "'" << CITRUN_SHARE << "'" << std::endl;
-}
 
 int
 main(int argc, char *argv[])
 {
-	std::chrono::high_resolution_clock::time_point m_start_time =
-		std::chrono::high_resolution_clock::now();
-
-	char *base_name;
-	if ((base_name = basename(argv[0])) == NULL)
-		err(1, "basename");
-
-	bool is_citruninst = false;
-	if (std::strcmp(base_name, "citrun-inst") == 0)
-		is_citruninst = true;
-
-	InstrumentLogger llog(is_citruninst);
-	print_toolinfo(llog);
-
-	if (is_citruninst) {
-		llog << ">> Welcome to C It Run! Have a nice day." << std::endl;
-	} else {
-		// There's extra work to do if we're not running as citrun-inst.
-		llog << "Tool called as '" << argv[0] << "'";
-		if (std::strcmp(base_name, argv[0]) != 0) {
-			llog << ", changing to '" << base_name << "'";
-			argv[0] = base_name;
-		}
-		llog << std::endl;
-
-		setprogname("citrun-inst");
-		clean_PATH(llog);
-	}
-
-	InstrumentFrontend main(argc, argv, &llog, is_citruninst);
+	InstrumentFrontend main(argc, argv);
 	main.process_cmdline();
 
-	int ret = main.instrument();
-	llog << "Rewriting " << (ret ? "failed." : "successful.") << std::endl;
+	main.instrument();
 
-	std::chrono::high_resolution_clock::time_point now =
-		std::chrono::high_resolution_clock::now();
-	llog << std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count()
-		<< " Milliseconds spent rewriting source." << std::endl;
-
-	if (is_citruninst)
-		return ret;
-	if (ret) {
-		// Rewriting failed. Original source files may be in an
-		// inconsistent state.
-		main.restore_original_src();
-		main.exec_compiler();
-	}
-
-	ret = main.fork_compiler();
-	llog << "Rewritten source compile "
-		<< (ret ? "failed." : "successful.") << std::endl;
+	int ret = main.fork_compiler();
 	main.restore_original_src();
 
 	if (ret)

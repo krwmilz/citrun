@@ -11,16 +11,17 @@ class InstrumentLogger : public std::ostream
 {
 	class LogBuffer : public std::stringbuf
 	{
-		bool			 m_iscitruninst;
 		pid_t			 m_pid;
 		std::error_code		 m_ec;
 		llvm::raw_fd_ostream	 m_outfile;
 	public:
-		LogBuffer(const bool &is_citruninst) :
-			m_iscitruninst(is_citruninst),
+		bool			 m_iscitruninst;
+
+		LogBuffer() :
 			m_pid(getpid()),
 			m_ec(),
-			m_outfile("citrun.log", m_ec, llvm::sys::fs::F_Append)
+			m_outfile("citrun.log", m_ec, llvm::sys::fs::F_Append),
+			m_iscitruninst(false)
 		{
 			if (m_ec.value())
 			std::cerr << "Can't open citrun.log: " << m_ec.message();
@@ -41,10 +42,15 @@ class InstrumentLogger : public std::ostream
 
 	LogBuffer buffer;
 public:
-	InstrumentLogger(const bool &is_citruninst) :
+	InstrumentLogger() :
 		std::ostream(&buffer),
-		buffer(is_citruninst)
+		buffer()
 	{
+	}
+
+	void set_citruninst()
+	{
+		buffer.m_iscitruninst = true;
 	}
 };
 
