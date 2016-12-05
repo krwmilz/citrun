@@ -228,9 +228,6 @@ InstrumentFrontend::process_cmdline()
 		return;
 
 	m_log << "No source files found on command line." << std::endl;
-	if (m_is_citruninst)
-		exit(0);
-
 	exec_compiler();
 }
 
