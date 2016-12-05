@@ -70,7 +70,6 @@ pkg_check_manifest
 cat <<EOF > tu_list.good
 src/inst_action.cc 118
 src/inst_frontend.cc 262
-src/inst_log.cc 47
 src/inst_main.cc 145
 src/inst_visitor.cc 188
 EOF
