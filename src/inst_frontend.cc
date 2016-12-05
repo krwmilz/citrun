@@ -39,48 +39,50 @@ InstrumentFrontend::InstrumentFrontend(int argc, char *argv[]) :
 	m_is_citruninst(false),
 	m_start_time(std::chrono::high_resolution_clock::now())
 {
+	char		*base_name;
+	struct utsname	 utsname;
 
-	char *base_name;
+	// Protect against argv[0] being an absolute path.
 	if ((base_name = basename(m_args[0])) == NULL)
 		err(1, "basename");
 
-	if (std::strcmp(base_name, "citrun-inst") == 0)
+	// Switch tool mode if we're called as 'citrun-inst'.
+	if (std::strcmp(base_name, "citrun-inst") == 0) {
 		m_is_citruninst = true;
-
-	if (m_is_citruninst)
+		// Enable logging to stdout.
 		m_log.set_citruninst();
+	}
 
 	m_log << "citrun-inst " << citrun_major << "." << citrun_minor << " ";
-
-	struct utsname utsname;
 	if (uname(&utsname) == -1)
-		m_log << "(Unknown OS)";
+		m_log << "(Unknown OS)" << std::endl;
 	else {
 		m_log << "(" << utsname.sysname << "-" << utsname.release << " "
-			<< utsname.machine << ")";
+			<< utsname.machine << ")" << std::endl;
 	}
-	m_log << " '" << CITRUN_SHARE << "'" << std::endl;
+	// This is important debugging information.
+	m_log << "CITRUN_SHARE = '" << CITRUN_SHARE << "'" << std::endl;
 
+	// If we're citrun-inst there's no more setup that's needed.
 	if (m_is_citruninst) {
 		m_log << ">> Welcome to C It Run! Have a nice day." << std::endl;
-	} else {
-		// There's extra work to do if we're not running as citrun-inst.
-		m_log << "Tool called as '" << m_args[0] << "'";
-		if (std::strcmp(base_name, m_args[0]) != 0) {
-			m_log << ", changing to '" << base_name << "'";
-			m_args[0] = base_name;
-		}
-		m_log << std::endl;
-
-		setprogname("citrun-inst");
-		clean_PATH();
+		return;
 	}
+
+	// Sometimes this doesn't make a difference.
+	m_log << "Switching argv[0] '" << m_args[0] << "' -> '" << base_name
+		<< "'" << std::endl;
+	m_args[0] = base_name;
+
+	setprogname("citrun-inst");
+	clean_PATH();
 }
 
 void
 InstrumentFrontend::clean_PATH()
 {
 	char *path;
+
 	if ((path = std::getenv("PATH")) == NULL)
 		errx(1, "Error: PATH is not set.");
 
@@ -312,6 +314,7 @@ int
 InstrumentFrontend::fork_compiler()
 {
 	pid_t child_pid;
+
 	if ((child_pid = fork()) < 0)
 		err(1, "fork");
 

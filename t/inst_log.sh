@@ -40,8 +40,9 @@ ok "is link ok" citrun-wrap cc -o main main.o
 strip_log citrun.log
 
 cat <<EOF > citrun.log.good
-citrun-inst 0.0 () ''
-Tool called as ''
+citrun-inst 0.0 ()
+CITRUN_SHARE = ''
+Switching argv[0] ''
 PATH=''
 Found source file ''
 Command line is ''
@@ -57,10 +58,11 @@ Instrumentation of '' finished:
 Modified source written successfully.
 Rewriting successful.
 Forked compiler ''
-Rewritten source compile successful.
+Rewritten source compile successful
 Restored ''
-citrun-inst 0.0 () ''
-Tool called as ''
+citrun-inst 0.0 ()
+CITRUN_SHARE = ''
+Switching argv[0] ''
 PATH=''
 Command line is ''
 Link detected, adding '' to command line.

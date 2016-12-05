@@ -15,12 +15,14 @@ ok "wrapping compile w/ preprocessor arg -E" citrun-wrap cc -E prepro.c
 ok "wrapping compile w/ preprocessor arg -MM" citrun-wrap cc -E prepro.c
 
 cat <<EOF > citrun.log.good
-citrun-inst 0.0 () ''
-Tool called as ''
+citrun-inst 0.0 ()
+CITRUN_SHARE = ''
+Switching argv[0] ''
 PATH=''
 Preprocessor argument found
-citrun-inst 0.0 () ''
-Tool called as ''
+citrun-inst 0.0 ()
+CITRUN_SHARE = ''
+Switching argv[0] ''
 PATH=''
 Preprocessor argument found
 EOF
