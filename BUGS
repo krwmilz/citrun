@@ -1,5 +1,0 @@
-$ citrun-wrap gcc -o main main.c
-where main.c does not exist.
-
-current code doesn't check if the file exists before it copies it aside and
-(erroneously) restores it.

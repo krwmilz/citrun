@@ -78,6 +78,9 @@ InstrumentFrontend::InstrumentFrontend(int argc, char *argv[]) :
 	clean_PATH();
 }
 
+//
+// Tries to remove CITRUN_SHARE from PATH otherwise it exits easily.
+//
 void
 InstrumentFrontend::clean_PATH()
 {
@@ -135,7 +138,8 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 	struct timeval st_tim[2];
 
 	// Save original access and modification times
-	stat(src_fn.c_str(), &sb);
+	if (stat(src_fn.c_str(), &sb) < 0)
+		err(1, "stat");
 #ifdef __APPLE__
 	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atimespec);
 	TIMESPEC_TO_TIMEVAL(&st_tim[1], &sb.st_mtimespec);
@@ -153,9 +157,14 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 	dst.close();
 
 	// Restore the original access and modification time
-	utimes(dst_fn.c_str(), st_tim);
+	if (utimes(dst_fn.c_str(), st_tim) < 0)
+		err(1, "utimes");
 }
 
+//
+// Guess if the argument is a sourcefile. If it is stash a backup of the file
+// and sync the timestamps.
+//
 void
 InstrumentFrontend::save_if_srcfile(char *arg)
 {
