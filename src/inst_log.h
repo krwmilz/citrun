@@ -7,6 +7,9 @@
 #include <sstream>
 #include <unistd.h>			// pid_t
 
+//
+// Taken from StackOverflow user Loki Astari. Thanks.
+//
 class InstrumentLogger : public std::ostream
 {
 	class LogBuffer : public std::stringbuf
