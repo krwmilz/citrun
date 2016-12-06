@@ -24,18 +24,20 @@ class InstrumentLogger : public std::ostream
 			m_iscitruninst(false)
 		{
 			if (m_ec.value())
-			std::cerr << "Can't open citrun.log: " << m_ec.message();
+				std::cerr << "Can't open citrun.log: " << m_ec.message();
 		}
 
 		virtual int sync()
 		{
-			m_outfile << m_pid << ": " << str();
+			if (!m_ec.value()) {
+				m_outfile << m_pid << ": " << str();
+				m_outfile.flush();
+			}
 
 			if (m_iscitruninst)
 				llvm::outs() << str();
 
 			str("");
-			m_outfile.flush();
 			return 0;
 		}
 	};
