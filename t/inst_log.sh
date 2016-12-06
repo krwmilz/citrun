@@ -45,7 +45,7 @@ CITRUN_SHARE = ''
 Switching argv[0] ''
 PATH=''
 Found source file ''
-Command line is ''
+Modified command line is ''
 Added clangtool argument ''
 Instrumentation of '' finished:
     22 Lines of source code
@@ -64,8 +64,8 @@ citrun-inst 0.0 ()
 CITRUN_SHARE = ''
 Switching argv[0] ''
 PATH=''
-Command line is ''
 Link detected, adding '' to command line.
+Modified command line is ''
 No source files found on command line.
 EOF
 
