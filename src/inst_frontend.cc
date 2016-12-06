@@ -188,6 +188,10 @@ InstrumentFrontend::save_if_srcfile(char *arg)
 	m_temp_file_map[arg] = dst_fn;
 }
 
+//
+// Careful guessing if we're linking. Use an absolute path to libcitrun.a to
+// avoid link failures.
+//
 void
 InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 {
@@ -210,18 +214,22 @@ InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 	m_args.push_back(const_cast<char *>(CITRUN_SHARE "/libcitrun.a"));
 }
 
+//
+// Walks the entire command line taking action on important arguments.
+//
 void
 InstrumentFrontend::process_cmdline()
 {
 	bool object_arg = false;
 	bool compile_arg = false;
 
-	std::ostringstream cmd_line;
+	//
+	// Walk every argument one by one looking for preprocessor switches,
+	// compile mode flags and source files.
+	//
 	for (auto &arg : m_args) {
-		cmd_line << arg << " ";
-
-		if (std::strcmp(arg, "-E") == 0 ||
-		    std::strcmp(arg, "-MM") == 0) {
+		if (std::strcmp(arg, "-E") == 0 || std::strcmp(arg, "-MM") == 0) {
+			// I don't know the repercussions of doing otherwise.
 			m_log << "Preprocessor argument found" << std::endl;
 			exec_compiler();
 		}
@@ -232,8 +240,14 @@ InstrumentFrontend::process_cmdline()
 
 		save_if_srcfile(arg);
 	}
-	m_log << "Command line is '" << cmd_line.str() << "'" << std::endl;
+
+	// If linking is detected append libcitrun.a to the command line.
 	if_link_add_runtime(object_arg, compile_arg);
+
+	m_log << "Modified command line is '";
+	for (auto &arg : m_args)
+		m_log << arg << " ";
+	m_log << "'" << std::endl;
 
 	if (m_source_files.size() != 0)
 		return;
@@ -242,6 +256,9 @@ InstrumentFrontend::process_cmdline()
 	exec_compiler();
 }
 
+//
+// Creates and executes InstrumentAction objects for detected source files.
+//
 void
 InstrumentFrontend::instrument()
 {
@@ -250,6 +267,7 @@ InstrumentFrontend::instrument()
 	// clang++ src1.c src2.c -- clang++ -I. -Isrc -c src1.c src2.c
 	//
 	std::vector<const char *> clang_argv;
+
 	clang_argv.push_back(m_args[0]);
 	for (auto s : m_source_files)
 		clang_argv.push_back(s.c_str());
@@ -269,32 +287,42 @@ InstrumentFrontend::instrument()
 	clang::tooling::ClangTool
 		Tool(op.getCompilations(), op.getSourcePathList());
 
+	//
+	// These diagnostics aren't too important because the input code could
+	// be terrible.
+	//
 	clang::TextDiagnosticBuffer diag_buffer;
 	Tool.setDiagnosticConsumer(&diag_buffer);
 
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
 
+	// Run the ClangTool over an InstrumentActionFactory, instrumenting and
+	// writing modified source code in place.
 	int ret = Tool.run(f.get());
-
 	m_log << "Rewriting " << (ret ? "failed." : "successful.") << std::endl;
 
+	// All of the time until now is the overhead citrun-inst adds.
 	std::chrono::high_resolution_clock::time_point now =
 		std::chrono::high_resolution_clock::now();
 	m_log << std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count()
 		<< " Milliseconds spent rewriting source." << std::endl;
 
+	// This is as far as we go in citrun-inst mode.
 	if (m_is_citruninst)
-		// This is as far as we go in citrun-inst mode.
 		exit(ret);
+
+	// If rewriting failed original source files may be in an
+	// inconsistent state.
 	if (ret) {
-		// Rewriting failed. Original source files may be in an
-		// inconsistent state.
 		restore_original_src();
 		exec_compiler();
 	}
 }
 
+//
+// Restore source files from stashed backups and sync timestamps.
+//
 void
 InstrumentFrontend::restore_original_src()
 {
@@ -306,45 +334,55 @@ InstrumentFrontend::restore_original_src()
 	}
 }
 
+//
+// Execute the compiler by calling execvp(3) on the m_args vector.
+//
 void
 InstrumentFrontend::exec_compiler()
 {
 	if (m_is_citruninst) {
-		m_log << "Running as citrun-inst, not re-exec()'ing" << std::endl;
+		m_log << "Running as citrun-inst, not calling exec()" << std::endl;
 		exit(0);
 	}
 
+	// Null termination explicitly mentioned in execvp(3).
 	m_args.push_back(NULL);
 	if (execvp(m_args[0], &m_args[0]))
 		err(1, "execvp");
 }
 
+//
+// fork(2) then execute the compiler and wait for it to finish. Returns exit
+// code of native compiler.
+//
 int
 InstrumentFrontend::fork_compiler()
 {
 	pid_t child_pid;
+	int status;
+	int exit = -1;
 
 	if ((child_pid = fork()) < 0)
 		err(1, "fork");
 
+	// If in child execute compiler.
 	if (child_pid == 0)
-		// In child.
 		exec_compiler();
 
 	m_log << "Forked compiler '" << m_args[0] << "' "
 	       << "pid is '" << child_pid << "'" << std::endl;
 
-	int status;
+	// Wait for the child to finish so we can get its exit code.
 	if (waitpid(child_pid, &status, 0) < 0)
 		err(1, "waitpid");
 
-	// Return the exit code of the native compiler.
-	int exit = -1;
+	// Decode the exit code from status.
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
 
-	m_log << "Rewritten source compile "
-		<< (exit ? "failed" : "successful") << std::endl;
+	m_log << "Rewritten source compile " << (exit ? "failed" : "successful")
+		<< std::endl;
 
+	// Return the exit code of the native compiler.
 	return exit;
 }

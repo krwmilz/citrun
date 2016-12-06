@@ -19,12 +19,14 @@
 int
 main(int argc, char *argv[])
 {
+	int ret;
+
 	InstrumentFrontend main(argc, argv);
 	main.process_cmdline();
 
 	main.instrument();
 
-	int ret = main.fork_compiler();
+	ret = main.fork_compiler();
 	main.restore_original_src();
 
 	if (ret)
