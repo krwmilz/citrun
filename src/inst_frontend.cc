@@ -35,7 +35,7 @@
 
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
-InstrumentFrontend::InstrumentFrontend(int argc, char *argv[]) :
+InstFrontend::InstFrontend(int argc, char *argv[]) :
 	m_args(argv, argv + argc),
 	m_is_citruninst(false),
 	m_start_time(std::chrono::high_resolution_clock::now())
@@ -79,7 +79,7 @@ InstrumentFrontend::InstrumentFrontend(int argc, char *argv[]) :
 // Tries to remove CITRUN_SHARE from PATH otherwise it exits easily.
 //
 void
-InstrumentFrontend::clean_PATH()
+InstFrontend::clean_PATH()
 {
 	char *path;
 
@@ -163,7 +163,7 @@ copy_file(std::string const &dst_fn, std::string const &src_fn)
 // and sync the timestamps.
 //
 void
-InstrumentFrontend::save_if_srcfile(char *arg)
+InstFrontend::save_if_srcfile(char *arg)
 {
 	if (!ends_with(arg, ".c") && !ends_with(arg, ".cc") &&
 	    !ends_with(arg, ".cpp") && !ends_with(arg, ".cxx"))
@@ -190,7 +190,7 @@ InstrumentFrontend::save_if_srcfile(char *arg)
 // avoid link failures.
 //
 void
-InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
+InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 {
 	bool linking = false;
 
@@ -215,7 +215,7 @@ InstrumentFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 // Walks the entire command line taking action on important arguments.
 //
 void
-InstrumentFrontend::process_cmdline()
+InstFrontend::process_cmdline()
 {
 	bool object_arg = false;
 	bool compile_arg = false;
@@ -257,7 +257,7 @@ InstrumentFrontend::process_cmdline()
 // Creates and executes InstrumentAction objects for detected source files.
 //
 void
-InstrumentFrontend::instrument()
+InstFrontend::instrument()
 {
 	//
 	// Create a special command line for ClangTool that looks like:
@@ -321,7 +321,7 @@ InstrumentFrontend::instrument()
 // Restore source files from stashed backups and sync timestamps.
 //
 void
-InstrumentFrontend::restore_original_src()
+InstFrontend::restore_original_src()
 {
 	for (auto &tmp_file : m_temp_file_map) {
 		m_log << "Restored '" << tmp_file.first << "'" << std::endl;
@@ -335,7 +335,7 @@ InstrumentFrontend::restore_original_src()
 // Execute the compiler by calling execvp(3) on the m_args vector.
 //
 void
-InstrumentFrontend::exec_compiler()
+InstFrontend::exec_compiler()
 {
 	if (m_is_citruninst) {
 		m_log << "Running as citrun-inst, not calling exec()" << std::endl;
@@ -353,7 +353,7 @@ InstrumentFrontend::exec_compiler()
 // code of native compiler.
 //
 int
-InstrumentFrontend::fork_compiler()
+InstFrontend::fork_compiler()
 {
 	pid_t child_pid;
 	int status;

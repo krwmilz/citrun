@@ -4,9 +4,9 @@
 #include <chrono>		// std::chrono::high_resolution_clock
 #include <string>
 
-class InstrumentFrontend {
+class InstFrontend {
 public:
-	InstrumentFrontend(int, char *argv[]);
+	InstFrontend(int, char *argv[]);
 
 	void			process_cmdline();
 	void			instrument();

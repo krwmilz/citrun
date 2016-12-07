@@ -14,14 +14,14 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 
-#include "inst_frontend.h"	// InstrumentFrontend
+#include "inst_frontend.h"	// InstFrontend
 
 int
 main(int argc, char *argv[])
 {
 	int ret;
 
-	InstrumentFrontend main(argc, argv);
+	InstFrontend main(argc, argv);
 	main.process_cmdline();
 
 	main.instrument();
