@@ -32,6 +32,7 @@
 #include <sstream>		// ostringstream
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
+
 static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
 
 InstrumentFrontend::InstrumentFrontend(int argc, char *argv[]) :
@@ -53,29 +54,25 @@ InstrumentFrontend::InstrumentFrontend(int argc, char *argv[]) :
 		m_log.set_citruninst();
 	}
 
-	m_log << "citrun-inst " << citrun_major << "." << citrun_minor << " ";
+	m_log << ">> citrun-inst v" << citrun_major << "." << citrun_minor;
 	if (uname(&utsname) == -1)
-		m_log << "(Unknown OS)" << std::endl;
-	else {
-		m_log << "(" << utsname.sysname << "-" << utsname.release << " "
-			<< utsname.machine << ")" << std::endl;
-	}
-	// This is important debugging information.
+		m_log << " Unknown OS" << std::endl;
+	else
+		m_log << " (" << utsname.sysname << "-" << utsname.release
+			<< " " << utsname.machine << ")" << std::endl;
+
 	m_log << "CITRUN_SHARE = '" << CITRUN_SHARE << "'" << std::endl;
 
-	// If we're citrun-inst there's no more setup that's needed.
-	if (m_is_citruninst) {
-		m_log << ">> Welcome to C It Run! Have a nice day." << std::endl;
-		return;
-	}
-
-	// Sometimes this doesn't make a difference.
+	// Always re-search PATH for binary name (in non-citrun-inst case).
 	m_log << "Switching argv[0] '" << m_args[0] << "' -> '" << base_name
 		<< "'" << std::endl;
 	m_args[0] = base_name;
 
+	// Sometimes we're not called as citrun-inst so force that here.
 	setprogname("citrun-inst");
-	clean_PATH();
+
+	if (m_is_citruninst == false)
+		clean_PATH();
 }
 
 //

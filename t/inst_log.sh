@@ -40,7 +40,7 @@ ok "is link ok" citrun-wrap cc -o main main.o
 strip_log citrun.log
 
 cat <<EOF > citrun.log.good
-citrun-inst 0.0 ()
+>> citrun-inst v0.0 ()
 CITRUN_SHARE = ''
 Switching argv[0] ''
 PATH=''
@@ -60,7 +60,7 @@ Rewriting successful.
 Forked compiler ''
 Rewritten source compile successful
 Restored ''
-citrun-inst 0.0 ()
+>> citrun-inst v0.0 ()
 CITRUN_SHARE = ''
 Switching argv[0] ''
 PATH=''
