@@ -18,138 +18,144 @@
 
 #include <cassert>
 #include <csignal>		// kill
+#include <cstring>		// strncmp
 #include <err.h>
 #include <fcntl.h>		// O_RDONLY
 #include <fstream>
+#include <iostream>
 #include <stdlib.h>		// getenv
+#include <string.h>		// memcpy
 #include <unistd.h>		// getpagesize
 
 #include "process_file.h"
+#include "rt.h"			// struct citrun_{node,header}
 #include "version.h"		// citrun_major
 
 
+//
+// Take a pointer to a shared memory region and map data structures on top.
+// Automatically increments the pointer once we know how big this region is.
+//
+TranslationUnit::TranslationUnit(void* &mem) :
+	m_node(static_cast<struct citrun_node *>(mem)),
+	m_data((unsigned long long *)(m_node + 1)),
+	m_data_buffer(new uint64_t[m_node->size]())
+{
+	unsigned int	 size, page_mask;
+
+	// Total size is node size plus live execution data size.
+	size = sizeof(struct citrun_node);
+	size += m_node->size * sizeof(unsigned long long);
+
+	// Increment passed in pointer to next page.
+	page_mask = getpagesize() - 1;
+	mem = (char *)mem + ((size + page_mask) & ~page_mask);
+
+	read_source();
+}
+
+//
+// Returns number of lines that citrun-inst processed (whole source file
+// ideally)
+//
+unsigned int
+TranslationUnit::num_lines() const
+{
+	return m_node->size;
+}
+
+//
+// Returns the source file path as it was passed to the compiler.
+//
+std::string
+TranslationUnit::comp_file_path() const
+{
+	return std::string(m_node->comp_file_path);
+}
+
+//
+// Try and read the contents of the on disk source file using the absolute path
+// provided by clang/llvm.
+//
+void
+TranslationUnit::read_source()
+{
+	std::ifstream file_stream(m_node->abs_file_path);
+
+	if (file_stream.is_open() == 0) {
+		warnx("ifstream.open(%s)", m_node->abs_file_path);
+		return;
+	}
+
+	std::string line;
+	while (std::getline(file_stream, line))
+		m_source.push_back(line);
+}
+
+//
+// Copy live executions to secondary buffer. Used for computing deltas later.
+//
+void
+TranslationUnit::save_executions()
+{
+	memcpy(m_data_buffer, m_data, m_node->size * sizeof(unsigned long long));
+}
+
+
+//
+// Take a filesystem path and memory map its contents. Map at least a header
+// structure on top of it.
+//
 ProcessFile::ProcessFile(std::string const &path) :
 	m_path(path),
 	m_fd(0),
-	m_mem(NULL),
-	m_pos(0),
 	m_tus_with_execs(0),
 	m_program_loc(0)
 {
+	struct stat	 sb;
+	void		*mem, *end;
+
 	if ((m_fd = open(m_path.c_str(), O_RDONLY, S_IRUSR | S_IWUSR)) < 0)
 		err(1, "open");
 
-	struct stat sb;
-	fstat(m_fd, &sb);
+	if (fstat(m_fd, &sb) < 0)
+		err(1, "fstat");
 
 	if (sb.st_size > 1024 * 1024 * 1024)
 		errx(1, "shared memory too large: %lli", sb.st_size);
 
-	m_mem = (uint8_t *)mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, m_fd, 0);
-	if (m_mem == MAP_FAILED)
-		err(1, "mmap");
-
 	m_size = sb.st_size;
 
-	std::string magic;
-	assert(sizeof(pid_t) == 4);
+	mem = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, m_fd, 0);
+	if (mem == MAP_FAILED)
+		err(1, "mmap");
 
-	shm_read_magic(magic);
-	assert(magic == "citrun");
-	shm_read_all(&m_major);
-	assert(m_major == citrun_major);
-	shm_read_all(&m_minor);
-	shm_read_all(&m_pid);
-	shm_read_all(&m_ppid);
-	shm_read_all(&m_pgrp);
-	shm_read_string(m_progname);
-	shm_read_string(m_cwd);
-	shm_next_page();
 
-	while (shm_at_end() == false) {
-		TranslationUnit t;
+	// Header is always at offset 0 and always one page long.
+	m_header = static_cast<struct citrun_header *>(mem);
 
-		shm_read_all(&t.num_lines);
+	end = (char *)mem + m_size;
+	mem = (char *)mem + getpagesize();
 
-		shm_read_string(t.comp_file_path);
-		shm_read_string(t.abs_file_path);
+	assert(std::strncmp(m_header->magic, "ctrn", 4) == 0);
+	assert(m_header->major == citrun_major);
 
-		t.exec_counts = (uint64_t *)shm_get_block(t.num_lines * 8);
-		t.exec_counts_last = new uint64_t[t.num_lines]();
+	while (mem < end)
+		m_tus.push_back(TranslationUnit(mem));
+	// Make sure internal increment in TranslationUnit works as intended.
+	assert(mem == end);
 
-		t.source.resize(t.num_lines);
-		m_program_loc += t.num_lines;
-		read_source(t);
-
-		m_tus.push_back(t);
-
-		shm_next_page();
-	}
+	for (auto &t : m_tus)
+		m_program_loc += t.num_lines();
 }
 
-void
-ProcessFile::read_source(struct TranslationUnit &t)
-{
-	std::ifstream file_stream(t.abs_file_path);
-
-	if (file_stream.is_open() == 0) {
-		warnx("ifstream.open(%s)", t.abs_file_path.c_str());
-		return;
-	}
-
-	for (auto &l : t.source)
-		std::getline(file_stream, l);
-}
-
-void
-ProcessFile::shm_next_page()
-{
-	int page_size = getpagesize();
-	m_pos += page_size - (m_pos % page_size);
-}
-
-void
-ProcessFile::shm_read_magic(std::string &magic)
-{
-	magic.resize(6);
-
-	memcpy(&magic[0], m_mem + m_pos, 6);
-	m_pos += 6;
-}
-
-void
-ProcessFile::shm_read_string(std::string &str)
-{
-	uint16_t len;
-
-	memcpy(&len, m_mem + m_pos, sizeof(len));
-	m_pos += sizeof(len);
-
-	str.resize(len);
-	memcpy(&str[0], m_mem + m_pos, len);
-	m_pos += len;
-}
-
-void *
-ProcessFile::shm_get_block(size_t inc)
-{
-	void *block = m_mem + m_pos;
-	m_pos += inc;
-
-	return block;
-}
-
-bool
-ProcessFile::shm_at_end()
-{
-	assert(m_pos <= m_size);
-	return (m_pos == m_size ? true : false);
-}
-
+//
+// Checks if the pid given by the runtime is alive. Prone to race conditions.
+//
 bool
 ProcessFile::is_alive() const
 {
-	if (kill(m_pid, 0) == 0)
+	if (kill(m_header->pids[0], 0) == 0)
 		return 1;
 	return 0;
 }
@@ -158,19 +164,37 @@ const TranslationUnit *
 ProcessFile::find_tu(std::string const &srcname) const
 {
 	for (auto &i : m_tus)
-		if (srcname == i.comp_file_path)
+		if (srcname == i.comp_file_path())
 			return &i;
 	return NULL;
 }
 
-void
-ProcessFile::save_executions()
+//
+// Return program the runtime is/was running within.
+//
+std::string
+ProcessFile::progname() const
 {
-	for (auto &t : m_tus)
-		memcpy(t.exec_counts_last, t.exec_counts, t.num_lines * 8);
+	return std::string(m_header->progname);
 }
 
-void
-ProcessFile::read_executions()
+//
+// Return the pid, ppid, pgrp the runtime is/was running within.
+//
+int
+ProcessFile::getpid() const
 {
+	return m_header->pids[0];
+}
+
+int
+ProcessFile::getppid() const
+{
+	return m_header->pids[1];
+}
+
+int
+ProcessFile::getpgrp() const
+{
+	return m_header->pids[2];
 }

@@ -83,11 +83,11 @@ add_new_process(std::string const &file_name)
 	demo_buffer_clear(buffer);
 
 	std::stringstream ss;
-	ss << "program name:\t" << pfile->m_progname << std::endl;
+	ss << "program name:\t" << pfile->progname() << std::endl;
 	ss << "trnsltn units:\t" << pfile->m_tus.size() << std::endl;
-	ss << "process id:\t" << pfile->m_pid << std::endl;
-	ss << "parent pid:\t" << pfile->m_ppid << std::endl;
-	ss << "process group:\t" << pfile->m_pgrp << std::endl;
+	ss << "process id:\t" << pfile->getpid() << std::endl;
+	ss << "parent pid:\t" << pfile->getppid() << std::endl;
+	ss << "process group:\t" << pfile->getpgrp() << std::endl;
 
 	glyphy_point_t cur_pos = { 0, 0 };
 	demo_buffer_move_to(buffer, &cur_pos);
@@ -98,7 +98,7 @@ add_new_process(std::string const &file_name)
 
 	cur_pos.x = 0;
 	for (auto &t : pfile->m_tus) {
-		demo_buffer_add_text(buffer, t.comp_file_path.c_str(), font, 1);
+		demo_buffer_add_text(buffer, t.comp_file_path().c_str(), font, 1);
 	}
 }
 
@@ -112,15 +112,15 @@ next_frame(View *vu)
 	delete new_files;
 
 	for (auto &rp : drawables) {
-		rp.read_executions();
+		// rp.read_executions();
 
 		//glyphy_point_t tmp;
 		for (auto &t : rp.m_tus) {
 			//size_t bytes_total = t.num_lines * sizeof(uint64_t);
 
-			for (unsigned int i = 0; i < t.num_lines; i++) {
-				if (t.exec_counts[i] == 0)
-					continue;
+			for (unsigned int i = 0; i < t.num_lines(); i++) {
+				//if (t.exec_counts[i] == 0)
+				//	continue;
 
 				// demo_buffer_add_text(buffer, ">>", font, 1);
 			}
