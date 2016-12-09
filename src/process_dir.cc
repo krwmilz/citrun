@@ -7,9 +7,7 @@
 
 ProcessDir::ProcessDir()
 {
-	if (std::getenv("CITRUN_TOOLS") != NULL)
-		m_procdir = "runtime/";
-	else
+	if ((m_procdir = std::getenv("CITRUN_PROCDIR")) == NULL)
 		m_procdir = "/tmp/citrun/";
 
 	if ((m_dirp = opendir(m_procdir)) == NULL)
