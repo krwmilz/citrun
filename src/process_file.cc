@@ -130,7 +130,6 @@ ProcessFile::ProcessFile(std::string const &path) :
 	if (mem == MAP_FAILED)
 		err(1, "mmap");
 
-
 	// Header is always at offset 0 and always one page long.
 	m_header = static_cast<struct citrun_header *>(mem);
 
