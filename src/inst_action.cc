@@ -70,7 +70,7 @@ InstrumentAction::EndSourceFileAction()
 
 	//
 	// Write instrumentation preamble. Includes:
-	// - runtime header,
+	// - runtime header
 	// - per tu citrun_node
 	// - static constructor for runtime initialization
 	//
