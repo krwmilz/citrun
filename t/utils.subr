@@ -15,7 +15,7 @@ strip_log()
 
 strip_millis()
 {
-	ok "stripping milliseconds" sed -i -e "/Milliseconds spent/d" $1
+	ok "are milliseconds sanitized" sed -i -e "/Milliseconds spent/d" $1
 }
 
 modify_PATH()
