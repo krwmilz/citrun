@@ -17,6 +17,7 @@
  */
 
 #include "gl_view.h"
+#include <GLFW/glfw3.h>
 
 extern "C" {
 #include "trackball.h"
@@ -143,15 +144,17 @@ View::apply_transform(float *mat)
 static long
 current_time (void)
 {
-	return glutGet(GLUT_ELAPSED_TIME);
+	return glfwGetTime();
 }
 
 void
 View::toggle_animation()
 {
+#if 0
 	animate = !animate;
 	if (animate)
 		start_animation();
+#endif
 }
 
 void
@@ -197,6 +200,7 @@ View::toggle_srgb()
 void
 View::toggle_fullscreen()
 {
+#if 0
 	fullscreen = !fullscreen;
 	if (fullscreen) {
 		x = glutGet(GLUT_WINDOW_X);
@@ -208,6 +212,7 @@ View::toggle_fullscreen()
 		glutReshapeWindow(width, height);
 		glutPositionWindow(x, y);
 	}
+#endif
 }
 
 void
@@ -221,7 +226,7 @@ void
 View::reshape_func(int width, int height)
 {
 	glViewport (0, 0, width, height);
-	glutPostRedisplay ();
+	// glutPostRedisplay ();
 }
 
 #define STEP 1.05
@@ -311,12 +316,13 @@ View::keyboard_func(unsigned char key, int x, int y)
 		default:
 			return;
 	}
-	glutPostRedisplay ();
+	// glutPostRedisplay ();
 }
 
 void
 View::special_func(int key, int x, int y)
 {
+#if 0
 	switch (key)
 	{
 		case GLUT_KEY_UP:
@@ -335,18 +341,20 @@ View::special_func(int key, int x, int y)
 		default:
 			return;
 	}
-	glutPostRedisplay ();
+#endif
+	// glutPostRedisplay ();
 }
 
 void
 View::mouse_func(int button, int state, int x, int y)
 {
+#if 0
 	if (state == GLUT_DOWN) {
 		buttons |= (1 << button);
 		click_handled = false;
 	} else
 		buttons &= !(1 << button);
-	modifiers = glutGetModifiers ();
+	// modifiers = glutGetModifiers ();
 
 	switch (button) {
 	case GLUT_RIGHT_BUTTON:
@@ -385,12 +393,13 @@ View::mouse_func(int button, int state, int x, int y)
 		scale(1. / STEP);
 		break;
 	}
+#endif
 
 	beginx = lastx = x;
 	beginy = lasty = y;
 	dragged = false;
 
-	glutPostRedisplay ();
+	// glutPostRedisplay ();
 }
 
 void
@@ -403,6 +412,7 @@ View::motion_func(int x, int y)
 	GLuint width  = viewport[2];
 	GLuint height = viewport[3];
 
+#if 0
 	if (buttons & (1 << GLUT_LEFT_BUTTON))
 	{
 		if (modifiers & GLUT_ACTIVE_SHIFT) {
@@ -455,12 +465,13 @@ View::motion_func(int x, int y)
 				+(2. * beginx / width  - 1) * (1 - factor),
 				-(2. * beginy / height - 1) * (1 - factor));
 	}
+#endif
 
 	lastx = x;
 	lasty = y;
 	lastt = current_time ();
 
-	glutPostRedisplay ();
+	// glutPostRedisplay ();
 }
 
 void
@@ -511,7 +522,7 @@ View::display()
 
 	demo_buffer_draw (buffer);
 
-	glutSwapBuffers ();
+	// glutSwapBuffers ();
 }
 
 void

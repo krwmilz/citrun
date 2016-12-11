@@ -40,21 +40,20 @@ CLANG_LIBS =
 if $(OS) = OPENBSD {
 	C++ = eg++ ;
 
-	PKG_CONFIG_LIBS = gl glew freetype2 ;
-	LINKLIBS on citrun-gl = -lm -lglut ;
+	PKG_CONFIG_LIBS = gl glfw3 glew freetype2 ;
 	LINKLIBS on citrun-inst += -Wl,--start-group $(CLANG_LIBS) -Wl,--end-group ;
 }
 
 if $(OS) = MACOSX {
-	PKG_CONFIG_LIBS = glew freetype2 ;
-	LINKLIBS on citrun-gl = -framework OpenGL -framework GLUT -lm ;
+	PKG_CONFIG_LIBS = glfw3 glew freetype2 ;
+	LINKLIBS on citrun-gl = -framework OpenGL ;
 	LINKLIBS on citrun-inst = $(CLANG_LIBS) ;
 }
 
 if $(OS) = LINUX {
 	# llvm version is 3.5 on Debian, which is too old.
-	PKG_CONFIG_LIBS = gl glew freetype2 ;
-	LINKLIBS on citrun-gl = -lbsd -lm -lglut ;
+	PKG_CONFIG_LIBS = gl glfw3 glew freetype2 ;
+	LINKLIBS on citrun-gl = -lbsd ;
 	LINKLIBS on citrun-inst = -lbsd ;
 	LINKLIBS on citrun-inst += -Wl,--start-group $(CLANG_LIBS) -Wl,--end-group ;
 }
@@ -92,7 +91,7 @@ if $(CITRUN_SA) {
 
 # Link with the c++ compiler so that the matching c++ runtime library gets added
 # automatically.
-LINK on citrun-inst citrun-term citrun-gl = $(C++) ;
+LINK on citrun-inst citrun-term citrun-gl citrun-gltest = $(C++) ;
 
 rule Stringize
 {

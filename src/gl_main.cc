@@ -10,6 +10,8 @@
 #include "process_dir.h"
 #include "process_file.h"
 
+#include <GLFW/glfw3.h>
+
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
 #elif defined(__APPLE__)
@@ -71,7 +73,8 @@ display(void)
 static long
 current_time(void)
 {
-	return glutGet(GLUT_ELAPSED_TIME);
+	//return glutGet(GLUT_ELAPSED_TIME);
+	return glfwGetTime();
 }
 
 void
@@ -128,18 +131,7 @@ next_frame(View *vu)
 		std::cout << "tick" << std::endl;
 	}
 
-	glutPostRedisplay ();
-}
-
-void
-idle_step(void)
-{
-	View *vu = static_vu;
-	if (vu->animate) {
-		next_frame (vu);
-	}
-	else
-		glutIdleFunc(NULL);
+	// glutPostRedisplay ();
 }
 
 void
@@ -147,7 +139,7 @@ print_fps(int ms)
 {
 	View *vu = static_vu;
 	if (vu->animate) {
-		glutTimerFunc (ms, print_fps, ms);
+		// glutTimerFunc (ms, print_fps, ms);
 		long t = current_time ();
 		LOGI ("%gfps\n", vu->num_frames * 1000. / (t - vu->fps_start_time));
 		vu->num_frames = 0;
@@ -162,13 +154,14 @@ start_animation()
 	View *vu = static_vu;
 	vu->num_frames = 0;
 	vu->last_frame_time = vu->fps_start_time = current_time();
-	glutIdleFunc(idle_step);
+	// glutIdleFunc(idle_step);
 	if (!vu->has_fps_timer) {
 		vu->has_fps_timer = true;
-		glutTimerFunc (5000, print_fps, 5000);
+		// glutTimerFunc (5000, print_fps, 5000);
 	}
 }
 
+#if 0
 int
 main(int argc, char *argv[])
 {
@@ -210,6 +203,85 @@ main(int argc, char *argv[])
 	demo_buffer_add_text(buffer, "waiting...", font, 1);
 
 	glutMainLoop();
+
+	return 0;
+}
+#endif
+
+static void
+error_callback(int error, const char *desc)
+{
+	fprintf(stderr, "Error: %s\n", desc);
+}
+
+int
+main(int argc, char *argv[])
+{
+	GLFWwindow *window;
+
+	glfwSetErrorCallback(error_callback);
+
+	if (!glfwInit())
+		return 1;
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+	window = glfwCreateWindow(1600, 1200, "C It Run", NULL, NULL);
+	if (window == NULL) {
+		glfwTerminate();
+		return 1;
+	}
+
+	// glfwSetKeyCallback(window, key_callback);
+
+	// glutReshapeFunc(reshape_func);
+	// glutDisplayFunc(display);
+	// glutKeyboardFunc(keyboard_func);
+	// glutSpecialFunc(special_func);
+	// glutMouseFunc(mouse_func);
+	// glutMotionFunc(motion_func);
+
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
+
+	GLenum glew_status = glewInit();
+	if (GLEW_OK != glew_status)
+		errx(1, "%s", glewGetErrorString(glew_status));
+	if (!glewIsSupported("GL_VERSION_2_0"))
+		errx(1, "No support for OpenGL 2.0 found");
+
+	st = demo_glstate_create();
+	buffer = demo_buffer_create();
+
+	static_vu = new View(st, buffer);
+
+	FT_Init_FreeType(&ft_library);
+
+	ft_face = NULL;
+	FT_New_Face(ft_library, FONT_PATH, /* face_index */ 0, &ft_face);
+
+	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
+
+	static_vu->setup();
+
+	static_vu->toggle_animation();
+
+	glyphy_point_t top_left = { 0, 0 };
+	demo_buffer_move_to(buffer, &top_left);
+	demo_buffer_add_text(buffer, "waiting...", font, 1);
+
+	while (!glfwWindowShouldClose(window)) {
+
+		next_frame(static_vu);
+		static_vu->display();
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
 
 	return 0;
 }
