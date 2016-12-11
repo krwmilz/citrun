@@ -69,14 +69,6 @@ display(void)
 }
 
 
-/* Return current time in milli-seconds */
-static long
-current_time(void)
-{
-	//return glutGet(GLUT_ELAPSED_TIME);
-	return glfwGetTime();
-}
-
 void
 add_new_process(std::string const &file_name)
 {
@@ -132,33 +124,6 @@ next_frame(View *vu)
 	}
 
 	// glutPostRedisplay ();
-}
-
-void
-print_fps(int ms)
-{
-	View *vu = static_vu;
-	if (vu->animate) {
-		// glutTimerFunc (ms, print_fps, ms);
-		long t = current_time ();
-		LOGI ("%gfps\n", vu->num_frames * 1000. / (t - vu->fps_start_time));
-		vu->num_frames = 0;
-		vu->fps_start_time = t;
-	} else
-		vu->has_fps_timer = false;
-}
-
-void
-start_animation()
-{
-	View *vu = static_vu;
-	vu->num_frames = 0;
-	vu->last_frame_time = vu->fps_start_time = current_time();
-	// glutIdleFunc(idle_step);
-	if (!vu->has_fps_timer) {
-		vu->has_fps_timer = true;
-		// glutTimerFunc (5000, print_fps, 5000);
-	}
 }
 
 #if 0
