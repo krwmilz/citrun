@@ -119,53 +119,6 @@ next_frame(View *vu)
 	// glutPostRedisplay ();
 }
 
-#if 0
-int
-main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	glutInitWindowSize(1600, 1200);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutCreateWindow("C It Run");
-	glutReshapeFunc(reshape_func);
-	glutDisplayFunc(display);
-	glutKeyboardFunc(keyboard_func);
-	glutSpecialFunc(special_func);
-	glutMouseFunc(mouse_func);
-	glutMotionFunc(motion_func);
-
-	GLenum glew_status = glewInit();
-	if (GLEW_OK != glew_status)
-		errx(1, "%s", glewGetErrorString(glew_status));
-	if (!glewIsSupported("GL_VERSION_2_0"))
-		errx(1, "No support for OpenGL 2.0 found");
-
-	st = demo_glstate_create();
-	buffer = demo_buffer_create();
-
-	static_vu = new View(st, buffer);
-
-	FT_Init_FreeType(&ft_library);
-
-	ft_face = NULL;
-	FT_New_Face(ft_library, FONT_PATH, /* face_index */ 0, &ft_face);
-
-	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
-
-	static_vu->setup();
-
-	static_vu->toggle_animation();
-
-	glyphy_point_t top_left = { 0, 0 };
-	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, "waiting...", font, 1);
-
-	glutMainLoop();
-
-	return 0;
-}
-#endif
-
 static void
 error_callback(int error, const char *desc)
 {
