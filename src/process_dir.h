@@ -8,7 +8,7 @@
 class ProcessDir {
 public:
 	ProcessDir();
-	std::vector<std::string>	*scan();
+	std::vector<std::string>	 scan();
 
 private:
 	const char			*m_procdir;

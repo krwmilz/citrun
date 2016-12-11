@@ -93,11 +93,8 @@ add_new_process(std::string const &file_name)
 void
 next_frame(View *vu)
 {
-	std::vector<std::string> *new_files = m_pdir.scan();
-	for (std::string &file_name : *new_files)
+	for (std::string &file_name : m_pdir.scan())
 		add_new_process(file_name);
-
-	delete new_files;
 
 	for (auto &rp : drawables) {
 		// rp.read_executions();
@@ -115,8 +112,6 @@ next_frame(View *vu)
 		}
 		std::cout << "tick" << std::endl;
 	}
-
-	// glutPostRedisplay ();
 }
 
 static void
