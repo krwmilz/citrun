@@ -63,13 +63,6 @@ motion_func(int x, int y)
 }
 
 void
-display(void)
-{
-	static_vu->display();
-}
-
-
-void
 add_new_process(std::string const &file_name)
 {
 	drawables.push_back(ProcessFile(file_name));
@@ -201,7 +194,6 @@ main(int argc, char *argv[])
 	glfwSetKeyCallback(window, keyboard_func);
 
 	// glutReshapeFunc(reshape_func);
-	// glutDisplayFunc(display);
 	// glutSpecialFunc(special_func);
 	// glutMouseFunc(mouse_func);
 	// glutMotionFunc(motion_func);
@@ -228,8 +220,6 @@ main(int argc, char *argv[])
 	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
 
 	static_vu->setup();
-
-	static_vu->toggle_animation();
 
 	glyphy_point_t top_left = { 0, 0 };
 	demo_buffer_move_to(buffer, &top_left);

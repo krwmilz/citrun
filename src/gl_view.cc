@@ -147,16 +147,6 @@ current_time (void)
 }
 
 void
-View::toggle_animation()
-{
-#if 0
-	animate = !animate;
-	if (animate)
-		start_animation();
-#endif
-}
-
-void
 View::toggle_vsync()
 {
 	vsync = !vsync;
@@ -239,9 +229,6 @@ View::keyboard_func(GLFWwindow *window, int key, int scancode, int action, int m
 			glfwSetWindowShouldClose(window, 1);
 			break;
 
-		case ' ':
-			toggle_animation();
-			break;
 		case 'v':
 			toggle_vsync();
 			break;
@@ -288,23 +275,23 @@ View::keyboard_func(GLFWwindow *window, int key, int scancode, int action, int m
 			toggle_srgb();
 			break;
 
-		case '=':
+		case GLFW_KEY_EQUAL:
 			scale(STEP);
 			break;
 		case '-':
 			scale(1. / STEP);
 			break;
 
-		case 'k':
+		case GLFW_KEY_K:
 			translate(0, -.1);
 			break;
-		case 'j':
+		case GLFW_KEY_J:
 			translate(0, +.1);
 			break;
-		case 'h':
+		case GLFW_KEY_H:
 			translate(+.1, 0);
 			break;
-		case 'l':
+		case GLFW_KEY_L:
 			translate(-.1, 0);
 			break;
 

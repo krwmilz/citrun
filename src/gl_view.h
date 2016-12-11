@@ -28,7 +28,6 @@ public:
 	bool has_fps_timer;
 	long last_frame_time;
 
-	void toggle_animation();
 private:
 	void scale_gamma_adjust(double);
 	void scale_contrast(double);
