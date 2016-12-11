@@ -6,11 +6,12 @@
 # If PREFIX is set we're building a package, so trust that will be the final
 # (after installation) location.
 #
-echo ...build C It Run on $(OS)... ;
 if $(PREFIX) {
+	echo ...build C It Run (Release) on $(OS)... ;
 	CITRUN_SHARE = $(PREFIX)/share/citrun ;
 }
 else {
+	echo ...build C It Run (Debug) on $(OS)... ;
 	#CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
 	CITRUN_SHARE = "`cd $(TOP)/src && pwd`" ;
 	CFLAGS += -Wall -g ;
