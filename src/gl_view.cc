@@ -17,7 +17,6 @@
  */
 
 #include "gl_view.h"
-#include <GLFW/glfw3.h>
 
 extern "C" {
 #include "trackball.h"
@@ -231,13 +230,13 @@ View::reshape_func(int width, int height)
 
 #define STEP 1.05
 void
-View::keyboard_func(unsigned char key, int x, int y)
+View::keyboard_func(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	switch (key)
 	{
 		case '\033':
-		case 'q':
-			exit (0);
+		case GLFW_KEY_Q:
+			glfwSetWindowShouldClose(window, 1);
 			break;
 
 		case ' ':

@@ -4,6 +4,7 @@
 #include "demo-common.h"
 #include "gl_buffer.h"
 #include "demo-glstate.h"
+#include <GLFW/glfw3.h>
 
 class View {
 public:
@@ -12,7 +13,7 @@ public:
 
 	void reset();
 	void reshape_func(int, int);
-	void keyboard_func(unsigned char key, int x, int y);
+	void keyboard_func(GLFWwindow *, int, int, int, int);
 	void special_func(int key, int x, int y);
 	void mouse_func(int button, int state, int x, int y);
 	void motion_func(int x, int y);

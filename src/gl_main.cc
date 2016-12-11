@@ -39,9 +39,9 @@ reshape_func(int width, int height)
 }
 
 void
-keyboard_func(unsigned char key, int x, int y)
+keyboard_func(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-	static_vu->keyboard_func(key, x, y);
+	static_vu->keyboard_func(window, key, scancode, action, mods);
 }
 
 void
@@ -233,11 +233,10 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	// glfwSetKeyCallback(window, key_callback);
+	glfwSetKeyCallback(window, keyboard_func);
 
 	// glutReshapeFunc(reshape_func);
 	// glutDisplayFunc(display);
-	// glutKeyboardFunc(keyboard_func);
 	// glutSpecialFunc(special_func);
 	// glutMouseFunc(mouse_func);
 	// glutMotionFunc(motion_func);
