@@ -18,6 +18,8 @@
 #define FONT_PATH "/Library/Fonts/Andale Mono.ttf"
 #elif defined(__gnu_linux__)
 #define FONT_PATH "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+#else
+#error "Font path not configured for this platform!"
 #endif
 
 demo_glstate_t *st;
