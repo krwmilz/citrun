@@ -17,6 +17,7 @@
  */
 #include <assert.h>
 #include <err.h>
+#include <math.h>
 #include <unordered_map>
 #include <vector>
 
