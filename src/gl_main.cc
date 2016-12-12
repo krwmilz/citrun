@@ -31,7 +31,6 @@ View *static_vu;
 FT_Library ft_library;
 FT_Face ft_face;
 
-demo_font_t *font;
 demo_buffer_t *buffer;
 
 void
@@ -65,7 +64,7 @@ motion_func(int x, int y)
 }
 
 void
-add_new_process(std::string const &file_name)
+add_new_process(std::string const &file_name, demo_font_t *font)
 {
 	drawables.push_back(ProcessFile(file_name));
 	ProcessFile *pfile = &drawables.back();
@@ -93,10 +92,10 @@ add_new_process(std::string const &file_name)
 }
 
 void
-next_frame(View *vu)
+next_frame(View *vu, demo_font_t *font)
 {
 	for (std::string &file_name : m_pdir.scan())
-		add_new_process(file_name);
+		add_new_process(file_name, font);
 
 	for (auto &rp : drawables) {
 		// rp.read_executions();
@@ -167,7 +166,7 @@ main(int argc, char *argv[])
 	ft_face = NULL;
 	FT_New_Face(ft_library, FONT_PATH, /* face_index */ 0, &ft_face);
 
-	font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
+	demo_font_t *font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
 
 	static_vu->setup();
 
@@ -177,7 +176,7 @@ main(int argc, char *argv[])
 
 	while (!glfwWindowShouldClose(window)) {
 
-		next_frame(static_vu);
+		next_frame(static_vu, font);
 		static_vu->display();
 
 		glfwSwapBuffers(window);
