@@ -28,12 +28,10 @@ extern "C" {
 void start_animation();
 
 View::View(demo_glstate_t *st, demo_buffer_t *buf) :
+	refcount(1),
 	st(st),
 	buffer(buf),
-	fullscreen(false),
-	animate(false),
-	refcount(1),
-	has_fps_timer(0)
+	fullscreen(false)
 {
 	TRACE();
 
@@ -395,10 +393,10 @@ View::motion_func(int x, int y)
 
 	int viewport[4];
 	glGetIntegerv (GL_VIEWPORT, viewport);
+#if 0
 	GLuint width  = viewport[2];
 	GLuint height = viewport[3];
 
-#if 0
 	if (buttons & (1 << GLUT_LEFT_BUTTON))
 	{
 		if (modifiers & GLUT_ACTIVE_SHIFT) {
