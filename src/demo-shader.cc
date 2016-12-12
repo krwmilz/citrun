@@ -16,6 +16,7 @@
  * Google Author(s): Behdad Esfahbod
  */
 #include <assert.h>
+#include <GL/glew.h>
 
 #include "demo-shader.h"
 

@@ -22,10 +22,7 @@
 #include "glyphy/glyphy.h"
 
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
-
-#include <GL/glew.h>
 
 #if defined(__APPLE__)
 #  include <OpenGL/OpenGL.h>

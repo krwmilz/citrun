@@ -1,4 +1,5 @@
 #include <cmath>
+#include <GL/glew.h>
 #include <err.h>
 #include <iostream>
 #include <sstream>
