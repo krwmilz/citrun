@@ -27,8 +27,6 @@
 #include <math.h>
 #include <assert.h>
 
-#include <vector>
-
 #include <GL/glew.h>
 
 #if defined(__APPLE__)

@@ -18,10 +18,11 @@
 
 #include <err.h>
 
+#include <unordered_map>
+#include <vector>
+
 #include "gl_font.h"
 #include "glyphy/glyphy-freetype.h"
-
-#include <unordered_map>
 
 #if defined(__OpenBSD__)
 #define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"

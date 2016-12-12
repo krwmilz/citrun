@@ -19,6 +19,8 @@
 #ifndef DEMO_SHADERS_H
 #define DEMO_SHADERS_H
 
+#include <vector>
+
 #include "demo-common.h"
 #include "gl_font.h"
 
