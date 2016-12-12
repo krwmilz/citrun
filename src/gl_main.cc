@@ -4,32 +4,19 @@
 #include <sstream>
 #include <vector>
 
-#include "demo-font.h"
 #include "gl_buffer.h"
+#include "gl_font.h"
 #include "gl_view.h"
 #include "process_dir.h"
 #include "process_file.h"
 
 #include <GLFW/glfw3.h>
 
-#if defined(__OpenBSD__)
-#define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
-#elif defined(__APPLE__)
-#define FONT_PATH "/Library/Fonts/Andale Mono.ttf"
-#elif defined(__gnu_linux__)
-#define FONT_PATH "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
-#else
-#error "Font path not configured for this platform!"
-#endif
-
 demo_glstate_t *st;
 
 std::vector<ProcessFile> drawables;
 ProcessDir m_pdir;
 View *static_vu;
-
-FT_Library ft_library;
-FT_Face ft_face;
 
 demo_buffer_t *buffer;
 
@@ -161,12 +148,7 @@ main(int argc, char *argv[])
 
 	static_vu = new View(st, buffer);
 
-	FT_Init_FreeType(&ft_library);
-
-	ft_face = NULL;
-	FT_New_Face(ft_library, FONT_PATH, /* face_index */ 0, &ft_face);
-
-	demo_font_t *font = demo_font_create(ft_face, demo_glstate_get_atlas(st));
+	demo_font_t *font = demo_font_create(demo_glstate_get_atlas(st));
 
 	static_vu->setup();
 

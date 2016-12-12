@@ -16,8 +16,8 @@
  * Google Author(s): Behdad Esfahbod
  */
 
-#ifndef DEMO_FONT_H
-#define DEMO_FONT_H
+#ifndef GL_FONT_H
+#define GL_FONT_H
 
 #include "demo-common.h"
 #include "demo-atlas.h"
@@ -40,8 +40,7 @@ typedef struct {
 typedef struct demo_font_t demo_font_t;
 
 demo_font_t *
-demo_font_create (FT_Face       face,
-		  demo_atlas_t *atlas);
+demo_font_create (demo_atlas_t *atlas);
 
 demo_font_t *
 demo_font_reference (demo_font_t *font);
@@ -66,4 +65,4 @@ void
 demo_font_print_stats (demo_font_t *font);
 
 
-#endif /* DEMO_FONT_H */
+#endif /* GL_FONT_H */

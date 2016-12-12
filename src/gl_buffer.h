@@ -20,7 +20,7 @@
 #define DEMO_BUFFER_H
 
 #include "demo-common.h"
-#include "demo-font.h"
+#include "gl_font.h"
 #include "demo-shader.h"
 
 typedef struct demo_buffer_t demo_buffer_t;

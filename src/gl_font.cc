@@ -18,13 +18,25 @@
 
 #include <err.h>
 
-#include "demo-font.h"
+#include "gl_font.h"
 #include "glyphy/glyphy-freetype.h"
 
 #include <unordered_map>
 
+#if defined(__OpenBSD__)
+#define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
+#elif defined(__APPLE__)
+#define FONT_PATH "/Library/Fonts/Andale Mono.ttf"
+#elif defined(__gnu_linux__)
+#define FONT_PATH "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+#else
+#error "Font path not configured for this platform!"
+#endif
+
 
 typedef std::unordered_map<unsigned int, glyph_info_t> glyph_cache_t;
+FT_Library ft_library;
+FT_Face ft_face;
 
 struct demo_font_t {
   unsigned int   refcount;
@@ -43,13 +55,17 @@ struct demo_font_t {
 };
 
 demo_font_t *
-demo_font_create (FT_Face       face,
-		  demo_atlas_t *atlas)
+demo_font_create (demo_atlas_t *atlas)
 {
+	FT_Init_FreeType(&ft_library);
+
+	ft_face = NULL;
+	FT_New_Face(ft_library, FONT_PATH, /* face_index */ 0, &ft_face);
+
   demo_font_t *font = (demo_font_t *) calloc (1, sizeof (demo_font_t));
   font->refcount = 1;
 
-  font->face = face;
+  font->face = ft_face;
   font->glyph_cache = new glyph_cache_t ();
   font->atlas = demo_atlas_reference (atlas);
   font->acc = glyphy_arc_accumulator_create ();

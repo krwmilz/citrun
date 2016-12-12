@@ -20,7 +20,7 @@
 #define DEMO_SHADERS_H
 
 #include "demo-common.h"
-#include "demo-font.h"
+#include "gl_font.h"
 
 
 struct glyph_vertex_t {

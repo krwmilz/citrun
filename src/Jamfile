@@ -31,7 +31,7 @@ GL_SRCS =
 	gl_view.cc
 	demo-atlas.cc
 	gl_buffer.cc
-	demo-font.cc
+	gl_font.cc
 	demo-glstate.cc
 	demo-shader.cc
 	matrix4x4.c
