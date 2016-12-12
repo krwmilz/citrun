@@ -15,9 +15,8 @@
  *
  * Google Author(s): Behdad Esfahbod
  */
-
+#include <assert.h>
 #include <err.h>
-
 #include <unordered_map>
 #include <vector>
 

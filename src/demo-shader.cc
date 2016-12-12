@@ -15,6 +15,7 @@
  *
  * Google Author(s): Behdad Esfahbod
  */
+#include <assert.h>
 
 #include "demo-shader.h"
 

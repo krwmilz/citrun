@@ -15,6 +15,8 @@
  *
  * Google Author(s): Behdad Esfahbod, Maysum Panju, Wojciech Baranowski
  */
+#include <sys/time.h>
+#include <assert.h>
 
 #include "gl_view.h"
 
@@ -23,7 +25,6 @@ extern "C" {
 #include "matrix4x4.h"
 }
 
-#include <sys/time.h>
 
 void start_animation();
 
