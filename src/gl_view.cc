@@ -20,7 +20,6 @@
 #include <assert.h>
 #include <GL/glew.h>
 
-
 #include "gl_view.h"
 
 extern "C" {
@@ -131,7 +130,7 @@ View::apply_transform(float *mat)
 	}
 
 	// Rotate
-	float m[4][4];
+	//float m[4][4];
 	//build_rotmatrix (m, quat);
 	//m4MultMatrix(mat, &m[0][0]);
 
