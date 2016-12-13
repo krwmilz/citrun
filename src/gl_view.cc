@@ -302,7 +302,6 @@ View::keyboard_func(GLFWwindow *window, int key, int scancode, int action, int m
 		default:
 			return;
 	}
-	// glutPostRedisplay ();
 }
 
 void
@@ -507,8 +506,6 @@ View::display()
 	glClear (GL_COLOR_BUFFER_BIT);
 
 	demo_buffer_draw (buffer);
-
-	// glutSwapBuffers ();
 }
 
 void
