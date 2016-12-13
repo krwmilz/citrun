@@ -24,7 +24,6 @@
 #include "gl_view.h"
 
 extern "C" {
-#include "trackball.h"
 #include "matrix4x4.h"
 }
 
@@ -55,8 +54,8 @@ View::reset()
 	perspective = 4;
 	scale_ = 1;
 	translate_.x = translate_.y = 0;
-	trackball (quat , 0.0, 0.0, 0.0, 0.0);
-	vset (rot_axis, 0., 0., 1.);
+	// trackball (quat , 0.0, 0.0, 0.0, 0.0);
+	// vset (rot_axis, 0., 0., 1.);
 	rot_speed = ANIMATION_SPEED / 1000.;
 }
 
@@ -133,8 +132,8 @@ View::apply_transform(float *mat)
 
 	// Rotate
 	float m[4][4];
-	build_rotmatrix (m, quat);
-	m4MultMatrix(mat, &m[0][0]);
+	//build_rotmatrix (m, quat);
+	//m4MultMatrix(mat, &m[0][0]);
 
 	// Fix 'up'
 	m4Scale (mat, 1, -1, 1);

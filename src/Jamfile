@@ -34,8 +34,7 @@ GL_SRCS =
 	gl_font.cc
 	demo-glstate.cc
 	demo-shader.cc
-	matrix4x4.c
-	trackball.c ;
+	matrix4x4.c ;
 
 Library gl_common : $(GL_SRCS) ;
 
