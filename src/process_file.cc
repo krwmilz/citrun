@@ -18,13 +18,12 @@
 
 #include <cassert>
 #include <csignal>		// kill
-#include <cstring>		// strncmp
+#include <cstring>		// memcpy, strncmp
 #include <err.h>
 #include <fcntl.h>		// O_RDONLY
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>		// getenv
-#include <string.h>		// memcpy
 #include <unistd.h>		// getpagesize
 
 #include "process_file.h"
@@ -98,7 +97,7 @@ TranslationUnit::read_source()
 void
 TranslationUnit::save_executions()
 {
-	memcpy(m_data_buffer, m_data, m_node->size * sizeof(unsigned long long));
+	std::memcpy(m_data_buffer, m_data, m_node->size * sizeof(unsigned long long));
 }
 
 
