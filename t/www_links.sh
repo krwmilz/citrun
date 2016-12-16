@@ -1,5 +1,9 @@
-use strict;
-use Test::More tests => 1;
+#!/bin/sh -u
+#
+# Test that all html links on the website work.
+#
+. t/libtap.subr
+plan 1
 
 # --spider: don't download the page
 # -r: recursive retrieval
@@ -7,5 +11,4 @@ use Test::More tests => 1;
 # -nv: turn off extra downloading output
 # -H: span accross hosts
 # -l: recursion level
-my $ret = system( "wget --spider -r -nd -nv -H -l 1 http://cit.run" );
-is( $ret, 0, "http://cit.run/ has no broken links" );
+ok "is no broken links" wget --spider -r -nd -nv -l 1 http://cit.run
