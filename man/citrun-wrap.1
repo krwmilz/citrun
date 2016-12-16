@@ -22,7 +22,7 @@
 .Sh SYNOPSIS
 .Nm
 .Ar build_cmd
-.Op Ar arg1 Ar ... Ar argN
+.Op Ar ...
 .Sh DESCRIPTION
 C It Run uses source code rewriting, also called instrumentation. The only time
 rewriting can succeed is at software compilation time.
@@ -40,21 +40,21 @@ when finding compiler executables, which must be named one of the following:
 .Pp
 .Bl -bullet -compact
 .It
+c++
+.It
+cc
+.It
 clang
 .It
 clang++
 .It
-egcc
-.It
 eg++
 .It
-gcc
+egcc
 .It
 g++
 .It
-cc
-.It
-c++
+gcc
 .El
 .Pp
 The warnings and errors from the rewrite tool are indiscernible from the
