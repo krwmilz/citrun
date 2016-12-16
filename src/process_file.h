@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 
+#include "gl_buffer.h"
+
 
 //
 // Owns a few pages of shared memory that are created by a running instrumented
@@ -34,16 +36,15 @@ class ProcessFile
 	size_t			 m_size;
 	int			 m_tus_with_execs;
 	unsigned int		 m_program_loc;
+	demo_buffer_t		*m_gl_buffer;
 
 public:
-	ProcessFile(std::string const &);
+	ProcessFile(std::string const &, demo_font_t *);
 
 	const TranslationUnit	*find_tu(std::string const &) const;
 	bool			 is_alive() const;
-	std::string		 progname() const;
-	int			 getpid() const;
-	int			 getppid() const;
-	int			 getpgrp() const;
+	void			 display() const;
+	glyphy_extents_t	 get_extents() const;
 
 	std::vector<TranslationUnit> m_tus;
 };

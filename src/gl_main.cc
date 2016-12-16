@@ -2,7 +2,6 @@
 #include <GL/glew.h>
 #include <err.h>
 #include <iostream>
-#include <sstream>
 #include <vector>
 
 #include "gl_buffer.h"
@@ -13,13 +12,7 @@
 
 #include <GLFW/glfw3.h>
 
-demo_glstate_t *st;
-
-std::vector<ProcessFile> drawables;
-ProcessDir m_pdir;
 View *static_vu;
-
-demo_buffer_t *buffer;
 
 void
 reshape_func(int width, int height)
@@ -52,55 +45,8 @@ motion_func(int x, int y)
 }
 
 void
-add_new_process(std::string const &file_name, demo_font_t *font)
-{
-	drawables.push_back(ProcessFile(file_name));
-	ProcessFile *pfile = &drawables.back();
-
-	demo_buffer_clear(buffer);
-
-	std::stringstream ss;
-	ss << "program name:\t" << pfile->progname() << std::endl;
-	ss << "trnsltn units:\t" << pfile->m_tus.size() << std::endl;
-	ss << "process id:\t" << pfile->getpid() << std::endl;
-	ss << "parent pid:\t" << pfile->getppid() << std::endl;
-	ss << "process group:\t" << pfile->getpgrp() << std::endl;
-
-	glyphy_point_t cur_pos = { 0, 0 };
-	demo_buffer_move_to(buffer, &cur_pos);
-
-	demo_buffer_add_text(buffer, ss.str().c_str(), font, 2);
-
-	demo_buffer_current_point(buffer, &cur_pos);
-
-	cur_pos.x = 0;
-	for (auto &t : pfile->m_tus) {
-		demo_buffer_add_text(buffer, t.comp_file_path().c_str(), font, 1);
-	}
-}
-
-void
 next_frame(View *vu, demo_font_t *font)
 {
-	for (std::string &file_name : m_pdir.scan())
-		add_new_process(file_name, font);
-
-	for (auto &rp : drawables) {
-		// rp.read_executions();
-
-		//glyphy_point_t tmp;
-		for (auto &t : rp.m_tus) {
-			//size_t bytes_total = t.num_lines * sizeof(uint64_t);
-
-			for (unsigned int i = 0; i < t.num_lines(); i++) {
-				//if (t.exec_counts[i] == 0)
-				//	continue;
-
-				// demo_buffer_add_text(buffer, ">>", font, 1);
-			}
-		}
-		std::cout << "tick" << std::endl;
-	}
 }
 
 static void
@@ -144,10 +90,13 @@ main(int argc, char *argv[])
 	if (!glewIsSupported("GL_VERSION_2_0"))
 		errx(1, "No support for OpenGL 2.0 found");
 
-	st = demo_glstate_create();
-	buffer = demo_buffer_create();
+	ProcessDir m_pdir;
+	std::vector<ProcessFile> drawables;
 
-	static_vu = new View(st, buffer);
+	demo_glstate_t *st = demo_glstate_create();
+	demo_buffer_t *buffer = demo_buffer_create();
+
+	static_vu = new View(st);
 
 	demo_font_t *font = demo_font_create(demo_glstate_get_atlas(st));
 
@@ -159,8 +108,25 @@ main(int argc, char *argv[])
 
 	while (!glfwWindowShouldClose(window)) {
 
-		next_frame(static_vu, font);
-		static_vu->display();
+		for (std::string &file_name : m_pdir.scan())
+			drawables.push_back(ProcessFile(file_name, font));
+
+		glyphy_extents_t extents;
+		for (auto &i : drawables) {
+			glyphy_extents_t t = i.get_extents();
+			extents.max_x = std::max(extents.max_x, t.max_x);
+			extents.max_y = std::max(extents.max_y, t.max_y);
+			extents.min_x = std::min(extents.min_x, t.min_x);
+			extents.min_y = std::min(extents.min_y, t.min_y);
+		}
+
+		// Set up view transforms
+		static_vu->display(extents);
+
+		demo_buffer_draw (buffer);
+
+		for (auto &i : drawables)
+			i.display();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -29,10 +29,9 @@ extern "C" {
 
 void start_animation();
 
-View::View(demo_glstate_t *st, demo_buffer_t *buf) :
+View::View(demo_glstate_t *st) :
 	refcount(1),
 	st(st),
-	buffer(buf),
 	fullscreen(false)
 {
 	TRACE();
@@ -471,7 +470,7 @@ View::advance_frame(long dtime)
 }
 
 void
-View::display()
+View::display(glyphy_extents_t const &extents)
 {
 	long new_time = current_time ();
 	advance_frame(new_time - last_frame_time);
@@ -490,8 +489,6 @@ View::display()
 	apply_transform(mat);
 
 	// Buffer best-fit
-	glyphy_extents_t extents;
-	demo_buffer_extents (buffer, NULL, &extents);
 	double content_scale = .9 * std::min (width  / (extents.max_x - extents.min_x),
 			height / (extents.max_y - extents.min_y));
 	m4Scale (mat, content_scale, content_scale, 1);
@@ -504,8 +501,6 @@ View::display()
 
 	glClearColor (1, 1, 1, 1);
 	glClear (GL_COLOR_BUFFER_BIT);
-
-	demo_buffer_draw (buffer);
 }
 
 void

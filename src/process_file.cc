@@ -23,7 +23,7 @@
 #include <fcntl.h>		// O_RDONLY
 #include <fstream>
 #include <iostream>
-#include <stdlib.h>		// getenv
+#include <sstream>
 #include <unistd.h>		// getpagesize
 
 #include "process_file.h"
@@ -108,11 +108,12 @@ TranslationUnit::save_executions()
 // Take a filesystem path and memory map its contents. Map at least a header
 // structure on top of it.
 //
-ProcessFile::ProcessFile(std::string const &path) :
+ProcessFile::ProcessFile(std::string const &path, demo_font_t *font) :
 	m_path(path),
 	m_fd(0),
 	m_tus_with_execs(0),
-	m_program_loc(0)
+	m_program_loc(0),
+	m_gl_buffer(demo_buffer_create())
 {
 	struct stat	 sb;
 	void		*mem, *end;
@@ -123,8 +124,9 @@ ProcessFile::ProcessFile(std::string const &path) :
 	if (fstat(m_fd, &sb) < 0)
 		err(1, "fstat");
 
-	if (sb.st_size > 1024 * 1024 * 1024)
-		errx(1, "shared memory too large: %lli", sb.st_size);
+	// Explicitly check 0 here otherwise mmap barfs.
+	if (sb.st_size == 0 || sb.st_size > 1024 * 1024 * 1024)
+		errx(1, "invalid file size %lli", sb.st_size);
 
 	m_size = sb.st_size;
 
@@ -148,6 +150,23 @@ ProcessFile::ProcessFile(std::string const &path) :
 
 	for (auto &t : m_tus)
 		m_program_loc += t.num_lines();
+
+	std::stringstream ss;
+	ss << "Program Name:" << m_header->progname << std::endl;
+	ss << "Translation Units:" << m_tus.size() << std::endl;
+	ss << "Lines of Code:" << m_program_loc << std::endl;
+	ss << "Process Id:" << m_header->pids[0] << std::endl;
+	ss << "Parent Process Id:" << m_header->pids[1] << std::endl;
+	ss << "Process Group:" << m_header->pids[2] << std::endl;
+
+	glyphy_point_t cur_pos = { 0, 0 };
+	demo_buffer_move_to(m_gl_buffer, &cur_pos);
+	demo_buffer_add_text(m_gl_buffer, ss.str().c_str(), font, 2);
+
+	demo_buffer_current_point(m_gl_buffer, &cur_pos);
+	cur_pos.x = 0;
+	for (auto &t : m_tus)
+		demo_buffer_add_text(m_gl_buffer, t.comp_file_path().c_str(), font, 1);
 }
 
 //
@@ -170,32 +189,17 @@ ProcessFile::find_tu(std::string const &srcname) const
 	return NULL;
 }
 
-//
-// Return program the runtime is/was running within.
-//
-std::string
-ProcessFile::progname() const
+void
+ProcessFile::display() const
 {
-	return std::string(m_header->progname);
+	demo_buffer_draw (m_gl_buffer);
 }
 
-//
-// Return the pid, ppid, pgrp the runtime is/was running within.
-//
-int
-ProcessFile::getpid() const
+glyphy_extents_t
+ProcessFile::get_extents() const
 {
-	return m_header->pids[0];
-}
+	glyphy_extents_t extents;
+	demo_buffer_extents(m_gl_buffer, NULL, &extents);
 
-int
-ProcessFile::getppid() const
-{
-	return m_header->pids[1];
-}
-
-int
-ProcessFile::getpgrp() const
-{
-	return m_header->pids[2];
+	return extents;
 }

@@ -1,11 +1,10 @@
 SubDir TOP src ;
 
 #
-# libcitrun.a and utils.a
+# libcitrun.a
 #
 ObjectCcFlags rt.c : -fPIC -ansi ;
 Library libcitrun : rt.c ;
-Library utils : process_file.cc process_dir.cc ;
 
 #
 # citrun-wrap, citrun-check
@@ -21,13 +20,14 @@ ReplaceTokens citrun-wrap ;
 #
 LINKLIBS on citrun-term += -lcurses ;
 # XXX: Not the main focus right now.
-# LinkLibraries citrun-term : utils ;
 # Main citrun-term : term_main.cc ;
 
 #
 # citrun-gl & citrun-gltest
 #
 GL_SRCS =
+	process_file.cc
+	process_dir.cc
 	gl_view.cc
 	demo-atlas.cc
 	gl_buffer.cc
@@ -46,7 +46,7 @@ ObjectC++Flags gl_main.cc gl_testmain.cc $(GL_SRCS) :
 	`pkg-config $(PKG_CONFIG_LIBS) --cflags` ;
 
 LINKLIBS on citrun-gl citrun-gltest += -lm `pkg-config $(PKG_CONFIG_LIBS) --libs` ;
-LinkLibraries citrun-gl citrun-gltest : gl_common libglyphy utils ;
+LinkLibraries citrun-gl citrun-gltest : gl_common libglyphy ;
 
 LINKLIBS on citrun-gltest += -lOSMesa ;
 

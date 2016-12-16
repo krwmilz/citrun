@@ -8,7 +8,7 @@
 
 class View {
 public:
-	View(demo_glstate_t *, demo_buffer_t *);
+	View(demo_glstate_t *);
 	~View();
 
 	void reset();
@@ -18,7 +18,7 @@ public:
 	void mouse_func(int button, int state, int x, int y);
 	void motion_func(int x, int y);
 	void print_help();
-	void display();
+	void display(glyphy_extents_t const &);
 	void setup();
 
 	/* Animation */
