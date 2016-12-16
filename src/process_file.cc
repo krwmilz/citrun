@@ -89,6 +89,10 @@ TranslationUnit::read_source()
 	std::string line;
 	while (std::getline(file_stream, line))
 		m_source.push_back(line);
+
+	if (m_source.size() != m_node->size)
+		warnx("%s size mismatch: %lu vs %u", m_node->abs_file_path,
+			m_source.size(), m_node->size);
 }
 
 //
