@@ -24,12 +24,12 @@
 .Ar build_cmd
 .Op Ar ...
 .Sh DESCRIPTION
-C It Run uses source code rewriting, also called instrumentation. The only time
-rewriting can succeed is at software compilation time.
+C It Run must rewrite source code to add instrumentation. This process happens
+at compile time.
 .Pp
 The
 .Nm
-utility enables rewriting on any source files compiled by
+utility enables source code rewriting on any files compiled during
 .Ar build_cmd .
 .Pp
 An important caveat is that
