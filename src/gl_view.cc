@@ -27,8 +27,6 @@ extern "C" {
 }
 
 
-void start_animation();
-
 View::View(demo_glstate_t *st) :
 	refcount(1),
 	st(st),
