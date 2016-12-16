@@ -6,7 +6,8 @@ Build dependencies:
 - C++11 capable compiler
 - Curses
 - DejaVu Sans Mono
-- freeglut and glew
+- GLEW
+- GLFW
 - FreeType2
 - Jam
 - LLVM and Clang > 3.7
