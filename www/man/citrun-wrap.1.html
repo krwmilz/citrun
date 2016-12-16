@@ -39,35 +39,35 @@ CITRUN-WRAP(1)</td>
 <td>
 <b class="name">citrun-wrap</b></td>
 <td>
-<i class="arg">build_cmd</i> [<span class="opt"><i class="arg">arg1</i> <i class="arg">...</i> <i class="arg">argN</i></span>]</td>
+<i class="arg">build_cmd</i> [<span class="opt"><i class="arg">...</i></span>]</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section">
-<h1 id="DESCRIPTION">DESCRIPTION</h1> C It Run uses source code rewriting, also called instrumentation. The only time rewriting can succeed is at software compilation time.<div class="spacer">
+<h1 id="DESCRIPTION">DESCRIPTION</h1> C It Run must rewrite source code to add instrumentation. This process happens at compile time.<div class="spacer">
 </div>
-The <b class="name">citrun-wrap</b> utility enables rewriting on any source files compiled by <i class="arg">build_cmd</i>.<div class="spacer">
+The <b class="name">citrun-wrap</b> utility enables source code rewriting on any files compiled during <i class="arg">build_cmd</i>.<div class="spacer">
 </div>
 An important caveat is that <i class="arg">build_cmd</i> must search <span class="env">PATH</span> when finding compiler executables, which must be named one of the following:<div class="spacer">
 </div>
 <ul style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-bul">
 <li class="list-bul" style="margin-top: 0.00em;">
+c++</li>
+<li class="list-bul" style="margin-top: 0.00em;">
+cc</li>
+<li class="list-bul" style="margin-top: 0.00em;">
 clang</li>
 <li class="list-bul" style="margin-top: 0.00em;">
 clang++</li>
 <li class="list-bul" style="margin-top: 0.00em;">
-egcc</li>
-<li class="list-bul" style="margin-top: 0.00em;">
 eg++</li>
 <li class="list-bul" style="margin-top: 0.00em;">
-gcc</li>
+egcc</li>
 <li class="list-bul" style="margin-top: 0.00em;">
 g++</li>
 <li class="list-bul" style="margin-top: 0.00em;">
-cc</li>
-<li class="list-bul" style="margin-top: 0.00em;">
-c++</li>
+gcc</li>
 </ul>
 <div class="spacer">
 </div>
