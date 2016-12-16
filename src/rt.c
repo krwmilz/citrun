@@ -28,7 +28,8 @@
 #include "rt.h"			/* citrun_*, struct citrun_{header,node} */
 
 
-static int shm_fd = 0;
+static int			 shm_fd = 0;
+static struct citrun_header	*shm_header;
 
 /*
  * Extends the file and memory mapping length of shm_fd by a requested amount of
@@ -71,7 +72,6 @@ shm_create()
 {
 	char			*procdir;
 	char			 procfile[PATH_MAX];
-	struct citrun_header	*header;
 
 	/* User of this env var must give trailing slash */
 	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
@@ -89,21 +89,23 @@ shm_create()
 
 	/* Add header. */
 	assert(sizeof(struct citrun_header) < getpagesize());
-	header = shm_extend(sizeof(struct citrun_header));
+	shm_header = shm_extend(sizeof(struct citrun_header));
 
 	/* Purposefully not null terminated. */
-	strncpy(header->magic, "ctrn", sizeof(header->magic));
+	strncpy(shm_header->magic, "ctrn", sizeof(shm_header->magic));
 
-	header->major = citrun_major;
-	header->minor = citrun_minor;
-	header->pids[0] = getpid();
-	header->pids[1] = getppid();
-	header->pids[2] = getpgrp();
+	shm_header->major = citrun_major;
+	shm_header->minor = citrun_minor;
+	shm_header->pids[0] = getpid();
+	shm_header->pids[1] = getppid();
+	shm_header->pids[2] = getpgrp();
+	shm_header->units = 0;
+	shm_header->loc = 0;
 
 	/* getprogname() should never fail. */
-	strlcpy(header->progname, getprogname(), sizeof(header->progname));
+	strlcpy(shm_header->progname, getprogname(), sizeof(shm_header->progname));
 
-	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
+	if (getcwd(shm_header->cwd, sizeof(shm_header->cwd)) == NULL)
 		err(1, "getcwd");
 }
 
@@ -130,6 +132,9 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 
 	sz = sizeof(struct citrun_node);
 	sz += n->size * sizeof(unsigned long long);
+
+	shm_header->units++;
+	shm_header->loc += n->size;
 
 	shm_node = shm_extend(sz);
 

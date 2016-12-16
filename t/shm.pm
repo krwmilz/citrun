@@ -14,14 +14,15 @@ sub new {
 	open(my $fh, "<:mmap", $procfile) or die $!;
 
 	$self->{fh} = $fh;
-	$self->{size} = (stat $procfile)[7];
 
 	(	$self->{magic},
 		$self->{major}, $self->{minor},
 		$self->{pids}[0], $self->{pids}[1], $self->{pids}[2],
+		$self->{units},
+		$self->{loc},
 		$self->{progname},
 		$self->{cwd}
-	) = unpack("Z4I5Z1024Z1024", xread($fh, $pagesize));
+	) = unpack("Z4I7Z1024Z1024", xread($fh, $pagesize));
 
 	my @translation_units;
 	while (tell $fh < $self->{size}) {

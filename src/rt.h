@@ -6,6 +6,8 @@ struct citrun_header {
 	unsigned int		 major;
 	unsigned int		 minor;
 	unsigned int		 pids[3];
+	unsigned int		 units;
+	unsigned int		 loc;
 	char			 progname[1024];
 	char			 cwd[1024];
 };
