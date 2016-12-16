@@ -27,8 +27,7 @@
 #include <unistd.h>		// getpagesize
 
 #include "process_file.h"
-#include "rt.h"			// struct citrun_{node,header}
-#include "version.h"		// citrun_major
+#include "rt.h"			// citrun_major, struct citrun_{node,header}
 
 
 //

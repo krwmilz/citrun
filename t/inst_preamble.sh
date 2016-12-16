@@ -16,6 +16,9 @@ cat <<EOF > preamble.c.good
 #ifdef __cplusplus
 extern "" {
 #endif
+static const unsigned int citrun_major = 0;
+static const unsigned int citrun_minor = 0;
+
 struct citrun_header {
 	char			 magic[4];
 	unsigned int		 major;
@@ -40,7 +43,7 @@ static struct citrun_node _citrun = {
 };
 __attribute__((constructor)) static void
 citrun_constructor() {
-	citrun_node_add(0, 0, &_citrun);
+	citrun_node_add(citrun_major, citrun_minor, &_citrun);
 }
 #ifdef __cplusplus
 }

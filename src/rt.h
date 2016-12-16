@@ -1,3 +1,6 @@
+static const unsigned int citrun_major = 0;
+static const unsigned int citrun_minor = 0;
+
 struct citrun_header {
 	char			 magic[4];
 	unsigned int		 major;

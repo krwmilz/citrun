@@ -25,8 +25,7 @@
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
 
-#include "rt.h"			/* struct citrun_{header,node} */
-#include "version.h"
+#include "rt.h"			/* citrun_*, struct citrun_{header,node} */
 
 
 static int shm_fd = 0;

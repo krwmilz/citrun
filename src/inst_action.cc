@@ -15,7 +15,6 @@
 //
 #include "inst_action.h"
 #include "rt_h.h"
-#include "version.h"		// citrun_major, citrun_minor
 
 #include <clang/Frontend/CompilerInstance.h>
 #include <err.h>
@@ -86,8 +85,7 @@ InstrumentAction::EndSourceFileAction()
 	preamble << "};\n";
 	preamble << "__attribute__((constructor)) static void\n"
 		<< "citrun_constructor() {\n"
-		<< "	citrun_node_add(" << citrun_major << ", "
-		<< citrun_minor << ", &_citrun);\n"
+		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
 		<< "}\n";
 	preamble << "#ifdef __cplusplus\n"
 		<< "}\n"
