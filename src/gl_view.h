@@ -47,7 +47,6 @@ private:
 	unsigned int   refcount;
 
 	demo_glstate_t *st;
-	demo_buffer_t *buffer;
 
 	/* Output */
 	GLint vsync;

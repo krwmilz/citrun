@@ -65,7 +65,7 @@ main(int argc, char *argv[])
 	std::vector<ProcessFile> drawables;
 
 	demo_glstate_t *st = demo_glstate_create();
-	demo_buffer_t *buffer = demo_buffer_create();
+	GlBuffer buffer;
 
 	static_vu = new View(st);
 
@@ -74,13 +74,13 @@ main(int argc, char *argv[])
 	static_vu->setup();
 
 	glyphy_point_t top_left = { 0, 0 };
-	demo_buffer_move_to(buffer, &top_left);
-	demo_buffer_add_text(buffer, "waiting...", font, 1);
+	buffer.move_to(&top_left);
+	buffer.add_text("waiting...", font, 1);
 
 	while (!glfwWindowShouldClose(window)) {
 
 		for (std::string &file_name : m_pdir.scan())
-			drawables.push_back(ProcessFile(file_name, font));
+			drawables.emplace_back(file_name, font);
 
 		glyphy_extents_t extents;
 		for (auto &i : drawables) {
@@ -94,7 +94,7 @@ main(int argc, char *argv[])
 		// Set up view transforms
 		static_vu->display(extents);
 
-		demo_buffer_draw (buffer);
+		buffer.draw();
 
 		for (auto &i : drawables)
 			i.display();

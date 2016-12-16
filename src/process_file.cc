@@ -112,8 +112,7 @@ ProcessFile::ProcessFile(std::string const &path, demo_font_t *font) :
 	m_path(path),
 	m_fd(0),
 	m_tus_with_execs(0),
-	m_program_loc(0),
-	m_gl_buffer(demo_buffer_create())
+	m_program_loc(0)
 {
 	struct stat	 sb;
 	void		*mem, *end;
@@ -144,7 +143,7 @@ ProcessFile::ProcessFile(std::string const &path, demo_font_t *font) :
 	assert(m_header->major == citrun_major);
 
 	while (mem < end)
-		m_tus.push_back(TranslationUnit(mem));
+		m_tus.emplace_back(mem);
 	// Make sure internal increment in TranslationUnit works as intended.
 	assert(mem == end);
 
@@ -160,13 +159,13 @@ ProcessFile::ProcessFile(std::string const &path, demo_font_t *font) :
 	ss << "Process Group:" << m_header->pids[2] << std::endl;
 
 	glyphy_point_t cur_pos = { 0, 0 };
-	demo_buffer_move_to(m_gl_buffer, &cur_pos);
-	demo_buffer_add_text(m_gl_buffer, ss.str().c_str(), font, 2);
+	m_glbuffer.move_to(&cur_pos);
+	m_glbuffer.add_text(ss.str().c_str(), font, 2);
 
-	demo_buffer_current_point(m_gl_buffer, &cur_pos);
+	m_glbuffer.current_point(&cur_pos);
 	cur_pos.x = 0;
 	for (auto &t : m_tus)
-		demo_buffer_add_text(m_gl_buffer, t.comp_file_path().c_str(), font, 1);
+		m_glbuffer.add_text(t.comp_file_path().c_str(), font, 1);
 }
 
 //
@@ -190,16 +189,16 @@ ProcessFile::find_tu(std::string const &srcname) const
 }
 
 void
-ProcessFile::display() const
+ProcessFile::display()
 {
-	demo_buffer_draw (m_gl_buffer);
+	m_glbuffer.draw();
 }
 
 glyphy_extents_t
-ProcessFile::get_extents() const
+ProcessFile::get_extents()
 {
 	glyphy_extents_t extents;
-	demo_buffer_extents(m_gl_buffer, NULL, &extents);
+	m_glbuffer.extents(NULL, &extents);
 
 	return extents;
 }

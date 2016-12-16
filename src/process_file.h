@@ -36,15 +36,15 @@ class ProcessFile
 	size_t			 m_size;
 	int			 m_tus_with_execs;
 	unsigned int		 m_program_loc;
-	demo_buffer_t		*m_gl_buffer;
+	GlBuffer		 m_glbuffer;
 
 public:
 	ProcessFile(std::string const &, demo_font_t *);
 
 	const TranslationUnit	*find_tu(std::string const &) const;
 	bool			 is_alive() const;
-	void			 display() const;
-	glyphy_extents_t	 get_extents() const;
+	void			 display();
+	glyphy_extents_t	 get_extents();
 
 	std::vector<TranslationUnit> m_tus;
 };
