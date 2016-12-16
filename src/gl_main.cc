@@ -15,38 +15,9 @@
 View *static_vu;
 
 void
-reshape_func(int width, int height)
-{
-	static_vu->reshape_func(width, height);
-}
-
-void
 keyboard_func(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	static_vu->keyboard_func(window, key, scancode, action, mods);
-}
-
-void
-special_func(int key, int x, int y)
-{
-	static_vu->special_func(key, x, y);
-}
-
-void
-mouse_func(int button, int state, int x, int y)
-{
-	static_vu->mouse_func(button, state, x, y);
-}
-
-void
-motion_func(int x, int y)
-{
-	static_vu->motion_func(x, y);
-}
-
-void
-next_frame(View *vu, demo_font_t *font)
-{
 }
 
 static void
