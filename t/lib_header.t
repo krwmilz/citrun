@@ -3,7 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 15;
 use t::program;
 use t::shm;
 use t::tmpdir;
@@ -18,9 +18,11 @@ my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
 is scalar @procfiles,	1,	"is one file in procdir";
 
 my $shm = t::shm->new($procfiles[0]);
-is $shm->{magic},	"ctrn",	"is file magic correct";
-is $shm->{major},	0,	"is major correct";
-is $shm->{minor},	0,	"is minor correct";
+is $shm->{magic},	"ctrn",	"is correct file magic";
+is $shm->{major},	0,	"is correct major";
+is $shm->{minor},	0,	"is correct minor";
+is $shm->{units},	3,	"is correct number of translation units";
+is $shm->{loc},		40,	"is correct number of translation units";
 
 my ($pid, $ppid, $pgrp) = @{ $shm->{pids} };
 cmp_ok $pid,	'<',	100 * 1000,	"is pid < max pid";
