@@ -38,7 +38,6 @@ private:
 	void scale(double);
 	void translate(double, double);
 	void apply_transform(float *);
-	void toggle_srgb();
 	void toggle_fullscreen();
 	void toggle_debug();
 	void advance_frame(long);
@@ -48,7 +47,6 @@ private:
 	demo_glstate_t *st;
 
 	/* Output */
-	glyphy_bool_t srgb;
 	glyphy_bool_t fullscreen;
 
 	/* Mouse handling */

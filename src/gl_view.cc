@@ -142,24 +142,6 @@ current_time (void)
 }
 
 void
-View::toggle_srgb()
-{
-	srgb = !srgb;
-	LOGI ("Setting sRGB framebuffer %s.\n", srgb ? "on" : "off");
-#if defined(GL_FRAMEBUFFER_SRGB) && defined(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT)
-	GLboolean available = false;
-	if ((glewIsSupported ("GL_ARB_framebuffer_sRGB") || glewIsSupported ("GL_EXT_framebuffer_sRGB")) &&
-			(glGetBooleanv (GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &available), available)) {
-		if (srgb)
-			glEnable (GL_FRAMEBUFFER_SRGB);
-		else
-			glDisable (GL_FRAMEBUFFER_SRGB);
-	} else
-#endif
-		LOGW ("No sRGB framebuffer extension found; failed to set sRGB framebuffer\n");
-}
-
-void
 View::toggle_fullscreen()
 {
 #if 0
@@ -239,9 +221,6 @@ View::keyboard_func(GLFWwindow *window, int key, int scancode, int action, int m
 			break;
 		case 'b':
 			scale_gamma_adjust(1. / STEP);
-			break;
-		case 'c':
-			toggle_srgb();
 			break;
 
 		case GLFW_KEY_EQUAL:
@@ -476,7 +455,5 @@ View::display(glyphy_extents_t const &extents)
 void
 View::setup()
 {
-	if (!srgb)
-		toggle_srgb();
 	demo_glstate_setup(st);
 }

@@ -38,6 +38,7 @@ main(int argc, char *argv[])
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_SRGB_CAPABLE, 1);
 
 	window = glfwCreateWindow(1600, 1200, "C It Run", NULL, NULL);
 	if (window == NULL) {
