@@ -8,7 +8,7 @@
 #include "gl_font.h"
 #include "gl_view.h"
 #include "process_dir.h"
-#include "process_file.h"
+#include "gl_procfile.h"
 
 #include <GLFW/glfw3.h>
 
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
 		errx(1, "No support for OpenGL 2.0 found");
 
 	ProcessDir m_pdir;
-	std::vector<ProcessFile> drawables;
+	std::vector<GlProcessFile> drawables;
 
 	demo_glstate_t *st = demo_glstate_create();
 	GlBuffer buffer;

@@ -26,7 +26,8 @@ LINKLIBS on citrun-term += -lcurses ;
 # citrun-gl & citrun-gltest
 #
 GL_SRCS =
-	process_file.cc
+	gl_procfile.cc
+	gl_transunit.cc
 	process_dir.cc
 	gl_view.cc
 	demo-atlas.cc
