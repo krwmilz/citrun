@@ -25,6 +25,7 @@ sub new {
 	) = unpack("Z4I7Z1024Z1024", xread($fh, $pagesize));
 
 	my @translation_units;
+	$self->{size} = (stat $procfile)[7];
 	while (tell $fh < $self->{size}) {
 		my %tu;
 
@@ -36,6 +37,8 @@ sub new {
 		$self->next_page();
 
 		push @translation_units, (\%tu);
+
+		$self->{size} = (stat $procfile)[7];
 	}
 	$self->{translation_units} = \@translation_units;
 
