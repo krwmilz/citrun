@@ -3,8 +3,8 @@ SubDir TOP src ;
 #
 # libcitrun.a
 #
-ObjectCcFlags rt.c : -fPIC -ansi ;
-Library libcitrun : rt.c ;
+ObjectCcFlags lib.c : -fPIC -ansi ;
+Library libcitrun : lib.c ;
 
 #
 # citrun-wrap, citrun-check
@@ -62,7 +62,7 @@ INST_SRCS =
 	inst_action.cc
 	inst_visitor.cc ;
 
-Stringize rt_h.h : rt.h ;
+Stringize lib_h.h : lib.h ;
 
 ObjectC++Flags $(INST_SRCS) : `llvm-config --cxxflags` ;
 ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;

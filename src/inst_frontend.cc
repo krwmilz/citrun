@@ -14,7 +14,7 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include "inst_frontend.h"
-#include "rt.h"			// citrun_major, citrun_minor
+#include "lib.h"		// citrun_major, citrun_minor
 
 #include <sys/stat.h>		// stat
 #include <sys/time.h>		// utimes

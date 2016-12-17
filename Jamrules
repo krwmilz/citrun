@@ -76,7 +76,7 @@ actions TestCoverage
 	prove
 	# prove tt
 
-	gcov -o src src/rt.c
+	gcov -o src src/lib.c
 	egcov -r src/*.cc
 }
 
