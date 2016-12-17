@@ -41,7 +41,7 @@ extend(size_t requested_bytes)
 {
 	size_t	 aligned_bytes, page_mask;
 	off_t	 len;
-	void	*shm;
+	void	*mem;
 
 	page_mask = getpagesize() - 1;
 	aligned_bytes = (requested_bytes + page_mask) & ~page_mask;
@@ -55,20 +55,20 @@ extend(size_t requested_bytes)
 		err(1, "ftruncate from %lld to %llu", len, len + aligned_bytes);
 
 	/* Increase memory mapping length. */
-	shm = mmap(NULL, requested_bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
+	mem = mmap(NULL, requested_bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
 		fd, len);
 
-	if (shm == MAP_FAILED)
+	if (mem == MAP_FAILED)
 		err(1, "mmap %zu bytes @ %llu", requested_bytes, len);
 
-	return shm;
+	return mem;
 }
 
 /*
- * Creates a new shared memory file with a header. Exits on error.
+ * Opens a file with a random suffix. Exits on error.
  */
 static void
-create()
+open_fd()
 {
 	char			*procdir;
 	char			 procfile[PATH_MAX];
@@ -86,12 +86,20 @@ create()
 
 	if ((fd = mkstemp(procfile)) < 0)
 		err(1, "mkstemp");
+}
 
-	/* Add header. */
+/*
+ * Extends the memory mapping and puts a struct citrun_header on top of it.
+ */
+static void
+add_header()
+{
+	/* This assumption is hardcoded elsewhere.*/
 	assert(sizeof(struct citrun_header) < getpagesize());
+
 	header = extend(sizeof(struct citrun_header));
 
-	/* Purposefully not null terminated. */
+	/* Must be exactly 4 bytes. */
 	strncpy(header->magic, "ctrn", sizeof(header->magic));
 
 	header->major = citrun_major;
@@ -106,7 +114,7 @@ create()
 	strlcpy(header->progname, getprogname(), sizeof(header->progname));
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
-		err(1, "getcwd");
+		strlcpy(header->cwd, "<none>", 7);
 }
 
 /*
@@ -120,7 +128,7 @@ void
 citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 {
 	size_t			 sz;
-	struct citrun_node	*shm_node;
+	struct citrun_node	*new;
 
 	/* Binary compatibility between versions not guaranteed. */
 	if (major != citrun_major || minor != citrun_minor)
@@ -128,20 +136,25 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 			"try cleaning and rebuilding your project",
 			citrun_major, citrun_minor, major, minor);
 
-	if (fd == 0)
-		create();
+	if (fd == 0) {
+		open_fd();
+		add_header();
+	}
 
+	/* Allocate enough room for node and live execution buffers. */
 	sz = sizeof(struct citrun_node);
 	sz += n->size * sizeof(unsigned long long);
+	new = extend(sz);
 
-	shm_node = extend(sz);
-
+	/* Increment accumulation fields in header. */
 	header->units++;
 	header->loc += n->size;
 
-	shm_node->size = n->size;
-	strlcpy(shm_node->comp_file_path, n->comp_file_path, 1024);
-	strlcpy(shm_node->abs_file_path, n->abs_file_path, 1024);
+	/* Copy these fields from incoming node verbatim. */
+	new->size = n->size;
+	strlcpy(new->comp_file_path, n->comp_file_path, 1024);
+	strlcpy(new->abs_file_path,  n->abs_file_path, 1024);
 
-	n->data = (unsigned long long *)(shm_node + 1);
+	/* Set incoming nodes data pointer to allocated space after struct. */
+	n->data = (unsigned long long *)(new + 1);
 }
