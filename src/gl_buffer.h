@@ -30,7 +30,7 @@ class GlBuffer
 {
 	unsigned int			 m_refcount;
 	glyphy_point_t			 m_cursor;
-	std::vector<glyph_vertex_t>	*m_vertices;
+	std::vector<glyph_vertex_t>	 m_vertices;
 	glyphy_extents_t		 m_ink_extents;
 	glyphy_extents_t		 m_logical_extents;
 	bool				 m_dirty;
@@ -38,7 +38,6 @@ class GlBuffer
 
 public:
 	GlBuffer();
-	~GlBuffer();
 
 	void		reference();
 	void		clear();

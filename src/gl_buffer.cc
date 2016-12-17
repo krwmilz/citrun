@@ -19,24 +19,23 @@
 #include "gl_buffer.h"
 
 
-GlBuffer::GlBuffer()
+GlBuffer::GlBuffer() :
+	m_refcount(1),
+	m_cursor({0, 0})
 {
-	m_refcount = 1;
-
-	m_vertices = new std::vector<glyph_vertex_t>;
 	glGenBuffers(1, &m_buf_name);
-
 	clear();
 }
 
+#if 0
 GlBuffer::~GlBuffer()
 {
 	//if (!buffer || --buffer->refcount)
 	//	return;
 
 	glDeleteBuffers(1, &m_buf_name);
-	delete m_vertices;
 }
+#endif
 
 void
 GlBuffer::reference()
@@ -47,7 +46,7 @@ GlBuffer::reference()
 void
 GlBuffer::clear()
 {
-	m_vertices->clear();
+	m_vertices.clear();
 	glyphy_extents_clear(&m_ink_extents);
 	glyphy_extents_clear(&m_logical_extents);
 	m_dirty = true;
@@ -126,7 +125,7 @@ GlBuffer::add_text(const char *utf8, demo_font_t *font, double font_size)
 
 		/* Update ink extents */
 		glyphy_extents_t m_ink_extents;
-		demo_shader_add_glyph_vertices(m_cursor, font_size, &gi, m_vertices, &m_ink_extents);
+		demo_shader_add_glyph_vertices(m_cursor, font_size, &gi, &m_vertices, &m_ink_extents);
 		glyphy_extents_extend(&m_ink_extents, &m_ink_extents);
 
 		/* Update logical extents */
@@ -155,11 +154,11 @@ GlBuffer::draw()
 	GLuint a_glyph_vertex_loc = glGetAttribLocation(program, "a_glyph_vertex");
 	glBindBuffer(GL_ARRAY_BUFFER, m_buf_name);
 	if (m_dirty) {
-		glBufferData(GL_ARRAY_BUFFER,  sizeof (glyph_vertex_t) * m_vertices->size (), (const char *) &(*m_vertices)[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,  sizeof (glyph_vertex_t) * m_vertices.size(), (const char *) &(m_vertices)[0], GL_STATIC_DRAW);
 		m_dirty = false;
 	}
 	glEnableVertexAttribArray (a_glyph_vertex_loc);
 	glVertexAttribPointer (a_glyph_vertex_loc, 4, GL_FLOAT, GL_FALSE, sizeof (glyph_vertex_t), 0);
-	glDrawArrays (GL_TRIANGLES, 0, m_vertices->size ());
+	glDrawArrays (GL_TRIANGLES, 0, m_vertices.size());
 	glDisableVertexAttribArray (a_glyph_vertex_loc);
 }

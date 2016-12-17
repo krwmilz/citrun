@@ -34,7 +34,8 @@
 // Take a pointer to a shared memory region and map data structures on top.
 // Automatically increments the pointer once we know how big this region is.
 //
-TranslationUnit::TranslationUnit(void* &mem) :
+TranslationUnit::TranslationUnit(void* &mem, demo_font_t *font,
+		glyphy_point_t &cur_pos) :
 	m_node(static_cast<struct citrun_node *>(mem)),
 	m_data((unsigned long long *)(m_node + 1)),
 	m_data_buffer(new uint64_t[m_node->size]())
@@ -49,7 +50,31 @@ TranslationUnit::TranslationUnit(void* &mem) :
 	page_mask = getpagesize() - 1;
 	mem = (char *)mem + ((size + page_mask) & ~page_mask);
 
-	read_source();
+	glyphy_point_t next_pos = cur_pos;
+	next_pos.x += 80;
+	m_glbuffer.move_to(&cur_pos);
+
+	m_glbuffer.add_text(m_node->comp_file_path, font, 1);
+
+	std::ifstream file_stream(m_node->abs_file_path);
+	if (file_stream.is_open() == 0) {
+		warnx("ifstream.open(%s)", m_node->abs_file_path);
+		return;
+	}
+
+	std::string line;
+	unsigned int i;
+	for (i = 0; std::getline(file_stream, line); ++i) {
+		m_glbuffer.current_point(&cur_pos);
+		cur_pos.x = 0;
+
+		m_glbuffer.move_to(&cur_pos);
+		//m_glbuffer.add_text(line.c_str(), font, 1);
+	}
+
+	if (i != m_node->size)
+		warnx("%s size mismatch: %u vs %u", m_node->abs_file_path, i,
+			m_node->size);
 }
 
 //
@@ -71,27 +96,13 @@ TranslationUnit::comp_file_path() const
 	return std::string(m_node->comp_file_path);
 }
 
-//
-// Try and read the contents of the on disk source file using the absolute path
-// provided by clang/llvm.
-//
-void
-TranslationUnit::read_source()
+glyphy_extents_t
+TranslationUnit::get_extents()
 {
-	std::ifstream file_stream(m_node->abs_file_path);
+	glyphy_extents_t extents;
+	m_glbuffer.extents(NULL, &extents);
 
-	if (file_stream.is_open() == 0) {
-		warnx("ifstream.open(%s)", m_node->abs_file_path);
-		return;
-	}
-
-	std::string line;
-	while (std::getline(file_stream, line))
-		m_source.push_back(line);
-
-	if (m_source.size() != m_node->size)
-		warnx("%s size mismatch: %lu vs %u", m_node->abs_file_path,
-			m_source.size(), m_node->size);
+	return extents;
 }
 
 //
@@ -103,6 +114,12 @@ TranslationUnit::save_executions()
 	std::memcpy(m_data_buffer, m_data, m_node->size * sizeof(unsigned long long));
 }
 
+void
+TranslationUnit::display()
+{
+	m_glbuffer.draw();
+}
+
 
 //
 // Take a filesystem path and memory map its contents. Map at least a header
@@ -111,8 +128,7 @@ TranslationUnit::save_executions()
 ProcessFile::ProcessFile(std::string const &path, demo_font_t *font) :
 	m_path(path),
 	m_fd(0),
-	m_tus_with_execs(0),
-	m_program_loc(0)
+	m_tus_with_execs(0)
 {
 	struct stat	 sb;
 	void		*mem, *end;
@@ -136,36 +152,28 @@ ProcessFile::ProcessFile(std::string const &path, demo_font_t *font) :
 	// Header is always at offset 0 and always one page long.
 	m_header = static_cast<struct citrun_header *>(mem);
 
-	end = (char *)mem + m_size;
-	mem = (char *)mem + getpagesize();
-
 	assert(std::strncmp(m_header->magic, "ctrn", 4) == 0);
 	assert(m_header->major == citrun_major);
 
-	while (mem < end)
-		m_tus.emplace_back(mem);
-	// Make sure internal increment in TranslationUnit works as intended.
-	assert(mem == end);
-
-	for (auto &t : m_tus)
-		m_program_loc += t.num_lines();
-
 	std::stringstream ss;
 	ss << "Program Name:" << m_header->progname << std::endl;
-	ss << "Translation Units:" << m_tus.size() << std::endl;
-	ss << "Lines of Code:" << m_program_loc << std::endl;
+	ss << "Translation Units:" << m_header->units << std::endl;
+	ss << "Lines of Code:" << m_header->loc << std::endl;
 	ss << "Process Id:" << m_header->pids[0] << std::endl;
 	ss << "Parent Process Id:" << m_header->pids[1] << std::endl;
 	ss << "Process Group:" << m_header->pids[2] << std::endl;
 
-	glyphy_point_t cur_pos = { 0, 0 };
-	m_glbuffer.move_to(&cur_pos);
 	m_glbuffer.add_text(ss.str().c_str(), font, 2);
-
+	glyphy_point_t cur_pos;
 	m_glbuffer.current_point(&cur_pos);
-	cur_pos.x = 0;
-	for (auto &t : m_tus)
-		m_glbuffer.add_text(t.comp_file_path().c_str(), font, 1);
+
+	end = (char *)mem + m_size;
+	mem = (char *)mem + getpagesize();
+
+	while (mem < end)
+		m_tus.emplace_back(mem, font, cur_pos);
+	// Make sure internal increment in TranslationUnit works as intended.
+	assert(mem == end);
 }
 
 //
@@ -192,6 +200,9 @@ void
 ProcessFile::display()
 {
 	m_glbuffer.draw();
+
+	for (auto &t : m_tus)
+		t.display();
 }
 
 glyphy_extents_t
@@ -199,6 +210,14 @@ ProcessFile::get_extents()
 {
 	glyphy_extents_t extents;
 	m_glbuffer.extents(NULL, &extents);
+
+	for (auto &i : m_tus) {
+		glyphy_extents_t t = i.get_extents();
+		extents.max_x = std::max(extents.max_x, t.max_x);
+		extents.max_y = std::max(extents.max_y, t.max_y);
+		extents.min_x = std::min(extents.min_x, t.min_x);
+		extents.min_y = std::min(extents.min_y, t.min_y);
+	}
 
 	return extents;
 }

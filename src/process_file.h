@@ -13,16 +13,16 @@ class TranslationUnit
 	struct citrun_node	*m_node;
 	uint64_t		*m_data;
 	uint64_t		*m_data_buffer;
-
-	std::vector<std::string> m_source;
+	GlBuffer		 m_glbuffer;
 
 public:
-	TranslationUnit(void* &);
+	TranslationUnit(void* &, demo_font_t *, glyphy_point_t &);
 
 	std::string		 comp_file_path() const;
 	unsigned int		 num_lines() const;
-	void			 read_source();
 	void			 save_executions();
+	void			 display();
+	glyphy_extents_t	 get_extents();
 };
 
 //
@@ -35,7 +35,6 @@ class ProcessFile
 	int			 m_fd;
 	size_t			 m_size;
 	int			 m_tus_with_execs;
-	unsigned int		 m_program_loc;
 	GlBuffer		 m_glbuffer;
 
 public:
