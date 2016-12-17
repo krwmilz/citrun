@@ -28,38 +28,38 @@
 #include "lib.h"		/* citrun_*, struct citrun_{header,node} */
 
 
-static int			 shm_fd = 0;
-static struct citrun_header	*shm_header;
+static int			 fd = 0;
+static struct citrun_header	*header;
 
 /*
- * Extends the file and memory mapping length of shm_fd by a requested amount of
+ * Extends the file and memory mapping length of fd by a requested amount of
  * bytes (rounded up to the next page size).
  * Returns a pointer to the extended region on success, exits on failure.
  */
 static void *
-shm_extend(size_t requested_bytes)
+extend(size_t requested_bytes)
 {
 	size_t	 aligned_bytes, page_mask;
-	off_t	 shm_len;
+	off_t	 len;
 	void	*shm;
 
 	page_mask = getpagesize() - 1;
 	aligned_bytes = (requested_bytes + page_mask) & ~page_mask;
 
 	/* Get current file length. */
-	if ((shm_len = lseek(shm_fd, 0, SEEK_END)) < 0)
+	if ((len = lseek(fd, 0, SEEK_END)) < 0)
 		err(1, "lseek");
 
 	/* Increase file length. */
-	if (ftruncate(shm_fd, shm_len + aligned_bytes) < 0)
-		err(1, "ftruncate from %lld to %llu", shm_len, shm_len + aligned_bytes);
+	if (ftruncate(fd, len + aligned_bytes) < 0)
+		err(1, "ftruncate from %lld to %llu", len, len + aligned_bytes);
 
 	/* Increase memory mapping length. */
 	shm = mmap(NULL, requested_bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
-		shm_fd, shm_len);
+		fd, len);
 
 	if (shm == MAP_FAILED)
-		err(1, "mmap %zu bytes @ %llu", requested_bytes, shm_len);
+		err(1, "mmap %zu bytes @ %llu", requested_bytes, len);
 
 	return shm;
 }
@@ -68,7 +68,7 @@ shm_extend(size_t requested_bytes)
  * Creates a new shared memory file with a header. Exits on error.
  */
 static void
-shm_create()
+create()
 {
 	char			*procdir;
 	char			 procfile[PATH_MAX];
@@ -84,33 +84,34 @@ shm_create()
 	strlcat(procfile, getprogname(), PATH_MAX);
 	strlcat(procfile, "_XXXXXXXXXX", PATH_MAX);
 
-	if ((shm_fd = mkstemp(procfile)) < 0)
+	if ((fd = mkstemp(procfile)) < 0)
 		err(1, "mkstemp");
 
 	/* Add header. */
 	assert(sizeof(struct citrun_header) < getpagesize());
-	shm_header = shm_extend(sizeof(struct citrun_header));
+	header = extend(sizeof(struct citrun_header));
 
 	/* Purposefully not null terminated. */
-	strncpy(shm_header->magic, "ctrn", sizeof(shm_header->magic));
+	strncpy(header->magic, "ctrn", sizeof(header->magic));
 
-	shm_header->major = citrun_major;
-	shm_header->minor = citrun_minor;
-	shm_header->pids[0] = getpid();
-	shm_header->pids[1] = getppid();
-	shm_header->pids[2] = getpgrp();
-	shm_header->units = 0;
-	shm_header->loc = 0;
+	header->major = citrun_major;
+	header->minor = citrun_minor;
+	header->pids[0] = getpid();
+	header->pids[1] = getppid();
+	header->pids[2] = getpgrp();
+	header->units = 0;
+	header->loc = 0;
 
 	/* getprogname() should never fail. */
-	strlcpy(shm_header->progname, getprogname(), sizeof(shm_header->progname));
+	strlcpy(header->progname, getprogname(), sizeof(header->progname));
 
-	if (getcwd(shm_header->cwd, sizeof(shm_header->cwd)) == NULL)
+	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
 		err(1, "getcwd");
 }
 
 /*
- * Public interface: Called by all instrumented translation units.
+ * Public Interface.
+ *
  * Copies n into the shared memory file and then points n->data to a region of
  * memory located right after n that's at least 8 * n->size large.
  * Exits on failure.
@@ -127,16 +128,16 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 			"try cleaning and rebuilding your project",
 			citrun_major, citrun_minor, major, minor);
 
-	if (shm_fd == 0)
-		shm_create();
+	if (fd == 0)
+		create();
 
 	sz = sizeof(struct citrun_node);
 	sz += n->size * sizeof(unsigned long long);
 
-	shm_header->units++;
-	shm_header->loc += n->size;
+	shm_node = extend(sz);
 
-	shm_node = shm_extend(sz);
+	header->units++;
+	header->loc += n->size;
 
 	shm_node->size = n->size;
 	strlcpy(shm_node->comp_file_path, n->comp_file_path, 1024);
