@@ -1,4 +1,3 @@
-# The test suite is part Shell and part Perl, but everything needs to be run at
-# once.
+# Test suite is part Shell and part Perl.
 --ext '.t'
 --ext '.sh'
