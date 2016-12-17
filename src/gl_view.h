@@ -38,7 +38,6 @@ private:
 	void scale(double);
 	void translate(double, double);
 	void apply_transform(float *);
-	void toggle_vsync();
 	void toggle_srgb();
 	void toggle_fullscreen();
 	void toggle_debug();
@@ -49,7 +48,6 @@ private:
 	demo_glstate_t *st;
 
 	/* Output */
-	GLint vsync;
 	glyphy_bool_t srgb;
 	glyphy_bool_t fullscreen;
 

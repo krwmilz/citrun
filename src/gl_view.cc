@@ -142,28 +142,6 @@ current_time (void)
 }
 
 void
-View::toggle_vsync()
-{
-	vsync = !vsync;
-	LOGI ("Setting vsync %s.\n", vsync ? "on" : "off");
-#if defined(__APPLE__)
-	CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &vsync);
-#elif defined(__WGLEW__)
-	if (wglewIsSupported ("WGL_EXT_swap_control"))
-		wglSwapIntervalEXT (vsync);
-	else
-		LOGW ("WGL_EXT_swal_control not supported; failed to set vsync\n");
-#elif defined(__GLXEW_H__)
-	if (glxewIsSupported ("GLX_SGI_swap_control"))
-		glXSwapIntervalSGI (vsync);
-	else
-		LOGW ("GLX_SGI_swap_control not supported; failed to set vsync\n");
-#else
-	LOGW ("No vsync extension found; failed to set vsync\n");
-#endif
-}
-
-void
 View::toggle_srgb()
 {
 	srgb = !srgb;
@@ -222,10 +200,6 @@ View::keyboard_func(GLFWwindow *window, int key, int scancode, int action, int m
 		case '\033':
 		case GLFW_KEY_Q:
 			glfwSetWindowShouldClose(window, 1);
-			break;
-
-		case 'v':
-			toggle_vsync();
 			break;
 
 		case 'f':
@@ -502,8 +476,6 @@ View::display(glyphy_extents_t const &extents)
 void
 View::setup()
 {
-	if (!vsync)
-		toggle_vsync();
 	if (!srgb)
 		toggle_srgb();
 	demo_glstate_setup(st);
