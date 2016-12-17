@@ -15,8 +15,6 @@
  *
  * Google Author(s): Behdad Esfahbod, Maysum Panju, Wojciech Baranowski
  */
-#include <sys/time.h>
-
 #include <assert.h>
 #include <GL/glew.h>
 
