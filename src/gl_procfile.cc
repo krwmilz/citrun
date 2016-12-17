@@ -34,8 +34,7 @@
 //
 GlProcessFile::GlProcessFile(std::string const &path, demo_font_t *font) :
 	m_path(path),
-	m_fd(0),
-	m_tus_with_execs(0)
+	m_fd(0)
 {
 	struct stat	 sb;
 	void		*mem, *end;

@@ -15,7 +15,6 @@ class GlProcessFile
 	std::string		 m_path;
 	int			 m_fd;
 	size_t			 m_size;
-	int			 m_tus_with_execs;
 	GlBuffer		 m_glbuffer;
 
 public:
