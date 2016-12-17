@@ -37,14 +37,14 @@ static struct citrun_header	*header;
  * Returns a pointer to the extended region on success, exits on failure.
  */
 static void *
-extend(size_t requested_bytes)
+extend(size_t req_bytes)
 {
 	size_t	 aligned_bytes, page_mask;
 	off_t	 len;
 	void	*mem;
 
 	page_mask = getpagesize() - 1;
-	aligned_bytes = (requested_bytes + page_mask) & ~page_mask;
+	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
 
 	/* Get current file length. */
 	if ((len = lseek(fd, 0, SEEK_END)) < 0)
@@ -55,11 +55,10 @@ extend(size_t requested_bytes)
 		err(1, "ftruncate from %lld to %llu", len, len + aligned_bytes);
 
 	/* Increase memory mapping length. */
-	mem = mmap(NULL, requested_bytes, PROT_READ | PROT_WRITE, MAP_SHARED,
-		fd, len);
+	mem = mmap(NULL, req_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, len);
 
 	if (mem == MAP_FAILED)
-		err(1, "mmap %zu bytes @ %llu", requested_bytes, len);
+		err(1, "mmap %zu bytes @ %llu", req_bytes, len);
 
 	return mem;
 }
