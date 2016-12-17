@@ -6,9 +6,9 @@
 
 #include "gl_buffer.h"
 #include "gl_font.h"
+#include "gl_procfile.h"
 #include "gl_view.h"
 #include "process_dir.h"
-#include "gl_procfile.h"
 
 #include <GLFW/glfw3.h>
 
