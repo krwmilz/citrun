@@ -47,11 +47,6 @@ main(int argc, char *argv[])
 
 	glfwSetKeyCallback(window, keyboard_func);
 
-	// glutReshapeFunc(reshape_func);
-	// glutSpecialFunc(special_func);
-	// glutMouseFunc(mouse_func);
-	// glutMotionFunc(motion_func);
-
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
