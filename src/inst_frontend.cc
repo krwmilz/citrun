@@ -266,7 +266,7 @@ InstFrontend::instrument()
 	std::vector<const char *> clang_argv;
 
 	clang_argv.push_back(m_args[0]);
-	for (auto s : m_source_files)
+	for (auto &s : m_source_files)
 		clang_argv.push_back(s.c_str());
 	clang_argv.push_back("--");
 	clang_argv.insert(clang_argv.end(), m_args.begin(), m_args.end());
