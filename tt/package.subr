@@ -1,4 +1,3 @@
-. t/libtap.subr
 . t/utils.subr
 
 if [ `uname` != "OpenBSD" ]; then
