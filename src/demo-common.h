@@ -25,7 +25,8 @@
 #include <stdio.h>
 
 #if defined(__APPLE__)
-#  include <OpenGL/OpenGL.h>
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
 #else
 #  include <GLES2/gl2.h>
 #endif
