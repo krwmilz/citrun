@@ -1,7 +1,7 @@
 strip_preamble()
 {
 	file="${1}"
-	tail -n +38 $file.citrun > $file.citrun_nohdr
+	tail -n +39 $file.citrun > $file.citrun_nohdr
 }
 
 strip_log()

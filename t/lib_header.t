@@ -3,7 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 16;
 use t::program;
 use t::shm;
 use t::tmpdir;
@@ -22,7 +22,8 @@ is $shm->{magic},	"ctrn",	"is correct file magic";
 is $shm->{major},	0,	"is correct major";
 is $shm->{minor},	0,	"is correct minor";
 is $shm->{units},	3,	"is correct number of translation units";
-is $shm->{loc},		40,	"is correct number of translation units";
+is $shm->{loc},		40,	"is loc right ";
+is $shm->{done},	1,	"is done signalled";
 
 my ($pid, $ppid, $pgrp) = @{ $shm->{pids} };
 cmp_ok $pid,	'<',	100 * 1000,	"is pid < max pid";

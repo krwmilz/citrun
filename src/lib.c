@@ -21,14 +21,14 @@
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
-#include <stdlib.h>		/* get{env,progname} */
+#include <stdlib.h>		/* atexit, get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
 
 #include "lib.h"		/* citrun_*, struct citrun_{header,node} */
 
 
-static int			 fd = 0;
+static int			 fd;
 static struct citrun_header	*header;
 
 /*
@@ -88,6 +88,15 @@ open_fd()
 }
 
 /*
+ * Called by atexit(3), which doesn't always get called (this is unreliable).
+ */
+static void
+set_exited()
+{
+	header->exited = 1;
+}
+
+/*
  * Extends the memory mapping and puts a struct citrun_header on top of it.
  */
 static void
@@ -106,14 +115,14 @@ add_header()
 	header->pids[0] = getpid();
 	header->pids[1] = getppid();
 	header->pids[2] = getpgrp();
-	header->units = 0;
-	header->loc = 0;
 
 	/* getprogname() should never fail. */
 	strlcpy(header->progname, getprogname(), sizeof(header->progname));
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
 		strlcpy(header->cwd, "<none>", 7);
+
+	atexit(set_exited);
 }
 
 /*

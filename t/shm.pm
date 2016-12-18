@@ -20,9 +20,10 @@ sub new {
 		$self->{pids}[0], $self->{pids}[1], $self->{pids}[2],
 		$self->{units},
 		$self->{loc},
+		$self->{done},
 		$self->{progname},
 		$self->{cwd}
-	) = unpack("Z4I7Z1024Z1024", xread($fh, $pagesize));
+	) = unpack("Z4I8Z1024Z1024", xread($fh, $pagesize));
 
 	my @translation_units;
 	$self->{size} = (stat $procfile)[7];

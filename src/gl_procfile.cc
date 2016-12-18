@@ -62,12 +62,10 @@ GlProcessFile::GlProcessFile(std::string const &path, demo_font_t *font) :
 	assert(m_header->major == citrun_major);
 
 	std::stringstream ss;
-	ss << "Program Name:" << m_header->progname << std::endl;
-	ss << "Translation Units:" << m_header->units << std::endl;
-	ss << "Lines of Code:" << m_header->loc << std::endl;
-	ss << "Process Id:" << m_header->pids[0] << std::endl;
-	ss << "Parent Process Id:" << m_header->pids[1] << std::endl;
-	ss << "Process Group:" << m_header->pids[2] << std::endl;
+	ss << "Program: " << m_header->progname << std::endl;
+	ss << "Translation Units: " << m_header->units << std::endl;
+	ss << "Lines of Code: " << m_header->loc << std::endl;
+	ss << "Done: " << m_header->exited << std::endl;
 
 	m_glbuffer.add_text(ss.str().c_str(), font, 2);
 	glyphy_point_t cur_pos;

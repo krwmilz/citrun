@@ -26,6 +26,7 @@ struct citrun_header {
 	unsigned int		 pids[3];
 	unsigned int		 units;
 	unsigned int		 loc;
+	unsigned int		 done;
 	char			 progname[1024];
 	char			 cwd[1024];
 };
