@@ -1,9 +1,8 @@
 package t::shm;
 use strict;
 use warnings;
+use Inline 'C';
 use POSIX;
-
-my $pagesize = POSIX::sysconf(POSIX::_SC_PAGESIZE);
 
 sub new {
 	my ($class, $procfile) = @_;
@@ -12,8 +11,11 @@ sub new {
 	bless($self, $class);
 
 	open(my $fh, "<:mmap", $procfile) or die $!;
-
+	$self->{procfile} = $procfile;
 	$self->{fh} = $fh;
+
+	my $header_size = citrun_header_size();
+	my $aligned_size = get_aligned_size($header_size);
 
 	(	$self->{magic},
 		$self->{major}, $self->{minor},
@@ -23,38 +25,47 @@ sub new {
 		$self->{done},
 		$self->{progname},
 		$self->{cwd}
-	) = unpack("Z4I8Z1024Z1024", xread($fh, $pagesize));
+	) = unpack("Z4I8Z1024Z1024", xread($fh, $aligned_size));
 
 	my @translation_units;
-	$self->{size} = (stat $procfile)[7];
-	while (tell $fh < $self->{size}) {
+	while (tell $fh < $self->stat_procfile()) {
 		my %tu;
 
-		($tu{size}, $tu{comp_file_name}, $tu{abs_file_path}) =
-			unpack("IZ1024Z1024", xread($fh, 4 + 2 * 1024 + 4 + 8));
+		my $node_fixed_size = citrun_node_size();
+		(
+			$tu{size},
+			$tu{comp_file_name},
+			$tu{abs_file_path}
+		) = unpack("IZ1024Z1024", xread($fh, $node_fixed_size));
 
 		$tu{exec_buf_pos} = tell $fh;
-		xread($fh, $tu{size} * 8);
-		$self->next_page();
+
+		my $node_end = $tu{exec_buf_pos} + ($tu{size} * 8);
+		my $node_end_aligned = get_aligned_size($node_end);
+
+		seek $self->{fh}, $node_end_aligned, 0;
 
 		push @translation_units, (\%tu);
-
-		$self->{size} = (stat $procfile)[7];
 	}
 	$self->{translation_units} = \@translation_units;
 
 	return $self;
 }
 
-# Skips to the next page boundary. If exactly on a page boundary then stay
-# there.
-sub next_page {
+sub stat_procfile {
 	my ($self) = @_;
 
-	my $page_mask = $pagesize - 1;
-	my $cur_pos = tell $self->{fh};
+	$self->{size} = (stat $self->{fh})[7];
+	return $self->{size};
+}
 
-	seek $self->{fh}, ($cur_pos + $page_mask) & ~$page_mask, 0;
+sub get_aligned_size {
+	my ($unaligned_size) = @_;
+
+	my $page_size = POSIX::sysconf(POSIX::_SC_PAGESIZE);
+	my $page_mask = $page_size - 1;
+
+	return ($unaligned_size + $page_mask) & ~$page_mask;
 }
 
 sub execs_for {
@@ -89,3 +100,14 @@ sub xread {
 }
 
 1;
+__DATA__
+__C__
+#include "/home/kyle/citrun/src/lib.h"
+
+size_t citrun_header_size() {
+	return sizeof(struct citrun_header);
+}
+
+size_t citrun_node_size() {
+	return sizeof(struct citrun_node);
+}

@@ -50,7 +50,7 @@ extend(size_t req_bytes)
 	if ((len = lseek(fd, 0, SEEK_END)) < 0)
 		err(1, "lseek");
 
-	/* Increase file length. */
+	/* Increase file length, filling with zeros. */
 	if (ftruncate(fd, len + aligned_bytes) < 0)
 		err(1, "ftruncate from %lld to %llu", len, len + aligned_bytes);
 
@@ -102,9 +102,6 @@ set_exited()
 static void
 add_header()
 {
-	/* This assumption is hardcoded elsewhere.*/
-	assert(sizeof(struct citrun_header) < getpagesize());
-
 	header = extend(sizeof(struct citrun_header));
 
 	/* Must be exactly 4 bytes. */
