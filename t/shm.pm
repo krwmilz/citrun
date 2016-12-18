@@ -11,7 +11,6 @@ sub new {
 	bless($self, $class);
 
 	open(my $fh, "<:mmap", $procfile) or die $!;
-	$self->{procfile} = $procfile;
 	$self->{fh} = $fh;
 
 	my $header_size = citrun_header_size();
