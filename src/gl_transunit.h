@@ -11,7 +11,7 @@ class GlTranslationUnit
 {
 	struct citrun_node	*m_node;
 	uint64_t		*m_data;
-	uint64_t		*m_data_buffer;
+	std::vector<uint64_t>	 m_data_buffer;
 	GlBuffer		 m_glbuffer;
 
 public:

@@ -31,7 +31,7 @@ GlTranslationUnit::GlTranslationUnit(void* &mem, demo_font_t *font,
 		glyphy_point_t &cur_pos) :
 	m_node(static_cast<struct citrun_node *>(mem)),
 	m_data((unsigned long long *)(m_node + 1)),
-	m_data_buffer(new uint64_t[m_node->size]())
+	m_data_buffer(m_node->size)
 {
 	unsigned int	 size, page_mask;
 
@@ -104,7 +104,7 @@ GlTranslationUnit::get_extents()
 void
 GlTranslationUnit::save_executions()
 {
-	std::memcpy(m_data_buffer, m_data, m_node->size * sizeof(unsigned long long));
+	std::memcpy(&m_data_buffer[0], m_data, m_node->size * sizeof(unsigned long long));
 }
 
 void
