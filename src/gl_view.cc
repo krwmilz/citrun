@@ -408,23 +408,8 @@ View::motion_func(int x, int y)
 }
 
 void
-View::advance_frame(long dtime)
-{
-	if (animate) {
-		float dquat[4];
-		//axis_to_quat (rot_axis, rot_speed * dtime, dquat);
-		//add_quats (dquat, quat, quat);
-		num_frames++;
-	}
-}
-
-void
 View::display(glyphy_extents_t const &extents)
 {
-	long new_time = current_time ();
-	advance_frame(new_time - last_frame_time);
-	last_frame_time = new_time;
-
 	int viewport[4];
 	glGetIntegerv (GL_VIEWPORT, viewport);
 	GLint width  = viewport[2];
