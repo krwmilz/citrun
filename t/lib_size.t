@@ -6,7 +6,6 @@ use warnings;
 use POSIX;
 use Test::More tests => 3;
 use t::shm;
-use t::tmpdir;
 
 my $tmp_dir = t::tmpdir->new();
 

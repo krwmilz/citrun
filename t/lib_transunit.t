@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Test::More tests => 8;
 use t::shm;
-use t::tmpdir;
 
 my $tmp_dir = t::tmpdir->new();
 
