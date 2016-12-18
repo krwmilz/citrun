@@ -1,7 +1,5 @@
 //
 // osdemo.c originally from Brian Paul, public domain.
-// PPM output provided by Joerg Schmalzl.
-// ASCII PPM output added by Brian Paul.
 //
 #include <err.h>
 #include <GL/glew.h>
@@ -18,11 +16,8 @@
 #include "process_dir.h"
 
 
-#define SAVE_TARGA
-
 static int Width = 400;
 static int Height = 400;
-
 
 static void
 render_image(void)
@@ -64,7 +59,6 @@ render_image(void)
 		i.display();
 }
 
-#ifdef SAVE_TARGA
 static void
 write_targa(const char *filename, const GLubyte *buffer, int width, int height)
 {
@@ -103,52 +97,6 @@ write_targa(const char *filename, const GLubyte *buffer, int width, int height)
       }
    }
 }
-#else
-static void
-write_ppm(const char *filename, const GLubyte *buffer, int width, int height)
-{
-   const int binary = 0;
-   FILE *f = fopen( filename, "w" );
-   if (f) {
-      int i, x, y;
-      const GLubyte *ptr = buffer;
-      if (binary) {
-         fprintf(f,"P6\n");
-         fprintf(f,"# ppm-file created by osdemo.c\n");
-         fprintf(f,"%i %i\n", width,height);
-         fprintf(f,"255\n");
-         fclose(f);
-         f = fopen( filename, "ab" );  /* reopen in binary append mode */
-         for (y=height-1; y>=0; y--) {
-            for (x=0; x<width; x++) {
-               i = (y*width + x) * 4;
-               fputc(ptr[i], f);   /* write red */
-               fputc(ptr[i+1], f); /* write green */
-               fputc(ptr[i+2], f); /* write blue */
-            }
-         }
-      }
-      else {
-         /*ASCII*/
-         int counter = 0;
-         fprintf(f,"P3\n");
-         fprintf(f,"# ascii ppm file created by osdemo.c\n");
-         fprintf(f,"%i %i\n", width, height);
-         fprintf(f,"255\n");
-         for (y=height-1; y>=0; y--) {
-            for (x=0; x<width; x++) {
-               i = (y*width + x) * 4;
-               fprintf(f, " %3d %3d %3d", ptr[i], ptr[i+1], ptr[i+2]);
-               counter++;
-               if (counter % 5 == 0)
-                  fprintf(f, "\n");
-            }
-         }
-      }
-      fclose(f);
-   }
-}
-#endif // SAVE_TARGA
 
 int
 main(int argc, char *argv[])
@@ -202,11 +150,7 @@ main(int argc, char *argv[])
 	render_image();
 
 	if (filename != NULL)
-#ifdef SAVE_TARGA
 		write_targa(filename, static_cast<const GLubyte *>(buffer), Width, Height);
-#else
-		write_ppm(filename, static_cast<const GLubyte *>(buffer), Width, Height);
-#endif
 	else
 		printf("Specify a filename if you want to make an image file\n");
 
