@@ -4,12 +4,10 @@
 use strict;
 use warnings;
 use Test::More tests => 8;
-use t::program;
 use t::shm;
 use t::tmpdir;
 
 my $tmp_dir = t::tmpdir->new();
-t::program->new($tmp_dir);
 
 my $ret = system("$tmp_dir/program 10");
 is $ret >> 8,	0,	"is program exit code 0";

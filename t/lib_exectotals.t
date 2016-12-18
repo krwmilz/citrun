@@ -5,12 +5,10 @@ use strict;
 use warnings;
 use Test::More tests => 26;
 use Time::HiRes qw( time usleep );
-use t::program;
 use t::shm;
 use t::tmpdir;
 
 my $tmp_dir = t::tmpdir->new();
-t::program->new($tmp_dir);
 
 my $child_pid = fork();
 if ($child_pid == 0) {
