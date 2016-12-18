@@ -2,7 +2,6 @@
 #
 # Simple program that prints output.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

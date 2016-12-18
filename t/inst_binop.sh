@@ -2,7 +2,6 @@
 #
 # Test that binary operators in strange cases work. Includes enums and globals.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

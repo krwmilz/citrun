@@ -3,7 +3,6 @@
 # Test for some tricky macro situations. In particular macro expansions at the
 # end of binary operators.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

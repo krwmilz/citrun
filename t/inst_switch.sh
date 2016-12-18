@@ -2,7 +2,6 @@
 #
 # Make sure that switch statement condition instrumentation works.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

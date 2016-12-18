@@ -2,7 +2,6 @@
 #
 # Make sure preprocessor flags -E, -MM cause no instrumentation to be done.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 3
 

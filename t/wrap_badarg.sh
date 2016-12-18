@@ -1,5 +1,4 @@
 #!/bin/sh -u
-. t/libtap.subr
 . t/utils.subr
 plan 1
 

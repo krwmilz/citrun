@@ -2,7 +2,6 @@
 #
 # Test that compiling a non-existent file errors the parser out.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 4
 

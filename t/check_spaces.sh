@@ -2,7 +2,6 @@
 #
 # Verify citrun-check can handle paths with spaces when counting log file.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 2
 

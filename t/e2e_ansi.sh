@@ -3,7 +3,6 @@
 # Check that instrumentation works when the -ansi flag is passed during
 # compilation.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 4
 

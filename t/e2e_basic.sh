@@ -2,7 +2,6 @@
 #
 # Check that a simple program can execute successfully with instrumentation.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 7
 

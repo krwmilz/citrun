@@ -2,7 +2,6 @@
 #
 # Test that the instrumentation preamble is what we think it is.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 3
 

@@ -2,7 +2,6 @@
 #
 # Make sure that while loop condition instrumentation works.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

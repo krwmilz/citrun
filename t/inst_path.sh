@@ -4,7 +4,7 @@
 # - not having PATH set errors
 # - not having CITRUN_SHARE in PATH when using transparent compile mode errors
 #
-. t/libtap.subr
+. t/utils.subr
 plan 2
 
 # We need the absolute path to this faux compiler because we're killing PATH

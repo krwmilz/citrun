@@ -2,7 +2,6 @@
 #
 # Verify the output when 0 citrun.log files are found.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 1
 

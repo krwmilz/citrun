@@ -2,7 +2,6 @@
 #
 # Check that if statement conditions are instrumented properly.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

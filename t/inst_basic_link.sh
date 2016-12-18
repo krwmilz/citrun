@@ -2,7 +2,6 @@
 #
 # Check that the most basic of compile command lines works.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 4
 

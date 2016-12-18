@@ -2,7 +2,6 @@
 #
 # Make sure that citrun-wrap exits with the same code as the native build.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 1
 

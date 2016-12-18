@@ -2,7 +2,6 @@
 #
 # Check that return statement values (if any) are instrumented correctly.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

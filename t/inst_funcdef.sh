@@ -2,7 +2,6 @@
 #
 # Check that really long function declarations are instrumented properly.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

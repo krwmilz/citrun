@@ -2,7 +2,6 @@
 #
 # Test that for loop condition instrumenting works.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 5
 

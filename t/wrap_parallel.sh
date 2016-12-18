@@ -2,7 +2,6 @@
 #
 # Test that wrapping the 'make' build system produces instrumented binaries.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 12
 

@@ -3,7 +3,6 @@
 # Check that a raw citrun.log file is in good shape.
 # citrun-check relies on this output, and citrun-check is used quite a bit.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 3
 

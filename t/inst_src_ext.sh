@@ -2,7 +2,6 @@
 #
 # Check that the advertised source file extensions work.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 8
 

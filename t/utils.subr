@@ -1,3 +1,5 @@
+. t/libtap.subr
+
 strip_preamble()
 {
 	file="${1}"

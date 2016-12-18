@@ -3,7 +3,6 @@
 # Check that linking object files of one citrun version with libcitrun of
 # another errors.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 3
 

@@ -2,7 +2,6 @@
 #
 # Verify that passing a bad directory to citrun-check errors out.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 1
 

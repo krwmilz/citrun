@@ -3,7 +3,6 @@
 # Check that two source files given on the same command line both get
 # instrumented fully.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 4
 

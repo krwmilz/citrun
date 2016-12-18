@@ -2,7 +2,6 @@
 #
 # Check that a program that won't compile natively is handled properly.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 4
 

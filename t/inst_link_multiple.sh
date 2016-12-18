@@ -2,7 +2,6 @@
 #
 # Check that linking more than one instrumented object file together works.
 #
-. t/libtap.subr
 . t/utils.subr
 plan 4
 
