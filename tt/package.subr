@@ -6,7 +6,6 @@ fi
 
 portdir="/usr/ports/$1"
 workdir=`make -C $portdir show=WRKDIST`
-treedir=`pwd`
 
 pkg_check_deps()
 {
