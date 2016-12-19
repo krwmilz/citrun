@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 3
 
-enter_tmpdir
 
 touch preamble.c
 ok "running citrun-inst" citrun-inst -c preamble.c

@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 8
 
-enter_tmpdir
 
 touch main.{c,cc,cxx,cpp,C}
 ok "extension .c" citrun-wrap cc -c main.c

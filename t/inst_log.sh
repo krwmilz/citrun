@@ -6,7 +6,6 @@
 . t/utils.subr
 plan 3
 
-enter_tmpdir
 
 cat <<EOF > main.c
 #include <stdlib.h>

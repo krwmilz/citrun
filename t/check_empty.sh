@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 1
 
-enter_tmpdir
 
 output_good="Summary:
          0 Source files used as input"

@@ -1,6 +1,12 @@
 . t/libtap.subr
 
 export PATH="`pwd`/src:${PATH}"
+export CITRUN_PROCDIR="procdir/"
+
+treedir=`pwd`
+
+tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX` || exit 1
+cd $tmpdir
 
 strip_preamble()
 {
@@ -20,14 +26,4 @@ strip_log()
 strip_millis()
 {
 	ok "are milliseconds sanitized" sed -i -e "/Milliseconds spent/d" $1
-}
-
-enter_tmpdir()
-{
-	# Assume that a script wanting to enter a tmpdir also wants a local
-	# process file directory.
-	export CITRUN_PROCDIR="procdir/"
-
-	tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX` || exit 1
-	cd $tmpdir
 }

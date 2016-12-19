@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 5
 
-enter_tmpdir
 
 cat <<EOF > while.c
 int main(int argc, char *argv[]) {

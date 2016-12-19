@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 7
 
-enter_tmpdir
 
 cat <<EOF > fib.c
 #include <stdio.h>

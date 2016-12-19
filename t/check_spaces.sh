@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 2
 
-enter_tmpdir
 
 ok "are dirs with spaces in name created" mkdir dir\ a dir\ b
 echo "Found source file" > dir\ a/citrun.log

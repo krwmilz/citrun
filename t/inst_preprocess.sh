@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 3
 
-enter_tmpdir
 
 echo "int main(void) { return 0; }" > prepro.c
 

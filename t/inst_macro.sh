@@ -6,7 +6,6 @@
 . t/utils.subr
 plan 5
 
-enter_tmpdir
 
 cat <<EOF > macro.c
 #define MAYBE 1023;

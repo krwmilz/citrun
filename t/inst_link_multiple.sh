@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 4
 
-enter_tmpdir
 
 cat <<EOF > one.c
 void second_func();
