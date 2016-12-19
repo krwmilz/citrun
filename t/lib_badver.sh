@@ -1,13 +1,11 @@
 #!/bin/sh -u
 #
-# Check that linking object files of one citrun version with libcitrun of
+# Check that linking object files of one citrun version with libcitrun.a of
 # another errors.
 #
 . t/utils.subr
-plan 3
+plan 2
 
-# Hang onto the source location before entering the temp dir.
-src_dir="`pwd`/src"
 enter_tmpdir
 
 cat <<EOF > main.c
@@ -20,8 +18,7 @@ main(int argc, char *argv[])
 }
 EOF
 
-ok "compile fake node" cc -include $src_dir/lib.h -c main.c
-ok "link fake node to libcitrun.a" cc -o main main.o $src_dir/libcitrun.a
+ok "is compiled" cc -o main main.c
 
 output_good="main: libcitrun-0.0: incompatible version 0.255, try cleaning and rebuilding your project"
 ok_program "running fake node" 1 "$output_good" ./main
