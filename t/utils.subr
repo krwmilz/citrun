@@ -28,6 +28,6 @@ enter_tmpdir()
 	# process file directory.
 	export CITRUN_PROCDIR="procdir/"
 
-	tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX`
+	tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX` || exit 1
 	cd $tmpdir
 }
