@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use Test::More tests => 16;
-use t::shm;
+use t::utils;
 
 my $tmp_dir = t::tmpdir->new();
 

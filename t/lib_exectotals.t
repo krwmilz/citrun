@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More tests => 26;
 use Time::HiRes qw( time usleep );
-use t::shm;
+use t::utils;
 
 my $tmp_dir = t::tmpdir->new();
 
