@@ -8,8 +8,6 @@ portdir="/usr/ports/$1"
 workdir=`make -C $portdir show=WRKDIST`
 treedir=`pwd`
 
-modify_PATH
-
 pkg_check_deps()
 {
 	make -C $portdir full-build-depends > deps

@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 8
 
-modify_PATH
 enter_tmpdir
 
 touch main.{c,cc,cxx,cpp,C}

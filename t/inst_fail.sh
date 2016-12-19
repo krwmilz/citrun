@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 4
 
-modify_PATH
 enter_tmpdir
 
 echo "int main(void) { return 0; " > bad.c

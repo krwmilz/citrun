@@ -1,5 +1,7 @@
 . t/libtap.subr
 
+export PATH="`pwd`/src:${PATH}"
+
 strip_preamble()
 {
 	file="${1}"
@@ -18,11 +20,6 @@ strip_log()
 strip_millis()
 {
 	ok "are milliseconds sanitized" sed -i -e "/Milliseconds spent/d" $1
-}
-
-modify_PATH()
-{
-	export PATH="`pwd`/src:${PATH}"
 }
 
 enter_tmpdir()

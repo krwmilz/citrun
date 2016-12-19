@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 3
 
-modify_PATH
 enter_tmpdir
 
 touch preamble.c

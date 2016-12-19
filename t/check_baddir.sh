@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 1
 
-modify_PATH
 
 output_good="find: _nonexistent_dir_: No such file or directory
 Summary:

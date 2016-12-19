@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 5
 
-modify_PATH
 enter_tmpdir
 
 cat <<EOF > while.c

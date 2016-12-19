@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 7
 
-modify_PATH
 enter_tmpdir
 
 cat <<EOF > main.c

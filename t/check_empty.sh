@@ -5,7 +5,6 @@
 . t/utils.subr
 plan 1
 
-modify_PATH
 enter_tmpdir
 
 output_good="Summary:
