@@ -57,7 +57,7 @@ GlTranslationUnit::GlTranslationUnit(void* &mem, demo_font_t *font,
 
 	std::string line;
 	unsigned int i;
-	for (i = 0; std::getline(file_stream, line); ++i) {
+	for (i = 1; std::getline(file_stream, line); ++i) {
 		m_glbuffer.current_point(&cur_pos);
 		cur_pos.x = 0;
 
