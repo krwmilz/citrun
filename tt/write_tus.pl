@@ -3,7 +3,7 @@
 #
 use strict;
 use warnings;
-use t::shm;
+use t::utils;
 
 open(my $out, '>', 'tu_list.out') or die $!;
 my $shm = t::shm->new($ARGV[0]);
