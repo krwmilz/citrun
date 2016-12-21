@@ -1,0 +1,36 @@
+#!/bin/sh -eu
+#
+# ░█▀▀░░░▀█▀░▀█▀░░░█▀▄░█░█░█▀█
+# ░█░░░░░░█░░░█░░░░█▀▄░█░█░█░█
+# ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░▀░▀
+#
+# Creates Jamrules from Jamrules.in and output from this script.
+#
+type pkg-config
+type llvm-config
+
+# stuff still not accounted for:
+# - C++11 capable compiler
+# - Curses
+# - DejaVu Sans Mono
+# - Jam
+# - LLVM and Clang > 3.7
+# - OpenGLES >= 2.0
+
+gl_pkgs="osmesa glfw3 glew freetype2"
+pkg-config --exists $gl_pkgs
+
+cp Jamrules.in Jamrules
+cat <<EOF >> Jamrules
+
+# Automatically generated on `date`
+GL_CFLAGS = "`pkg-config --cflags glfw3 glew freetype2`" ;
+GL_LIBS = "`pkg-config --libs glfw3 glew freetype2`" ;
+GLTEST_LIBS  = "`pkg-config --libs osmesa`" ;
+INST_CFLAGS = "`llvm-config --cxxflags`" ;
+INST_LDFLAGS = "`llvm-config --ldflags`" ;
+INST_LIBS = "`llvm-config --libs bitreader mcparser transformutils option`" ;
+INST_LIBS += "`llvm-config --system-libs`" ;
+EOF
+
+echo ">> Jamrules created. Now run \`jam\` to build"

@@ -1,0 +1,70 @@
+#
+# Knowing the absolute path to citrun resources is necessary because:
+# - instrumented programs must be linked to the runtime library
+# - the PATH compiler interception mechanism needs to remove itself from PATH
+#
+# If PREFIX is set we're building a package, so trust that will be the final
+# (after installation) location.
+#
+if $(PREFIX) {
+	echo ...build C It Run (Release) on $(OS)... ;
+	CITRUN_SHARE = $(PREFIX)/share/citrun ;
+}
+else {
+	echo ...build C It Run (Debug) on $(OS)... ;
+	#CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
+	CITRUN_SHARE = "`cd $(TOP)/src && pwd`" ;
+	CFLAGS += -Wall -g ;
+}
+
+CCFLAGS += $(CFLAGS) ;
+C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti $(CFLAGS) ;
+LINKFLAGS += $(LDFLAGS) ;
+
+if $(OS) = OPENBSD {
+	C++ = eg++ ;
+	LDGROUP_START = -Wl,--start-group ;
+	LDGROUP_END = -Wl,--end-group ;
+}
+
+if $(OS) = MACOSX {
+	LINKLIBS on citrun-gl = -framework OpenGL ;
+}
+
+if $(OS) = LINUX {
+	LINKLIBS on citrun-gl = -lbsd ;
+	LINKLIBS on citrun-inst = -lbsd ;
+	LDGROUP_START = -Wl,--start-group ;
+	LDGROUP_END = -Wl,--end-group ;
+}
+
+actions StaticAnalysis
+{
+	export CITRUN_SA=1
+	scan-build -o html --use-c++=eg++ jam -j4
+	# scan-build -o html -v --use-c++=eg++ jam -j4
+}
+
+actions TestCoverage
+{
+	set -e
+	CFLAGS="-coverage -ggdb" LDFLAGS="-coverage" jam -j4
+
+	# Roll libgcov.a into libcitrun.a.
+	ar -M < t/libcitrun_gcov.mri
+
+	prove
+	# prove tt
+
+	gcov -o src src/lib.c
+	egcov -r src/*.cc
+}
+
+StaticAnalysis static-analysis ;
+TestCoverage test-coverage ;
+
+if $(CITRUN_SA) {
+	# scan-build sets these expecting us to pick up the new values.
+	CC = $(CC) ;
+	C++ = $(CXX) ;
+}
