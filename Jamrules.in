@@ -1,21 +1,4 @@
-#
-# Knowing the absolute path to citrun resources is necessary because:
-# - instrumented programs must be linked to the runtime library
-# - the PATH compiler interception mechanism needs to remove itself from PATH
-#
-# If PREFIX is set we're building a package, so trust that will be the final
-# (after installation) location.
-#
-if $(PREFIX) {
-	echo ...build C It Run (Release) on $(OS)... ;
-	CITRUN_SHARE = $(PREFIX)/share/citrun ;
-}
-else {
-	echo ...build C It Run (Debug) on $(OS)... ;
-	#CITRUN_SHARE = "`readlink -f $(TOP)/src`" ;
-	CITRUN_SHARE = "`cd $(TOP)/src && pwd`" ;
-	CFLAGS += -Wall -g ;
-}
+echo ...build C It Run on $(OS)... ;
 
 CCFLAGS += $(CFLAGS) ;
 C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti $(CFLAGS) ;

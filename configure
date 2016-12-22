@@ -24,9 +24,12 @@ cp Jamrules.in Jamrules
 cat <<EOF >> Jamrules
 
 # Automatically generated on `date`
+CITRUN_SRCDIR = "`pwd`/src" ;
+
 GL_CFLAGS = "`pkg-config --cflags glfw3 glew freetype2`" ;
 GL_LIBS = "`pkg-config --libs glfw3 glew freetype2`" ;
 GLTEST_LIBS  = "`pkg-config --libs osmesa`" ;
+
 INST_CFLAGS = "`llvm-config --cxxflags`" ;
 INST_LDFLAGS = "`llvm-config --ldflags`" ;
 INST_LIBS = "`llvm-config --libs bitreader mcparser transformutils option`" ;
