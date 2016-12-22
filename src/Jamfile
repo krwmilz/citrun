@@ -12,7 +12,6 @@ if $(PREFIX) {
 }
 else {
 	CITRUN_SHARE = $(CITRUN_SRCDIR) ;
-	CFLAGS += -Wall -g ;
 }
 
 # Do a string replacement on the first argument.
@@ -20,44 +19,6 @@ actions ReplaceTokens
 {
 	sed -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), -i.bak $(<) ;
 	rm $(<).bak
-}
-
-# Quote an entire file and add a variable declaration prefixing the string.
-rule Stringize
-{
-	MakeLocate $(1) : $(LOCATE_SOURCE) ;
-	SEARCH on $(2) = $(SEARCH_SOURCE) ;
-	Depends $(1) : $(2) ;
-	Clean clean : $(1) ;
-}
-
-actions Stringize
-{
-	# Quote the entire original source file and put it in the destination.
-	sed -e ' s/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/\\n"/; ' < $(>) > $(<)
-	echo ";" >> $(<)
-
-	# Add the declaration to the start of the file.
-	sed -e '1s/^/static const char *$(1:B) = /' -i.bak $(<)
-	rm $(<).bak
-}
-
-# Create installation directories and setup quirky ../../citrun-inst links.
-rule InstallSyms
-{
-	Depends install : $(PREFIX)/share/citrun/$(>) ;
-	MakeLocate $(PREFIX)/share/citrun/$(>) : $(<) ;
-
-	for i in $(>)
-	{
-		SymLink $(PREFIX)/share/citrun/$(i) ;
-	}
-}
-
-# Used by InstallSyms
-actions SymLink
-{
-	$(RM) $(<) && $(LN) -s ../../bin/citrun-inst $(<) ;
 }
 
 #
@@ -103,6 +64,7 @@ Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
 Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
 Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
 
+ObjectDefines gl_font.cc : FONT_PATH=\\\"$(FONT_PATH)\\\" ;
 ObjectC++Flags gl_main.cc gl_testmain.cc $(GL_SRCS) : $(GL_CFLAGS) ;
 
 LINKLIBS on citrun-gl citrun-gltest += -lm $(GL_LIBS) ;
