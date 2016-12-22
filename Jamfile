@@ -9,17 +9,15 @@ SubInclude TOP src ;
 #
 actions StaticAnalysis
 {
-	export CITRUN_SA=1
-	./configure
+	scan-build ./configure
 	scan-build -o html --use-c++=eg++ jam -j4
-	# scan-build -o html -v --use-c++=eg++ jam -j4
 }
 
 actions TestCoverage
 {
 	set -e
-	./configure
-	CFLAGS="-coverage -ggdb" LDFLAGS="-coverage" jam -j4
+	CFLAGS="-coverage" LDFLAGS="-coverage" ./configure
+	jam -j4
 
 	# Roll libgcov.a into libcitrun.a.
 	ar -M < t/libcitrun_gcov.mri
