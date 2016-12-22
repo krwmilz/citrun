@@ -2,3 +2,34 @@ SubDir TOP ;
 
 SubInclude TOP man ;
 SubInclude TOP src ;
+
+#
+# Different build modifiers. Put them here because it only makes sense to run
+# them from the root directory.
+#
+actions StaticAnalysis
+{
+	export CITRUN_SA=1
+	./configure
+	scan-build -o html --use-c++=eg++ jam -j4
+	# scan-build -o html -v --use-c++=eg++ jam -j4
+}
+
+actions TestCoverage
+{
+	set -e
+	./configure
+	CFLAGS="-coverage -ggdb" LDFLAGS="-coverage" jam -j4
+
+	# Roll libgcov.a into libcitrun.a.
+	ar -M < t/libcitrun_gcov.mri
+
+	prove
+	# prove tt
+
+	gcov -o src src/lib.c
+	egcov -r src/*.cc
+}
+
+StaticAnalysis static-analysis ;
+TestCoverage test-coverage ;
