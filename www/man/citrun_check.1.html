@@ -29,7 +29,7 @@ CITRUN-CHECK(1)</td>
 </tbody>
 </table>
 <div class="section">
-<h1 id="NAME">NAME</h1> <b class="name">citrun-check</b> &#8212; <span class="desc">check for rewrite activity</span></div>
+<h1 id="NAME">NAME</h1> <b class="name">citrun_check</b> &#8212; <span class="desc">check for rewrite activity</span></div>
 <div class="section">
 <h1 id="SYNOPSIS">SYNOPSIS</h1><table class="synopsis">
 <col style="width: 12.00ex;"/>
@@ -37,7 +37,7 @@ CITRUN-CHECK(1)</td>
 <tbody>
 <tr>
 <td>
-<b class="name">citrun-check</b></td>
+<b class="name">citrun_check</b></td>
 <td>
 [<span class="opt"><b class="flag">-o</b> <i class="arg">output</i></span>] [<span class="opt"><i class="arg">dir</i></span>]</td>
 </tr>
@@ -45,11 +45,11 @@ CITRUN-CHECK(1)</td>
 </table>
 </div>
 <div class="section">
-<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun-check</b> utility recursively checks either <i class="arg">dir</i>, if given, or the current working directory for activity logs created by <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a>.<div class="spacer">
+<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun_check</b> utility recursively checks either <i class="arg">dir</i>, if given, or the current working directory for activity logs created by <a class="link-man" href="citrun_wrap.1.html">citrun_wrap(1)</a>.<div class="spacer">
 </div>
-If the <b class="flag">-o</b> option is specified then <b class="name">citrun-check</b> will write to <i class="arg">output</i> instead of standard output.<div class="spacer">
+If the <b class="flag">-o</b> option is specified then <b class="name">citrun_check</b> will write to <i class="arg">output</i> instead of standard output.<div class="spacer">
 </div>
-The text below shows the output of <b class="name">citrun-check</b> after <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
+The text below shows the output of <b class="name">citrun_check</b> after <a class="link-man" href="citrun_wrap.1.html">citrun_wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
 </div>
 <pre style="margin-left: 5.00ex;" class="lit display">
 Summary: 
@@ -86,7 +86,7 @@ The number of times the rewriter successfully transformed the entire source file
 <dt class="list-tag" style="margin-top: 1.00em;">
 &#8220;Rewrite failures&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
-Rewriting a source file failed. There are two failure cases, either native parsing the original source file also fails, or, only citrun-inst failed parsing the source file.</dd>
+Rewriting a source file failed. There are two failure cases, either native parsing the original source file also fails, or, only citrun_inst failed parsing the source file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
 &#8220;Rewritten source compile successes&#8221;</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
@@ -98,9 +98,9 @@ Compiling the rewritten source file failed. There are two failure cases, either 
 </dl>
 </div>
 <div class="section">
-<h1 id="EXIT_STATUS">EXIT STATUS</h1> The <b class="utility">citrun-check</b> utility exits&#160;0 on success, and&#160;&gt;0 if an error occurs.</div>
+<h1 id="EXIT_STATUS">EXIT STATUS</h1> The <b class="utility">citrun_check</b> utility exits&#160;0 on success, and&#160;&gt;0 if an error occurs.</div>
 <div class="section">
-<h1 id="SEE_ALSO">SEE ALSO</h1> <a class="link-man" href="citrun-wrap.1.html">citrun-wrap(1)</a></div>
+<h1 id="SEE_ALSO">SEE ALSO</h1> <a class="link-man" href="citrun_wrap.1.html">citrun_wrap(1)</a></div>
 <table class="foot">
 <tbody>
 <tr>
