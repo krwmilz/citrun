@@ -40,8 +40,7 @@ ReplaceTokens citrun-wrap ;
 # citrun-term
 #
 #LINKLIBS on citrun-term += -lcurses ;
-# XXX: Not the main focus right now.
-# Main citrun-term : term_main.cc ;
+#Main citrun-term : term_main.cc ;
 
 #
 # citrun-gl & citrun-gltest
@@ -70,9 +69,9 @@ ObjectC++Flags gl_main.cc gl_testmain.cc $(GL_SRCS) : $(GL_CFLAGS) ;
 LINKLIBS on citrun-gl citrun-gltest += -lm $(GL_LIBS) ;
 LinkLibraries citrun-gl citrun-gltest : gl_common libglyphy ;
 
-LINKLIBS on citrun-gltest += $(GLTEST_LIBS) ;
-
 Main citrun-gl : gl_main.cc ;
+
+LINKLIBS on citrun-gltest += $(GLTEST_LIBS) ;
 Main citrun-gltest : gl_testmain.cc ;
 
 #
@@ -84,35 +83,19 @@ INST_SRCS =
 	inst_action.cc
 	inst_visitor.cc ;
 
-CLANG_LIBS =
-	-lclangAST
-	-lclangAnalysis
-	-lclangBasic
-	-lclangDriver
-	-lclangEdit
-	-lclangFrontend
-	-lclangFrontendTool
-	-lclangLex
-	-lclangParse
-	-lclangRewrite
-	-lclangRewriteFrontend
-	-lclangSema
-	-lclangSerialization
-	-lclangTooling ;
-
 Stringize lib_h.h : lib.h ;
 
 ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) ;
 ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
 
 LINKFLAGS on citrun-inst = $(LINKFLAGS) $(INST_LDFLAGS) ;
-LINKLIBS on citrun-inst += $(LDGROUP_START) $(CLANG_LIBS) $(LDGROUP_END) $(INST_LIBS) ;
+LINKLIBS on citrun-inst += $(INST_LIBS) ;
 
 Main citrun-inst : $(INST_SRCS) ;
 
 # Link with the c++ compiler so that the matching c++ runtime library gets added
 # automatically.
-LINK on citrun-inst citrun-term citrun-gl citrun-gltest = $(C++) ;
+LINK on citrun-inst citrun-gl citrun-gltest = $(C++) ;
 
 #
 # install
