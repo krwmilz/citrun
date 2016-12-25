@@ -3,6 +3,7 @@
 # Test that wrapping the 'cmake' build system produces instrumented binaries.
 #
 . t/utils.subr
+type cmake || skip_all "ninja not found"
 plan 7
 
 

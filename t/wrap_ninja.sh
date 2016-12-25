@@ -3,8 +3,8 @@
 # Test that wrapping the 'ninja' build system produces instrumented binaries.
 #
 . t/utils.subr
+type ninja || skip_all "ninja not found"
 plan 6
-
 
 cat <<EOF > main.c
 int

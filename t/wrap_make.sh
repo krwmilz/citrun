@@ -3,6 +3,7 @@
 # Test that wrapping the 'make' build system produces instrumented binaries.
 #
 . t/utils.subr
+type make || skip_all "make not found"
 plan 6
 
 

@@ -3,6 +3,7 @@
 # Test that wrapping the 'jam' build system produces instrumented binaries.
 #
 . t/utils.subr
+type jam || skip_all "jam not found"
 plan 6
 
 
