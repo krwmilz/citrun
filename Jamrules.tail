@@ -18,7 +18,7 @@ actions Stringize
 	rm $(<).bak
 }
 
-# Create installation directories and setup quirky ../../citrun-inst links.
+# Create installation directories and setup quirky ../../citrun_inst links.
 rule InstallSyms
 {
 	Depends install : $(PREFIX)/share/citrun/$(>) ;
@@ -33,5 +33,5 @@ rule InstallSyms
 # Used by InstallSyms
 actions SymLink
 {
-	$(RM) $(<) && $(LN) -s ../../bin/citrun-inst $(<) ;
+	$(RM) $(<) && $(LN) -s ../../bin/citrun_inst $(<) ;
 }

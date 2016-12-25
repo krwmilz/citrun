@@ -28,8 +28,8 @@ Totals:
          3 Total statements
 EOF
 
-ok "is compile successful" citrun-wrap cc -ansi -o main main.c
-ok "is citrun-check exit 0" citrun-check -o check.out
+ok "is compile successful" citrun_wrap cc -ansi -o main main.c
+ok "is citrun_check exit 0" citrun_check -o check.out
 
 strip_millis check.out
-ok "is citrun-check output different" diff -u check.good check.out
+ok "is citrun_check output different" diff -u check.good check.out

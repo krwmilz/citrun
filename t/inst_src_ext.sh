@@ -7,11 +7,11 @@ plan 8
 
 
 touch main.{c,cc,cxx,cpp,C}
-ok "extension .c" citrun-wrap cc -c main.c
-ok "extension .cc" citrun-wrap c++ -c main.cc
-ok "extension .cxx" citrun-wrap c++ -c main.cxx
-ok "extension .cpp" citrun-wrap c++ -c main.cpp
-ok "extension .C (not supported)" citrun-wrap c++ -c main.C
+ok "extension .c" citrun_wrap cc -c main.c
+ok "extension .cc" citrun_wrap c++ -c main.cc
+ok "extension .cxx" citrun_wrap c++ -c main.cxx
+ok "extension .cpp" citrun_wrap c++ -c main.cpp
+ok "extension .C (not supported)" citrun_wrap c++ -c main.C
 
 cat <<EOF > check.good
 Summary:
@@ -23,6 +23,6 @@ Totals:
          4 Lines of source code
 EOF
 
-ok "citrun-check" citrun-check -o check.out
+ok "citrun_check" citrun_check -o check.out
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

@@ -8,4 +8,4 @@ plan 1
 
 output_good="Summary:
          0 Source files used as input"
-ok_program "is no logs found message printed" 123 "$output_good" citrun-check .
+ok_program "is no logs found message printed" 123 "$output_good" citrun_check

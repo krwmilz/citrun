@@ -26,8 +26,8 @@ build main.o: cc main.c
 build program: link main.o
 EOF
 
-ok "is ninja successful" citrun-wrap ninja
-ok "is citrun-check successful" citrun-check -o check.out
+ok "is ninja successful" citrun_wrap ninja
+ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good
 Summary:
@@ -44,7 +44,7 @@ Totals:
 EOF
 
 strip_millis check.out
-ok "is citrun-check output identical" diff -u check.good check.out
+ok "is citrun_check output identical" diff -u check.good check.out
 
 ok "does compiled program run" ./program
 ok "is runtime shared memory file created" test -f procdir/program_*

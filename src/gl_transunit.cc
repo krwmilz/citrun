@@ -71,7 +71,7 @@ GlTranslationUnit::GlTranslationUnit(void* &mem, demo_font_t *font,
 }
 
 //
-// Returns number of lines that citrun-inst processed (whole source file
+// Returns number of lines that citrun_inst processed (whole source file
 // ideally)
 //
 unsigned int

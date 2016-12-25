@@ -49,11 +49,11 @@ Totals:
          7 Binary operators
 EOF
 
-ok "wrapped source compile" citrun-wrap cc -o fib fib.c
-ok "running citrun-check" citrun-check -o check.out
+ok "wrapped source compile" citrun_wrap cc -o fib fib.c
+ok "running citrun_check" citrun_check -o check.out
 
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out
 
 ok_program "fib with no args" 1 "" ./fib
 ok_program "fib of 10" 0 "55" ./fib 10

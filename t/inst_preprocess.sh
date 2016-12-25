@@ -8,18 +8,16 @@ plan 3
 
 echo "int main(void) { return 0; }" > prepro.c
 
-ok "wrapping compile w/ preprocessor arg -E" citrun-wrap cc -E prepro.c
-ok "wrapping compile w/ preprocessor arg -MM" citrun-wrap cc -E prepro.c
+ok "wrapping compile w/ preprocessor arg -E" citrun_wrap cc -E prepro.c
+ok "wrapping compile w/ preprocessor arg -MM" citrun_wrap cc -E prepro.c
 
 cat <<EOF > citrun.log.good
->> citrun-inst v0.0 ()
+>> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
-Switching argv[0] ''
 PATH=''
 Preprocessor argument found
->> citrun-inst v0.0 ()
+>> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
-Switching argv[0] ''
 PATH=''
 Preprocessor argument found
 EOF

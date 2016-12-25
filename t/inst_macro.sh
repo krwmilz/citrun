@@ -37,11 +37,11 @@ Totals:
          7 Total statements
 EOF
 
-ok "running citrun-inst" citrun-inst -c macro.c
-ok "running citrun-check" citrun-check -o check.out
+ok "running citrun_inst" citrun_inst -c macro.c
+ok "running citrun_check" citrun_check -o check.out
 
 strip_preamble macro.c
 strip_millis check.out
 
 ok "known good instrumented diff" diff -u macro.c.inst_good macro.c.citrun_nohdr
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

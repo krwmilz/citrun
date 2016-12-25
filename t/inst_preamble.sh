@@ -7,7 +7,7 @@ plan 3
 
 
 touch preamble.c
-ok "running citrun-inst" citrun-inst -c preamble.c
+ok "running citrun_inst" citrun_inst -c preamble.c
 
 cat <<EOF > preamble.c.good
 #ifdef __cplusplus

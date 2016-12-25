@@ -137,7 +137,7 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 
 	/* Binary compatibility between versions not guaranteed. */
 	if (major != citrun_major || minor != citrun_minor)
-		errx(1, "libcitrun-%i.%i: incompatible version %i.%i, "
+		errx(1, "libcitrun %i.%i: incompatible version %i.%i, "
 			"try cleaning and rebuilding your project",
 			citrun_major, citrun_minor, major, minor);
 

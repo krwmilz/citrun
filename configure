@@ -18,7 +18,7 @@ echo
 # C++11 required.
 ${CXX-c++} -x c++ -std=c++11 -E - < /dev/null > /dev/null
 
-# citrun-gltest needs osmesa and both it and citrun-gl need the rest.
+# citrun_gltest needs osmesa and both it and citrun_gl need the rest.
 gl_pkgs="osmesa glfw3 glew freetype2"
 for pkg in $gl_pkgs; do
 	printf "%10s = " $pkg
@@ -44,7 +44,7 @@ else
 	echo
 fi
 
-# Write top of Jamrules. Note any errors inside backticks will be ignored.
+# Write Jamrules. Note any errors inside backticks will be ignored.
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
 C++ = ${CXX-c++} ;

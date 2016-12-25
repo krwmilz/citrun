@@ -30,10 +30,10 @@ Totals:
          9 Total statements
 EOF
 
-ok "wrapped compile" citrun-wrap cc -o hello hello.c
+ok "wrapped compile" citrun_wrap cc -o hello hello.c
 
-ok "citrun-check" citrun-check -o check.out
+ok "citrun_check" citrun_check -o check.out
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out
 
 ok_program "stdout compare" 0 "hello, world!" ./hello

@@ -8,8 +8,8 @@ plan 4
 
 echo "int main(void) { return 0; " > bad.c
 
-citrun-wrap cc -c bad.c 2> /dev/null
-ok "is citrun-wrap exit code 1" test $? -eq 1
+citrun_wrap cc -c bad.c 2> /dev/null
+ok "is citrun_wrap exit code 1" test $? -eq 1
 
 cat <<EOF > check.good
 Summary:
@@ -23,6 +23,6 @@ Totals:
          3 Total statements
 EOF
 
-ok "running citrun-check" citrun-check -o check.out
+ok "running citrun_check" citrun_check -o check.out
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

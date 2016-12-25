@@ -21,5 +21,5 @@ EOF
 
 ok "is compiled" cc -o main main.c
 
-output_good="main: libcitrun-0.0: incompatible version 0.255, try cleaning and rebuilding your project"
+output_good="main: libcitrun 0.0: incompatible version 0.255, try cleaning and rebuilding your project"
 ok_program "running fake node" 1 "$output_good" ./main

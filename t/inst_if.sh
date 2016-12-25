@@ -48,11 +48,11 @@ Totals:
          2 Binary operators
 EOF
 
-ok "running citrun-inst" citrun-inst -c if.c
-ok "running citrun-check" citrun-check -o check.out
+ok "running citrun_inst" citrun_inst -c if.c
+ok "running citrun_check" citrun_check -o check.out
 
 strip_preamble if.c
 strip_millis check.out
 
 ok "known good instrumented diff" diff -u if.c.inst_good if.c.citrun_nohdr
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

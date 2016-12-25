@@ -10,7 +10,7 @@ cat <<EOF > main.c
 int main(void) { return 0; }
 EOF
 
-ok "wrapping simple build command" citrun-wrap cc main.c
+ok "wrapping simple build command" citrun_wrap cc main.c
 
 cat <<EOF > check.good
 Summary:
@@ -26,6 +26,6 @@ Totals:
          3 Total statements
 EOF
 
-ok "running citrun-check" citrun-check -o check.out
+ok "running citrun_check" citrun_check -o check.out
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

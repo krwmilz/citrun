@@ -33,8 +33,8 @@ Totals:
          6 Total statements
 EOF
 
-ok "citrun-wrap compile" citrun-wrap cc -o main main.c other.c
-ok "citrun-check" citrun-check -o check.out
+ok "citrun_wrap compile" citrun_wrap cc -o main main.c other.c
+ok "citrun_check" citrun_check -o check.out
 
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

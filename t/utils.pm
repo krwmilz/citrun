@@ -10,7 +10,7 @@ sub new {
 	$ENV{CITRUN_PROCDIR} = "$tmp_dir/procdir/";
 
 	copy($_, $tmp_dir) while (<t/program/*>);
-	system("src/citrun-wrap make -C $tmp_dir");
+	system("src/citrun_wrap make -C $tmp_dir");
 
 	return $tmp_dir;
 }

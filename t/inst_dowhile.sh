@@ -38,11 +38,11 @@ Totals:
          1 Binary operators
 EOF
 
-ok "citrun-inst rewrite" citrun-inst -c while.c
-ok "running citrun-check" citrun-check -o check.out
+ok "citrun_inst rewrite" citrun_inst -c while.c
+ok "running citrun_check" citrun_check -o check.out
 
 strip_preamble while.c
 strip_millis check.out
 
 ok "instrumented source diff" diff -u while.c.inst_good while.c.citrun_nohdr
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

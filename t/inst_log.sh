@@ -1,7 +1,7 @@
 #!/bin/sh -u
 #
 # Check that a raw citrun.log file is in good shape.
-# citrun-check relies on this output, and citrun-check is used quite a bit.
+# citrun_check relies on this output, and citrun_check is used quite a bit.
 #
 . t/utils.subr
 plan 3
@@ -31,15 +31,14 @@ main(int argc, char *argv[])
 }
 EOF
 
-ok "is compile ok" citrun-wrap cc -c main.c
-ok "is link ok" citrun-wrap cc -o main main.o
+ok "is compile ok" citrun_wrap cc -c main.c
+ok "is link ok" citrun_wrap cc -o main main.o
 
 strip_log citrun.log
 
 cat <<EOF > citrun.log.good
->> citrun-inst v0.0 ()
+>> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
-Switching argv[0] ''
 PATH=''
 Found source file ''
 Modified command line is ''
@@ -57,9 +56,8 @@ Rewriting successful.
 Forked compiler ''
 Rewritten source compile successful
 Restored ''
->> citrun-inst v0.0 ()
+>> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
-Switching argv[0] ''
 PATH=''
 Link detected, adding '' to command line.
 Modified command line is ''

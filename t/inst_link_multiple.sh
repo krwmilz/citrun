@@ -30,8 +30,8 @@ void third_func(void) {
 }
 EOF
 
-ok "is compile ok" citrun-wrap cc -o main one.c two.c three.c
-ok "running citrun-check" citrun-check -o check.out
+ok "is compile ok" citrun_wrap cc -o main one.c two.c three.c
+ok "running citrun_check" citrun_check -o check.out
 
 cat <<EOF > check.good
 Summary:
@@ -49,4 +49,4 @@ Totals:
 EOF
 
 strip_millis check.out
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_check diff" diff -u check.good check.out

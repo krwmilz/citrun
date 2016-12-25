@@ -33,7 +33,7 @@
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
 
-static llvm::cl::OptionCategory ToolingCategory("citrun-inst options");
+static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
 
 InstFrontend::InstFrontend(int argc, char *argv[]) :
 	m_args(argv, argv + argc),
@@ -47,14 +47,14 @@ InstFrontend::InstFrontend(int argc, char *argv[]) :
 	if ((base_name = basename(m_args[0])) == NULL)
 		err(1, "basename");
 
-	// Switch tool mode if we're called as 'citrun-inst'.
-	if (std::strcmp(base_name, "citrun-inst") == 0) {
+	// Switch tool mode if we're called as 'citrun_inst'.
+	if (std::strcmp(base_name, "citrun_inst") == 0) {
 		m_is_citruninst = true;
 		// Enable logging to stdout.
 		m_log.set_citruninst();
 	}
 
-	m_log << ">> citrun-inst v" << citrun_major << "." << citrun_minor;
+	m_log << ">> citrun_inst v" << citrun_major << "." << citrun_minor;
 	if (uname(&utsname) == -1)
 		m_log << " Unknown OS" << std::endl;
 	else
@@ -68,8 +68,8 @@ InstFrontend::InstFrontend(int argc, char *argv[]) :
 		<< "'" << std::endl;
 	m_args[0] = base_name;
 
-	// Sometimes we're not called as citrun-inst so force that here.
-	setprogname("citrun-inst");
+	// Sometimes we're not called as citrun_inst so force that here.
+	setprogname("citrun_inst");
 
 	if (m_is_citruninst == false)
 		clean_PATH();
@@ -299,13 +299,13 @@ InstFrontend::instrument()
 	int ret = Tool.run(f.get());
 	m_log << "Rewriting " << (ret ? "failed." : "successful.") << std::endl;
 
-	// All of the time until now is the overhead citrun-inst adds.
+	// All of the time until now is the overhead citrun_inst adds.
 	std::chrono::high_resolution_clock::time_point now =
 		std::chrono::high_resolution_clock::now();
 	m_log << std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count()
 		<< " Milliseconds spent rewriting source." << std::endl;
 
-	// This is as far as we go in citrun-inst mode.
+	// This is as far as we go in citrun_inst mode.
 	if (m_is_citruninst)
 		exit(ret);
 
@@ -338,7 +338,7 @@ void
 InstFrontend::exec_compiler()
 {
 	if (m_is_citruninst) {
-		m_log << "Running as citrun-inst, not calling exec()" << std::endl;
+		m_log << "Running as citrun_inst, not calling exec()" << std::endl;
 		exit(0);
 	}
 

@@ -20,8 +20,8 @@ program: main.o
 	cc -o program main.o
 EOF
 
-ok "is make successful" citrun-wrap make
-ok "is citrun-check successful" citrun-check -o check.out
+ok "is make successful" citrun_wrap make
+ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good
 Summary:
@@ -38,7 +38,7 @@ Totals:
 EOF
 
 strip_millis check.out
-ok "is citrun-check output identical" diff -u check.good check.out
+ok "is citrun_check output identical" diff -u check.good check.out
 
 ok "does compiled program run" ./program
 ok "is runtime shared memory file created" test -f procdir/program_*

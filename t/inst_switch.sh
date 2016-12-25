@@ -49,11 +49,11 @@ Totals:
         14 Total statements
 EOF
 
-ok "citrun-inst" citrun-inst -c switch.c
-ok "citrun-check" citrun-check -o check.out
+ok "citrun_inst" citrun_inst -c switch.c
+ok "citrun_check" citrun_check -o check.out
 
 strip_preamble switch.c
 strip_millis check.out
 
-ok "citrun-inst output diff" diff -u switch.c.inst_good switch.c.citrun_nohdr
-ok "citrun-check diff" diff -u check.good check.out
+ok "citrun_inst output diff" diff -u switch.c.inst_good switch.c.citrun_nohdr
+ok "citrun_check diff" diff -u check.good check.out
