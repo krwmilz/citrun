@@ -1,8 +1,8 @@
 SubDir TOP man ;
 
 InstallMan $(PREFIX)/man :
-	citrun-gl.1
-	citrun-inst.1
-	citrun-term.1
-	citrun-wrap.1
-	citrun-check.1 ;
+	citrun_gl.1
+	citrun_inst.1
+	citrun_term.1
+	citrun_wrap.1
+	citrun_check.1 ;

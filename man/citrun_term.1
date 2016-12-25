@@ -13,24 +13,32 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: April 9 2016 $
-.Dt CITRUN-GL 1
+.Dd $Mdocdate: July 19 2016 $
+.Dt CITRUN-TERM 1
 .Os
 .Sh NAME
-.Nm citrun-gl
-.Nd OpenGL viewer
+.Nm citrun_term
+.Nd terminal viewer
 .Sh DESCRIPTION
-Multiplexes execution data from any running instrumented programs into an
-OpenGL window.
+Displays live execution data from running instrumented programs. Note only one
+connection at a time is supported (for now).
 .Pp
-Started instrumented programs will try connecting to
+The
 .Nm
-when it is running. When that succeeds execution data will appear in the viewer
-window.
+control keys are
+.Qq hjkl
+and have the following effects:
 .Pp
-.Nm
-uses process group information from connected programs to aggregate similar
-processes together.
+.Bl -tag -offset indent -compact
+.It Qq j
+Scrolls source down one line
+.It Qq k
+Scrolls source up one line
+.It Qq h
+Moves to previous translation unit, if possible
+.It Qq l
+Moves to next translation unit, if possible
+.El
 .Sh FILES
 .Bl -tag -width Ds
 .It Pa /tmp/citrun.socket
@@ -39,5 +47,4 @@ Listen socket.
 .Sh EXIT STATUS
 .Ex -std
 .Sh SEE ALSO
-.Xr citrun-wrap 1 ,
-.Xr citrun-term 1
+.Xr citrun_gl 1

@@ -17,7 +17,7 @@
 .Dt CITRUN-CHECK 1
 .Os
 .Sh NAME
-.Nm citrun-check
+.Nm citrun_check
 .Nd check for rewrite activity
 .Sh SYNOPSIS
 .Nm
@@ -30,7 +30,7 @@ utility recursively checks either
 .Ar dir ,
 if given, or the current working directory for
 activity logs created by
-.Xr citrun-wrap 1 .
+.Xr citrun_wrap 1 .
 .Pp
 If the
 .Fl o
@@ -43,7 +43,7 @@ instead of standard output.
 The text below shows the output of
 .Nm
 after
-.Xr citrun-wrap 1
+.Xr citrun_wrap 1
 had been used to instrument a simple project:
 .Bd -literal -offset indent
 Summary:
@@ -79,7 +79,7 @@ The number of times the rewriter successfully transformed the entire source
 file.
 .It Qq Rewrite failures
 Rewriting a source file failed. There are two failure cases, either native
-parsing the original source file also fails, or, only citrun-inst failed parsing
+parsing the original source file also fails, or, only citrun_inst failed parsing
 the source file.
 .It Qq Rewritten source compile successes
 The number of times the rewritten source file is processed successfully by the
@@ -92,4 +92,4 @@ rewritten source fails.
 .Sh EXIT STATUS
 .Ex -std
 .Sh SEE ALSO
-.Xr citrun-wrap 1
+.Xr citrun_wrap 1
