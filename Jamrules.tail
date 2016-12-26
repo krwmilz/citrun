@@ -1,3 +1,4 @@
+
 # Quote an entire file and add a variable declaration prefixing the string.
 rule Stringize
 {
@@ -16,22 +17,4 @@ actions Stringize
 	# Add the declaration to the start of the file.
 	sed -e '1s/^/static const char *$(1:B) = /' -i.bak $(<)
 	rm $(<).bak
-}
-
-# Create installation directories and setup quirky ../../citrun_inst links.
-rule InstallSyms
-{
-	Depends install : $(PREFIX)/share/citrun/$(>) ;
-	MakeLocate $(PREFIX)/share/citrun/$(>) : $(<) ;
-
-	for i in $(>)
-	{
-		SymLink $(PREFIX)/share/citrun/$(i) ;
-	}
-}
-
-# Used by InstallSyms
-actions SymLink
-{
-	$(RM) $(<) && $(LN) -s ../../bin/citrun_inst $(<) ;
 }
