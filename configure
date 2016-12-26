@@ -24,8 +24,16 @@ for pkg in $gl_pkgs; do
 	printf "%10s = " $pkg
 	pkg-config --modversion $pkg || (echo "not found" && exit 1)
 done
-echo
 
+# citrun_inst needs clang and llvm libraries.
+CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
+	-lclangEdit -lclangFrontend -lclangFrontendTool -lclangLex \
+	-lclangParse -lclangRewrite -lclangRewriteFrontend -lclangSema \
+	-lclangSerialization -lclangTooling"
+
+LLVM_LIBS="bitreader mcparser transformutils option"
+
+# Operating system specific defines
 if [ $uname = OpenBSD ]; then
 	LDGROUP_START="-Wl,--start-group"
 	LDGROUP_END="-Wl,--end-group"
@@ -41,37 +49,36 @@ elif [ $uname = Linux ]; then
 	FONT_PATH="/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 else
 	echo WARNING: Platform $uname not tested. Compilation may fail.
-	echo
 fi
+echo
 
-# Write Jamrules. Note any errors inside backticks will be ignored.
+# Write Jamrules. Any errors inside backticks get ignored.
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
 C++ = ${CXX-c++} ;
 
-CCFLAGS += "${CFLAGS-}" ;
+CCFLAGS += ${CFLAGS-} ;
 C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti ${CFLAGS-} ;
-LINKFLAGS += "${LDFLAGS-}" ;
+LINKFLAGS += ${LDFLAGS-} ;
 
 FONT_PATH = "${FONT_PATH}" ;
 CITRUN_SRCDIR = "`pwd`/src" ;
 
-GL_CFLAGS = "`pkg-config --cflags glfw3 glew freetype2`" ;
-GL_LIBS = "${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2`" ;
-GLTEST_LIBS  = "`pkg-config --libs osmesa`" ;
+GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
+GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;
+GLTEST_LIBS  = `pkg-config --libs osmesa` ;
 
-INST_CFLAGS = "`llvm-config --cxxflags`" ;
-INST_LDFLAGS = "`llvm-config --ldflags`" ;
-INST_LIBS = "${INST_EXTRALIB-} ${LDGROUP_START-} -lclangAST -lclangAnalysis \
--lclangBasic -lclangDriver \
--lclangEdit -lclangFrontend -lclangFrontendTool -lclangLex -lclangParse \
--lclangRewrite -lclangRewriteFrontend -lclangSema -lclangSerialization \
--lclangTooling ${LDGROUP_END-} \
-`llvm-config --libs bitreader mcparser transformutils option` \
-`llvm-config --system-libs`" ;
+INST_CFLAGS = `llvm-config --cxxflags` ;
+INST_LDFLAGS = `llvm-config --ldflags` ;
+INST_LIBS = ${INST_EXTRALIB-}
+	${LDGROUP_START-} ${CLANG_LIBS} ${LDGROUP_END-}
+	`llvm-config --libs ${LLVM_LIBS}`
+	`llvm-config --system-libs` ;
 EOF
+
 echo === Configuration Summary ===================================================
-cat Jamrules
+head -n 9 Jamrules
 echo =============================================================================
 
+# Append any extra static rules to Jamfile.
 cat Jamrules.tail >> Jamrules
