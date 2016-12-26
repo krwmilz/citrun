@@ -30,9 +30,9 @@ pkg_test()
 
 pkg_check()
 {
-	ok "is citrun-check successful" citrun-check -o check.out $workdir
+	ok "is citrun_check successful" citrun_check -o check.out $workdir
 	strip_millis check.out
-	ok "citrun-check output diff" diff -u check.good check.out
+	ok "citrun_check output diff" diff -u check.good check.out
 }
 
 pkg_clean()
