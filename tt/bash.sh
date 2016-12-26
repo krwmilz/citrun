@@ -5,8 +5,6 @@
 . tt/package.subr "shells/bash"
 plan 11
 
-enter_tmpdir
-
 pkg_check_deps
 pkg_clean
 pkg_build
@@ -16,8 +14,6 @@ cat <<EOF > check.good
 Summary:
        351 Source files used as input
        100 Application link commands
-       190 Rewrite parse warnings
-        31 Rewrite parse errors
        322 Rewrite successes
         29 Rewrite failures
        299 Rewritten source compile successes

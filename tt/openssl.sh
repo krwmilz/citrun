@@ -6,8 +6,6 @@
 . tt/package.subr "security/openssl"
 plan 10
 
-enter_tmpdir
-
 pkg_check_deps
 pkg_clean
 pkg_build
@@ -16,7 +14,6 @@ cat <<EOF > check.good
 Summary:
        752 Source files used as input
         58 Application link commands
-       752 Rewrite parse warnings
        752 Rewrite successes
        752 Rewritten source compile successes
 

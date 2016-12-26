@@ -5,8 +5,6 @@
 . tt/package.subr "editors/nvi"
 plan 11
 
-enter_tmpdir
-
 pkg_check_deps
 pkg_clean
 pkg_build
@@ -15,7 +13,6 @@ cat <<EOF > check.good
 Summary:
        116 Source files used as input
          3 Application link commands
-        32 Rewrite parse warnings
        116 Rewrite successes
        116 Rewritten source compile successes
 

@@ -5,8 +5,6 @@
 . tt/package.subr "net/nmap"
 plan 10
 
-enter_tmpdir
-
 pkg_check_deps
 pkg_clean
 pkg_build
@@ -16,8 +14,6 @@ cat <<EOF > check.good
 Summary:
        400 Source files used as input
         83 Application link commands
-       598 Rewrite parse warnings
-        74 Rewrite parse errors
        334 Rewrite successes
         66 Rewrite failures
        311 Rewritten source compile successes

@@ -6,8 +6,6 @@
 . tt/package.subr "devel/git"
 plan 9
 
-enter_tmpdir
-
 pkg_check_deps
 pkg_clean
 pkg_build
@@ -18,8 +16,6 @@ cat <<EOF > check.good
 Summary:
        383 Source files used as input
         84 Application link commands
-        46 Rewrite parse warnings
-         6 Rewrite parse errors
        377 Rewrite successes
          6 Rewrite failures
        374 Rewritten source compile successes
