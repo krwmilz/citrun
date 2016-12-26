@@ -63,10 +63,12 @@ InstFrontend::InstFrontend(int argc, char *argv[]) :
 
 	m_log << "CITRUN_SHARE = '" << CITRUN_SHARE << "'" << std::endl;
 
-	// Always re-search PATH for binary name (in non-citrun-inst case).
-	m_log << "Switching argv[0] '" << m_args[0] << "' -> '" << base_name
-		<< "'" << std::endl;
-	m_args[0] = base_name;
+	// Always re-search PATH for binary name (in non citrun_inst case).
+	if (std::strcmp(m_args[0], base_name) != 0) {
+		m_log << "Switching argv[0] '" << m_args[0] << "' -> '"
+			<< base_name << "'" << std::endl;
+		m_args[0] = base_name;
+	}
 
 	// Sometimes we're not called as citrun_inst so force that here.
 	setprogname("citrun_inst");
