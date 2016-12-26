@@ -9,6 +9,7 @@ plan 2
 
 cat <<EOF > main.c
 #include <stddef.h>
+
 struct citrun_node;
 void citrun_node_add(unsigned int, unsigned int, struct citrun_node *);
 
