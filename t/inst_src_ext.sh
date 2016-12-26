@@ -3,26 +3,36 @@
 # Check that the advertised source file extensions work.
 #
 . t/utils.subr
-plan 8
-
-
-touch main.{c,cc,cxx,cpp,C}
-ok "extension .c" citrun_wrap cc -c main.c
-ok "extension .cc" citrun_wrap c++ -c main.cc
-ok "extension .cxx" citrun_wrap c++ -c main.cxx
-ok "extension .cpp" citrun_wrap c++ -c main.cpp
-ok "extension .C (not supported)" citrun_wrap c++ -c main.C
+plan 18
 
 cat <<EOF > check.good
 Summary:
-         4 Source files used as input
-         4 Rewrite successes
-         4 Rewritten source compile successes
+         1 Source files used as input
+         1 Rewrite successes
+         1 Rewritten source compile successes
 
 Totals:
-         4 Lines of source code
+         1 Lines of source code
 EOF
 
-ok "citrun_check" citrun_check -o check.out
-strip_millis check.out
-ok "citrun_check diff" diff -u check.good check.out
+# Check supported extensions.
+for ext in c cc cxx cpp; do
+	touch main.$ext
+	ok "is extension .$ext compiled successfully" cc -c main.$ext
+
+	ok "is citrun_check successful" citrun_check -o check.out
+	strip_millis check.out
+	ok "citrun_check diff" diff -u check.good check.out
+
+	rm main.$ext citrun.log check.out main.o
+done
+
+# Check unsupported extensions.
+for ext in C; do
+	touch main.$ext
+
+	ok "is extension .$ext compiled successfully" cc -c main.$ext
+	ok_program "is citrun_check exit code 1" 123 "" citrun_check -o check.out
+
+	rm main.$ext main.o
+done

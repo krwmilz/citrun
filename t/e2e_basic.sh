@@ -49,7 +49,7 @@ Totals:
          7 Binary operators
 EOF
 
-ok "wrapped source compile" citrun_wrap cc -o fib fib.c
+ok "is instrumented compile successful" cc -o fib fib.c
 ok "running citrun_check" citrun_check -o check.out
 
 strip_millis check.out

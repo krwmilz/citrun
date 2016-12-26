@@ -8,8 +8,8 @@ plan 4
 
 echo "int main(void) { return 0; " > bad.c
 
-citrun_wrap cc -c bad.c 2> /dev/null
-ok "is citrun_wrap exit code 1" test $? -eq 1
+cc -c bad.c 2> /dev/null
+ok "is instrumented compile exit code 1" test $? -eq 1
 
 cat <<EOF > check.good
 Summary:

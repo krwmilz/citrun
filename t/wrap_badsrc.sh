@@ -7,7 +7,7 @@ plan 4
 
 
 output_good="citrun_inst: stat: No such file or directory"
-ok_program "is citrun_wrap failing" 1 "$output_good" citrun_wrap cc -o main main.c
+ok_program "is instrumented compile failure" 1 "$output_good" cc -o main main.c
 ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good

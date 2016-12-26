@@ -30,8 +30,8 @@ void third_func(void) {
 }
 EOF
 
-ok "is compile ok" citrun_wrap cc -o main one.c two.c three.c
-ok "running citrun_check" citrun_check -o check.out
+ok "is instrumented compile successful" cc -o main one.c two.c three.c
+ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good
 Summary:

@@ -6,13 +6,7 @@
 type ninja || skip_all "ninja not found"
 plan 6
 
-cat <<EOF > main.c
-int
-main(void)
-{
-	return 0;
-}
-EOF
+empty_main
 
 # Quote the here-doc so that '$' does not get substituted.
 cat <<'EOF' > build.ninja
@@ -26,7 +20,7 @@ build main.o: cc main.c
 build program: link main.o
 EOF
 
-ok "is ninja successful" citrun_wrap ninja
+ok "is instrumented ninja successful" ninja
 ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good

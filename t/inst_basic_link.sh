@@ -5,12 +5,9 @@
 . t/utils.subr
 plan 4
 
+empty_main
 
-cat <<EOF > main.c
-int main(void) { return 0; }
-EOF
-
-ok "wrapping simple build command" citrun_wrap cc main.c
+ok "is instrumented compile successful" cc main.c
 
 cat <<EOF > check.good
 Summary:
@@ -20,7 +17,7 @@ Summary:
          1 Rewritten source compile successes
 
 Totals:
-         2 Lines of source code
+         6 Lines of source code
          1 Function definitions
          1 Return statement values
          3 Total statements

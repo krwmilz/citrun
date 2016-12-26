@@ -6,21 +6,14 @@
 type make || skip_all "make not found"
 plan 6
 
-
-cat <<EOF > main.c
-int
-main(void)
-{
-	return 0;
-}
-EOF
+empty_main
 
 cat <<EOF > Makefile
 program: main.o
 	cc -o program main.o
 EOF
 
-ok "is make successful" citrun_wrap make
+ok "is instrumented make successful" make
 ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good

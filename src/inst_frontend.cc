@@ -229,7 +229,8 @@ InstFrontend::process_cmdline()
 	for (auto &arg : m_args) {
 		if (std::strcmp(arg, "-E") == 0 || std::strcmp(arg, "-MM") == 0) {
 			// I don't know the repercussions of doing otherwise.
-			m_log << "Preprocessor argument found" << std::endl;
+			m_log << "Preprocessor argument " << arg << " found"
+				<< std::endl;
 			exec_compiler();
 		}
 		else if (std::strcmp(arg, "-o") == 0)

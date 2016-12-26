@@ -6,20 +6,13 @@
 type jam || skip_all "jam not found"
 plan 6
 
-
-cat <<EOF > main.c
-int
-main(void)
-{
-	return 0;
-}
-EOF
+empty_main
 
 cat <<EOF > Jamfile
 Main program : main.c ;
 EOF
 
-ok "is jam successful" citrun_wrap jam
+ok "is instrumented jam successful" jam
 ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good

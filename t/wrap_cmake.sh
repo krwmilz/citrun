@@ -6,14 +6,7 @@
 type cmake || skip_all "ninja not found"
 plan 7
 
-
-cat <<EOF > main.c
-int
-main(void)
-{
-	return 0;
-}
-EOF
+empty_main
 
 cat <<EOF > CMakeLists.txt
 cmake_minimum_required (VERSION 2.6)
@@ -21,10 +14,10 @@ project (program)
 add_executable(program main.c)
 EOF
 
-ok "is cmake successful" citrun_wrap cmake .
+ok "is instrumented cmake successful" cmake .
 find . -name citrun.log -print0 | xargs -0 rm
 
-ok "is make (from cmake) successful" citrun_wrap make
+ok "is instrumented make (from cmake) successful" make
 ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good

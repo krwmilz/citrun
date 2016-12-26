@@ -5,17 +5,11 @@
 . t/utils.subr
 plan 12
 
-
-cat <<EOF > main1.c
-int
-main(void)
-{
-	return 0;
-}
-EOF
-cp main1.c main2.c
-cp main1.c main3.c
-cp main1.c main4.c
+empty_main
+cp main.c main1.c
+cp main.c main2.c
+cp main.c main3.c
+cp main.c main4.c
 
 cat <<EOF > Makefile
 all: program1 program2 program3 program4
@@ -30,7 +24,7 @@ program4: main4.o
 	cc -o program4 main4.o
 EOF
 
-ok "is make successful" citrun_wrap make -j4
+ok "is instrumented make -j4 successful" make -j4
 ok "is citrun_check successful" citrun_check -o check.out
 
 cat <<EOF > check.good
@@ -51,6 +45,6 @@ strip_millis check.out
 ok "is citrun_check output identical" diff -u check.good check.out
 
 for i in 1 2 3 4; do
-	ok "does compiled program$i run" ./program$i
-	ok "is runtime shared memory file created" test -f procdir/program${i}_*
+	ok "is program$i execution successful" ./program$i
+	ok "is program$i runtime memory file created" test -f procdir/program${i}_*
 done

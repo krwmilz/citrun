@@ -25,5 +25,16 @@ strip_log()
 
 strip_millis()
 {
-	ok "are milliseconds sanitized" sed -i -e "/Milliseconds spent/d" $1
+	ok "is 'Milliseconds' sanitized" sed -i -e "/Milliseconds spent/d" $1
+}
+
+empty_main()
+{
+	cat <<EOF > main.c || exit 1
+int
+main(void)
+{
+	return 0;
+}
+EOF
 }

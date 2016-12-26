@@ -30,7 +30,7 @@ Totals:
          9 Total statements
 EOF
 
-ok "wrapped compile" citrun_wrap cc -o hello hello.c
+ok "is instrumented compile successful" cc -o hello hello.c
 
 ok "citrun_check" citrun_check -o check.out
 strip_millis check.out

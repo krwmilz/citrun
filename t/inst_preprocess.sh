@@ -8,18 +8,18 @@ plan 3
 
 echo "int main(void) { return 0; }" > prepro.c
 
-ok "wrapping compile w/ preprocessor arg -E" citrun_wrap cc -E prepro.c
-ok "wrapping compile w/ preprocessor arg -MM" citrun_wrap cc -E prepro.c
+ok "is instrumented compile argument -E handled" cc -E prepro.c
+ok "is instrumented compile argument  -MM handled" cc -MM prepro.c
 
 cat <<EOF > citrun.log.good
 >> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
 PATH=''
-Preprocessor argument found
+Preprocessor argument -E found
 >> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
 PATH=''
-Preprocessor argument found
+Preprocessor argument -MM found
 EOF
 
 strip_log citrun.log

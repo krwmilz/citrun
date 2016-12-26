@@ -6,12 +6,7 @@
 . t/utils.subr
 plan 4
 
-
-cat <<EOF > main.c
-int main(void) {
-	return 0;
-}
-EOF
+empty_main
 
 cat <<EOF > other.c
 int other(void) {
@@ -27,13 +22,13 @@ Summary:
          1 Rewritten source compile successes
 
 Totals:
-         8 Lines of source code
+        10 Lines of source code
          2 Function definitions
          2 Return statement values
          6 Total statements
 EOF
 
-ok "citrun_wrap compile" citrun_wrap cc -o main main.c other.c
+ok "is instrumented compile successful" cc -o main main.c other.c
 ok "citrun_check" citrun_check -o check.out
 
 strip_millis check.out

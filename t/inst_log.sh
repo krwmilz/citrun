@@ -31,8 +31,8 @@ main(int argc, char *argv[])
 }
 EOF
 
-ok "is compile ok" citrun_wrap cc -c main.c
-ok "is link ok" citrun_wrap cc -o main main.o
+ok "is instrumented compile ok" cc -c main.c
+ok "is instrumented link ok" cc -o main main.o
 
 strip_log citrun.log
 
