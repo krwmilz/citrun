@@ -52,6 +52,15 @@ else
 fi
 echo
 
+#
+# citrun_inst needs to know the absolute installation path.
+#
+if [ -z ${PREFIX-} ]; then
+	CITRUN_SHARE="`pwd`/src"
+else
+	CITRUN_SHARE="${PREFIX}/share/citrun"
+fi
+
 # Write Jamrules. Any errors inside backticks get ignored.
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
@@ -62,7 +71,7 @@ C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti ${CFLAGS-} ;
 LINKFLAGS += ${LDFLAGS-} ;
 
 FONT_PATH = "${FONT_PATH}" ;
-CITRUN_SRCDIR = "`pwd`/src" ;
+CITRUN_SHARE = ${CITRUN_SHARE} ;
 
 GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
 GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;

@@ -1,18 +1,4 @@
 SubDir TOP src ;
-#
-# Knowing the absolute path to citrun resources is necessary because:
-# - instrumented programs must be linked to the runtime library
-# - the PATH compiler interception mechanism needs to remove itself from PATH
-#
-# If PREFIX is set we're building a package, so trust that will be the final
-# (after installation) location.
-#
-if $(PREFIX) {
-	CITRUN_SHARE = $(PREFIX)/share/citrun ;
-}
-else {
-	CITRUN_SHARE = $(CITRUN_SRCDIR) ;
-}
 
 # Do a string replacement on the first argument.
 actions ReplaceTokens
