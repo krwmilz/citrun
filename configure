@@ -72,7 +72,7 @@ else
 fi
 
 #
-# Write Jamrules. Any errors inside backticks get ignored.
+# Write top of Jamrules. Any errors inside backticks get ignored.
 #
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
@@ -95,13 +95,37 @@ INST_LIBS = ${INST_EXTRALIB-}
 	${LDGROUP_START-} ${CLANG_LIBS} ${LDGROUP_END-}
 	`llvm-config --libs ${LLVM_LIBS}`
 	`llvm-config --system-libs` ;
+
 EOF
 
 #
-# Show summary and then append static rules in Jamrules.tail.
+# Write bottom of Jamrules, no variable interpolation.
+#
+cat <<'EOF' >> Jamrules
+# Quote an entire file and add a variable declaration prefixing the string.
+rule Stringize
+{
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	Depends $(1) : $(2) ;
+	Clean clean : $(1) ;
+}
+
+actions Stringize
+{
+	# Quote the entire original source file and put it in the destination.
+	sed -e ' s/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/\\n"/; ' < $(>) > $(<)
+	echo ";" >> $(<)
+
+	# Add the declaration to the start of the file.
+	sed -e '1s/^/static const char *$(1:B) = /' -i.bak $(<)
+	rm $(<).bak
+}
+EOF
+
+#
+# Show summary.
 #
 echo === Configuration Summary ===================================================
 head -n 9 Jamrules
 echo =============================================================================
-
-cat Jamrules.tail >> Jamrules
