@@ -6,26 +6,34 @@ uname=`uname`
 echo ░█▀▀░░░▀█▀░▀█▀░░░█▀▄░█░█░█▀█
 echo ░█░░░░░░█░░░█░░░░█▀▄░█░█░█░█
 echo ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░▀░▀
-echo C It Run 0.0 on $uname
+echo Configuring C It Run 0.0 for $uname
 echo
 
+#
 # These binaries are assumed throughout so make sure they are available.
+#
 type pkg-config
 type llvm-config
 type jam
 echo
 
+#
 # C++11 required.
+#
 ${CXX-c++} -x c++ -std=c++11 -E - < /dev/null > /dev/null
 
+#
 # citrun_gltest needs osmesa and both it and citrun_gl need the rest.
+#
 gl_pkgs="osmesa glfw3 glew freetype2"
 for pkg in $gl_pkgs; do
 	printf "%10s = " $pkg
 	pkg-config --modversion $pkg || (echo "not found" && exit 1)
 done
 
+#
 # citrun_inst needs clang and llvm libraries.
+#
 CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
 	-lclangEdit -lclangFrontend -lclangFrontendTool -lclangLex \
 	-lclangParse -lclangRewrite -lclangRewriteFrontend -lclangSema \
@@ -33,7 +41,9 @@ CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
 
 LLVM_LIBS="bitreader mcparser transformutils option"
 
-# Operating system specific defines
+#
+# Operating system specific variables.
+#
 if [ $uname = OpenBSD ]; then
 	LDGROUP_START="-Wl,--start-group"
 	LDGROUP_END="-Wl,--end-group"
@@ -61,7 +71,9 @@ else
 	CITRUN_SHARE="${PREFIX}/share/citrun"
 fi
 
+#
 # Write Jamrules. Any errors inside backticks get ignored.
+#
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
 C++ = ${CXX-c++} ;
@@ -85,9 +97,11 @@ INST_LIBS = ${INST_EXTRALIB-}
 	`llvm-config --system-libs` ;
 EOF
 
+#
+# Show summary and then append static rules in Jamrules.tail.
+#
 echo === Configuration Summary ===================================================
 head -n 9 Jamrules
 echo =============================================================================
 
-# Append any extra static rules to Jamfile.
 cat Jamrules.tail >> Jamrules
