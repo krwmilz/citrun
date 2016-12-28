@@ -13,6 +13,7 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
+#include <cstring>		// strcmp
 
 #include "inst_frontend.h"	// InstFrontend
 
@@ -20,6 +21,11 @@ int
 main(int argc, char *argv[])
 {
 	int ret;
+
+	if (argc == 2 && (std::strcmp(argv[1], "--print-share") == 0)) {
+		std::cout << CITRUN_SHARE;
+		return 0;
+	}
 
 	InstFrontend main(argc, argv);
 	main.process_cmdline();

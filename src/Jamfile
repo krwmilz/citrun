@@ -1,12 +1,5 @@
 SubDir TOP src ;
 
-# Do a string replacement on the first argument.
-actions ReplaceTokens
-{
-	sed -e s,%CITRUN_SHARE%,$(CITRUN_SHARE), -i.bak $(<) ;
-	rm $(<).bak
-}
-
 #
 # libcitrun.a
 #
@@ -19,8 +12,6 @@ Library libcitrun : lib.c ;
 MakeLocate citrun_check citrun_wrap : $(LOCATE_SOURCE) ;
 Shell citrun_check : check.sh ;
 Shell citrun_wrap : wrap.sh ;
-
-ReplaceTokens citrun_wrap ;
 
 #
 # citrun_term
