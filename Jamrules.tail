@@ -14,11 +14,13 @@ rule Stringize
 
 actions Stringize
 {
-	# Quote the entire original source file and put it in the destination.
-	sed -e ' s/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/\\n"/; ' < $(>) > $(<)
-	echo ";" >> $(<)
-
-	# Add the declaration to the start of the file.
-	sed -e '1s/^/static const char *$(1:B) = /' -i.bak $(<)
-	rm $(<).bak
+	perl -e 'print "static const char *$(1:B) = ";
+		while (<>) {
+			$_ =~ s/\\/\\\\/g ;
+			$_ =~ s/"/\\"/g;
+			$_ =~ s/^/"/;
+			$_ =~ s/$/\\n"/;
+			print
+		}
+		print ";" ' < $(>) > $(<)
 }
