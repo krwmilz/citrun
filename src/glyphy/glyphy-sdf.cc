@@ -27,7 +27,7 @@ using namespace GLyphy::Geometry;
 
 /*
  * TODO
- * 
+ *
  * Sync this with the shader sdf
  */
 
