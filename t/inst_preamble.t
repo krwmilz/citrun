@@ -1,15 +1,22 @@
-#!/bin/sh -u
 #
 # Test that the instrumentation preamble is what we think it is.
 #
-. t/utils.subr
-plan 3
+use strict;
+use warnings;
+use File::Slurp;
+use Test::Cmd;
+use Test::Differences;
+use Test::More tests => 3;
+unified_diff;
 
 
-touch preamble.c
-ok "running citrun_inst" citrun_inst -c preamble.c
+my $inst = Test::Cmd->new( prog => 'src/citrun_inst', workdir => '' );
 
-cat <<EOF > preamble.c.good
+$inst->write( "empty.c", "" );
+$inst->run( args => "-c empty.c", chdir => $inst->curdir );
+
+# Known good output.
+my $preamble_good = <<EOF ;
 #ifdef __cplusplus
 extern "" {
 #endif
@@ -50,5 +57,10 @@ citrun_constructor() {
 #endif
 EOF
 
-ok "remove os specific paths" sed -i -e 's/".*"/""/' preamble.c.citrun
-ok "diff against known good" diff -u preamble.c.good preamble.c.citrun
+# Read and sanitize special preamble file created by citrun_inst.
+my $preamble = read_file( $inst->workdir . "/empty.c.preamble" );
+$preamble =~ s/".*"/""/gm;
+
+eq_or_diff( $preamble,	$preamble_good, 'is preamble identical', { context => 3 } );
+is( $inst->stderr,	'',	'is citrun_inst stderr empty' );
+is( $? >> 8,		0,	'is citrun_inst exit code 0' );
