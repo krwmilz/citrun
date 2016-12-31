@@ -51,11 +51,10 @@ EOF
 $inst->run( args => '-MM prepro.c', chdir => $inst->curdir );
 
 # This file should not have been modified.
-my $inst_out;
 $inst->read(\$inst_out, 'prepro.c');
 
 # Sanitize paths from stdout.
-my $check_out = $inst->stdout;
+$check_out = $inst->stdout;
 $check_out =~ s/^.*Milliseconds spent.*\n//gm;
 $check_out =~ s/'.*'/''/gm;
 $check_out =~ s/\(.*\)/\(\)/gm;
