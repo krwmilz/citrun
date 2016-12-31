@@ -40,11 +40,6 @@ InstrumentAction::write_modified_src(clang::FileID const &fid)
 {
 	std::string out_file(getCurrentFile());
 
-	if (m_is_citruninst) {
-		out_file += ".citrun";
-		m_log << "Writing modified source to '" << out_file << "'" << std::endl;
-	}
-
 	std::error_code ec;
 	llvm::raw_fd_ostream output(out_file, ec, llvm::sys::fs::F_None);
 	if (ec.value()) {
@@ -92,7 +87,11 @@ InstrumentAction::EndSourceFileAction()
 		<< "#endif\n";
 
 	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
-	if (m_TheRewriter.InsertTextAfter(start, preamble.str())) {
+	if (m_is_citruninst) {
+		std::ofstream preamble_file(getCurrentFile().str() + ".preamble");
+		preamble_file << preamble.str();
+		preamble_file.close();
+	} else if (m_TheRewriter.InsertTextAfter(start, preamble.str())) {
 		m_log << "Failed to insert the instrumentation preabmle.";
 		return;
 	}
