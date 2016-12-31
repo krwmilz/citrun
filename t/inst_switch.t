@@ -45,7 +45,7 @@ int main(void)
 EOF
 
 my $check_good = <<EOF;
->> citrun_inst v0.0 (OpenBSD-6.0 amd64)
+>> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
 Switching argv[0] ''
 Found source file ''
@@ -71,6 +71,7 @@ my $inst_out = read_file($inst->workdir . '/switch.c');
 my $check_out = $inst->stdout;
 $check_out =~ s/^.*Milliseconds spent.*\n//gm;
 $check_out =~ s/'.*'/''/gm;
+$check_out =~ s/\(.*\)/\(\)/gm;
 
 eq_or_diff( $inst_out,	$inst_good, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_good,	$check_out, 'is citrun_inst output identical';
