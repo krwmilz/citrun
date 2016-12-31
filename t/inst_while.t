@@ -3,7 +3,6 @@
 #
 use strict;
 use warnings;
-use File::Slurp;
 use Test::Cmd;
 use Test::Differences;
 use Test::More tests => 4;
@@ -54,7 +53,8 @@ EOF
 $inst->run( args => '-c while.c', chdir => $inst->curdir );
 
 # This file should have been rewritten in place.
-my $inst_out = read_file($inst->workdir . '/while.c');
+my $inst_out;
+$inst->read(\$inst_out, 'while.c');
 
 # Sanitize paths from stdout.
 my $check_out = $inst->stdout;
