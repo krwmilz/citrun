@@ -14,13 +14,5 @@ rule Stringize
 
 actions Stringize
 {
-	perl -e 'print "static const char *$(1:B) = ";
-		while (<>) {
-			$_ =~ s/\\/\\\\/g ;
-			$_ =~ s/"/\\"/g;
-			$_ =~ s/^/"/;
-			$_ =~ s/$/\\n"/;
-			print
-		}
-		print ";" ' < $(>) > $(<)
+	perl src/stringize.pl $(1:B) < $(>) > $(<)
 }
