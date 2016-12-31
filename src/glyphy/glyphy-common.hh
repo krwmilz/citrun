@@ -21,6 +21,7 @@
 
 #include <glyphy.h>
 
+#define _USE_MATH_DEFINES	// Used on Windows to bring in math constants.
 #include <cmath>
 #include <math.h>
 #include <string.h>
