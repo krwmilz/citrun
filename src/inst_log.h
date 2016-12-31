@@ -5,7 +5,11 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>	// llvm::sys::fs::F_Append
 #include <sstream>
-#include <unistd.h>			// pid_t
+#ifdef WIN32
+#include <process.h>			// getpid
+#else
+#include <unistd.h>			// getpid
+#endif
 
 //
 // Taken from StackOverflow user Loki Astari. Thanks.
@@ -14,7 +18,7 @@ class InstrumentLogger : public std::ostream
 {
 	class LogBuffer : public std::stringbuf
 	{
-		pid_t			 m_pid;
+		int			 m_pid;
 		std::error_code		 m_ec;
 		llvm::raw_fd_ostream	 m_outfile;
 	public:
