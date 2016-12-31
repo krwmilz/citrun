@@ -17,7 +17,6 @@
 #include "lib_h.h"
 
 #include <clang/Frontend/CompilerInstance.h>
-#include <err.h>
 #include <fstream>
 #include <sstream>
 #include <string>
