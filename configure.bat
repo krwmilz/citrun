@@ -11,7 +11,7 @@ rem Extends to end of file so we have these modifications the entire time.
 rem
 setlocal
 set Path=C:\Users\kyle\src\jam-2.6\bin.ntx86;%Path%
-set Path=C:\Users\kyle\src\llvm-3.9.1.src\Debug\bin;%Path%
+set Path=C:\LLVM\bin;%Path%
 
 WHERE cl
 if %ERRORLEVEL% NEQ 0 (
@@ -41,11 +41,14 @@ if %ERRORLEVEL% NEQ 0 (
 	exit /B 1
 )
 
+WHERE perl
+
+set CLANG_LIBS=clangAST.lib clangAnalysis.lib clangBasic.lib clangDriver.lib clangEdit.lib clangFrontend.lib clangFrontendTool.lib clangLex.lib clangParse.lib clangRewrite.lib clangRewriteFrontend.lib clangSema.lib clangSerialization.lib clangTooling.lib
 set LLVM_LIBS=bitreader mcparser transformutils option
 
 del Jamrules
 
-echo C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti ; >>Jamrules
+echo C++FLAGS = /EHsc ; >>Jamrules
 echo( >>Jamrules
 
 echo FONT_PATH = "C:\Windows\Fonts\consola.ttf" ; >>Jamrules
@@ -57,19 +60,22 @@ rem GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;
 rem GLTEST_LIBS  = `pkg-config --libs osmesa` ;
 
 echo INST_CFLAGS = >>Jamrules
+echo -IC:\\Clang\\include >>Jamrules
 llvm-config.exe --cxxflags >>Jamrules
 echo ; >>Jamrules
 echo( >>Jamrules
 
 echo INST_LDFLAGS = >>Jamrules
+echo -LIBPATH:C:\\Clang\\lib >>Jamrules
 llvm-config.exe --ldflags >>Jamrules
 echo ; >>Jamrules
 echo( >>Jamrules
 
 echo INST_LIBS = >>Jamrules
-llvm-config.exe --libs %LLVM_LIBS% >>Jamrules
+echo %CLANG_LIBS% >>Jamrules
+llvm-config.exe --libnames %LLVM_LIBS% >>Jamrules
 llvm-config.exe --system-libs >>Jamrules
-echo ; >>Jamrules
+echo version.lib ; >>Jamrules
 echo( >>Jamrules
 
 copy /b Jamrules + Jamrules.tail Jamrules
