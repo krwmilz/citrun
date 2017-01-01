@@ -46,7 +46,6 @@ EOF
 my $check_good = <<EOF;
 >> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
-Switching argv[0] ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
@@ -72,6 +71,7 @@ my $check_out = $inst->stdout;
 $check_out =~ s/^.*Milliseconds spent.*\n//gm;
 $check_out =~ s/'.*'/''/gm;
 $check_out =~ s/\(.*\)/\(\)/gm;
+$check_out =~ s/^[0-9]+: //gm;
 
 eq_or_diff( $inst_out,	$inst_good, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_good,	$check_out, 'is citrun_inst output identical';
