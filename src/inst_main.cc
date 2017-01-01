@@ -14,20 +14,31 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include <cstring>		// strcmp
+#include <err.h>
+#include <libgen.h>		// basename
 
 #include "inst_frontend.h"	// InstFrontend
 
 int
 main(int argc, char *argv[])
 {
-	int ret;
+	int		 ret;
+	char		*base_name;
+	bool		 is_citrun_inst = false;
 
-	if (argc == 2 && (std::strcmp(argv[1], "--print-share") == 0)) {
-		std::cout << CITRUN_SHARE;
-		return 0;
-	}
+	// Protect against argv[0] being an absolute path.
+	if ((base_name = basename(argv[0])) == NULL)
+		err(1, "basename");
 
-	InstFrontend main(argc, argv);
+	// Switch tool mode if we're called as 'citrun_inst'.
+	if (std::strcmp(base_name, "citrun_inst") == 0)
+		is_citrun_inst = true;
+
+	// Always re-search PATH for binary name (in non citrun_inst case).
+	if (std::strcmp(argv[0], base_name) != 0)
+		argv[0] = base_name;
+
+	InstFrontend main(argc, argv, is_citrun_inst);
 	main.process_cmdline();
 
 	main.instrument();

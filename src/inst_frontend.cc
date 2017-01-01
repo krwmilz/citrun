@@ -28,31 +28,19 @@
 #include <cstring>		// strcmp
 #include <err.h>
 #include <fstream>		// ifstream, ofstream
-#include <libgen.h>		// basename
 #include <sstream>		// ostringstream
 #include <unistd.h>		// execvp, fork, getpid, unlink
 
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
 
-InstFrontend::InstFrontend(int argc, char *argv[]) :
+InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 	m_args(argv, argv + argc),
-	m_is_citruninst(false),
+	m_log(is_citrun_inst),
+	m_is_citruninst(is_citrun_inst),
 	m_start_time(std::chrono::high_resolution_clock::now())
 {
-	char		*base_name;
 	struct utsname	 utsname;
-
-	// Protect against argv[0] being an absolute path.
-	if ((base_name = basename(m_args[0])) == NULL)
-		err(1, "basename");
-
-	// Switch tool mode if we're called as 'citrun_inst'.
-	if (std::strcmp(base_name, "citrun_inst") == 0) {
-		m_is_citruninst = true;
-		// Enable logging to stdout.
-		m_log.set_citruninst();
-	}
 
 	m_log << ">> citrun_inst v" << citrun_major << "." << citrun_minor;
 	if (uname(&utsname) == -1)
@@ -62,13 +50,6 @@ InstFrontend::InstFrontend(int argc, char *argv[]) :
 			<< " " << utsname.machine << ")" << std::endl;
 
 	m_log << "CITRUN_SHARE = '" << CITRUN_SHARE << "'" << std::endl;
-
-	// Always re-search PATH for binary name (in non citrun_inst case).
-	if (std::strcmp(m_args[0], base_name) != 0) {
-		m_log << "Switching argv[0] '" << m_args[0] << "' -> '"
-			<< base_name << "'" << std::endl;
-		m_args[0] = base_name;
-	}
 
 	// Sometimes we're not called as citrun_inst so force that here.
 	setprogname("citrun_inst");

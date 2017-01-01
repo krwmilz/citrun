@@ -6,7 +6,7 @@
 
 class InstFrontend {
 public:
-	InstFrontend(int, char *argv[]);
+	InstFrontend(int, char *argv[], bool);
 
 	void			process_cmdline();
 	void			instrument();

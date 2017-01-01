@@ -19,47 +19,41 @@ class InstrumentLogger : public std::ostream
 	class LogBuffer : public std::stringbuf
 	{
 		int			 m_pid;
-		std::error_code		 m_ec;
-		llvm::raw_fd_ostream	 m_outfile;
+		llvm::raw_ostream	*m_out;
 	public:
-		bool			 m_iscitruninst;
 
-		LogBuffer() :
-			m_pid(getpid()),
-			m_ec(),
-			m_outfile("citrun.log", m_ec, llvm::sys::fs::F_Append),
-			m_iscitruninst(false)
+		LogBuffer(bool is_citrun_inst) :
+			m_pid(getpid())
 		{
-			if (m_ec.value())
+			if (is_citrun_inst) {
+				m_out = &llvm::outs();
+				return;
+			}
+
+			std::error_code m_ec;
+			m_out = new llvm::raw_fd_ostream("citrun.log", m_ec, llvm::sys::fs::F_Append);
+			if (m_ec.value()) {
 				std::cerr << "Can't open citrun.log: " << m_ec.message();
+				m_out = &llvm::errs();
+			}
 		}
 
 		virtual int sync()
 		{
-			if (!m_ec.value()) {
-				m_outfile << m_pid << ": " << str();
-				m_outfile.flush();
-			}
-
-			if (m_iscitruninst)
-				llvm::outs() << str();
-
+			*m_out << m_pid << ": " << str();
+			m_out->flush();
 			str("");
+
 			return 0;
 		}
 	};
 
 	LogBuffer buffer;
 public:
-	InstrumentLogger() :
+	InstrumentLogger(bool is_citrun_inst) :
 		std::ostream(&buffer),
-		buffer()
+		buffer(is_citrun_inst)
 	{
-	}
-
-	void set_citruninst()
-	{
-		buffer.m_iscitruninst = true;
 	}
 };
 
