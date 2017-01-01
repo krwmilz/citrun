@@ -7,11 +7,16 @@ ObjectCcFlags lib.c : -fPIC -ansi ;
 Library libcitrun : lib.c ;
 
 #
-# citrun_wrap, citrun_check
+# citrun_check
 #
-MakeLocate citrun_check citrun_wrap : $(LOCATE_SOURCE) ;
+MakeLocate citrun_check : $(LOCATE_SOURCE) ;
 Shell citrun_check : check.sh ;
-Shell citrun_wrap : wrap.sh ;
+
+#
+# citrun_wrap
+#
+ObjectDefines wrap.c : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
+Main citrun_wrap : wrap.c ;
 
 #
 # citrun_term
@@ -97,8 +102,8 @@ actions SymLink
 # install
 #
 InstallLib	$(PREFIX)/share/citrun	: libcitrun.a ;
-InstallShell	$(PREFIX)/bin		: citrun_wrap citrun_check ;
-InstallBin	$(PREFIX)/bin		: citrun_gl citrun_inst ;
+InstallShell	$(PREFIX)/bin		: citrun_check ;
+InstallBin	$(PREFIX)/bin		: citrun_wrap citrun_gl citrun_inst ;
 InstallSyms	$(PREFIX)/share/citrun	: cc gcc clang clang++ g++ c++ egcc eg++ ;
 
 SubInclude TOP src glyphy ;
