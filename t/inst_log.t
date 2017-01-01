@@ -1,13 +1,18 @@
-#!/bin/sh -u
 #
 # Check that a raw citrun.log file is in good shape.
 # citrun_check relies on this output, and citrun_check is used quite a bit.
 #
-. t/utils.subr
-plan 3
+use strict;
+use warnings;
+use Test::Cmd;
+use Test::Differences;
+use Test::More tests => 3;
+unified_diff;	# for Test::Differences
 
 
-cat <<EOF > main.c
+my $wrap = Test::Cmd->new( prog => 'src/citrun_wrap', workdir => '' );
+
+$wrap->write( 'main.c', <<EOF );
 #include <stdlib.h>
 
 long long
@@ -31,12 +36,10 @@ main(int argc, char *argv[])
 }
 EOF
 
-ok "is instrumented compile ok" cc -c main.c
-ok "is instrumented link ok" cc -o main main.o
+$wrap->write( 'Jamfile', 'Main main : main.c ;' );
+$wrap->run( args => 'jam', chdir => $wrap->curdir );
 
-strip_log citrun.log
-
-cat <<EOF > citrun.log.good
+my $citrun_log_good =<<EOF ;
 >> citrun_inst v0.0 ()
 CITRUN_SHARE = ''
 PATH=''
@@ -64,4 +67,14 @@ Modified command line is ''
 No source files found on command line.
 EOF
 
-ok "log file diff" diff -u citrun.log.good citrun.log.stripped
+my $citrun_log;
+$wrap->read(\$citrun_log, 'citrun.log');
+$citrun_log =~ s/^.*Milliseconds spent.*\n//gm;
+$citrun_log =~ s/'.*'/''/gm;
+$citrun_log =~ s/\(.*\)/\(\)/gm;
+$citrun_log =~ s/^[0-9]+: //gm;
+
+eq_or_diff( $citrun_log, $citrun_log_good, 'is citrun.log file identical', { context => 3 } );
+# Deliberately not checking $wrap->stdout here because portability.
+is( $wrap->stderr,	'',	'is citrun_wrap stderr silent' );
+is( $? >> 8,		0,	'is citrun_wrap exit code 0' );
