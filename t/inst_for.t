@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {++_citrun.data[0];
 EOF
 
 my $check_good = <<EOF;
->> citrun_inst v0.0 ()
+>> citrun_inst
 CITRUN_SHARE = ''
 Found source file ''
 Modified command line is ''
@@ -54,12 +54,12 @@ $inst->read(\$inst_out, 'for.c');
 
 # Sanitize paths from stdout.
 my $check_out = $inst->stdout;
+$check_out =~ s/^.* citrun_inst.*\n/>> citrun_inst\n/gm;
 $check_out =~ s/^.*Milliseconds spent.*\n//gm;
 $check_out =~ s/'.*'/''/gm;
-$check_out =~ s/\(.*\)/\(\)/gm;
 $check_out =~ s/^[0-9]+: //gm;
 
 eq_or_diff( $inst_out,	$inst_good, 'is instrumented file identical', { context => 3 } );
-eq_or_diff $check_good,	$check_out, 'is citrun_inst output identical';
+eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical', { context => 3 } ;
 is( $inst->stderr,	'',	'is citrun_inst stderr silent' );
 is( $? >> 8,		0,	'is citrun_inst exit code 0' );
