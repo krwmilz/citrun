@@ -36,11 +36,11 @@ main(int argc, char *argv[])
 #ifdef _WIN32
 	// XXX: error checking
 	base_name = PathFindFileNameA(argv[0]);
-#else /* _WIN32 */
+#else // _WIN32
 	// Protect against argv[0] being an absolute path.
 	if ((base_name = basename(argv[0])) == NULL)
 		err(1, "basename");
-#endif /* _WIN32 */
+#endif // _WIN32
 
 	// Switch tool mode if we're called as 'citrun_inst'.
 	if ((std::strcmp(base_name, "citrun_inst") == 0) ||
