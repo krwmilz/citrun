@@ -45,6 +45,18 @@
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
 
+static void
+Err(int code, const char *fmt)
+{
+	char buf[256];
+
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, 256, NULL);
+
+	std::cerr << fmt << ": " << buf << std::endl;
+	ExitProcess(code);
+}
+
 InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 	m_args(argv, argv + argc),
 	m_log(is_citrun_inst),
@@ -379,6 +391,76 @@ InstFrontend::compile_instrumented()
 		exec_compiler();
 }
 
+#ifdef _WIN32
+//
+// On Windows the best exec alternative is to CreateProcess, wait for it to
+// finish and exit with its exit code. Windows has execvp, but it looks to
+// CreateProcess and then itself exit, leading to race conditions.
+//
+void
+InstFrontend::exec_compiler()
+{
+	if (m_is_citruninst) {
+		m_log << "Running as citrun_inst, not calling exec()" << std::endl;
+		exit(0);
+	}
+
+	exit(fork_compiler());
+}
+
+//
+// On Windows this is a straighforward conversion. We do our own PATH lookup
+// because the default one CreateProcess does will find our cl.exe again
+// instead of searching the PATH for a new one.
+//
+int
+InstFrontend::fork_compiler()
+{
+	DWORD exit = -1;
+	STARTUPINFOA si;
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	char real_cc[MAX_PATH];
+	std::strcpy(real_cc, m_args[0]);
+	std::strcat(real_cc, ".exe");
+
+	PathFindOnPathA(real_cc, NULL);
+
+	std::stringstream argv;
+	for (unsigned int i = 1; i < m_args.size(); ++i)
+		argv << " " << m_args[i];
+
+	if (!CreateProcessA(real_cc,
+			(LPSTR) argv.str().c_str(),
+			NULL,
+			NULL,
+			FALSE,
+			0,
+			NULL,
+			NULL,
+			&si,
+			&pi))
+		Err(1, "CreateProcess");
+
+	m_log << "Forked compiler '" << real_cc << "' "
+	       << "pid is '" << pi.dwProcessId << "'" << std::endl;
+
+	if (WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
+		Err(1, "WaitForSingleObject");
+
+	if (GetExitCodeProcess(pi.hProcess, &exit) == FALSE)
+		Err(1, "GetExitCodeProcess");
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	return exit;
+}
+#else // _WIN32
 //
 // Execute the compiler by calling execvp(3) on the m_args vector.
 //
@@ -428,3 +510,4 @@ InstFrontend::fork_compiler()
 	// Return the exit code of the native compiler.
 	return exit;
 }
+#endif // _WIN32
