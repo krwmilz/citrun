@@ -89,6 +89,9 @@ main(int argc, char *argv[])
 {
 	char path[PATH_MAX];
 
+	if (argc < 2)
+		usage();
+
 	strlcpy(path, CITRUN_SHARE ":", PATH_MAX);
 	strlcat(path, getenv("PATH"), PATH_MAX);
 
@@ -97,6 +100,6 @@ main(int argc, char *argv[])
 
 	argv[argc] = NULL;
 	if (execvp(argv[1], argv + 1))
-		err(1, "execv");
+		err(1, "execvp");
 }
 #endif // _WIN32
