@@ -248,6 +248,10 @@ InstFrontend::process_cmdline()
 			object_arg = true;
 		else if (std::strcmp(arg, "-c") == 0)
 			compile_arg = true;
+#ifdef _WIN32
+		else if (std::strcmp(arg, "/c") == 0)
+			compile_arg = true;
+#endif // _WIN32
 
 		save_if_srcfile(arg);
 	}
