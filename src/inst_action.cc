@@ -77,10 +77,28 @@ InstrumentAction::EndSourceFileAction()
 		<< "	\"" << m_compiler_file_name << "\",\n"
 		<< "	\"" << getCurrentFile().str() << "\",\n";
 	preamble << "};\n";
+#ifdef _WIN32
+	//
+	// Cribbed from an answer by Joe:
+	// http://stackoverflow.com/questions/1113409/attribute-constructor-equivalent-in-vc
+	//
+	preamble << "#pragma section(\".CRT$XCU\",read)\n"
+		<< "#define INITIALIZER2_(f,p) \\\n"
+		<< "	static void f(void); \\\n"
+		<< "	__declspec(allocate(\".CRT$XCU\")) void (*f##_)(void) = f; \\\n"
+		<< "	__pragma(comment(linker,\"/include:\" p #f \"_\")) \\\n"
+		<< "	static void f(void)\n"
+		<< "#define INITIALIZER(f) INITIALIZER2_(f,\"_\")\n";
+	preamble << "INITIALIZER( init)\n"
+		<< "{"
+		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
+		<< "}\n";
+#else
 	preamble << "__attribute__((constructor)) static void\n"
 		<< "citrun_constructor() {\n"
 		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
 		<< "}\n";
+#endif
 	preamble << "#ifdef __cplusplus\n"
 		<< "}\n"
 		<< "#endif\n";
