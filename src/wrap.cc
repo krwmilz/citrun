@@ -16,6 +16,7 @@
 #include <windows.h>
 #include <tchar.h>
 #else // _WIN32
+#include <err.h>
 #include <unistd.h>		// execvp
 #endif // _WIN32
 
@@ -87,15 +88,14 @@ _tmain(int argc, TCHAR *argv[])
 int
 main(int argc, char *argv[])
 {
-	char path[PATH_MAX];
-
 	if (argc < 2)
 		usage();
 
-	strlcpy(path, CITRUN_SHARE ":", PATH_MAX);
-	strlcat(path, getenv("PATH"), PATH_MAX);
+	std::stringstream path;
+	path << CITRUN_SHARE ":";
+	path << getenv("PATH");
 
-	if (setenv("PATH", path, 1))
+	if (setenv("PATH", path.str().c_str(), 1))
 		err(1, "setenv");
 
 	argv[argc] = NULL;
