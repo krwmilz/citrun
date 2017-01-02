@@ -22,8 +22,6 @@ Running as citrun_inst, not calling exec()
 EOF
 
 $inst->run( args => '-E prepro.c', chdir => $inst->curdir );
-system( "dir " . $inst->workdir );
-print STDERR $inst->stdout ;
 
 # This file should not have been modified.
 my $inst_out;
