@@ -29,7 +29,6 @@
 int
 main(int argc, char *argv[])
 {
-	int		 ret;
 	char		*base_name;
 	bool		 is_citrun_inst = false;
 
