@@ -90,8 +90,10 @@ InstFrontend::clean_PATH()
 {
 	char *path;
 
-	if ((path = std::getenv("PATH")) == NULL)
-		errx(1, "Error: PATH is not set.");
+	if ((path = std::getenv("Path")) == NULL) {
+		m_log << "Error: PATH is not set." << std::endl;
+		exit(1);
+	}
 
 	m_log << "PATH='" << path << "'" << std::endl;
 
@@ -116,11 +118,15 @@ InstFrontend::clean_PATH()
 		first_component = 0;
 	}
 
-	if (!found_citrun_path)
-		errx(1, "Error: CITRUN_SHARE not in PATH.");
+	if (!found_citrun_path) {
+		m_log << "Error: CITRUN_SHARE not in PATH." << std::endl;
+		exit(1);
+	}
 
-	if (setenv("PATH", new_path.str().c_str(), 1))
-		err(1, "setenv");
+	if (_putenv_s("Path", new_path.str().c_str())) {
+		m_log << "setenv" << std::endl;
+		exit(1);
+	}
 }
 
 
