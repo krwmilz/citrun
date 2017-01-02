@@ -199,7 +199,7 @@ InstFrontend::save_if_srcfile(char *arg)
 }
 
 //
-// Careful guessing if we're linking. Use an absolute path to libcitrun.a to
+// Careful guessing if we're linking. Use an absolute path to libcitrun to
 // avoid link failures.
 //
 void
