@@ -70,8 +70,8 @@ Stringize lib_h.h : lib.h ;
 ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) ;
 ObjectDefines $(INST_SRCS) : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
 
-LINKFLAGS on citrun_inst = $(LINKFLAGS) $(INST_LDFLAGS) ;
-LINKLIBS on citrun_inst += $(INST_LIBS) ;
+LINKFLAGS on citrun_inst$(SUFEXE) = $(LINKFLAGS) $(INST_LDFLAGS) ;
+LINKLIBS on citrun_inst$(SUFEXE) += $(INST_LIBS) ;
 
 Main citrun_inst : $(INST_SRCS) ;
 
