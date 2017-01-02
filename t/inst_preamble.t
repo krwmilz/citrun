@@ -15,6 +15,31 @@ my $inst = Test::Cmd->new( prog => 'src/citrun_inst', workdir => '' );
 $inst->write( "empty.c", "" );
 $inst->run( args => "-c empty.c", chdir => $inst->curdir );
 
+my $constructor_decl;
+if ($^O eq "MSWin32") {
+	$constructor_decl = <<EOF ;
+#pragma section("",read)
+#define INITIALIZER2_(f,p) \\
+	static void f(void); \\
+	__declspec(allocate("")) void (*f##_)(void) = f; \\
+	__pragma(comment(linker,"")) \\
+	static void f(void)
+#define INITIALIZER(f) INITIALIZER2_(f,"")
+INITIALIZER( init)
+{
+	citrun_node_add(citrun_major, citrun_minor, &_citrun);
+}
+EOF
+}
+else {
+	$constructor_decl = <<EOF ;
+__attribute__((constructor)) static void
+citrun_constructor() {
+	citrun_node_add(citrun_major, citrun_minor, &_citrun);
+}
+EOF
+}
+
 # Known good output.
 my $preamble_good = <<EOF ;
 #ifdef __cplusplus
@@ -48,10 +73,7 @@ static struct citrun_node _citrun = {
 	"",
 	"",
 };
-__attribute__((constructor)) static void
-citrun_constructor() {
-	citrun_node_add(citrun_major, citrun_minor, &_citrun);
-}
+$constructor_decl
 #ifdef __cplusplus
 }
 #endif
