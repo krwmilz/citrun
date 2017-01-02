@@ -363,6 +363,22 @@ InstFrontend::restore_original_src()
 	}
 }
 
+void
+InstFrontend::compile_instrumented()
+{
+	int ret;
+
+	ret = fork_compiler();
+	m_log << "Rewritten source compile " << (ret ? "failed" : "successful")
+		<< std::endl;
+
+	restore_original_src();
+
+	if (ret)
+		// Rewritten compile failed. Run again without modified src.
+		exec_compiler();
+}
+
 //
 // Execute the compiler by calling execvp(3) on the m_args vector.
 //
@@ -408,9 +424,6 @@ InstFrontend::fork_compiler()
 	// Decode the exit code from status.
 	if (WIFEXITED(status))
 		exit = WEXITSTATUS(status);
-
-	m_log << "Rewritten source compile " << (exit ? "failed" : "successful")
-		<< std::endl;
 
 	// Return the exit code of the native compiler.
 	return exit;

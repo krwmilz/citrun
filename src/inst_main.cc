@@ -55,12 +55,7 @@ main(int argc, char *argv[])
 	main.process_cmdline();
 
 	main.instrument();
+	main.compile_instrumented();
 
-	ret = main.fork_compiler();
-	main.restore_original_src();
-
-	if (ret)
-		// Rewritten compile failed. Run again without modified src.
-		main.exec_compiler();
 	return 0;
 }

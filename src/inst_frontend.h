@@ -10,14 +10,16 @@ public:
 
 	void			process_cmdline();
 	void			instrument();
-	int			fork_compiler();
-	void			exec_compiler();
-	void			restore_original_src();
+	void			compile_instrumented();
 
 private:
+	void			log_identity();
 	void			clean_PATH();
 	void			save_if_srcfile(char *);
 	void			if_link_add_runtime(bool, bool);
+	int			fork_compiler();
+	void			exec_compiler();
+	void			restore_original_src();
 
 	std::vector<char *>	m_args;
 	InstrumentLogger	m_log;
