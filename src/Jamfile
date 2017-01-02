@@ -1,7 +1,7 @@
 SubDir TOP src ;
 
 #
-# libcitrun.a
+# libcitrun
 #
 ObjectCcFlags lib.c : -fPIC -ansi ;
 Library libcitrun : lib.c ;
