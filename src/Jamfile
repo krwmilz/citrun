@@ -75,6 +75,14 @@ LINKLIBS on citrun_inst += $(INST_LIBS) ;
 
 Main citrun_inst : $(INST_SRCS) ;
 
+if $(NT) {
+	for i in cl.exe link.exe {
+		MakeLocate $(i) : $(LOCATE_SOURCE) ;
+		File $(i) : citrun_inst.exe ;
+		Clean clean : $(i) ;
+	}
+}
+
 # Link with the c++ compiler so that the matching c++ runtime library gets added
 # automatically.
 LINK on citrun_inst citrun_gl citrun_gltest = $(C++) ;
