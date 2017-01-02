@@ -51,22 +51,35 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 	m_is_citruninst(is_citrun_inst),
 	m_start_time(std::chrono::high_resolution_clock::now())
 {
-	struct utsname	 utsname;
-
-	m_log << ">> citrun_inst v" << citrun_major << "." << citrun_minor;
-	if (uname(&utsname) == -1)
-		m_log << " Unknown OS" << std::endl;
-	else
-		m_log << " (" << utsname.sysname << "-" << utsname.release
-			<< " " << utsname.machine << ")" << std::endl;
+	log_identity();
 
 	m_log << "CITRUN_SHARE = '" << CITRUN_SHARE << "'" << std::endl;
 
+#ifndef _WIN32
 	// Sometimes we're not called as citrun_inst so force that here.
 	setprogname("citrun_inst");
+#endif // _WIN32
 
 	if (m_is_citruninst == false)
 		clean_PATH();
+}
+
+void
+InstFrontend::log_identity()
+{
+	m_log << ">> citrun_inst v" << citrun_major << "." << citrun_minor;
+#ifdef _WIN32
+	m_log << " (Windows x86)";
+#else // _WIN32
+	struct utsname	 utsname;
+
+	if (uname(&utsname) == -1)
+		m_log << " (Unknown OS)";
+	else
+		m_log << " (" << utsname.sysname << "-" << utsname.release
+			<< " " << utsname.machine << ")";
+#endif // _WIN32
+	m_log << " called as " << m_args[0] << std::endl;
 }
 
 //
