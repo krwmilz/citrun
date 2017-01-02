@@ -90,7 +90,7 @@ InstrumentAction::EndSourceFileAction()
 		<< "	static void f(void)\n"
 		<< "#define INITIALIZER(f) INITIALIZER2_(f,\"_\")\n";
 	preamble << "INITIALIZER( init)\n"
-		<< "{"
+		<< "{\n"
 		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
 		<< "}\n";
 #else
@@ -99,7 +99,8 @@ InstrumentAction::EndSourceFileAction()
 		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
 		<< "}\n";
 #endif
-	preamble << "#ifdef __cplusplus\n"
+	preamble << "\n"
+		<< "#ifdef __cplusplus\n"
 		<< "}\n"
 		<< "#endif\n";
 
