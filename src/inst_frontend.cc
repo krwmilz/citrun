@@ -137,10 +137,13 @@ InstFrontend::clean_PATH()
 		exit(1);
 	}
 
-	if (_putenv_s("Path", new_path.str().c_str())) {
-		m_log << "setenv" << std::endl;
-		exit(1);
-	}
+#ifdef _WIN32
+	if (SetEnvironmentVariable("Path", new_path.str().c_str()) == 0)
+		Err(1);
+#else // _WIN32
+	if (setenv("PATH", new_path.str().c_str(), 1))
+		err(1, "setenv");
+#endif // _WIN32
 }
 
 
