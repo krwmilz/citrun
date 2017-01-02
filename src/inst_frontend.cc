@@ -17,19 +17,30 @@
 #include "lib.h"		// citrun_major, citrun_minor
 
 #include <sys/stat.h>		// stat
-#include <sys/time.h>		// utimes
-#include <sys/utsname.h>	// uname
-#include <sys/wait.h>		// waitpid
 
 #include <clang/Frontend/TextDiagnosticBuffer.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <cstdio>		// tmpnam
 #include <cstring>		// strcmp
-#include <err.h>
 #include <fstream>		// ifstream, ofstream
 #include <sstream>		// ostringstream
+
+#ifdef _WIN32
+#include <windows.h>		// CreateProcess
+#include <Shlwapi.h>		// PathFindOnPath
+
+#define PATH_SEP ';'
+#else // _WIN32
+#include <sys/time.h>		// utimes
+#include <sys/utsname.h>	// uname
+#include <sys/wait.h>		// waitpid
+
+#include <err.h>
 #include <unistd.h>		// execvp, fork, getpid, unlink
+
+#define PATH_SEP ':'
+#endif // _WIN32
 
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
