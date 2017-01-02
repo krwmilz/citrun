@@ -205,6 +205,16 @@ InstFrontend::save_if_srcfile(char *arg)
 void
 InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 {
+#ifdef _WIN32
+	bool linking = (std::strcmp(m_args[0], "link") == 0);
+
+	if (!linking)
+		return;
+
+	m_log << "Link detected, adding '" << CITRUN_SHARE "\\libcitrun.lib"
+		<< "' to command line." << std::endl;
+	m_args.push_back(const_cast<char *>(CITRUN_SHARE "\\libcitrun.lib"));
+#else // _WIN32
 	bool linking = false;
 
 	if (!object_arg && !compile_arg && m_source_files.size() > 0)
@@ -222,6 +232,7 @@ InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 	m_log << "Link detected, adding '"<< CITRUN_SHARE "/libcitrun.a"
 		<< "' to command line." << std::endl;
 	m_args.push_back(const_cast<char *>(CITRUN_SHARE "/libcitrun.a"));
+#endif // _WIN32
 }
 
 //
