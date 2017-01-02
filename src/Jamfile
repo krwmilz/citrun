@@ -15,8 +15,8 @@ Shell citrun_check : check.sh ;
 #
 # citrun_wrap
 #
-ObjectDefines wrap.c : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
-Main citrun_wrap : wrap.c ;
+ObjectDefines wrap.cc : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
+Main citrun_wrap : wrap.cc ;
 
 #
 # citrun_term
