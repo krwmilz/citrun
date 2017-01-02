@@ -45,6 +45,7 @@
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
 
+#ifdef _WIN32
 static void
 Err(int code, const char *fmt)
 {
@@ -56,6 +57,7 @@ Err(int code, const char *fmt)
 	std::cerr << fmt << ": " << buf << std::endl;
 	ExitProcess(code);
 }
+#endif // _WIN32
 
 InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 	m_args(argv, argv + argc),
@@ -102,7 +104,7 @@ InstFrontend::clean_PATH()
 {
 	char *path;
 
-	if ((path = std::getenv("Path")) == NULL) {
+	if ((path = std::getenv("PATH")) == NULL) {
 		m_log << "Error: PATH is not set." << std::endl;
 		exit(1);
 	}
