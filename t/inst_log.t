@@ -10,7 +10,7 @@ use Test::More tests => 3;
 unified_diff;	# for Test::Differences
 
 
-my $wrap = Test::Cmd->new( prog => 'src/citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'src\citrun_wrap.exe', workdir => '' );
 
 $wrap->write( 'main.c', <<EOF );
 #include <stdlib.h>
@@ -40,7 +40,7 @@ $wrap->write( 'Jamfile', 'Main main : main.c ;' );
 $wrap->run( args => 'jam', chdir => $wrap->curdir );
 
 my $citrun_log_good =<<EOF ;
->> citrun_inst v0.0 ()
+>> citrun_inst
 CITRUN_SHARE = ''
 PATH=''
 Found source file ''
@@ -59,7 +59,7 @@ Rewriting successful.
 Forked compiler ''
 Rewritten source compile successful
 Restored ''
->> citrun_inst v0.0 ()
+>> citrun_inst
 CITRUN_SHARE = ''
 PATH=''
 Link detected, adding '' to command line.
@@ -71,10 +71,11 @@ my $citrun_log;
 $wrap->read(\$citrun_log, 'citrun.log');
 $citrun_log =~ s/^.*Milliseconds spent.*\n//gm;
 $citrun_log =~ s/'.*'/''/gm;
-$citrun_log =~ s/\(.*\)/\(\)/gm;
+$citrun_log =~ s/^.* citrun_inst.*\n/>> citrun_inst\n/gm;
 $citrun_log =~ s/^[0-9]+: //gm;
 
 eq_or_diff( $citrun_log, $citrun_log_good, 'is citrun.log file identical', { context => 3 } );
 # Deliberately not checking $wrap->stdout here because portability.
+print $wrap->stdout;
 is( $wrap->stderr,	'',	'is citrun_wrap stderr silent' );
 is( $? >> 8,		0,	'is citrun_wrap exit code 0' );
