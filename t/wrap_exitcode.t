@@ -19,8 +19,10 @@ if ($^O eq "MSWin32") {
 }
 else {
 	$wrap->run( args => 'ls asdf' );
+	my $err_good = "ls: asdf: No such file or directory
+";
 
-	#is( $wrap->stdout,	'',	'is citrun_wrap stdout empty');
-	#is( $wrap->stderr,	$err_good,	'is citrun_wrap stderr identical');
+	is( $wrap->stdout,	'',	'is citrun_wrap stdout empty');
+	is( $wrap->stderr,	$err_good,	'is citrun_wrap stderr identical');
 	is( $? >> 8,		1,	'is citrun_wrap exit code 1');
 }
