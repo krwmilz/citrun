@@ -290,6 +290,9 @@ InstFrontend::instrument()
 #elif defined(__APPLE__)
 	clang_argv.push_back("-I/opt/local/libexec/llvm-3.8/lib/clang/3.8.1/include");
 	m_log << "Added clangtool argument '" << clang_argv.back() << "'" << std::endl;
+#elif defined(WIN32)
+	clang_argv.push_back("-IC:\\Clang\\lib\\clang\\3.9.1\\include");
+	m_log << "Added clangtool argument '" << clang_argv.back() << "'" << std::endl;
 #endif
 
 	int clang_argc = clang_argv.size();
