@@ -102,14 +102,14 @@ InstFrontend::clean_PATH()
 	bool first_component = 1;
 	bool found_citrun_path = 0;
 
-	while (std::getline(path_ss, component, ':')) {
+	while (std::getline(path_ss, component, PATH_SEP)) {
 		if (component.compare(CITRUN_SHARE) == 0) {
 			found_citrun_path = 1;
 			continue;
 		}
 
 		if (first_component == 0)
-			new_path << ":";
+			new_path << PATH_SEP;
 
 		// It wasn't CITRUN_SHARE, keep it
 		new_path << component;
