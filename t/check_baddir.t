@@ -12,7 +12,7 @@ my $output_good = "Summary:
 my $error_good = "find: _nonexistent_: No such file or directory
 ";
 
-my $check = Test::Cmd->new( prog => 'src/citrun_check', workdir => '' );
+my $check = Test::Cmd->new( prog => 'citrun_check', workdir => '' );
 $check->run( args => '_nonexistent_', chdir => $check->curdir );
 
 is( $check->stdout,	$output_good,	'is citrun_check stdout identical' );

@@ -10,7 +10,7 @@ use Test::More tests => 4;
 unified_diff;	# for Test::Differences
 
 
-my $inst = Test::Cmd->new( prog => 'src/citrun_inst', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
 $inst->write( 'macro.c', <<EOF );
 #define MAYBE 1023;
 

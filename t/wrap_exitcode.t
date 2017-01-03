@@ -6,7 +6,7 @@ use warnings;
 use Test::Cmd;
 use Test::More tests => 3;
 
-my $wrap = Test::Cmd->new( prog => 'src/citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
 if ($^O eq "MSWin32") {
 	my $err_good = "Cannot access file C:\\Users\\kyle\\citrun\\asdf

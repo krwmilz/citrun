@@ -8,7 +8,7 @@ use warnings;
 use Test::Cmd;
 use Test::More tests => 6;
 
-my $cc = Test::Cmd->new( prog => 'src/cc', workdir => '' );
+my $cc = Test::Cmd->new( prog => 'cc', workdir => '' );
 
 delete $ENV{'PATH'};
 $cc->run( args => "-c nomatter.c", chdir => $cc->curdir );

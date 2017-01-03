@@ -10,7 +10,7 @@ my $output_good = "Summary:
          0 Source files used as input
 ";
 
-my $check = Test::Cmd->new( prog => 'src/citrun_check', workdir => '' );
+my $check = Test::Cmd->new( prog => 'citrun_check', workdir => '' );
 $check->run( chdir => $check->curdir );
 
 is( $check->stdout,	$output_good,	'is citrun_check stdout identical' );

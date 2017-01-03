@@ -10,7 +10,7 @@ unified_diff;	# for Test::Differences
 
 my $preproc = 'int main(void) { return 0; }';
 
-my $inst = Test::Cmd->new( prog => 'src/citrun_inst', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
 $inst->write( 'prepro.c', $preproc );
 
 # Test -E

@@ -10,7 +10,7 @@ use Test::More tests => 3;
 unified_diff;	# for Test::Differences
 
 
-my $wrap = Test::Cmd->new( prog => 'src/citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
 $wrap->write( 'main.c', <<EOF );
 #include <stdlib.h>

@@ -10,7 +10,7 @@ use Test::More tests => 3;
 unified_diff;
 
 
-my $inst = Test::Cmd->new( prog => 'src/citrun_inst', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
 
 $inst->write( "empty.c", "" );
 $inst->run( args => "-c empty.c", chdir => $inst->curdir );
