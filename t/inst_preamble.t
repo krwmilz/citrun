@@ -25,7 +25,7 @@ if ($^O eq "MSWin32") {
 	__pragma(comment(linker,"")) \\
 	static void f(void)
 #define INITIALIZER(f) INITIALIZER2_(f,"")
-INITIALIZER( init)
+INITIALIZER( init_empty)
 {
 	citrun_node_add(citrun_major, citrun_minor, &_citrun);
 }
