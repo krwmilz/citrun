@@ -223,7 +223,14 @@ void
 InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 {
 #ifdef _WIN32
-	bool linking = (std::strcmp(m_args[0], "link") == 0);
+	bool linking = false;
+
+	if (std::strcmp(m_args[0], "link") == 0)
+		// If we're called as link.exe we're linking for sure.
+		linking = true;
+	if (!compile_arg)
+		// cl.exe main.c
+		linking = true;
 
 	if (!linking)
 		return;
