@@ -63,7 +63,7 @@ echo
 # citrun_inst needs to know the absolute installation path.
 #
 if [ -z ${PREFIX-} ]; then
-	CITRUN_SHARE="`pwd`/src"
+	CITRUN_SHARE="`pwd`"
 else
 	CITRUN_SHARE="${PREFIX}/share/citrun"
 fi
