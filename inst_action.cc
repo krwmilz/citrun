@@ -89,7 +89,7 @@ InstrumentAction::EndSourceFileAction()
 		<< "	__pragma(comment(linker,\"/include:\" p #f \"_\")) \\\n"
 		<< "	static void f(void)\n"
 		<< "#define INITIALIZER(f) INITIALIZER2_(f,\"_\")\n";
-	preamble << "INITIALIZER( init)\n"
+	preamble << "INITIALIZER( init_" << m_compiler_file_name.substr(0, m_compiler_file_name.find(".")) << ")\n"
 		<< "{\n"
 		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
 		<< "}\n";
