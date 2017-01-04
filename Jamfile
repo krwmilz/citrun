@@ -119,7 +119,7 @@ Main citrun_inst : $(INST_SRCS) ;
 
 if $(NT) {
 	for i in cl.exe link.exe {
-		MakeLocate $(i) : $(LOCATE_SOURCE) ;
+		MakeLocate $(i) : compilers ;
 		File $(i) : citrun_inst.exe ;
 		Clean clean : $(i) ;
 	}
