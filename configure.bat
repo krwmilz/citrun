@@ -1,49 +1,47 @@
 @echo off
-rem
-rem Checks that a bunch of crap is installed and available on Windows.
-rem
-echo Configuring C It Run on NT
-echo.
+REM
+REM Checks that a bunch of crap is installed and available on Windows.
+REM
+ECHO Configuring C It Run for Windows
+ECHO.
 
-rem
-rem Need to 'setlocal' otherwise Path modifications get saved to the parent shell.
-rem Extends to end of file so we have these modifications the entire time.
-rem
-setlocal
-set Path=C:\LLVM\bin;%Path%
+REM
+REM Need to 'setlocal' otherwise Path modifications get saved to the parent shell.
+REM Extends to end of file so we have these modifications the entire time.
+REM
+SETLOCAL
+SET Path=C:\LLVM\bin;%Path%
 
 WHERE cl
-if %ERRORLEVEL% NEQ 0 (
-	echo cl.exe not found on the Path!
-	echo(
-	echo Please make sure Visual Studio is installed and that you're running this
-	echo at a developer command prompt with the correct Path set.
+IF %ERRORLEVEL% NEQ 0 (
+	ECHO cl.exe not found on the Path!
+	ECHO(
+	ECHO Please make sure Visual Studio is installed and that you're running this
+	ECHO at a developer command prompt with the correct Path set.
 
-	exit /B 1
+	EXIT /B 1
 )
 
 WHERE jam
-if %ERRORLEVEL% NEQ 0 (
-	echo jam.exe not found on the Path!
-	echo(
-	echo Jam can be downloaded by this command:
+IF %ERRORLEVEL% NEQ 0 (
+	ECHO jam.exe not found on the Path!
+	ECHO(
+	ECHO Jam can be downloaded by this command:
 )
 
 WHERE llvm-config.exe 2>nul
-if %ERRORLEVEL% NEQ 0 (
-	echo llvm-config.exe not found on the Path!
-	echo You need to have compiled the LLVM sources by hand to get this
-	echo executable.
-	echo(
-	echo Download LLVM sources from http://llvm.org/.
+IF %ERRORLEVEL% NEQ 0 (
+	ECHO llvm-config.exe not found on the Path!
+	ECHO You need to have compiled the LLVM sources by hand to get this
+	ECHO executable.
+	ECHO(
+	ECHO Download LLVM sources from http://llvm.org/.
 
-	exit /B 1
+	EXIT /B 1
 )
 
-WHERE perl
-
-set CLANG_LIBS=clangAST.lib clangAnalysis.lib clangBasic.lib clangDriver.lib clangEdit.lib clangFrontend.lib clangFrontendTool.lib clangLex.lib clangParse.lib clangRewrite.lib clangRewriteFrontend.lib clangSema.lib clangSerialization.lib clangTooling.lib
-set LLVM_LIBS=bitreader mcparser transformutils option
+SET CLANG_LIBS=clangAST.lib clangAnalysis.lib clangBasic.lib clangDriver.lib clangEdit.lib clangFrontend.lib clangFrontendTool.lib clangLex.lib clangParse.lib clangRewrite.lib clangRewriteFrontend.lib clangSema.lib clangSerialization.lib clangTooling.lib
+SET LLVM_LIBS=bitreader mcparser transformutils option
 
 del Jamrules
 
