@@ -29,8 +29,6 @@ actions TestCoverage
 StaticAnalysis static-analysis ;
 TestCoverage test-coverage ;
 
-#SubDir TOP src ;
-
 #
 # libcitrun
 #
