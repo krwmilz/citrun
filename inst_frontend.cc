@@ -138,8 +138,8 @@ InstFrontend::clean_PATH()
 	}
 
 #ifdef _WIN32
-	if (SetEnvironmentVariable("Path", new_path.str().c_str()) == 0)
-		Err(1);
+	if (SetEnvironmentVariableA("Path", new_path.str().c_str()) == 0)
+		Err(1, "SetEnvironmentVariableA");
 #else // _WIN32
 	if (setenv("PATH", new_path.str().c_str(), 1))
 		err(1, "setenv");
