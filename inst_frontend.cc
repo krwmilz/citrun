@@ -228,7 +228,7 @@ InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 	if (std::strcmp(m_args[0], "link") == 0)
 		// If we're called as link.exe we're linking for sure.
 		linking = true;
-	if (!compile_arg)
+	if (!compile_arg && m_source_files.size() > 0)
 		// cl.exe main.c
 		linking = true;
 
