@@ -1,4 +1,4 @@
-@echo off
+@ECHO off
 REM
 REM Checks that a bunch of crap is installed and available on Windows.
 REM
@@ -43,39 +43,39 @@ IF %ERRORLEVEL% NEQ 0 (
 SET CLANG_LIBS=clangAST.lib clangAnalysis.lib clangBasic.lib clangDriver.lib clangEdit.lib clangFrontend.lib clangFrontendTool.lib clangLex.lib clangParse.lib clangRewrite.lib clangRewriteFrontend.lib clangSema.lib clangSerialization.lib clangTooling.lib
 SET LLVM_LIBS=bitreader mcparser transformutils option
 
-del Jamrules
+DEL Jamrules
 
-echo C++FLAGS = /EHsc ; >>Jamrules
-echo( >>Jamrules
+ECHO C++FLAGS = ; >>Jamrules
+ECHO( >>Jamrules
 
-echo FONT_PATH = "C:\Windows\Fonts\consola.ttf" ; >>Jamrules
-echo CITRUN_COMPILERS = %CD:\=\\\\%\\\\compilers ; >> Jamrules
-echo CITRUN_LIB = %CD:\=\\\\%\\\\libcitrun.lib ; >>Jamrules
-echo( >>Jamrules
+ECHO FONT_PATH = "C:\Windows\Fonts\consola.ttf" ; >>Jamrules
+ECHO CITRUN_COMPILERS = %CD:\=\\\\%\\\\compilers ; >> Jamrules
+ECHO CITRUN_LIB = %CD:\=\\\\%\\\\libcitrun.lib ; >>Jamrules
+ECHO( >>Jamrules
 
-rem GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
-rem GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;
-rem GLTEST_LIBS  = `pkg-config --libs osmesa` ;
+REM GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
+REM GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;
+REM GLTEST_LIBS  = `pkg-config --libs osmesa` ;
 
-echo INST_CFLAGS = >>Jamrules
-echo -IC:\\Clang\\include >>Jamrules
+ECHO INST_CFLAGS = >>Jamrules
+ECHO -IC:\\Clang\\include >>Jamrules
 llvm-config.exe --cxxflags >>Jamrules
-echo ; >>Jamrules
-echo( >>Jamrules
+ECHO ; >>Jamrules
+ECHO( >>Jamrules
 
-echo INST_LDFLAGS = >>Jamrules
-echo -LIBPATH:C:\\Clang\\lib >>Jamrules
+ECHO INST_LDFLAGS = >>Jamrules
+ECHO -LIBPATH:C:\\Clang\\lib >>Jamrules
 llvm-config.exe --ldflags >>Jamrules
-echo ; >>Jamrules
-echo( >>Jamrules
+ECHO ; >>Jamrules
+ECHO( >>Jamrules
 
-echo INST_LIBS = >>Jamrules
-echo %CLANG_LIBS% >>Jamrules
+ECHO INST_LIBS = >>Jamrules
+ECHO %CLANG_LIBS% >>Jamrules
 llvm-config.exe --libnames %LLVM_LIBS% >>Jamrules
 llvm-config.exe --system-libs >>Jamrules
-echo shlwapi.lib version.lib ; >>Jamrules
-echo( >>Jamrules
+ECHO shlwapi.lib version.lib ; >>Jamrules
+ECHO( >>Jamrules
 
-copy /b Jamrules + Jamrules.tail Jamrules
+COPY /b Jamrules + Jamrules.tail Jamrules
 
-endlocal
+ENDLOCAL
