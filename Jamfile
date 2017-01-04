@@ -45,8 +45,12 @@ Shell citrun_check : check.sh ;
 #
 # citrun_wrap
 #
-ObjectDefines wrap.cc : CITRUN_SHARE=\\\"$(CITRUN_SHARE)\\\" ;
-Main citrun_wrap : wrap.cc ;
+if $(NT) {
+	File citrun_wrap.bat : wrap.bat ;
+	Clean clean : citrun_wrap.bat ;
+} else {
+	Shell citrun_wrap : wrap.sh ;
+}
 
 #
 # citrun_term
