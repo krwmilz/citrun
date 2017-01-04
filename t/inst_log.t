@@ -68,6 +68,13 @@ Modified command line is ''
 No source files found on command line.
 EOF
 
+if ($^O eq "MSWin32") {
+	# Windows gets an extra message because exec() is emulated by fork().
+	$citrun_log_good .= <<EOF ;
+Forked compiler ''
+EOF
+}
+
 my $citrun_log;
 $wrap->read(\$citrun_log, 'citrun.log');
 $citrun_log = t::utils::clean_citrun_log($citrun_log);
