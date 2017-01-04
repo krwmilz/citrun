@@ -49,7 +49,8 @@ echo C++FLAGS = /EHsc ; >>Jamrules
 echo( >>Jamrules
 
 echo FONT_PATH = "C:\Windows\Fonts\consola.ttf" ; >>Jamrules
-echo CITRUN_SHARE = C:\Users\kyle\citrun\src ; >>Jamrules
+echo CITRUN_COMPILERS = %CD:\=\\\\%\\\\compilers ; >> Jamrules
+echo CITRUN_LIB = %CD:\=\\\\%\\\\libcitrun.lib ; >>Jamrules
 echo( >>Jamrules
 
 rem GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
