@@ -67,7 +67,7 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 {
 	log_identity();
 
-	m_log << "CITRUN_SHARE = '" << CITRUN_SHARE << "'" << std::endl;
+	m_log << "CITRUN_COMPILERS = '" << CITRUN_COMPILERS << "'" << std::endl;
 
 #ifndef _WIN32
 	// Sometimes we're not called as citrun_inst so force that here.
@@ -97,7 +97,7 @@ InstFrontend::log_identity()
 }
 
 //
-// Tries to remove CITRUN_SHARE from PATH otherwise it exits easily.
+// Tries to remove CITRUN_COMPILERS from PATH otherwise it exits easily.
 //
 void
 InstFrontend::clean_PATH()
@@ -111,7 +111,7 @@ InstFrontend::clean_PATH()
 
 	m_log << "PATH='" << path << "'" << std::endl;
 
-	// Filter CITRUN_SHARE out of PATH
+	// Filter CITRUN_COMPILERS out of PATH
 	std::stringstream path_ss(path);
 	std::ostringstream new_path;
 	std::string component;
@@ -119,7 +119,7 @@ InstFrontend::clean_PATH()
 	bool found_citrun_path = 0;
 
 	while (std::getline(path_ss, component, PATH_SEP)) {
-		if (component.compare(CITRUN_SHARE) == 0) {
+		if (component.compare(CITRUN_COMPILERS) == 0) {
 			found_citrun_path = 1;
 			continue;
 		}
@@ -127,13 +127,13 @@ InstFrontend::clean_PATH()
 		if (first_component == 0)
 			new_path << PATH_SEP;
 
-		// It wasn't CITRUN_SHARE, keep it
+		// It wasn't CITRUN_COMPILERS, keep it
 		new_path << component;
 		first_component = 0;
 	}
 
 	if (!found_citrun_path) {
-		m_log << "Error: CITRUN_SHARE not in PATH." << std::endl;
+		m_log << "Error: CITRUN_COMPILERS not in PATH." << std::endl;
 		exit(1);
 	}
 
@@ -234,10 +234,6 @@ InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 
 	if (!linking)
 		return;
-
-	m_log << "Link detected, adding '" << CITRUN_SHARE "\\libcitrun.lib"
-		<< "' to command line." << std::endl;
-	m_args.push_back(const_cast<char *>(CITRUN_SHARE "\\libcitrun.lib"));
 #else // _WIN32
 	bool linking = false;
 
@@ -252,11 +248,11 @@ InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 
 	if (!linking)
 		return;
-
-	m_log << "Link detected, adding '"<< CITRUN_SHARE "/libcitrun.a"
-		<< "' to command line." << std::endl;
-	m_args.push_back(const_cast<char *>(CITRUN_SHARE "/libcitrun.a"));
 #endif // _WIN32
+
+	m_log << "Link detected, adding '"<< CITRUN_LIB
+		<< "' to command line." << std::endl;
+	m_args.push_back(const_cast<char *>(CITRUN_LIB));
 }
 
 //

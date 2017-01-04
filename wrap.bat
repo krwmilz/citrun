@@ -1,7 +1,7 @@
 @ECHO off
 
 SETLOCAL
-SET Path=C:\Users\kyle\citrun\compilers;%Path%
+SET Path=%CITRUN_COMPILERS%;%Path%
 CALL %*
-exit /B %ERRORLEVEL%
+EXIT /B %ERRORLEVEL%
 ENDLOCAL

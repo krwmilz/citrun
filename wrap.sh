@@ -3,5 +3,5 @@ if [[ ${1} = -* ]]; then
 	exit 1
 fi
 
-export PATH="%CITRUN_SHARE%:$PATH"
+export PATH="%CITRUN_COMPILERS%:$PATH"
 exec $@

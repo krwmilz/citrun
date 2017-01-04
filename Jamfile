@@ -41,6 +41,10 @@ Library libcitrun : lib.c ;
 # citrun_check
 #
 Shell citrun_check : check.sh ;
+actions ReplaceToken
+{
+	perl -p -i.bak -e "s/%CITRUN_COMPILERS%/$(CITRUN_COMPILERS)/" $(<)
+}
 
 #
 # citrun_wrap
@@ -48,8 +52,11 @@ Shell citrun_check : check.sh ;
 if $(NT) {
 	File citrun_wrap.bat : wrap.bat ;
 	Clean clean : citrun_wrap.bat ;
-} else {
+	ReplaceToken citrun_wrap.bat ;
+}
+else {
 	Shell citrun_wrap : wrap.sh ;
+	ReplaceToken citrun_wrap ;
 }
 
 #
