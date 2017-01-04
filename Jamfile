@@ -38,7 +38,10 @@ Library libcitrun : lib.c ;
 #
 # citrun_check
 #
-Shell citrun_check : check.sh ;
+if ! $(NT) {
+	Shell citrun_check : check.sh ;
+}
+
 actions ReplaceToken
 {
 	perl -p -i.bak -e "s/%CITRUN_COMPILERS%/$(CITRUN_COMPILERS)/" $(<)
