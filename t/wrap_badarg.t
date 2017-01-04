@@ -11,13 +11,11 @@ $wrap->run( args => '-ASD', chdir => $wrap->curdir );
 
 my $err_good;
 if ($^O eq "MSWin32") {
-	$err_good = "'-ASD' is not recognized as an internal or external command,
-operable program or batch file.
-";
+	$err_good = "'-ASD' is not recognized as an internal or external command";
+} else {
+	$err_good = '-ASD: not found';
 }
 
 is( $wrap->stdout,	'',	'is citrun_wrap stdout silent' );
-is( $wrap->stderr,	$err_good, 'is citrun_wrap stderr identical' );
-is( $? >> 8,		1,	'is citrun_wrap exit code 1' );
-#output_good="usage: citrun_wrap <build cmd>"
-#ok_program "citrun_wrap -ASD" 1 "$output_good" citrun_wrap -ASD
+like( $wrap->stderr,	qr/$err_good/, 'is citrun_wrap stderr looking good' );
+isnt( $? >> 8,		0,	'is citrun_wrap exit code nonzero' );
