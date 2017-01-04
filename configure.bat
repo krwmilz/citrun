@@ -10,7 +10,6 @@ rem Need to 'setlocal' otherwise Path modifications get saved to the parent shel
 rem Extends to end of file so we have these modifications the entire time.
 rem
 setlocal
-set Path=C:\Users\kyle\src\jam-2.6\bin.ntx86;%Path%
 set Path=C:\LLVM\bin;%Path%
 
 WHERE cl
