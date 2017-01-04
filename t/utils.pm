@@ -23,7 +23,7 @@ sub new {
 	my $tmp_dir = tempdir( CLEANUP => 1 );
 
 	$ENV{CITRUN_PROCDIR} = "$tmp_dir/procdir/";
-	$ENV{PATH} = getcwd . ":$ENV{PATH}";
+	$ENV{PATH} = getcwd . "/compilers:$ENV{PATH}";
 
 	copy($_, $tmp_dir) while (<t/program/*>);
 	system("make -C $tmp_dir");

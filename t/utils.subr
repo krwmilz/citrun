@@ -1,7 +1,7 @@
 . t/libtap.subr
 
 treedir=`pwd`
-export PATH="$treedir:${PATH}"
+export PATH="$treedir/compilers:$treedir:${PATH}"
 export CITRUN_PROCDIR="procdir/"
 
 tmpdir=`mktemp -d /tmp/citrun.XXXXXXXXXX` || exit 1
