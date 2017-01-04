@@ -6,6 +6,7 @@ use warnings;
 use Test::Cmd;
 use Test::Differences;
 use Test::More tests => 8;
+use t::utils;
 unified_diff;	# for Test::Differences
 
 my $preproc = 'int main(void) { return 0; }';
@@ -28,11 +29,7 @@ my $inst_out;
 $inst->read(\$inst_out, 'prepro.c');
 
 # Sanitize paths from stdout.
-my $check_out = $inst->stdout;
-$check_out =~ s/>> citrun_inst.*\n/>> citrun_inst\n/gm;
-$check_out =~ s/^.*Milliseconds spent.*\n//gm;
-$check_out =~ s/'.*'/''/gm;
-$check_out =~ s/^[0-9]+: //gm;
+my $check_out = t::utils::clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $inst_out,	$preproc, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical';
@@ -53,11 +50,7 @@ $inst->run( args => '-MM prepro.c', chdir => $inst->curdir );
 $inst->read(\$inst_out, 'prepro.c');
 
 # Sanitize paths from stdout.
-$check_out = $inst->stdout;
-$check_out =~ s/>> citrun_inst.*\n/>> citrun_inst\n/gm;
-$check_out =~ s/^.*Milliseconds spent.*\n//gm;
-$check_out =~ s/'.*'/''/gm;
-$check_out =~ s/^[0-9]+: //gm;
+$check_out = t::utils::clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $inst_out,	$preproc, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical', { context => 3 };

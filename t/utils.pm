@@ -1,6 +1,19 @@
 use strict;
 use warnings;
 
+package t::utils;
+
+sub clean_citrun_log {
+	my ($log) = @_;
+
+	$log =~ s/>> citrun_inst.*\n/>> citrun_inst\n/gm;
+	$log =~ s/^.*Milliseconds spent.*\n//gm;
+	$log =~ s/'.*'/''/gm;
+	$log =~ s/^[0-9]+: //gm;
+
+	return $log;
+}
+
 package t::tmpdir;
 use Cwd;
 use File::Copy;
