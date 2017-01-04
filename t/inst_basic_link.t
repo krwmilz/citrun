@@ -22,7 +22,7 @@ if ($^O eq "MSWin32") {
 
 my $log_good = <<EOF;
 >> citrun_inst
-CITRUN_SHARE = ''
+CITRUN_COMPILERS = ''
 PATH=''
 Found source file ''
 Link detected, adding '' to command line.

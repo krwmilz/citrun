@@ -42,7 +42,7 @@ $wrap->run( args => 'jam', chdir => $wrap->curdir );
 
 my $citrun_log_good =<<EOF ;
 >> citrun_inst
-CITRUN_SHARE = ''
+CITRUN_COMPILERS = ''
 PATH=''
 Found source file ''
 Modified command line is ''
@@ -61,7 +61,7 @@ Forked compiler ''
 Rewritten source compile successful
 Restored ''
 >> citrun_inst
-CITRUN_SHARE = ''
+CITRUN_COMPILERS = ''
 PATH=''
 Link detected, adding '' to command line.
 Modified command line is ''

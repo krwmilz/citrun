@@ -54,7 +54,7 @@ EOF
 
 my $check_good = <<EOF;
 >> citrun_inst
-CITRUN_SHARE = ''
+CITRUN_COMPILERS = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
