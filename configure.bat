@@ -75,7 +75,7 @@ echo INST_LIBS = >>Jamrules
 echo %CLANG_LIBS% >>Jamrules
 llvm-config.exe --libnames %LLVM_LIBS% >>Jamrules
 llvm-config.exe --system-libs >>Jamrules
-echo version.lib ; >>Jamrules
+echo shlwapi.lib version.lib ; >>Jamrules
 echo( >>Jamrules
 
 copy /b Jamrules + Jamrules.tail Jamrules
