@@ -132,7 +132,7 @@ if $(NT) {
 
 # Link with the c++ compiler so that the matching c++ runtime library gets added
 # automatically.
-LINK on citrun_wrap citrun_inst citrun_gl citrun_gltest = $(C++) ;
+LINK on citrun_inst citrun_gl citrun_gltest = $(C++) ;
 
 
 # Create installation directories and setup quirky ../../citrun_inst links.
