@@ -3,13 +3,14 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 16;
+use File::DosGlob 'glob';
 use t::utils;
+plan tests => 18;
 
-my $tmp_dir = t::tmpdir->new();
+my $dir = setup_projdir();
 
-my $ret = system("cd $tmp_dir && ./program 1");
-is $ret >> 8,	0,	"is program exit code 0";
+$dir->run( prog => $dir->workdir . '/program', args => '1', chdir => $dir->curdir );
+is( $? >> 8,	0,	"is instrumented program exit code 0" );
 
 my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
 is scalar @procfiles,	1,	"is one file in procdir";
@@ -19,16 +20,25 @@ is $shm->{magic},	"ctrn",	"is correct file magic";
 is $shm->{major},	0,	"is correct major";
 is $shm->{minor},	0,	"is correct minor";
 is $shm->{units},	3,	"is correct number of translation units";
-is $shm->{loc},		40,	"is loc right ";
+is $shm->{loc},		42,	"is loc right ";
 is $shm->{done},	1,	"is done signalled";
 
 my ($pid, $ppid, $pgrp) = @{ $shm->{pids} };
 cmp_ok $pid,	'<',	100 * 1000,	"is pid < max pid";
 cmp_ok $pid,	'>',	1,		"is pid > min pid";
-cmp_ok $ppid,	'<',	100 * 1000,	"is ppid < max pid";
-cmp_ok $ppid,	'>',	1,		"is ppid > min pid";
-cmp_ok $pgrp,	'<',	100 * 1000,	"is pgrp < max pid";
-cmp_ok $pgrp,	'>',	1,		"is pgrp > min pid";
 
-is $shm->{progname},	"program",	"is test program name correct";
-like $shm->{cwd},	qr/.*$tmp_dir/,	"is working directory believable";
+SKIP: {
+	skip 'win32 has no ppid or pgrp', 4 if ($^O eq "MSWin32");
+
+	cmp_ok $ppid,	'<',	100 * 1000,	"is ppid < max pid";
+	cmp_ok $ppid,	'>',	1,		"is ppid > min pid";
+	cmp_ok $pgrp,	'<',	100 * 1000,	"is pgrp < max pid";
+	cmp_ok $pgrp,	'>',	1,		"is pgrp > min pid";
+}
+
+my $tmp_dir = $dir->workdir;
+# Regex doesn't like single '\'s, so replace each with two.
+$tmp_dir =~ s/\\/\\\\/g;
+
+like( $shm->{cwd},	qr/.*$tmp_dir/,	"is working directory believable" );
+like( $shm->{progname},	qr/program/,	"is test program name correct" );
