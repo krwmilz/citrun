@@ -91,7 +91,7 @@ open_fd()
  * Called by atexit(3), which doesn't always get called (this is unreliable).
  */
 static void
-set_exited()
+set_exited(void)
 {
 	header->exited = 1;
 }
