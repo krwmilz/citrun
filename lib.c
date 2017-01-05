@@ -117,7 +117,7 @@ add_header()
 	strlcpy(header->progname, getprogname(), sizeof(header->progname));
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
-		strlcpy(header->cwd, "<none>", 7);
+		strcpy(header->cwd, "");
 
 	atexit(set_exited);
 }
