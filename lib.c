@@ -13,6 +13,14 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#ifdef _WIN32
+#include <direct.h>		/* getcwd */
+#include <stdio.h>		/* stderr */
+#include <windows.h>		/* HANDLE, MapViewOfFile, ... */
+#include <io.h>
+#define PATH_MAX 32000
+#define DEFAULT_PROCDIR "C:\\CItRun\\"
+#else /* _WIN32 */
 #include <sys/mman.h>		/* mmap */
 #include <sys/stat.h>		/* S_IRUSR, S_IWUSR, mkdir */
 
@@ -24,12 +32,31 @@
 #include <stdlib.h>		/* atexit, get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
+#define DEFAULT_PROCDIR "/tmp/citrun"
+#endif /* _WIN32 */
 
 #include "lib.h"		/* citrun_*, struct citrun_{header,node} */
 
 
-static int			 fd;
 static struct citrun_header	*header;
+
+#ifdef _WIN32
+static HANDLE			 h = INVALID_HANDLE_VALUE;
+
+static void
+Err(int code, const char *fmt)
+{
+	char buf[256];
+
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, 256, NULL);
+
+	fprintf(stderr, "%s: %s", fmt, buf);
+	exit(code);
+}
+#else /* _WIN32 */
+static int			 fd;
+#endif /* _WIN32 */
 
 /*
  * Extends the file and memory mapping length of fd by a requested amount of
@@ -40,9 +67,41 @@ static void *
 extend(size_t req_bytes)
 {
 	size_t	 aligned_bytes, page_mask;
-	off_t	 len;
+	size_t	 len;
 	void	*mem;
 
+#ifdef _WIN32
+	HANDLE	 fm;
+
+	SYSTEM_INFO system_info;
+	GetSystemInfo(&system_info);
+
+	page_mask = system_info.dwAllocationGranularity - 1;
+	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
+
+	/* Get current file length. */
+	if ((len = GetFileSize(h, NULL)) == INVALID_FILE_SIZE)
+		Err(1, "GetFileSize");
+
+	/* Increase file pointer to new length. */
+	if (SetFilePointer(h, len + aligned_bytes, NULL, FILE_BEGIN)
+	    == INVALID_SET_FILE_POINTER)
+		Err(1, "SetFilePointer");
+
+	/* Set new length. */
+	if (SetEndOfFile(h) == 0)
+		Err(1, "SetEndOfFile");
+
+	/* Create a new mapping that's used temporarily. */
+	if ((fm = CreateFileMapping(h, NULL, PAGE_READWRITE, 0, 0, NULL)) == NULL)
+		Err(1, "CreateFileMapping");
+
+	/* Create a new memory mapping for the newly extended space. */
+	if ((mem = MapViewOfFile(fm, FILE_MAP_READ | FILE_MAP_WRITE, 0, len, req_bytes)) == NULL)
+		Err(1, "MapViewOfFile");
+
+	CloseHandle(fm);
+#else /* _WIN32 */
 	page_mask = getpagesize() - 1;
 	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
 
@@ -59,6 +118,7 @@ extend(size_t req_bytes)
 
 	if (mem == MAP_FAILED)
 		err(1, "mmap %zu bytes @ %llu", req_bytes, len);
+#endif /* _WIN32 */
 
 	return mem;
 }
@@ -74,8 +134,26 @@ open_fd()
 
 	/* User of this env var must give trailing slash */
 	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
-		procdir = "/tmp/citrun/";
+		procdir = DEFAULT_PROCDIR;
 
+#ifdef _WIN32
+	if (CreateDirectory(procdir, NULL) == 0 &&
+	    GetLastError() != ERROR_ALREADY_EXISTS)
+		Err(1, "CreateDirectory");
+
+	strncpy(procfile, procdir, PATH_MAX);
+	strncat(procfile, "procfile.shm", PATH_MAX);
+
+	if ((h = CreateFile("procfile.shm",
+	    GENERIC_READ | GENERIC_WRITE,
+	    0,
+	    NULL,
+	    CREATE_NEW,
+	    0,
+	    NULL
+	    )) == INVALID_HANDLE_VALUE)
+		Err(1, "CreateFile");
+#else /* _WIN32 */
 	if (mkdir(procdir, S_IRWXU) && errno != EEXIST)
 		err(1, "mkdir '%s'", procdir);
 
@@ -85,6 +163,7 @@ open_fd()
 
 	if ((fd = mkstemp(procfile)) < 0)
 		err(1, "mkstemp");
+#endif /* _WIN32 */
 }
 
 /*
@@ -110,11 +189,21 @@ add_header()
 	header->major = citrun_major;
 	header->minor = citrun_minor;
 	header->pids[0] = getpid();
+
+#ifdef _WIN32
+	/*
+	 * Win32 doesn't have parent process id's or process groups, so leave
+	 * that blank for now.
+	 */
+
+	GetModuleFileName(NULL, header->progname, sizeof(header->progname));
+#else /* _WIN32 */
 	header->pids[1] = getppid();
 	header->pids[2] = getpgrp();
 
 	/* getprogname() should never fail. */
 	strlcpy(header->progname, getprogname(), sizeof(header->progname));
+#endif /* _WIN32 */
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
 		strcpy(header->cwd, "");
@@ -136,12 +225,18 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 	struct citrun_node	*new;
 
 	/* Binary compatibility between versions not guaranteed. */
-	if (major != citrun_major || minor != citrun_minor)
-		errx(1, "libcitrun %i.%i: incompatible version %i.%i, "
-			"try cleaning and rebuilding your project",
+	if (major != citrun_major || minor != citrun_minor) {
+		fprintf(stderr, "libcitrun %i.%i: incompatible version %i.%i.\n"
+			"Try cleaning and rebuilding your project.\n",
 			citrun_major, citrun_minor, major, minor);
+		exit(1);
+	}
 
+#ifdef _WIN32
+	if (h == INVALID_HANDLE_VALUE) {
+#else
 	if (fd == 0) {
+#endif /* _WIN32 */
 		open_fd();
 		add_header();
 	}
@@ -157,8 +252,9 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 
 	/* Copy these fields from incoming node verbatim. */
 	new->size = n->size;
-	strlcpy(new->comp_file_path, n->comp_file_path, 1024);
-	strlcpy(new->abs_file_path,  n->abs_file_path, 1024);
+	strncpy(new->comp_file_path, n->comp_file_path, 1024);
+	strncpy(new->abs_file_path,  n->abs_file_path, 1024);
+	new->comp_file_path[1024] = new->abs_file_path[1024] = '\0';
 
 	/* Set incoming nodes data pointer to allocated space after struct. */
 	n->data = (unsigned long long *)(new + 1);
