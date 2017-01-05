@@ -8,21 +8,16 @@ use Test::More tests => 3;
 
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
+my $err_good;
 if ($^O eq "MSWin32") {
-	my $err_good = "Cannot access file C:\\Users\\kyle\\citrun\\asdf
-";
 	$wrap->run( args => 'more.com asdf' );
-
-	is( $wrap->stdout,	'',	'is citrun_wrap stdout empty');
-	is( $wrap->stderr,	$err_good,	'is citrun_wrap stderr identical');
-	is( $? >> 8,		1,	'is citrun_wrap exit code 1');
+	$err_good = 'Cannot access file .*asdf';
 }
 else {
 	$wrap->run( args => 'ls asdf' );
-	my $err_good = "ls: asdf: No such file or directory
-";
-
-	is( $wrap->stdout,	'',	'is citrun_wrap stdout empty');
-	is( $wrap->stderr,	$err_good,	'is citrun_wrap stderr identical');
-	is( $? >> 8,		1,	'is citrun_wrap exit code 1');
+	$err_good = "ls: asdf: No such file or directory";
 }
+
+is( $wrap->stdout,	'',	'is citrun_wrap stdout empty');
+like( $wrap->stderr,	qr/$err_good/,	'is citrun_wrap stderr identical');
+is( $? >> 8,		1,	'is citrun_wrap exit code 1');
