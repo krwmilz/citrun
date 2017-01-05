@@ -4,7 +4,10 @@
 use strict;
 use warnings;
 use Test::Cmd;
-use Test::More tests => 3;
+use Test::More;
+
+plan skip_all => 'not impl on win32' if ($^O eq "MSWin32");
+plan tests => 3;
 
 my $output_good = "Summary:
          0 Source files used as input
