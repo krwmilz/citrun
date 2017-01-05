@@ -434,7 +434,9 @@ InstFrontend::fork_compiler()
 
 	char real_cc[MAX_PATH];
 	std::strcpy(real_cc, m_args[0]);
-	std::strcat(real_cc, ".exe");
+
+	if (!ends_with(real_cc, ".exe") && !ends_with(real_cc, ".EXE"))
+		std::strcat(real_cc, ".exe");
 
 	PathFindOnPathA(real_cc, NULL);
 
