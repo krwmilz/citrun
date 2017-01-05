@@ -123,6 +123,39 @@ extend(size_t req_bytes)
 	return mem;
 }
 
+#ifdef _WIN32
+HANDLE
+mkstemp(char *template)
+{
+	int i;
+	unsigned int r;
+
+	char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+	for (i = strlen(template) - 1; i > 0; --i) {
+		if (template[i] != 'X')
+			break;
+
+		if (rand_s(&r)) {
+			fprintf(stderr, "rand failed: %s\n", strerror(errno));
+			exit(1);
+		}
+
+		template[i] = chars[r % sizeof(chars)];
+	}
+
+	return CreateFile(
+		template,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		NULL,
+		CREATE_NEW,
+		0,
+		NULL
+	);
+}
+#endif /* _WIN32 */
+
 /*
  * Opens a file with a random suffix. Exits on error.
  */
@@ -142,17 +175,11 @@ open_fd()
 		Err(1, "CreateDirectory");
 
 	strncpy(procfile, procdir, PATH_MAX);
-	strncat(procfile, "procfile.shm", PATH_MAX);
+	strncat(procfile, "program", PATH_MAX);
+	strncat(procfile, "_XXXXXXXXXX", PATH_MAX);
 
-	if ((h = CreateFile("procfile.shm",
-	    GENERIC_READ | GENERIC_WRITE,
-	    0,
-	    NULL,
-	    CREATE_NEW,
-	    0,
-	    NULL
-	    )) == INVALID_HANDLE_VALUE)
-		Err(1, "CreateFile");
+	if ((h = mkstemp(procfile)) == INVALID_HANDLE_VALUE)
+		Err(1, "mkstemp");
 #else /* _WIN32 */
 	if (mkdir(procdir, S_IRWXU) && errno != EEXIST)
 		err(1, "mkdir '%s'", procdir);
