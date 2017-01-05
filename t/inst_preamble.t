@@ -3,11 +3,8 @@
 #
 use strict;
 use warnings;
-use File::Slurp;
-use Test::Cmd;
-use Test::Differences;
-use Test::More tests => 3;
-unified_diff;
+use t::utils;
+plan tests => 3;
 
 
 my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
@@ -80,7 +77,8 @@ $constructor_decl
 EOF
 
 # Read and sanitize special preamble file created by citrun_inst.
-my $preamble = read_file( $inst->workdir . "/empty.c.preamble" );
+my $preamble;
+$inst->read( \$preamble, "empty.c.preamble" );
 $preamble =~ s/".*"/""/gm;
 
 eq_or_diff( $preamble,	$preamble_good, 'is preamble identical', { context => 3 } );

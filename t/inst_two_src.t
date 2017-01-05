@@ -4,11 +4,8 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::Differences;
-use Test::More tests => 3;
 use t::utils;
-unified_diff;
+plan tests => 3;
 
 
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
@@ -56,7 +53,7 @@ EOF
 
 my $citrun_log;
 $wrap->read( \$citrun_log, 'citrun.log' );
-$citrun_log = t::utils::clean_citrun_log($citrun_log);
+$citrun_log = clean_citrun_log($citrun_log);
 
 eq_or_diff( $citrun_log,	$log_good,	'is citrun.log identical', { context => 3 } );
 print $wrap->stdout;

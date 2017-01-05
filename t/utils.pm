@@ -1,7 +1,9 @@
 use strict;
 use warnings;
-
-package t::utils;
+use Test::Cmd;
+use Test::Differences;
+use Test::More;
+unified_diff;		# For Test::Differences diffs
 
 sub clean_citrun_log {
 	my ($log) = @_;

@@ -3,11 +3,8 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::Differences;
-use Test::More tests => 2;
 use t::utils;
-unified_diff;
+plan tests => 2;
 
 
 my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
@@ -30,7 +27,7 @@ Added clangtool argument ''
 Rewriting failed.
 EOF
 
-my $out = t::utils::clean_citrun_log(scalar $inst->stdout);
+my $out = clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $out,	$out_good,	'is citrun_inst output identical' );
 print $inst->stderr;

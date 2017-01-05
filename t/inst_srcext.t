@@ -3,11 +3,8 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::Differences;
-use Test::More tests => 15;
 use t::utils;
-unified_diff;
+plan tests => 15;
 
 
 my @supported_exts = ("c", "cc", "cxx", "cpp");
@@ -33,7 +30,7 @@ for (@supported_exts) {
 	$inst->write( "main.$_", 'int main(void) { return 0; }' );
 	$inst->run( args => "-c main.$_", chdir => $inst->curdir );
 
-	my $out = t::utils::clean_citrun_log(scalar $inst->stdout);
+	my $out = clean_citrun_log(scalar $inst->stdout);
 	eq_or_diff( $out, $out_good,	".$_: is citrun_inst output identical", { context => 3} );
 	is ( $inst->stderr,	'',	".$_: is citrun_inst stderr silent" );
 	is( $? >> 8,		0,	".$_: is citrun_inst exit code 0" );
@@ -50,7 +47,7 @@ EOF
 $inst->write( "main.z", 'int main(void) { return 0; }' );
 $inst->run( args => "-c main.z", chdir => $inst->curdir );
 
-my $out = t::utils::clean_citrun_log(scalar $inst->stdout);
-eq_or_diff( $out, $out_good,	".z: is citrun_inst output identical", { context => 3} );
+my $out = clean_citrun_log(scalar $inst->stdout);
+eq_or_diff( $out, $out_good,	".z: is citrun_inst output identical", { context => 3 } );
 is ( $inst->stderr,	'',	".z: is citrun_inst stderr silent" );
 is( $? >> 8,		0,	".z: is citrun_inst exit code 1" );

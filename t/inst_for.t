@@ -3,11 +3,8 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::Differences;
-use Test::More tests => 4;
 use t::utils;
-unified_diff;	# for Test::Differences
+plan tests => 4;
 
 
 my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
@@ -54,7 +51,7 @@ my $inst_out;
 $inst->read(\$inst_out, 'for.c');
 
 # Sanitize paths from stdout.
-my $check_out = t::utils::clean_citrun_log(scalar $inst->stdout);
+my $check_out = clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $inst_out,	$inst_good, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical', { context => 3 } ;

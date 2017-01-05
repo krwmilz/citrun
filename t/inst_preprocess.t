@@ -3,11 +3,8 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::Differences;
-use Test::More tests => 8;
 use t::utils;
-unified_diff;	# for Test::Differences
+plan tests => 8;
 
 my $preproc = 'int main(void) { return 0; }';
 
@@ -29,7 +26,7 @@ my $inst_out;
 $inst->read(\$inst_out, 'prepro.c');
 
 # Sanitize paths from stdout.
-my $check_out = t::utils::clean_citrun_log(scalar $inst->stdout);
+my $check_out = clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $inst_out,	$preproc, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical';
@@ -50,7 +47,7 @@ $inst->run( args => '-MM prepro.c', chdir => $inst->curdir );
 $inst->read(\$inst_out, 'prepro.c');
 
 # Sanitize paths from stdout.
-$check_out = t::utils::clean_citrun_log(scalar $inst->stdout);
+$check_out = clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $inst_out,	$preproc, 'is instrumented file identical', { context => 3 } );
 eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical', { context => 3 };
