@@ -1,13 +1,13 @@
 #
 # Try and wrap devenv with citrun_wrap.
+# TODO: devenv uses response files (not supported right now).
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::More;
+use t::utils;
 
 if ($^O eq "MSWin32") {
-	plan tests => 1;
+	plan tests => 3;
 } else {
 	plan skip_all => 'win32 only';
 }
@@ -43,10 +43,31 @@ $wrap->write( 'main.vcxproj', <<'EOF' );
 </Project>
 EOF
 
-$wrap->write( 'main.c', 'int main(void) { return 0; }' );
+$wrap->write( 'main.cpp', 'int main(void) { return 0; }' );
 
 $wrap->run( args => 'devenv /useenv main.vcxproj /Build', chdir => $wrap->curdir );
-
 print $wrap->stdout;
-print $wrap->stderr;
-is( $? >> 8,	1,	'is citrun_wrap exit code 1' );
+
+# XXX: devenv uses response files so we don't detect any source files.
+my $log_good = <<EOF;
+>> citrun_inst
+CITRUN_COMPILERS = ''
+PATH=''
+Modified command line is ''
+No source files found on command line.
+Forked compiler ''
+>> citrun_inst
+CITRUN_COMPILERS = ''
+PATH=''
+Modified command line is ''
+No source files found on command line.
+Forked compiler ''
+EOF
+
+my $log_file;
+$wrap->read( \$log_file, 'citrun.log' );
+$log_file = clean_citrun_log($log_file);
+
+eq_or_diff( $log_file, $log_good,	'is devenv citrun.log identical' );
+is( $wrap->stderr,	'',	'is citrun_wrap devenv stderr silent' );
+is( $? >> 8,	0,	'is citrun_wrap exit code 0' );
