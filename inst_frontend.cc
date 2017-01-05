@@ -438,7 +438,8 @@ InstFrontend::fork_compiler()
 	if (!ends_with(real_cc, ".exe") && !ends_with(real_cc, ".EXE"))
 		std::strcat(real_cc, ".exe");
 
-	PathFindOnPathA(real_cc, NULL);
+	if (PathFindOnPathA(real_cc, NULL) == FALSE)
+		m_log << "PathFindOnPathA failed for " << real_cc << std::endl;
 
 	std::stringstream argv;
 	for (unsigned int i = 1; i < m_args.size(); ++i)
