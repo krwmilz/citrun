@@ -4,11 +4,7 @@
 use strict;
 use warnings;
 use File::Which;
-use Test::Cmd;
-use Test::Differences;
-use Test::More;
 use t::utils;
-unified_diff;
 
 if (which 'cmake') {
 	plan tests => 8;
@@ -65,12 +61,17 @@ print $wrap->stdout;
 is( $wrap->stderr,	'',	'is citrun_wrap cmake stderr empty');
 is( $? >> 8,		0,	'is citrun_wrap cmake exit code 0');
 
-# Ok now run regular make.
-$wrap->run( args => 'make', chdir => $wrap->curdir );
+# Now run whatever platform specific-ish files CMake decided to give us.
+if ($^O eq "MSWin32") {
+	# MSBuild currently does not work.
+	$wrap->run( args => 'devenv /useenv program.sln /Build', chdir => $wrap->curdir );
+} else {
+	$wrap->run( args => 'make', chdir => $wrap->curdir );
+}
 
 my $log_out;
 $wrap->read( \$log_out, 'citrun.log' );
-$log_out = t::utils::clean_citrun_log($log_out);
+$log_out = clean_citrun_log($log_out);
 
 eq_or_diff( $log_out, $log_good,	'is citrun.log identical', { context => 3 } );
 print $wrap->stdout;
