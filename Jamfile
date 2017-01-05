@@ -32,7 +32,9 @@ TestCoverage test-coverage ;
 #
 # libcitrun
 #
-ObjectCcFlags lib.c : -fPIC -ansi ;
+if ! $(NT) {
+	ObjectCcFlags lib.c : -fPIC -ansi ;
+}
 Library libcitrun : lib.c ;
 
 #
