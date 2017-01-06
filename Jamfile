@@ -114,8 +114,8 @@ Stringize lib_h.h : lib.h ;
 
 ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) ;
 ObjectDefines $(INST_SRCS) :
-	CITRUN_COMPILERS=\\\"$(CITRUN_COMPILERS)\\\"
-	CITRUN_LIB=\\\"$(CITRUN_LIB)\\\" ;
+	CITRUN_COMPILERS=R\\\"($(CITRUN_COMPILERS))\\\"
+	CITRUN_LIB=R\\\"($(CITRUN_LIB))\\\" ;
 
 LINKFLAGS on citrun_inst$(SUFEXE) = $(LINKFLAGS) $(INST_LDFLAGS) ;
 LINKLIBS on citrun_inst$(SUFEXE) += $(INST_LIBS) ;
