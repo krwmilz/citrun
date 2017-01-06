@@ -58,6 +58,23 @@ Err(int code, const char *fmt)
 static int			 fd;
 #endif /* _WIN32 */
 
+static size_t
+align_bytes(size_t unaligned_bytes)
+{
+	size_t	 page_mask;
+
+#ifdef _WIN32
+	SYSTEM_INFO system_info;
+	GetSystemInfo(&system_info);
+
+	page_mask = system_info.dwAllocationGranularity - 1;
+#else
+	page_mask = getpagesize() - 1;
+#endif
+
+	return (unaligned_bytes + page_mask) & ~page_mask;
+}
+
 /*
  * Extends the file and memory mapping length of fd by a requested amount of
  * bytes (rounded up to the next page size).
@@ -66,18 +83,14 @@ static int			 fd;
 static void *
 extend(size_t req_bytes)
 {
-	size_t	 aligned_bytes, page_mask;
+	size_t	 aligned_bytes;
 	size_t	 len;
 	void	*mem;
 
+	aligned_bytes = align_bytes(req_bytes);
+
 #ifdef _WIN32
 	HANDLE	 fm;
-
-	SYSTEM_INFO system_info;
-	GetSystemInfo(&system_info);
-
-	page_mask = system_info.dwAllocationGranularity - 1;
-	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
 
 	/* Get current file length. */
 	if ((len = GetFileSize(h, NULL)) == INVALID_FILE_SIZE)
@@ -102,9 +115,6 @@ extend(size_t req_bytes)
 
 	CloseHandle(fm);
 #else /* _WIN32 */
-	page_mask = getpagesize() - 1;
-	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
-
 	/* Get current file length. */
 	if ((len = lseek(fd, 0, SEEK_END)) < 0)
 		err(1, "lseek");
@@ -141,7 +151,7 @@ mkstemp(char *template)
 			exit(1);
 		}
 
-		template[i] = chars[r % sizeof(chars)];
+		template[i] = chars[r % (sizeof(chars) - 1)];
 	}
 
 	return CreateFile(
