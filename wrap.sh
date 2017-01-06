@@ -1,3 +1,3 @@
 
-export PATH="%CITRUN_COMPILERS%:$PATH"
+export PATH="_CITRUN_COMPILERS_:$PATH"
 exec $@

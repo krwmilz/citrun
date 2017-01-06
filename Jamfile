@@ -46,7 +46,7 @@ if ! $(NT) {
 
 actions ReplaceToken
 {
-	perl -p -i.bak -e "s,%CITRUN_COMPILERS%,$(CITRUN_COMPILERS)," $(<)
+	perl -p -i.bak -e "s,_CITRUN_COMPILERS_,$(CITRUN_COMPILERS)," $(<)
 	$(RM) $(<).bak
 }
 
