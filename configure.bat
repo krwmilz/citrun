@@ -79,3 +79,4 @@ ECHO( >>Jamrules
 COPY /b Jamrules + Jamrules.tail Jamrules
 
 ENDLOCAL
+PAUSE
