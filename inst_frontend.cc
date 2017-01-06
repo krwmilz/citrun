@@ -42,6 +42,9 @@
 #define PATH_SEP ':'
 #endif // _WIN32
 
+#define xstr(x) make_str(x)
+#define make_str(x) #x
+
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
 
@@ -67,7 +70,7 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 {
 	log_identity();
 
-	m_log << "CITRUN_COMPILERS = '" << CITRUN_COMPILERS << "'" << std::endl;
+	m_log << "CITRUN_COMPILERS = '" << xstr(CITRUN_COMPILERS) << "'" << std::endl;
 
 #ifndef _WIN32
 	// Sometimes we're not called as citrun_inst so force that here.
@@ -119,7 +122,7 @@ InstFrontend::clean_PATH()
 	bool found_citrun_path = 0;
 
 	while (std::getline(path_ss, component, PATH_SEP)) {
-		if (component.compare(CITRUN_COMPILERS) == 0) {
+		if (component.compare(xstr(CITRUN_COMPILERS)) == 0) {
 			found_citrun_path = 1;
 			continue;
 		}
@@ -250,9 +253,9 @@ InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 		return;
 #endif // _WIN32
 
-	m_log << "Link detected, adding '"<< CITRUN_LIB
+	m_log << "Link detected, adding '"<< xstr(CITRUN_LIB)
 		<< "' to command line." << std::endl;
-	m_args.push_back(const_cast<char *>(CITRUN_LIB));
+	m_args.push_back(const_cast<char *>(xstr(CITRUN_LIB)));
 }
 
 //
