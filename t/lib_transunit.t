@@ -3,18 +3,16 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 8;
 use t::utils;
+plan tests => 8;
 
-my $tmp_dir = t::tmpdir->new();
+my $dir = setup_projdir();
 
-my $ret = system("$tmp_dir/program 10");
-is $ret >> 8,	0,	"is program exit code 0";
+$dir->run( prog => $dir->workdir . '/program', args => '1', chdir => $dir->curdir );
+is( $? >> 8,	0,	"is instrumented program exit code 0" );
 
-my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
-is scalar @procfiles,	1,	"is one file in procdir";
-
-my $shm = t::shm->new($procfiles[0]);
+my $shm_file_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
+my $shm = t::shm->new( $shm_file_path );
 
 my ($tu1, $tu2, $tu3) = @{ $shm->{translation_units} };
 is	$tu1->{size},	9,	"is translation unit 1 9 lines";
