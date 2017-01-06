@@ -1,9 +1,3 @@
-print "static const char *$ARGV[0] = ";
-while (<STDIN>) {
-	$_ =~ s/\\/\\\\/g ;
-	$_ =~ s/"/\\"/g;
-	$_ =~ s/^/"/;
-	$_ =~ s/$/\\n"/;
-	print ;
-}
-print ";";
+print "static const char *$ARGV[0] = R\"(";
+print while (<STDIN>);
+print ")\";";
