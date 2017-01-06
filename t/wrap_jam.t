@@ -20,6 +20,7 @@ Main program : main.c ;
 EOF
 
 $wrap->run( args => 'jam', chdir => $wrap->curdir );
+print $wrap->stdout;
 is( $wrap->stderr,	'',	'is citrun_wrap jam stderr silent' );
 is( $? >> 8,		0,	'is citrun_wrap jam exit code 0' );
 
@@ -56,13 +57,6 @@ $citrun_log = clean_citrun_log( $citrun_log );
 eq_or_diff( $citrun_log, $log_good,	'is citrun_wrap log file identical', { context => 3 } );
 
 $wrap->run( prog => $wrap->workdir . '/program', chdir => $wrap->curdir );
-
-SKIP: {
-	skip 'win32 broken', 3 if $^O eq "MSWin32";
-
-	is( $wrap->stdout,	'',	'is instrumented program stdout silent' );
-	is( $wrap->stderr,	'',	'is instrumented program stderr silent' );
-	is( $? >> 8,		0,	'is instrumented program exit code 0' );
-}
-
-#ok "is runtime shared memory file created" test -f procdir/program_*
+is( $wrap->stdout,	'',	'is instrumented program stdout silent' );
+is( $wrap->stderr,	'',	'is instrumented program stderr silent' );
+is( $? >> 8,		0,	'is instrumented program exit code 0' );

@@ -2,11 +2,8 @@ use strict;
 use warnings;
 use t::utils;
 
-if ($^O eq "MSWin32") {
-	plan tests => 4;
-} else {
-	plan skip_all => 'win32 only';
-}
+plan skip_all => 'win32 only' if ($^O ne "MSWin32");
+plan tests => 6;
 
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
@@ -18,7 +15,6 @@ main.exe: main.obj
 EOF
 
 $wrap->run( args => 'nmake /nologo', chdir => $wrap->curdir );
-
 print $wrap->stdout;
 is( $wrap->stderr, '',	'is citrun_wrap nmake stderr silent' );
 is( $? >> 8,	0,	'is citrun_wrap nmake exit code 0' );
@@ -67,6 +63,6 @@ eq_or_diff( $citrun_log,	$log_good,	'is nmake citrun.log identical',
 	{ context => 3 } );
 
 $wrap->run( prog => $wrap->workdir . "/main", chdir => $wrap->curdir );
-print $wrap->stdout;
-print $wrap->stderr;
-is( $? >> 8,	1,	'is main exit code 1' );
+is( $wrap->stdout,	'',	'is instrumented program stdout silent' );
+is( $wrap->stderr,	'',	'is instrumented program stderr silent' );
+is( $? >> 8,		0,	'is main exit code 1' );
