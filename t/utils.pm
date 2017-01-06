@@ -212,7 +212,7 @@ sub xread {
 1;
 __DATA__
 __C__
-#include "../src/lib.h"
+#include "../lib.h"
 
 size_t citrun_header_size() {
 	return sizeof(struct citrun_header);
