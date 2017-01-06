@@ -3,19 +3,17 @@
 #
 use strict;
 use warnings;
-use File::DosGlob 'glob';
 use t::utils;
-plan tests => 18;
+plan tests => 17;
 
 my $dir = setup_projdir();
 
 $dir->run( prog => $dir->workdir . '/program', args => '1', chdir => $dir->curdir );
 is( $? >> 8,	0,	"is instrumented program exit code 0" );
 
-my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
-is scalar @procfiles,	1,	"is one file in procdir";
+my $shm_file_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
+my $shm = t::shm->new( $shm_file_path );
 
-my $shm = t::shm->new($procfiles[0]);
 is $shm->{magic},	"ctrn",	"is correct file magic";
 is $shm->{major},	0,	"is correct major";
 is $shm->{minor},	0,	"is correct minor";

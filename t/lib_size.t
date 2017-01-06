@@ -3,10 +3,9 @@
 #
 use strict;
 use warnings;
-use File::DosGlob 'glob';
 use POSIX;
 use t::utils;
-plan tests => 5;
+plan tests => 4;
 
 
 my $dir = setup_projdir();
@@ -14,10 +13,8 @@ my $dir = setup_projdir();
 $dir->run( prog => $dir->workdir . "/program", args => '1', chdir => $dir->curdir );
 is( $? >> 8,		0,	"is instrumented program exit code 0" );
 
-my @procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
-is scalar @procfiles,	1,	"is one file in procdir";
-
-my $procfile = t::shm->new($procfiles[0]);
+my $shm_file_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
+my $procfile = t::shm->new( $shm_file_path );
 
 my $alloc_size;
 if ($^O eq "MSWin32") {

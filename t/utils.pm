@@ -18,6 +18,23 @@ sub clean_citrun_log {
 	return $log;
 }
 
+sub get_one_shmfile {
+	my ($dir) = @_;
+	opendir( DIR, $dir ) or die $!;
+
+	my @files;
+	for (readdir(DIR)) {
+		next if ($_ eq ".");
+		next if ($_ eq "..");
+		push @files, ($_);
+	}
+
+	closedir(DIR);
+	die "not exactly one procfile found" if (scalar @files != 1);
+
+	return File::Spec->catfile( $dir, $files[0] );
+}
+
 sub setup_projdir {
 
 	my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
