@@ -1,6 +1,6 @@
 use strict;
+use Test::More skip_all => "citrun_term not compiled";
 use Expect;
-use Test::More skip_all => "Uses perl expect";
 use test::project;
 
 my $project = test::project->new();
