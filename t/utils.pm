@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use File::Util;
 use Test::Cmd;
 use Test::Differences;
 use Test::More;
@@ -17,10 +18,12 @@ sub clean_citrun_log {
 	return $log;
 }
 
-sub make_testcmd {
+sub setup_projdir {
 
 	my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
-	#$ENV{CITRUN_PROCDIR} = $wrap->workdir . "\\procdir\\";
+
+	$ENV{CITRUN_PROCDIR} =  File::Spec->catdir( $wrap->workdir, "procdir" );
+	$ENV{CITRUN_PROCDIR} .= File::Util->SL;
 
 	$wrap->write( 'main.c', <<EOF);
 #include <stdio.h>
@@ -92,7 +95,12 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
-	open(my $fh, "<:mmap", $procfile) or die $!;
+	my $fh;
+	if ($^O eq "MSWin32") {
+		open($fh, "<", $procfile) or die $!;
+	} else {
+		open($fh, "<:mmap", $procfile) or die $!;
+	}
 	$self->{fh} = $fh;
 
 	my $header_size = citrun_header_size();
@@ -143,8 +151,12 @@ sub stat_procfile {
 sub get_aligned_size {
 	my ($unaligned_size) = @_;
 
-	my $page_size = POSIX::sysconf(POSIX::_SC_PAGESIZE);
-	my $page_mask = $page_size - 1;
+	my $page_mask;
+	if ($^O eq "MSWin32") {
+		$page_mask = 64 * 1024 - 1;
+	} else {
+		$page_mask = POSIX::sysconf(POSIX::_SC_PAGESIZE) - 1;
+	}
 
 	return ($unaligned_size + $page_mask) & ~$page_mask;
 }
