@@ -70,6 +70,7 @@ static struct citrun_node _citrun = {
 	"",
 	"",
 };
+
 $constructor_decl
 #ifdef __cplusplus
 }

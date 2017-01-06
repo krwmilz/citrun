@@ -68,41 +68,55 @@ InstrumentAction::EndSourceFileAction()
 	// - static constructor for runtime initialization
 	//
 	std::ostringstream preamble;
-	preamble << "#ifdef __cplusplus\n"
-		<< "extern \"C\" {\n"
-		<< "#endif\n";
+	preamble <<
+R"(#ifdef __cplusplus
+extern "C" {
+#endif
+)";
 	preamble << lib_h;
 	preamble << "static struct citrun_node _citrun = {\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"
 		<< "	\"" << getCurrentFile().str() << "\",\n";
 	preamble << "};\n";
+
 #ifdef _WIN32
 	//
 	// Cribbed from an answer by Joe:
 	// http://stackoverflow.com/questions/1113409/attribute-constructor-equivalent-in-vc
 	//
-	preamble << "#pragma section(\".CRT$XCU\",read)\n"
-		<< "#define INITIALIZER2_(f,p) \\\n"
-		<< "	static void f(void); \\\n"
-		<< "	__declspec(allocate(\".CRT$XCU\")) void (*f##_)(void) = f; \\\n"
-		<< "	__pragma(comment(linker,\"/include:\" p #f \"_\")) \\\n"
-		<< "	static void f(void)\n"
-		<< "#define INITIALIZER(f) INITIALIZER2_(f,\"_\")\n";
-	preamble << "INITIALIZER( init_" << m_compiler_file_name.substr(0, m_compiler_file_name.find(".")) << ")\n"
-		<< "{\n"
-		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
-		<< "}\n";
+	preamble << R"(
+#pragma section(".CRT$XCU",read)
+#define INITIALIZER2_(f,p) \
+	static void f(void); \
+	__declspec(allocate(".CRT$XCU")) void (*f##_)(void) = f; \
+	__pragma(comment(linker,"/include:" p #f "_")) \
+	static void f(void)
+#define INITIALIZER(f) INITIALIZER2_(f,"_")
+)";
+	preamble << "INITIALIZER( init_"
+		<< m_compiler_file_name.substr(0, m_compiler_file_name.find("."))
+		<< ")"
+		<< R"(
+{
+	citrun_node_add(citrun_major, citrun_minor, &_citrun);
+}
+)";
 #else
-	preamble << "__attribute__((constructor)) static void\n"
-		<< "citrun_constructor() {\n"
-		<< "	citrun_node_add(citrun_major, citrun_minor, &_citrun);\n"
-		<< "}\n";
+	preamble << R"(
+__attribute__((constructor)) static void
+citrun_constructor()
+{
+	citrun_node_add(citrun_major, citrun_minor, &_citrun);
+}
+)";
 #endif
-	preamble << "\n"
-		<< "#ifdef __cplusplus\n"
-		<< "}\n"
-		<< "#endif\n";
+
+	preamble << R"(
+#ifdef __cplusplus
+}
+#endif
+)";
 
 	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
 	if (m_is_citruninst) {
