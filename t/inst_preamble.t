@@ -31,7 +31,8 @@ EOF
 else {
 	$constructor_decl = <<EOF ;
 __attribute__((constructor)) static void
-citrun_constructor() {
+citrun_constructor()
+{
 	citrun_node_add(citrun_major, citrun_minor, &_citrun);
 }
 EOF
