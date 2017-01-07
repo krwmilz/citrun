@@ -243,7 +243,7 @@ add_header()
 #endif /* _WIN32 */
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
-		strcpy(header->cwd, "");
+		strncpy(header->cwd, "", 3);
 
 	atexit(set_exited);
 }
