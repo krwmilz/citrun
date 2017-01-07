@@ -52,7 +52,8 @@ IF %ERRORLEVEL% NEQ 0 (
 
 DEL Jamrules 2>nul
 
->> Jamrules ECHO C++FLAGS = ;
+:: Silence warning about exceptions being disabled from xlocale.
+>> Jamrules ECHO C++FLAGS = /D_HAS_EXCEPTIONS=0 ;
 >> Jamrules ECHO.
 
 >> Jamrules ECHO FONT_PATH = "C:\Windows\Fonts\consola.ttf" ;
