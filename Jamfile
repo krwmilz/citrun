@@ -56,7 +56,6 @@ actions ReplaceToken
 if $(NT) {
 	File citrun_wrap.bat : wrap.bat ;
 	Clean clean : citrun_wrap.bat ;
-	ReplaceToken citrun_wrap.bat ;
 }
 else {
 	Shell citrun_wrap : wrap.sh ;
