@@ -43,6 +43,7 @@ my $preamble_good = <<EOF ;
 #ifdef __cplusplus
 extern "" {
 #endif
+
 static const unsigned int citrun_major = 0;
 static const unsigned int citrun_minor = 0;
 
