@@ -13,5 +13,7 @@ rule Stringize
 
 actions Stringize
 {
-	perl stringize.pl $(1:B) < $(>) > $(<)
+	>> $(<) echo static const char *$(1:B) = R"(
+	>> $(<) type $(>)
+	>> $(<) echo )";
 }
