@@ -1,7 +1,6 @@
 #ifndef _INST_LOG_H
 #define _INST_LOG_H
 
-#include <iostream>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>	// llvm::sys::fs::F_Append
 #include <sstream>
@@ -33,8 +32,8 @@ class InstrumentLogger : public std::ostream
 			std::error_code m_ec;
 			m_out = new llvm::raw_fd_ostream("citrun.log", m_ec, llvm::sys::fs::F_Append);
 			if (m_ec.value()) {
-				std::cerr << "Can't open citrun.log: " << m_ec.message();
 				m_out = &llvm::errs();
+				*m_out << "Can't open citrun.log: " << m_ec.message();
 			}
 		}
 
