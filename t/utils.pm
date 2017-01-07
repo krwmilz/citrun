@@ -134,36 +134,31 @@ sub new {
 	) = unpack("Z4I8Z1024Z1024", xread($fh, $aligned_size));
 
 	my $node_fixed_size = citrun_node_size();
-	my @translation_units;
+	my %trans_units;
 
-	while (tell $fh < $self->stat_procfile()) {
+	#while (tell $fh < $self->stat_procfile()) {
+	while (not eof $fh) {
+
+		my @struct_fields = unpack("IZ1024Z1024", xread($fh, $node_fixed_size));
+		my $buf_pos = tell $fh;
+		my $buf_size = $struct_fields[0];
+
 		my %tu;
+		$trans_units{ $struct_fields[2] } = {
+			size => $buf_size,
+			comp_file_name => $struct_fields[1],
+			exec_buf_pos => $buf_pos
+		};
 
-		(
-			$tu{size},
-			$tu{comp_file_name},
-			$tu{abs_file_path}
-		) = unpack("IZ1024Z1024", xread($fh, $node_fixed_size));
-
-		$tu{exec_buf_pos} = tell $fh;
-
-		my $node_end = $tu{exec_buf_pos} + ($tu{size} * 8);
+		my $node_end = $buf_pos + ($buf_size * 8);
 		my $node_end_aligned = get_aligned_size($node_end);
 
 		seek $self->{fh}, $node_end_aligned, 0;
-
-		push @translation_units, (\%tu);
+		$self->{size} = $node_end_aligned;
 	}
-	$self->{translation_units} = \@translation_units;
+	$self->{trans_units} = \%trans_units;
 
 	return $self;
-}
-
-sub stat_procfile {
-	my ($self) = @_;
-
-	$self->{size} = (stat $self->{fh})[7];
-	return $self->{size};
 }
 
 sub get_aligned_size {
