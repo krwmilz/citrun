@@ -4,11 +4,13 @@
 use strict;
 use warnings;
 use t::utils;
-plan tests => 8;
+plan tests => 11;
 
 my $dir = setup_projdir();
 
 $dir->run( prog => $dir->workdir . '/program', args => '1', chdir => $dir->curdir );
+is( $dir->stdout,	'1',	'is instrumented program stdout correct' );
+is( $dir->stderr,	'',	'is instrumented program stderr silent' );
 is( $? >> 8,	0,	"is instrumented program exit code 0" );
 
 my $shm_file_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );

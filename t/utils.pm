@@ -72,7 +72,7 @@ EOF
 void
 print_output(long long n)
 {
-	fprintf(stderr, "%lli", n);
+	printf("%lli", n);
 	return;
 }
 EOF
@@ -133,11 +133,12 @@ sub new {
 		$self->{cwd}
 	) = unpack("Z4I8Z1024Z1024", xread($fh, $aligned_size));
 
+	my $node_fixed_size = citrun_node_size();
 	my @translation_units;
+
 	while (tell $fh < $self->stat_procfile()) {
 		my %tu;
 
-		my $node_fixed_size = citrun_node_size();
 		(
 			$tu{size},
 			$tu{comp_file_name},
