@@ -24,6 +24,8 @@ private:
 	std::vector<char *>	m_args;
 	InstrumentLogger	m_log;
 	bool			m_is_citruninst;
+	std::string		m_compilers_path;
+	std::string		m_lib_path;
 	std::chrono::high_resolution_clock::time_point m_start_time;
 	std::vector<std::string> m_source_files;
 	std::map<std::string, std::string> m_temp_file_map;
