@@ -71,7 +71,19 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 {
 	log_identity();
 
-	m_log << "CITRUN_COMPILERS = '" << xstr(CITRUN_COMPILERS) << "'" << std::endl;
+	const char *citrun_path = std::getenv("CITRUN_PATH");
+
+	m_compilers_path = citrun_path ? citrun_path : "" ;
+	m_compilers_path.append("compilers");
+
+	m_lib_path = citrun_path ? citrun_path : "" ;
+#ifdef _WIN32
+	m_lib_path.append("libcitrun.lib");
+#else
+	m_lib_path_append("libcitrun.a");
+#endif // _WIN32
+
+	m_log << "CITRUN_COMPILERS = '" << m_compilers_path << "'" << std::endl;
 
 #ifndef _WIN32
 	// Sometimes we're not called as citrun_inst so force that here.
@@ -101,7 +113,7 @@ InstFrontend::log_identity()
 }
 
 //
-// Tries to remove CITRUN_COMPILERS from PATH otherwise it exits easily.
+// Tries to remove m_compilers_path from PATH otherwise it exits easily.
 //
 void
 InstFrontend::clean_PATH()
@@ -109,13 +121,14 @@ InstFrontend::clean_PATH()
 	char *path;
 
 	if ((path = std::getenv("PATH")) == NULL) {
-		m_log << "Error: PATH is not set." << std::endl;
+		std::cerr << "Error: PATH is not set." << std::endl;
+		m_log <<     "Error: PATH is not set." << std::endl;
 		exit(1);
 	}
 
 	m_log << "PATH='" << path << "'" << std::endl;
 
-	// Filter CITRUN_COMPILERS out of PATH
+	// Filter m_compilers_path out of PATH
 	std::stringstream path_ss(path);
 	std::ostringstream new_path;
 	std::string component;
@@ -123,7 +136,7 @@ InstFrontend::clean_PATH()
 	bool found_citrun_path = 0;
 
 	while (std::getline(path_ss, component, PATH_SEP)) {
-		if (component.compare(xstr(CITRUN_COMPILERS)) == 0) {
+		if (component == m_compilers_path) {
 			found_citrun_path = 1;
 			continue;
 		}
@@ -131,13 +144,14 @@ InstFrontend::clean_PATH()
 		if (first_component == 0)
 			new_path << PATH_SEP;
 
-		// It wasn't CITRUN_COMPILERS, keep it
+		// It wasn't m_compilers_path, keep it
 		new_path << component;
 		first_component = 0;
 	}
 
 	if (!found_citrun_path) {
-		m_log << "Error: CITRUN_COMPILERS not in PATH." << std::endl;
+		std::cerr << "Error: " << m_compilers_path << " not in PATH." << std::endl;
+		m_log <<     "Error: " << m_compilers_path << " not in PATH." << std::endl;
 		exit(1);
 	}
 
@@ -254,9 +268,9 @@ InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
 		return;
 #endif // _WIN32
 
-	m_log << "Link detected, adding '"<< xstr(CITRUN_LIB)
+	m_log << "Link detected, adding '"<< m_lib_path
 		<< "' to command line." << std::endl;
-	m_args.push_back(const_cast<char *>(xstr(CITRUN_LIB)));
+	m_args.push_back(const_cast<char *>(m_lib_path.c_str()));
 }
 
 //

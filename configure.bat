@@ -57,8 +57,6 @@ DEL Jamrules 2>nul
 >> Jamrules ECHO.
 
 >> Jamrules ECHO FONT_PATH = "C:\Windows\Fonts\consola.ttf" ;
->> Jamrules ECHO CITRUN_COMPILERS = %CD:\=/%/compilers ;
->> Jamrules ECHO CITRUN_LIB = %CD:\=/%/libcitrun.lib ;
 >> Jamrules ECHO.
 
 REM GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
