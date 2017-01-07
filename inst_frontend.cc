@@ -217,6 +217,12 @@ InstFrontend::save_if_srcfile(char *arg)
 	    !ends_with(arg, ".cpp") && !ends_with(arg, ".cxx"))
 		return;
 
+	char *dst_fn;
+	if ((dst_fn = std::tmpnam(NULL)) == NULL) {
+		m_log << "tmpnam failed." << std::endl;
+		return;
+	}
+
 	m_source_files.push_back(arg);
 	m_log << "Found source file '" << arg << "'" << std::endl;
 
@@ -224,10 +230,6 @@ InstFrontend::save_if_srcfile(char *arg)
 		// In this mode the modified source file is written to a
 		// completely different file.
 		return;
-
-	char *dst_fn;
-	if ((dst_fn = std::tmpnam(NULL)) == NULL)
-		err(1, "tmpnam");
 
 	copy_file(dst_fn, arg);
 	m_temp_file_map[arg] = dst_fn;
