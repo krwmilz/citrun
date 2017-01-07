@@ -90,6 +90,4 @@ SET inst_libs_clang=clangAST.lib clangAnalysis.lib clangBasic.lib clangDriver.li
 
 DEL llvm-config.out
 ENDLOCAL
-
-ECHO !! C It Run Windows configuration script finished.
 PAUSE
