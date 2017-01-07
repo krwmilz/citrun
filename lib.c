@@ -19,7 +19,7 @@
 #include <windows.h>		/* HANDLE, MapViewOfFile, ... */
 #include <io.h>
 #define PATH_MAX 32000
-#define DEFAULT_PROCDIR "C:\\CItRun\\"
+#define DEFAULT_PROCDIR "C:\\CItRun"
 #else /* _WIN32 */
 #include <sys/mman.h>		/* mmap */
 #include <sys/stat.h>		/* S_IRUSR, S_IWUSR, mkdir */
@@ -32,7 +32,7 @@
 #include <stdlib.h>		/* atexit, get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
-#define DEFAULT_PROCDIR "/tmp/citrun/"
+#define DEFAULT_PROCDIR "/tmp/citrun"
 #endif /* _WIN32 */
 
 #include "lib.h"		/* citrun_*, struct citrun_{header,node} */
@@ -175,7 +175,6 @@ open_fd()
 	char			*procdir;
 	char			 procfile[PATH_MAX];
 
-	/* User of this env var must give trailing slash */
 	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
 		procdir = DEFAULT_PROCDIR;
 
@@ -185,6 +184,7 @@ open_fd()
 		Err(1, "CreateDirectory");
 
 	strncpy(procfile, procdir, PATH_MAX);
+	strncat(procfile, "\\", PATH_MAX);
 	strncat(procfile, "program", PATH_MAX);
 	strncat(procfile, "_XXXXXXXXXX", PATH_MAX);
 
@@ -195,6 +195,7 @@ open_fd()
 		err(1, "mkdir '%s'", procdir);
 
 	strlcpy(procfile, procdir, PATH_MAX);
+	strlcat(procfile, "/", PATH_MAX);
 	strlcat(procfile, getprogname(), PATH_MAX);
 	strlcat(procfile, "_XXXXXXXXXX", PATH_MAX);
 

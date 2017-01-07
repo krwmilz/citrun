@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use File::Util;
+use if $^O eq "MSWin32", 'File::DosGlob' => 'glob';
 use Test::Cmd;
 use Test::Differences;
 use Test::More;
@@ -20,27 +20,17 @@ sub clean_citrun_log {
 
 sub get_one_shmfile {
 	my ($dir) = @_;
-	opendir( DIR, $dir ) or die $!;
 
-	my @files;
-	for (readdir(DIR)) {
-		next if ($_ eq ".");
-		next if ($_ eq "..");
-		push @files, ($_);
-	}
-
-	closedir(DIR);
+	my @files = glob File::Spec->catfile( $dir, "program_*");
 	die "not exactly one procfile found" if (scalar @files != 1);
 
-	return File::Spec->catfile( $dir, $files[0] );
+	return $files[0];
 }
 
 sub setup_projdir {
 
 	my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
-
-	$ENV{CITRUN_PROCDIR} =  File::Spec->catdir( $wrap->workdir, "procdir" );
-	$ENV{CITRUN_PROCDIR} .= File::Util->SL;
+	$ENV{CITRUN_PROCDIR} =  $wrap->workdir;
 
 	$wrap->write( 'main.c', <<EOF);
 #include <stdio.h>
