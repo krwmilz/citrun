@@ -19,7 +19,7 @@ my $shm = t::shm->new( $shm_file_path );
 my %tus = %{ $shm->{trans_units} };
 my ($tu1, $tu2, $tu3) = sort keys %tus;
 
-like( $tu1,		qr/.*ib.c/,	'is end of absolute file path fib.c' );
+like( $tu1,		qr/.*fib.c/,	'is end of absolute file path fib.c' );
 is( $tus{$tu1}->{size},	11,		"is fib.c the correct length" );
 is( $tus{$tu1}->{comp_file_name}, 'fib.c', 'is compiler file name right' );
 
