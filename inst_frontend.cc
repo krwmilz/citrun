@@ -24,6 +24,7 @@
 #include <cstdio>		// tmpnam
 #include <cstring>		// strcmp
 #include <fstream>		// ifstream, ofstream
+#include <iostream>		// cerr
 #include <sstream>		// ostringstream
 
 #ifdef _WIN32
