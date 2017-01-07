@@ -32,7 +32,7 @@
 #include <stdlib.h>		/* atexit, get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
-#define DEFAULT_PROCDIR "/tmp/citrun"
+#define DEFAULT_PROCDIR "/tmp/citrun/"
 #endif /* _WIN32 */
 
 #include "lib.h"		/* citrun_*, struct citrun_{header,node} */
@@ -291,7 +291,7 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 	new->size = n->size;
 	strncpy(new->comp_file_path, n->comp_file_path, 1024);
 	strncpy(new->abs_file_path,  n->abs_file_path, 1024);
-	new->comp_file_path[1024] = new->abs_file_path[1024] = '\0';
+	new->comp_file_path[1023] = new->abs_file_path[1023] = '\0';
 
 	/* Set incoming nodes data pointer to allocated space after struct. */
 	n->data = (unsigned long long *)(new + 1);
