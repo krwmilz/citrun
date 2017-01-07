@@ -95,8 +95,9 @@ INST_LIBS = ${INST_EXTRALIB-}
 	${LDGROUP_START-} ${CLANG_LIBS} ${LDGROUP_END-}
 	`llvm-config --libs ${LLVM_LIBS}`
 	`llvm-config --system-libs` ;
+
+include Jamrules.tail ;
 EOF
-cat Jamrules.tail >> Jamrules
 
 #
 # Show summary.
