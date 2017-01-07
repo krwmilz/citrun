@@ -136,9 +136,7 @@ sub new {
 	my $node_fixed_size = citrun_node_size();
 	my %trans_units;
 
-	#while (tell $fh < $self->stat_procfile()) {
 	while (not eof $fh) {
-
 		my @struct_fields = unpack("IZ1024Z1024", xread($fh, $node_fixed_size));
 		my $buf_pos = tell $fh;
 		my $buf_size = $struct_fields[0];
@@ -174,13 +172,13 @@ sub get_aligned_size {
 	return ($unaligned_size + $page_mask) & ~$page_mask;
 }
 
-sub execs_for {
-	my ($self, $tu_num) = @_;
+sub get_buffers {
+	my ($self, $tu_key) = @_;
 
-	my $tu = $self->{translation_units}->[$tu_num];
+	my $tu = $self->{trans_units}->{$tu_key};
 	seek $self->{fh}, $tu->{exec_buf_pos}, 0;
-	my @execs = unpack("Q$tu->{size}", xread($self->{fh}, $tu->{size} * 8));
 
+	my @execs = unpack("Q$tu->{size}", xread($self->{fh}, $tu->{size} * 8));
 	return \@execs;
 }
 
