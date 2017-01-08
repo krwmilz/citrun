@@ -11,9 +11,18 @@ rule Stringize
 	Clean clean : $(1) ;
 }
 
-actions Stringize
-{
-	>> $(<) echo static const char *$(1:B) = R"(
-	>> $(<) type $(>)
-	>> $(<) echo )";
+if $(NT) {
+	actions Stringize
+	{
+		> $(<) echo "static const char *$(1:B) = R\"("
+		>> $(<) cat $(>)
+		>> $(<) echo ")\";"
+	}
+} else {
+	actions Stringize
+	{
+		> $(<) echo "static const char *$(1:B) = R\"("
+		>> $(<) cat $(>)
+		>> $(<) echo ")\";"
+	}
 }
