@@ -19,7 +19,9 @@
 #include <windows.h>		/* HANDLE, MapViewOfFile, ... */
 #include <io.h>
 #define PATH_MAX 32000
+
 #define DEFAULT_PROCDIR "C:\\CItRun"
+static HANDLE			 h = INVALID_HANDLE_VALUE;
 #else /* _WIN32 */
 #include <sys/mman.h>		/* mmap */
 #include <sys/stat.h>		/* S_IRUSR, S_IWUSR, mkdir */
@@ -33,7 +35,9 @@
 #include <stdlib.h>		/* atexit, get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
+
 #define DEFAULT_PROCDIR "/tmp/citrun"
+static int			 fd;
 #endif /* _WIN32 */
 
 #include "lib.h"		/* citrun_*, struct citrun_{header,node} */
@@ -42,8 +46,6 @@
 static struct citrun_header	*header;
 
 #ifdef _WIN32
-static HANDLE			 h = INVALID_HANDLE_VALUE;
-
 static void
 Err(int code, const char *fmt)
 {
@@ -55,8 +57,37 @@ Err(int code, const char *fmt)
 	fprintf(stderr, "%s: %s", fmt, buf);
 	exit(code);
 }
-#else /* _WIN32 */
-static int			 fd;
+
+HANDLE
+mkstemp(char *template)
+{
+	int i;
+	unsigned int r;
+
+	char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+	for (i = strlen(template) - 1; i > 0; --i) {
+		if (template[i] != 'X')
+			break;
+
+		if (rand_s(&r)) {
+			fprintf(stderr, "rand failed: %s\n", strerror(errno));
+			exit(1);
+		}
+
+		template[i] = chars[r % (sizeof(chars) - 1)];
+	}
+
+	return CreateFile(
+		template,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		NULL,
+		CREATE_NEW,
+		0,
+		NULL
+	);
+}
 #endif /* _WIN32 */
 
 static size_t
@@ -71,8 +102,7 @@ align_bytes(size_t unaligned_bytes)
 	page_mask = system_info.dwAllocationGranularity - 1;
 #else
 	page_mask = getpagesize() - 1;
-#endif
-
+#endif // _WIN32
 	return (unaligned_bytes + page_mask) & ~page_mask;
 }
 
@@ -134,38 +164,16 @@ extend(size_t req_bytes)
 	return mem;
 }
 
-#ifdef _WIN32
-HANDLE
-mkstemp(char *template)
+static void
+get_prog_name(char *buf, size_t buf_size)
 {
-	int i;
-	unsigned int r;
-
-	char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-	for (i = strlen(template) - 1; i > 0; --i) {
-		if (template[i] != 'X')
-			break;
-
-		if (rand_s(&r)) {
-			fprintf(stderr, "rand failed: %s\n", strerror(errno));
-			exit(1);
-		}
-
-		template[i] = chars[r % (sizeof(chars) - 1)];
-	}
-
-	return CreateFile(
-		template,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		NULL,
-		CREATE_NEW,
-		0,
-		NULL
-	);
+#ifdef _WIN32
+	if (GetModuleFileName(NULL, buf, buf_size) == 0)
+		Err(1, "GetModuleFileName");
+#else
+	strlcpy(buf, getprogname(), buf_size);
+#endif
 }
-#endif /* _WIN32 */
 
 /*
  * Opens a file with a random suffix. Exits on error.
@@ -228,21 +236,12 @@ add_header()
 	header->major = citrun_major;
 	header->minor = citrun_minor;
 	header->pids[0] = getpid();
-
-#ifdef _WIN32
-	/*
-	 * Win32 doesn't have parent process id's or process groups, so leave
-	 * that blank for now.
-	 */
-
-	GetModuleFileName(NULL, header->progname, sizeof(header->progname));
-#else /* _WIN32 */
+#ifndef _WIN32
 	header->pids[1] = getppid();
 	header->pids[2] = getpgrp();
+#endif /* ! _WIN32 */
 
-	/* getprogname() should never fail. */
-	strlcpy(header->progname, getprogname(), sizeof(header->progname));
-#endif /* _WIN32 */
+	get_prog_name(header->progname, sizeof(header->progname));
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
 		strncpy(header->cwd, "", 3);
