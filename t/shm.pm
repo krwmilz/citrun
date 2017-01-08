@@ -1,6 +1,9 @@
 package t::shm;
+use strict;
+use warnings;
 use Inline 'C';
 use POSIX;
+use autodie;
 
 sub new {
 	my ($class, $procfile) = @_;
@@ -8,13 +11,11 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
-	my $fh;
 	if ($^O eq "MSWin32") {
-		open($fh, "<", $procfile) or die $!;
+		open($self->{fh}, "<", $procfile);
 	} else {
-		open($fh, "<:mmap", $procfile) or die $!;
+		open($self->{fh}, "<:mmap", $procfile);
 	}
-	$self->{fh} = $fh;
 
 	my $header_size = citrun_header_size();
 	my $aligned_size = get_aligned_size($header_size);
@@ -27,14 +28,14 @@ sub new {
 		$self->{done},
 		$self->{progname},
 		$self->{cwd}
-	) = unpack("Z4I8Z1024Z1024", xread($fh, $aligned_size));
+	) = unpack("Z4I8Z1024Z1024", $self->xread($aligned_size));
 
 	my $node_fixed_size = citrun_node_size();
 	my %trans_units;
 
-	while (not eof $fh) {
-		my @struct_fields = unpack("IZ1024Z1024", xread($fh, $node_fixed_size));
-		my $buf_pos = tell $fh;
+	while (not eof $self->{fh}) {
+		my @struct_fields = unpack("IZ1024Z1024", $self->xread($node_fixed_size));
+		my $buf_pos = tell $self->{fh};
 		my $buf_size = $struct_fields[0];
 
 		my %tu;
@@ -74,7 +75,7 @@ sub get_buffers {
 	my $tu = $self->{trans_units}->{$tu_key};
 	seek $self->{fh}, $tu->{exec_buf_pos}, 0;
 
-	my @execs = unpack("Q$tu->{size}", xread($self->{fh}, $tu->{size} * 8));
+	my @execs = unpack("Q$tu->{size}", $self->xread($tu->{size} * 8));
 	return \@execs;
 }
 
@@ -82,12 +83,12 @@ sub get_buffers {
 # Read an exact amount of bytes.
 #
 sub xread {
-	my ($fh, $bytes_total) = @_;
+	my ($self, $bytes_total) = @_;
 
 	my $data;
 	my $bytes_read = 0;
 	while ($bytes_total > 0) {
-		my $read = read($fh, $data, $bytes_total, $bytes_read);
+		my $read = read($self->{fh}, $data, $bytes_total, $bytes_read);
 
 		die "read failed: $!" if (!defined $read);
 		die "end of file\n" if ($read == 0);
