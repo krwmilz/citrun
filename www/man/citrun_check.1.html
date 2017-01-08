@@ -39,60 +39,39 @@ CITRUN_CHECK(1)</td>
 <td>
 <b class="name">citrun_check</b></td>
 <td>
-[<span class="opt"><b class="flag">-o</b> <i class="arg">output</i></span>] [<span class="opt"><i class="arg">dir</i></span>]</td>
+[<span class="opt"><i class="arg">dir</i></span>]</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section">
-<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun_check</b> utility recursively checks either <i class="arg">dir</i>, if given, or the current working directory for activity logs created by <a class="link-man" href="citrun_wrap.1.html">citrun_wrap(1)</a>.<div class="spacer">
+<h1 id="DESCRIPTION">DESCRIPTION</h1> The <b class="name">citrun_check</b> utility recursively searches for activity logs created by <a class="link-man" href="citrun_wrap.1.html">citrun_wrap(1)</a>.<div class="spacer">
 </div>
-If the <b class="flag">-o</b> option is specified then <b class="name">citrun_check</b> will write to <i class="arg">output</i> instead of standard output.<div class="spacer">
+When <i class="arg">dir</i> is given it is searched instead of the current working directory.<div class="spacer">
 </div>
-The text below shows the output of <b class="name">citrun_check</b> after <a class="link-man" href="citrun_wrap.1.html">citrun_wrap(1)</a> had been used to instrument a simple project:<div class="spacer">
-</div>
-<pre style="margin-left: 5.00ex;" class="lit display">
-Summary: 
-         1 Source files used as input 
-         1 Application link commands 
-         1 Rewrite successes 
-         1 Rewritten source compile successes 
- 
-Totals: 
-         6 Lines of source code 
-        53 Milliseconds spent rewriting source 
-         1 Function definitions 
-         1 Return statement values 
-         3 Total statements</pre>
-<div class="spacer">
-</div>
-The first section shows how thoroughly the project was instrumented, while the second section contains rewriting totals.</div>
-<div class="section">
-<h1 id="SUMMARY_COUNTS">SUMMARY COUNTS</h1> The most important summary events are failures. Source rewriting can fail for a few reasons and is not always a bad thing.<div class="spacer">
-</div>
-The following table lists all possible events and describes them:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
+The first section output by <b class="name">citrun_check</b> is a summary of all rewrite activity. It can contain any of the following events:<dl style="margin-top: 0.00em;margin-bottom: 0.00em;" class="list list-tag">
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Source files used as input&#8221;</dt>
+Source files used as input</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 The total number of C/C++ source files that had rewriting attempted on them.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Application link commands&#8221;</dt>
+Application link commands</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 Number of link commands detected and modified to include the runtime.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewrite successes&#8221;</dt>
+Rewrite successes</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 The number of times the rewriter successfully transformed the entire source file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewrite failures&#8221;</dt>
+Rewrite failures</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 Rewriting a source file failed. There are two failure cases, either native parsing the original source file also fails, or, only citrun_inst failed parsing the source file.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewritten source compile successes&#8221;</dt>
+Rewritten source compile successes</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 The number of times the rewritten source file is processed successfully by the native compiler.</dd>
 <dt class="list-tag" style="margin-top: 1.00em;">
-&#8220;Rewritten source compile failures&#8221;</dt>
+Rewritten source compile failures</dt>
 <dd class="list-tag" style="margin-left: 6.00ex;">
 Compiling the rewritten source file failed. There are two failure cases, either compiling the original source file also fails or only compiling the rewritten source fails.</dd>
 </dl>
