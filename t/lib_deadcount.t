@@ -24,13 +24,13 @@ my ($tu1, $tu2, $tu3) = sort keys %tus;
 my @fib_good = qw(
 177
 177
+177
 354
 34
 286
 55
 0
 528
-0
 0
 0
 );
@@ -41,6 +41,7 @@ my @main_good = qw(
 0
 0
 0
+0
 1
 1
 1
@@ -55,18 +56,17 @@ my @main_good = qw(
 0
 2
 1
-0
 0
 0
 );
 
 my @print_good = qw(
 0
-1
-1
-1
-1
 0
+1
+1
+1
+1
 0
 0
 0
