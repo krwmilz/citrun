@@ -17,20 +17,6 @@
 #
 set -eu
 
-args=`getopt o: $*`
-
-set -- $args
-while [ $# -ne 0 ]; do
-	case "$1"
-	in
-		-o)
-			# Redirect stdout to argument of -o.
-			exec 1<&-; exec 1<>"$2"; shift; shift;;
-		--)
-			shift; break;;
-	esac
-done
-
 # If positional arguments are zero length (== no directories given).
 if [ -z $@ ]; then
 	# Then set $1 (and $@) to current directory.

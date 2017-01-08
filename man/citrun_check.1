@@ -21,70 +21,39 @@
 .Nd check for rewrite activity
 .Sh SYNOPSIS
 .Nm
-.Op Fl o Ar output
 .Op Ar dir
 .Sh DESCRIPTION
 The
 .Nm
-utility recursively checks either
-.Ar dir ,
-if given, or the current working directory for
-activity logs created by
+utility recursively searches for activity logs created by
 .Xr citrun_wrap 1 .
 .Pp
-If the
-.Fl o
-option is specified then
+When
+.Ar dir
+is given it is searched instead of the current working
+directory.
+.Pp
+The first section output by
 .Nm
-will write to
-.Ar output
-instead of standard output.
-.Pp
-The text below shows the output of
-.Nm
-after
-.Xr citrun_wrap 1
-had been used to instrument a simple project:
-.Bd -literal -offset indent
-Summary:
-         1 Source files used as input
-         1 Application link commands
-         1 Rewrite successes
-         1 Rewritten source compile successes
-
-Totals:
-         6 Lines of source code
-        53 Milliseconds spent rewriting source
-         1 Function definitions
-         1 Return statement values
-         3 Total statements
-.Ed
-.Pp
-The first section shows how thoroughly the project was instrumented, while
-the second section contains rewriting totals.
-.Sh SUMMARY COUNTS
-.Pp
-The most important summary events are failures. Source rewriting can fail for a
-few reasons and is not always a bad thing.
-.Pp
-The following table lists all possible events and describes them:
+is a summary of all rewrite activity. It can contain any of the following
+events:
 .Pp
 .Bl -tag -width Ds
-.It Qq Source files used as input
+.It Source files used as input
 The total number of C/C++ source files that had rewriting attempted on them.
-.It Qq Application link commands
+.It Application link commands
 Number of link commands detected and modified to include the runtime.
-.It Qq Rewrite successes
+.It Rewrite successes
 The number of times the rewriter successfully transformed the entire source
 file.
-.It Qq Rewrite failures
+.It Rewrite failures
 Rewriting a source file failed. There are two failure cases, either native
 parsing the original source file also fails, or, only citrun_inst failed parsing
 the source file.
-.It Qq Rewritten source compile successes
+.It Rewritten source compile successes
 The number of times the rewritten source file is processed successfully by the
 native compiler.
-.It Qq Rewritten source compile failures
+.It Rewritten source compile failures
 Compiling the rewritten source file failed. There are two failure cases, either
 compiling the original source file also fails or only compiling the
 rewritten source fails.
