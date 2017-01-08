@@ -10,12 +10,7 @@ plan tests => 3;
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
 $wrap->write( 'main.c', 'int main(void) { return 0; }' );
-
-if ($^O eq "MSWin32") {
-	$wrap->run( args => 'cl /nologo main.c', chdir => $wrap->curdir );
-} else {
-	$wrap->run( args => 'cc main.c', chdir => $wrap->curdir );
-}
+$wrap->run( args => os_compiler() . 'main main.c', chdir => $wrap->curdir );
 
 my $log_good = <<EOF;
 >> citrun_inst

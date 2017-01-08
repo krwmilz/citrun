@@ -7,6 +7,12 @@ use Test::More;
 use autodie;
 unified_diff;		# For Test::Differences diffs
 
+sub os_compiler {
+	if ($^O eq 'MSWin32') {
+		return 'cl /nologo /Fe';
+	}
+	return 'cc -o ';
+}
 
 sub clean_citrun_log {
 	my ($log) = @_;

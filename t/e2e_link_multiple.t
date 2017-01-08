@@ -33,11 +33,7 @@ void third_func(void) {
 }
 EOF
 
-if ($^O eq "MSWin32") {
-	$wrap->run( args => 'cl /nologo one.c two.c three.c', chdir => $wrap->curdir );
-} else {
-	$wrap->run( args => 'cc -o main one.c two.c three.c', chdir => $wrap->curdir );
-}
+$wrap->run( args => os_compiler() . 'main one.c two.c three.c', chdir => $wrap->curdir );
 
 my $log_good = <<EOF;
 >> citrun_inst

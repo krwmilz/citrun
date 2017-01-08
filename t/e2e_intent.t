@@ -35,11 +35,7 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-if ($^O eq "MSWin32") {
-	$e2e->run( args => 'cl /nologo fib.c', chdir => $e2e->curdir );
-} else {
-	$e2e->run( args => 'cc -o fib fib.c', chdir => $e2e->curdir );
-}
+$e2e->run( args => os_compiler() . 'fib fib.c', chdir => $e2e->curdir );
 
 my $log;
 $e2e->read( \$log, 'citrun.log' );
