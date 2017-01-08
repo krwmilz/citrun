@@ -1,3 +1,0 @@
-# Test suite is part Shell and part Perl.
---ext '.t'
---ext '.sh'
