@@ -23,7 +23,11 @@ main(int argc, char *argv[])
 }
 EOF
 
-$compiler->run( args => 'cl /nologo main.c', chdir => $compiler->curdir );
+if ($^O eq "MSWin32") {
+	$compiler->run( args => 'cl /nologo main.c', chdir => $compiler->curdir );
+} else {
+	$compiler->run( args => 'cc -o main main.c', chdir => $compiler->curdir );
+}
 # is( $compiler->stdout,	'',	'is compiler stdout silent' );
 is( $compiler->stderr,	'',	'is compiler stderr silent' );
 is( $? >> 8,	0,	'is compiler exit code 0' );
