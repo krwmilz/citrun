@@ -3,6 +3,7 @@
 #
 use strict;
 use warnings;
+use t::shm;
 use t::utils;
 plan tests => 14;
 

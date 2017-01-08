@@ -4,6 +4,7 @@
 use strict;
 use warnings;
 use POSIX;
+use t::shm;
 use t::utils;
 plan tests => 4;
 
