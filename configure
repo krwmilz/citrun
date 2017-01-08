@@ -85,10 +85,3 @@ INST_LIBS = ${INST_EXTRALIB-}
 
 include Jamrules.tail ;
 EOF
-
-#
-# Show summary.
-#
-echo === Configuration Summary ===================================================
-head -n 10 Jamrules
-echo =============================================================================
