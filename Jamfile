@@ -23,13 +23,7 @@ else {
 }
 
 #
-# citrun_term
-#
-#LINKLIBS on citrun_term += -lcurses ;
-#Main citrun_term : term_main.cc ;
-
-#
-# citrun_gl & citrun_gltest
+# citrun_gl,  citrun_gltest
 #
 GL_SRCS =
 	gl_procfile.cc
