@@ -29,6 +29,7 @@
 #include <errno.h>		/* EEXIST */
 #include <fcntl.h>		/* O_CREAT */
 #include <limits.h>		/* PATH_MAX */
+#include <stdio.h>
 #include <stdlib.h>		/* atexit, get{env,progname} */
 #include <string.h>		/* str{l,n}cpy */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
