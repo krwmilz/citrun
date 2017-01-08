@@ -14,9 +14,9 @@ rule Stringize
 if $(NT) {
 	actions Stringize
 	{
-		> $(<) echo "static const char *$(1:B) = R\"("
-		>> $(<) cat $(>)
-		>> $(<) echo ")\";"
+		> $(<) echo static const char *$(1:B) = R"(
+		>> $(<) type $(>)
+		>> $(<) echo )";
 	}
 } else {
 	actions Stringize
