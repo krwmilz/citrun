@@ -1,5 +1,7 @@
 SubDir TOP ;
 
+include Jamrules.extra ;
+
 #
 # Different build modifiers. Put them here because it only makes sense to run
 # them from the root directory.
