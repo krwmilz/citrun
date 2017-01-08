@@ -143,6 +143,6 @@ InstallLib	$(PREFIX)/share/citrun	: libcitrun.a ;
 InstallShell	$(PREFIX)/bin		: citrun_check ;
 InstallBin	$(PREFIX)/bin		: citrun_wrap citrun_gl citrun_inst ;
 InstallSyms	$(PREFIX)/share/citrun	: cc gcc clang clang++ g++ c++ egcc eg++ ;
+InstallMan	$(PREFIX)/man		: citrun_gl.1 citrun_inst.1 citrun_wrap.1 citrun_check.1 ;
 
 SubInclude TOP glyphy ;
-SubInclude TOP man ;
