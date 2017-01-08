@@ -80,7 +80,7 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 #ifdef _WIN32
 	m_lib_path.append("libcitrun.lib");
 #else
-	m_lib_path_append("libcitrun.a");
+	m_lib_path.append("libcitrun.a");
 #endif // _WIN32
 
 	m_log << "CITRUN_COMPILERS = '" << m_compilers_path << "'" << std::endl;
