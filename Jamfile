@@ -38,20 +38,7 @@ if ! $(NT) {
 Library libcitrun : lib.c ;
 
 #
-# citrun_check
-#
-if ! $(NT) {
-	Shell citrun_check : check.sh ;
-}
-
-actions ReplaceToken
-{
-	perl -p -i.bak -e "s,_CITRUN_COMPILERS_,$(CITRUN_COMPILERS)," $(<)
-	$(RM) $(<).bak
-}
-
-#
-# citrun_wrap
+# citrun_wrap, citrun_check
 #
 if $(NT) {
 	File citrun_wrap.bat : wrap.bat ;
@@ -59,7 +46,7 @@ if $(NT) {
 }
 else {
 	Shell citrun_wrap : wrap.sh ;
-	ReplaceToken citrun_wrap ;
+	Shell citrun_check : check.sh ;
 }
 
 #
