@@ -3,36 +3,33 @@
 #
 use strict;
 use warnings;
-use Test::More tests => 26;
 use Time::HiRes qw( time usleep );
+use t::shm;
 use t::utils;
+plan tests => 23;
 
-my $tmp_dir = t::tmpdir->new();
+
+my $dir = setup_projdir();
 
 my $child_pid = fork();
 if ($child_pid == 0) {
 	# Child.
-	exec ("$tmp_dir/program", "45") or die $!;
+	exec ($dir->workdir . "/program", "45") or die $!;
 }
 
-# Give the forked child time to set up, but no longer than 1.0 seconds.
-my $start = time;
-my @procfiles;
-do {
-	@procfiles = glob("$ENV{CITRUN_PROCDIR}/program_*");
-} while (scalar @procfiles == 0 && (time - $start) < 1.0);
+usleep 500 * 1000;
+my $shm_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
+my $shm = t::shm->new( $shm_path );
 
-is scalar @procfiles,	1,	"is one file in procdir";
-
-my $shm = t::shm->new($procfiles[0]);
+my %trans_units = %{ $shm->{trans_units} };
 
 my $last_total = 0;
-for (0..24) {
-	usleep 100 * 1000;
+for (0..20) {
+	usleep 1 * 1000;
 	my $total = 0;
 
-	for (0..2) {
-		my $execs = $shm->execs_for($_);
+	for (keys %trans_units) {
+		my $execs = $shm->get_buffers($_);
 		$total += $_ for (@$execs);
 	}
 

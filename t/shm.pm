@@ -3,7 +3,9 @@ use strict;
 use warnings;
 use Inline 'C';
 use POSIX;
+use Sys::Mmap;
 use autodie;
+
 
 sub new {
 	my ($class, $procfile) = @_;
@@ -11,14 +13,18 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
-	if ($^O eq "MSWin32") {
-		open($self->{fh}, "<", $procfile);
-	} else {
-		open($self->{fh}, "<:mmap", $procfile);
+	$self->{mem} = '';
+	open(FH, "<", $procfile);
+	if ($^O ne "MSWin32") {
+		mmap($self->{mem}, 0, PROT_READ, MAP_SHARED, FH) or die "mmap: $!";
 	}
+	close FH;
 
+	$self->{size} = length $self->{mem};
+
+	# These functions proved by C code at the end of this file.
 	my $header_size = citrun_header_size();
-	my $aligned_size = get_aligned_size($header_size);
+	my $node_fixed_size = citrun_node_size();
 
 	(	$self->{magic},
 		$self->{major}, $self->{minor},
@@ -28,28 +34,27 @@ sub new {
 		$self->{done},
 		$self->{progname},
 		$self->{cwd}
-	) = unpack("Z4I8Z1024Z1024", $self->xread($aligned_size));
+	) = unpack("Z4I8Z1024Z1024", $self->{mem});
 
-	my $node_fixed_size = citrun_node_size();
 	my %trans_units;
+	my $node_start = get_aligned_size($header_size);
 
-	while (not eof $self->{fh}) {
-		my @struct_fields = unpack("IZ1024Z1024", $self->xread($node_fixed_size));
-		my $buf_pos = tell $self->{fh};
+	while ($node_start < $self->{size}) {
+		# Struct field ordering controlled by lib.h.
+		my $data = substr($self->{mem}, $node_start, $node_fixed_size);
+		my @struct_fields = unpack("IZ1024Z1024", $data);
+
+		# Store a hash of information we just found.
 		my $buf_size = $struct_fields[0];
-
-		my %tu;
 		$trans_units{ $struct_fields[2] } = {
 			size => $buf_size,
 			comp_file_name => $struct_fields[1],
-			exec_buf_pos => $buf_pos
+			exec_buf_pos => $node_start + $node_fixed_size
 		};
 
-		my $node_end = $buf_pos + ($buf_size * 8);
-		my $node_end_aligned = get_aligned_size($node_end);
-
-		seek $self->{fh}, $node_end_aligned, 0;
-		$self->{size} = $node_end_aligned;
+		# Calculate where the end of this node is.
+		my $node_end = $node_start + $node_fixed_size + ($buf_size * 8);
+		$node_start = get_aligned_size($node_end);
 	}
 	$self->{trans_units} = \%trans_units;
 
@@ -73,31 +78,10 @@ sub get_buffers {
 	my ($self, $tu_key) = @_;
 
 	my $tu = $self->{trans_units}->{$tu_key};
-	seek $self->{fh}, $tu->{exec_buf_pos}, 0;
+	my $data = substr($self->{mem}, $tu->{exec_buf_pos}, $tu->{size} * 8);
+	my @execs = unpack("Q$tu->{size}", $data);
 
-	my @execs = unpack("Q$tu->{size}", $self->xread($tu->{size} * 8));
 	return \@execs;
-}
-
-#
-# Read an exact amount of bytes.
-#
-sub xread {
-	my ($self, $bytes_total) = @_;
-
-	my $data;
-	my $bytes_read = 0;
-	while ($bytes_total > 0) {
-		my $read = read($self->{fh}, $data, $bytes_total, $bytes_read);
-
-		die "read failed: $!" if (!defined $read);
-		die "end of file\n" if ($read == 0);
-
-		$bytes_total -= $read;
-		$bytes_read += $read;
-	}
-
-	return $data;
 }
 
 1;
