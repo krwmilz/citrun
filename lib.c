@@ -102,7 +102,7 @@ align_bytes(size_t unaligned_bytes)
 	page_mask = system_info.dwAllocationGranularity - 1;
 #else
 	page_mask = getpagesize() - 1;
-#endif // _WIN32
+#endif /* _WIN32 */
 	return (unaligned_bytes + page_mask) & ~page_mask;
 }
 
