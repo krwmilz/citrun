@@ -2,35 +2,29 @@
 #
 # Checks that a bunch of crap is installed, creates Jamrules file.
 #
-uname=`uname`
-echo Configuring C It Run 0.0 for $uname
+echo ░█▀▀░░░▀█▀░▀█▀░░░█▀▄░█░█░█▀█
+echo ░█░░░░░░█░░░█░░░░█▀▄░█░█░█░█
+echo ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░▀░▀
+echo Configuring...
 echo
 
-#
 # These binaries are assumed throughout so make sure they are available.
-#
 type pkg-config
 type llvm-config
 type jam
 echo
 
-#
 # C++11 required.
-#
 ${CXX-c++} -x c++ -std=c++11 -E - < /dev/null > /dev/null
 
-#
 # citrun_gltest needs osmesa and both it and citrun_gl need the rest.
-#
 gl_pkgs="osmesa glfw3 glew freetype2"
 for pkg in $gl_pkgs; do
 	printf "%10s = " $pkg
 	pkg-config --modversion $pkg || (echo "not found" && exit 1)
 done
 
-#
 # citrun_inst needs clang and llvm libraries.
-#
 CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
 	-lclangEdit -lclangFrontend -lclangFrontendTool -lclangLex \
 	-lclangParse -lclangRewrite -lclangRewriteFrontend -lclangSema \
@@ -38,9 +32,8 @@ CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
 
 LLVM_LIBS="bitreader mcparser transformutils option"
 
-#
 # Operating system specific variables.
-#
+uname=`uname`
 if [ $uname = OpenBSD ]; then
 	LDGROUP_START="-Wl,--start-group"
 	LDGROUP_END="-Wl,--end-group"
@@ -59,9 +52,7 @@ else
 fi
 echo
 
-#
 # Write top of Jamrules. Any errors inside backticks get ignored.
-#
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
 C++ = ${CXX-c++} ;

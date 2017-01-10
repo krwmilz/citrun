@@ -1,7 +1,3 @@
-echo ░█▀▀░░░▀█▀░▀█▀░░░█▀▄░█░█░█▀█ ;
-echo ░█░░░░░░█░░░█░░░░█▀▄░█░█░█░█ ;
-echo ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░▀░▀ ;
-
 # Quote an entire file and add a variable declaration prefixing the string.
 rule Stringize
 {
