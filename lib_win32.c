@@ -77,6 +77,7 @@ extend(size_t req_bytes)
 {
 	size_t	 aligned_bytes;
 	size_t	 len;
+	HANDLE	 fm;
 	void	*mem;
 	size_t	 page_mask;
 
@@ -84,9 +85,8 @@ extend(size_t req_bytes)
 	GetSystemInfo(&system_info);
 
 	page_mask = system_info.dwAllocationGranularity - 1;
-	aligned_bytes (req_bytes + page_mask) & ~page_mask;
+	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
 
-	HANDLE	 fm;
 
 	/* Get current file length. */
 	if ((len = GetFileSize(h, NULL)) == INVALID_FILE_SIZE)
