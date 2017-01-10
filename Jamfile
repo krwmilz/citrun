@@ -5,10 +5,12 @@ include Jamrules.extra ;
 #
 # libcitrun
 #
-if ! $(NT) {
-	ObjectCcFlags lib.c : -fPIC -ansi ;
+if $(NT) {
+	Library libcitrun : lib.c lib_win32.c ;
+} else {
+	ObjectCcFlags lib.c lib_unix.c : -fPIC -ansi ;
+	Library libcitrun : lib.c lib_unix.c ;
 }
-Library libcitrun : lib.c ;
 
 #
 # citrun_wrap, citrun_check
