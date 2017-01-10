@@ -14,10 +14,12 @@ sub get_mem {
 
 	open( FH, "<", $procfile );
 
+	$self->{mem} = '';
 	mmap( $self->{mem}, 0, PROT_READ, MAP_SHARED, FH ) or die "mmap: $!";
 	$self->{size} = length $self->{mem};
 
 	close FH;
+
 }
 
 1;
