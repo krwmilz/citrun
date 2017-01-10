@@ -1,11 +1,14 @@
 use strict;
 use warnings;
+
 use if $^O eq "MSWin32", 'File::DosGlob' => 'glob';
 use Test::Cmd;
 use Test::Differences;
 use Test::More;
+
 use autodie;
 unified_diff;		# For Test::Differences diffs
+
 
 sub os_compiler {
 	if ($^O eq 'MSWin32') {
