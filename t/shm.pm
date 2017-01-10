@@ -1,11 +1,13 @@
 package t::shm;
+
 use strict;
 use warnings;
+
 use Inline 'C';
 use POSIX;
-use Sys::Mmap;
+use if $^O eq 'MSWin32', 't::mem_win32';
+use if $^O ne 'MSWin32', 't::mem_unix';
 use autodie;
-
 
 sub new {
 	my ($class, $procfile) = @_;
@@ -13,14 +15,7 @@ sub new {
 	my $self = {};
 	bless($self, $class);
 
-	$self->{mem} = '';
-	open(FH, "<", $procfile);
-	if ($^O ne "MSWin32") {
-		mmap($self->{mem}, 0, PROT_READ, MAP_SHARED, FH) or die "mmap: $!";
-	}
-	close FH;
-
-	$self->{size} = length $self->{mem};
+	get_mem( $self, $procfile );
 
 	# These functions proved by C code at the end of this file.
 	my $header_size = citrun_header_size();
@@ -64,14 +59,7 @@ sub new {
 sub get_aligned_size {
 	my ($unaligned_size) = @_;
 
-	my $page_mask;
-	if ($^O eq "MSWin32") {
-		$page_mask = 64 * 1024 - 1;
-	} else {
-		$page_mask = POSIX::sysconf(POSIX::_SC_PAGESIZE) - 1;
-	}
-
-	return ($unaligned_size + $page_mask) & ~$page_mask;
+	return ($unaligned_size + $t::shm::page_mask) & ~$t::shm::page_mask;
 }
 
 sub get_buffers {
