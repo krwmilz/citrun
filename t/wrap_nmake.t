@@ -21,8 +21,8 @@ is( $? >> 8,	0,	'is citrun_wrap nmake exit code 0' );
 
 my $log_good = <<EOF ;
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
@@ -37,8 +37,8 @@ Forked compiler ''
 Rewritten source compile successful
 Restored ''
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Found source file ''
 Link detected, adding '' to command line.
 Modified command line is ''

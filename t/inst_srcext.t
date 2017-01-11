@@ -13,7 +13,7 @@ my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
 
 my $out_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
+Compilers path = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
@@ -38,7 +38,7 @@ for (@supported_exts) {
 
 $out_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
+Compilers path = ''
 Modified command line is ''
 No source files found on command line.
 Running as citrun_inst, not calling exec()

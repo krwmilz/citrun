@@ -14,7 +14,7 @@ $inst->write( 'prepro.c', $preproc );
 # Test -E
 my $check_good = <<EOF ;
 >> citrun_inst
-CITRUN_COMPILERS = ''
+Compilers path = ''
 Preprocessor argument -E found
 Running as citrun_inst, not calling exec()
 EOF
@@ -36,7 +36,7 @@ is( $? >> 8,		0,	'is citrun_inst exit code 0' );
 # Test -MM
 $check_good = <<EOF ;
 >> citrun_inst
-CITRUN_COMPILERS = ''
+Compilers path = ''
 Preprocessor argument -MM found
 Running as citrun_inst, not calling exec()
 EOF

@@ -12,7 +12,7 @@ $inst->run( args => '-c doesnt_exist.c', workdir => $inst->curdir );
 
 my $out_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
+Compilers path = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''

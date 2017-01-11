@@ -51,14 +51,14 @@ print $wrap->stdout;
 # XXX: devenv uses response files so we don't detect any source files.
 my $log_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Modified command line is ''
 No source files found on command line.
 Forked compiler ''
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Modified command line is ''
 No source files found on command line.
 Forked compiler ''

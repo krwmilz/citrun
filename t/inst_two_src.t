@@ -21,8 +21,8 @@ $wrap->run( args => os_compiler() . 'main main.c other.c', chdir => $wrap->curdi
 
 my $log_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Found source file ''
 Found source file ''
 Link detected, adding '' to command line.

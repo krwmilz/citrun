@@ -31,7 +31,7 @@ EOF
 
 my $check_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
+Compilers path = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''

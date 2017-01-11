@@ -34,8 +34,8 @@ is( $? >> 8,		0,	'is citrun_wrap ninja exit code 0' );
 my $citrun_log;
 my $log_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
@@ -50,8 +50,8 @@ Forked compiler ''
 Rewritten source compile successful
 Restored ''
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Link detected, adding '' to command line.
 Modified command line is ''
 No source files found on command line.

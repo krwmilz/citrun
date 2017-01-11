@@ -37,8 +37,8 @@ $wrap->run( args => os_compiler() . 'main one.c two.c three.c', chdir => $wrap->
 
 my $log_good = <<EOF;
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Found source file ''
 Found source file ''
 Found source file ''
