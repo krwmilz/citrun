@@ -83,7 +83,7 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 	m_lib_path.append("libcitrun.a");
 #endif // _WIN32
 
-	m_log << "CITRUN_COMPILERS = '" << m_compilers_path << "'" << std::endl;
+	m_log << "Compilers path = '" << m_compilers_path << "'" << std::endl;
 
 #ifndef _WIN32
 	// Sometimes we're not called as citrun_inst so force that here.
@@ -126,7 +126,7 @@ InstFrontend::clean_PATH()
 		exit(1);
 	}
 
-	m_log << "PATH='" << path << "'" << std::endl;
+	m_log << "PATH = '" << path << "'" << std::endl;
 
 	// Filter m_compilers_path out of PATH
 	std::stringstream path_ss(path);

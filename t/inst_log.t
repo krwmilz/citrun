@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use t::utils;
-plan tests => 3;
+plan tests => 4;
 
 
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
@@ -39,8 +39,8 @@ $wrap->run( args => 'jam', chdir => $wrap->curdir );
 
 my $citrun_log_good =<<EOF ;
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
@@ -58,22 +58,30 @@ Forked compiler ''
 Rewritten source compile successful
 Restored ''
 >> citrun_inst
-CITRUN_COMPILERS = ''
-PATH=''
+Compilers path = ''
+PATH = ''
 Link detected, adding '' to command line.
 Modified command line is ''
 No source files found on command line.
 EOF
 
-if ($^O eq "MSWin32") {
+my $citrun_log;
+$wrap->read(\$citrun_log, 'citrun.log');
+
+# Check line endings.
+if ($^O eq 'MSWin32') {
 	# Windows gets an extra message because exec() is emulated by fork().
 	$citrun_log_good .= <<EOF ;
 Forked compiler ''
 EOF
+	my $rn_count = () = $citrun_log_good =~ /\r\n/g;
+	is( $rn_count,	25,	'is \r\n count correct' );
+}
+else {
+	my $n_count = () = $citrun_log_good =~ /\n/g;
+	is( $n_count,	25,	'is \n count correct' );
 }
 
-my $citrun_log;
-$wrap->read(\$citrun_log, 'citrun.log');
 $citrun_log = clean_citrun_log($citrun_log);
 
 eq_or_diff( $citrun_log, $citrun_log_good, 'is citrun.log file identical', { context => 3 } );
