@@ -26,9 +26,9 @@ if $(NT) {
 #
 # Different build modifiers for static analysis and test coverage.
 #
-actions StaticAnalysis
+actions Analysis
 {
-	scan-build ./configure
+	scan-build --use-c++=eg++ ./configure
 	scan-build -o html --use-c++=eg++ jam -j4
 }
 
@@ -51,5 +51,5 @@ actions TestCoverage
 	mv *.gcov gcov/
 }
 
-StaticAnalysis static-analysis ;
+Analysis analysis ;
 TestCoverage test-coverage ;
