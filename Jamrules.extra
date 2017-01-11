@@ -44,8 +44,11 @@ actions TestCoverage
 	prove
 	# prove tt
 
-	gcov -o src src/lib.c
-	egcov -r src/*.cc
+	gcov -o . lib*.c
+	egcov -r *.cc
+
+	mkdir gcov
+	mv *.gcov gcov/
 }
 
 StaticAnalysis static-analysis ;
