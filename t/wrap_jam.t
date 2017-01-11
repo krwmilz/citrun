@@ -48,8 +48,15 @@ PATH=''
 Link detected, adding '' to command line.
 Modified command line is ''
 No source files found on command line.
+EOF
+
+if ($^O eq 'MSWin32') {
+	# Windows gets an extra message because exec() is emulated by fork().
+	$log_good .= <<EOF ;
 Forked compiler ''
 EOF
+}
+
 
 $wrap->read( \$citrun_log, 'citrun.log' );
 $citrun_log = clean_citrun_log( $citrun_log );
