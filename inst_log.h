@@ -30,7 +30,8 @@ class InstrumentLogger : public std::ostream
 			}
 
 			std::error_code m_ec;
-			m_out = new llvm::raw_fd_ostream("citrun.log", m_ec, llvm::sys::fs::F_Append);
+			m_out = new llvm::raw_fd_ostream("citrun.log", m_ec,
+				llvm::sys::fs::F_Append | llvm::sys::fs::F_Text);
 			if (m_ec.value()) {
 				m_out = &llvm::errs();
 				*m_out << "Can't open citrun.log: " << m_ec.message();
