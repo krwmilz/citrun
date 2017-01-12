@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Time::HiRes qw( time usleep );
-use t::shm;
+use t::mem;
 use t::utils;
 plan tests => 23;
 
@@ -20,7 +20,7 @@ if ($child_pid == 0) {
 
 usleep 500 * 1000;
 my $shm_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
-my $shm = t::shm->new( $shm_path );
+my $shm = t::mem->new( $shm_path );
 
 my %trans_units = %{ $shm->{trans_units} };
 

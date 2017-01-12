@@ -1,4 +1,4 @@
-package t::shm;
+package t::mem;
 
 use strict;
 use warnings;
@@ -59,7 +59,7 @@ sub new {
 sub get_aligned_size {
 	my ($unaligned_size) = @_;
 
-	my $page_mask = $t::shm::os_allocsize - 1;
+	my $page_mask = $t::mem::os_allocsize - 1;
 	return ($unaligned_size + $page_mask) & ~$page_mask;
 }
 

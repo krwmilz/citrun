@@ -1,4 +1,4 @@
-package t::shm;
+package t::mem;
 
 use strict;
 use warnings;

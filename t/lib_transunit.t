@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use t::shm;
+use t::mem;
 use t::utils;
 plan tests => 14;
 
@@ -17,7 +17,7 @@ is( $dir->stderr,	'',	'is instrumented program stderr silent' );
 is( $? >> 8,	0,	"is instrumented program exit code 0" );
 
 my $shm_file_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
-my $shm = t::shm->new( $shm_file_path );
+my $shm = t::mem->new( $shm_file_path );
 
 my %tus = %{ $shm->{trans_units} };
 my ($tu1, $tu2, $tu3) = sort keys %tus;

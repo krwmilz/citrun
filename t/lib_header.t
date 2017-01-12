@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use t::shm;
+use t::mem;
 use t::utils;
 plan tests => 19;
 
@@ -17,7 +17,7 @@ is( $dir->stderr,	'',	'is instrumented program stderr empty' );
 is( $? >> 8,		0,	'is instrumented program exit code 0' );
 
 my $shm_file_path = get_one_shmfile( $ENV{CITRUN_PROCDIR} );
-my $shm = t::shm->new( $shm_file_path );
+my $shm = t::mem->new( $shm_file_path );
 
 is( $shm->{magic},	'ctrn',	'is file magic correct' );
 is( $shm->{major},	0,	'is major 0' );
