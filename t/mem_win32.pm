@@ -7,7 +7,7 @@ use POSIX;		# NULL
 use Win32::API;
 use autodie;
 
-our $page_mask = 64 * 1024 - 1;
+our $os_allocsize = 64 * 1024;
 
 use constant GENERIC_READ => 0x80000000;
 use constant OPEN_EXISTING => 3;

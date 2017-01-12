@@ -7,7 +7,7 @@ use POSIX;
 use Sys::Mmap;
 use autodie;
 
-our $page_mask = POSIX::sysconf(POSIX::_SC_PAGESIZE) - 1;
+our $os_allocsize = POSIX::sysconf(POSIX::_SC_PAGESIZE);
 
 sub get_mem {
 	my ($self, $procfile) = @_;

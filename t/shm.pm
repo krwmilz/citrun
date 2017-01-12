@@ -59,7 +59,8 @@ sub new {
 sub get_aligned_size {
 	my ($unaligned_size) = @_;
 
-	return ($unaligned_size + $t::shm::page_mask) & ~$t::shm::page_mask;
+	my $page_mask = $t::shm::os_allocsize - 1;
+	return ($unaligned_size + $page_mask) & ~$page_mask;
 }
 
 sub get_buffers {
