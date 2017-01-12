@@ -4,6 +4,7 @@
 #
 use strict;
 use warnings;
+
 use t::utils;		# os_compiler()
 plan tests => 4;
 
@@ -26,7 +27,7 @@ EOF
 $compiler->run( args => os_compiler() . 'main main.c', chdir => $compiler->curdir );
 # is( $compiler->stdout,	'',	'is compiler stdout silent' );
 is( $compiler->stderr,	'',	'is compiler stderr silent' );
-is( $? >> 8,	0,	'is compiler exit code 0' );
+is( $? >> 8,		0,	'is compiler exit code 0' );
 
 my $err_good = 'libcitrun 0.0: incompatible version 0.255.
 Try cleaning and rebuilding your project.
