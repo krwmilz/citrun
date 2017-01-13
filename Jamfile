@@ -64,6 +64,12 @@ INST_SRCS =
 	inst_action.cc
 	inst_visitor.cc ;
 
+if $(NT) {
+	INST_SRCS += inst_fewin32.cc ;
+} else {
+	INST_SRCS += inst_feunix.cc ;
+}
+
 Stringize lib_h.h : lib.h ;
 
 ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) ;

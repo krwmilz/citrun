@@ -14,104 +14,54 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include "inst_action.h"	// InstrumentActionFactory
-#include "inst_frontend.h"
+#include "inst_fe.h"
 #include "lib.h"		// citrun_major, citrun_minor
 #include "prefix.h"		// prefix
-
-#include <sys/stat.h>		// stat
 
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <cstdio>		// tmpnam
 #include <cstring>		// strcmp
-#include <fstream>		// ifstream, ofstream
 #include <iostream>		// cerr
 #include <llvm/Support/raw_os_ostream.h>
 #include <sstream>		// ostringstream
 
-#ifdef _WIN32
-#include <windows.h>		// CreateProcess
-#include <Shlwapi.h>		// PathFindOnPath
-
-#define PATH_SEP ';'
-#else // _WIN32
-#include <sys/time.h>		// utimes
-#include <sys/utsname.h>	// uname
-#include <sys/wait.h>		// waitpid
-
-#include <err.h>
-#include <unistd.h>		// execvp, fork, getpid, unlink
-
-#define PATH_SEP ':'
-#endif // _WIN32
-
-#define xstr(x) make_str(x)
-#define make_str(x) #x
-
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
 
-#ifdef _WIN32
-static void
-Err(int code, const char *fmt)
-{
-	char buf[256];
-
-	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf, 256, NULL);
-
-	std::cerr << fmt << ": " << buf << std::endl;
-	ExitProcess(code);
-}
-#endif // _WIN32
-
 InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
+	m_start_time(std::chrono::high_resolution_clock::now()),
 	m_args(argv, argv + argc),
-	m_log(is_citrun_inst),
 	m_is_citruninst(is_citrun_inst),
-	m_start_time(std::chrono::high_resolution_clock::now())
+	m_log(is_citrun_inst)
 {
-	log_identity();
-
-	m_compilers_path = prefix ;
-	m_lib_path = prefix ;
-
-#ifdef _WIN32
-	m_compilers_path.append("\\compilers");
-	m_lib_path.append("\\libcitrun.lib");
-#else
-	m_compilers_path.append("/compilers");
-	m_lib_path.append("/libcitrun.a");
-#endif // _WIN32
-
-	m_log << "Compilers path = '" << m_compilers_path << "'" << std::endl;
-
 #ifndef _WIN32
 	// Sometimes we're not called as citrun_inst so force that here.
 	setprogname("citrun_inst");
 #endif // _WIN32
-
-	if (m_is_citruninst == false)
-		clean_PATH();
 }
 
 void
 InstFrontend::log_identity()
 {
 	m_log << ">> citrun_inst v" << citrun_major << "." << citrun_minor;
-#ifdef _WIN32
-	m_log << " (Windows x86)";
-#else // _WIN32
-	struct utsname	 utsname;
-
-	if (uname(&utsname) == -1)
-		m_log << " (Unknown OS)";
-	else
-		m_log << " (" << utsname.sysname << "-" << utsname.release
-			<< " " << utsname.machine << ")";
-#endif // _WIN32
+	log_os_str();
 	m_log << " called as " << m_args[0] << std::endl;
+}
+
+void
+InstFrontend::get_paths()
+{
+	m_compilers_path = prefix ;
+	m_compilers_path += dir_sep();
+	m_compilers_path.append("compilers");
+
+	m_lib_path = prefix ;
+	m_lib_path += dir_sep();
+	m_lib_path += lib_name();
+
+	m_log << "Compilers path = '" << m_compilers_path << "'" << std::endl;
 }
 
 //
@@ -121,6 +71,9 @@ void
 InstFrontend::clean_PATH()
 {
 	char *path;
+
+	if (m_is_citruninst == true)
+		return;
 
 	if ((path = std::getenv("PATH")) == NULL) {
 		std::cerr << "Error: PATH is not set." << std::endl;
@@ -137,14 +90,14 @@ InstFrontend::clean_PATH()
 	bool first_component = 1;
 	bool found_citrun_path = 0;
 
-	while (std::getline(path_ss, component, PATH_SEP)) {
+	while (std::getline(path_ss, component, path_sep())) {
 		if (component == m_compilers_path) {
 			found_citrun_path = 1;
 			continue;
 		}
 
 		if (first_component == 0)
-			new_path << PATH_SEP;
+			new_path << path_sep();
 
 		// It wasn't m_compilers_path, keep it
 		new_path << component;
@@ -157,15 +110,8 @@ InstFrontend::clean_PATH()
 		exit(1);
 	}
 
-#ifdef _WIN32
-	if (SetEnvironmentVariableA("Path", new_path.str().c_str()) == 0)
-		Err(1, "SetEnvironmentVariableA");
-#else // _WIN32
-	if (setenv("PATH", new_path.str().c_str(), 1))
-		err(1, "setenv");
-#endif // _WIN32
+	set_path(new_path.str());
 }
-
 
 // Returns true if value ends with suffix, false otherwise.
 static bool
@@ -175,37 +121,6 @@ ends_with(std::string const &value, std::string const &suffix)
 		return false;
 
 	return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
-}
-
-// Copies one file to another preserving timestamps.
-static void
-copy_file(std::string const &dst_fn, std::string const &src_fn)
-{
-	struct stat sb;
-	struct timeval st_tim[2];
-
-	// Save original access and modification times
-	if (stat(src_fn.c_str(), &sb) < 0)
-		err(1, "stat");
-#ifdef __APPLE__
-	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atimespec);
-	TIMESPEC_TO_TIMEVAL(&st_tim[1], &sb.st_mtimespec);
-#else
-	TIMESPEC_TO_TIMEVAL(&st_tim[0], &sb.st_atim);
-	TIMESPEC_TO_TIMEVAL(&st_tim[1], &sb.st_mtim);
-#endif
-
-	std::ifstream src(src_fn, std::ios::binary);
-	std::ofstream dst(dst_fn, std::ios::binary);
-
-	dst << src.rdbuf();
-
-	src.close();
-	dst.close();
-
-	// Restore the original access and modification time
-	if (utimes(dst_fn.c_str(), st_tim) < 0)
-		err(1, "utimes");
 }
 
 //
@@ -235,46 +150,6 @@ InstFrontend::save_if_srcfile(char *arg)
 
 	copy_file(dst_fn, arg);
 	m_temp_file_map[arg] = dst_fn;
-}
-
-//
-// Careful guessing if we're linking. Use an absolute path to libcitrun to
-// avoid link failures.
-//
-void
-InstFrontend::if_link_add_runtime(bool object_arg, bool compile_arg)
-{
-#ifdef _WIN32
-	bool linking = false;
-
-	if (std::strcmp(m_args[0], "link") == 0)
-		// If we're called as link.exe we're linking for sure.
-		linking = true;
-	if (!compile_arg && m_source_files.size() > 0)
-		// cl.exe main.c
-		linking = true;
-
-	if (!linking)
-		return;
-#else // _WIN32
-	bool linking = false;
-
-	if (!object_arg && !compile_arg && m_source_files.size() > 0)
-		// Assume single line a.out compilation
-		// $ gcc main.c
-		linking = true;
-	else if (object_arg && !compile_arg)
-		// gcc -o main main.o fib.o while.o
-		// gcc -o main main.c fib.c
-		linking = true;
-
-	if (!linking)
-		return;
-#endif // _WIN32
-
-	m_log << "Link detected, adding '"<< m_lib_path
-		<< "' to command line." << std::endl;
-	m_args.push_back(const_cast<char *>(m_lib_path.c_str()));
 }
 
 //
@@ -309,8 +184,11 @@ InstFrontend::process_cmdline()
 		save_if_srcfile(arg);
 	}
 
-	// If linking is detected append libcitrun.a to the command line.
-	if_link_add_runtime(object_arg, compile_arg);
+	if (is_link(object_arg, compile_arg)) {
+		m_log << "Link detected, adding '"<< m_lib_path
+			<< "' to command line." << std::endl;
+		m_args.push_back(const_cast<char *>(m_lib_path.c_str()));
+	}
 
 	m_log << "Modified command line is '";
 	for (auto &arg : m_args)
@@ -424,127 +302,3 @@ InstFrontend::compile_instrumented()
 		// Rewritten compile failed. Run again without modified src.
 		exec_compiler();
 }
-
-#ifdef _WIN32
-//
-// On Windows the best exec alternative is to CreateProcess, wait for it to
-// finish and exit with its exit code. Windows has execvp, but it looks to
-// CreateProcess and then itself exit, leading to race conditions.
-//
-void
-InstFrontend::exec_compiler()
-{
-	if (m_is_citruninst) {
-		m_log << "Running as citrun_inst, not calling exec()" << std::endl;
-		exit(0);
-	}
-
-	exit(fork_compiler());
-}
-
-//
-// On Windows this is a straighforward conversion. We do our own PATH lookup
-// because the default one CreateProcess does will find our cl.exe again
-// instead of searching the PATH for a new one.
-//
-int
-InstFrontend::fork_compiler()
-{
-	DWORD exit = -1;
-	STARTUPINFOA si;
-	PROCESS_INFORMATION pi;
-
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
-
-	char real_cc[MAX_PATH];
-	std::strcpy(real_cc, m_args[0]);
-
-	if (!ends_with(real_cc, ".exe") && !ends_with(real_cc, ".EXE"))
-		std::strcat(real_cc, ".exe");
-
-	if (PathFindOnPathA(real_cc, NULL) == FALSE)
-		m_log << "PathFindOnPathA failed for " << real_cc << std::endl;
-
-	std::stringstream argv;
-	for (unsigned int i = 1; i < m_args.size(); ++i)
-		argv << " " << m_args[i];
-
-	if (!CreateProcessA(real_cc,
-			(LPSTR) argv.str().c_str(),
-			NULL,
-			NULL,
-			FALSE,
-			0,
-			NULL,
-			NULL,
-			&si,
-			&pi))
-		Err(1, "CreateProcess");
-
-	m_log << "Forked compiler '" << real_cc << "' "
-	       << "pid is '" << pi.dwProcessId << "'" << std::endl;
-
-	if (WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
-		Err(1, "WaitForSingleObject");
-
-	if (GetExitCodeProcess(pi.hProcess, &exit) == FALSE)
-		Err(1, "GetExitCodeProcess");
-
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-
-	return exit;
-}
-#else // _WIN32
-//
-// Execute the compiler by calling execvp(3) on the m_args vector.
-//
-void
-InstFrontend::exec_compiler()
-{
-	if (m_is_citruninst) {
-		m_log << "Running as citrun_inst, not calling exec()" << std::endl;
-		exit(0);
-	}
-
-	// Null termination explicitly mentioned in execvp(3).
-	m_args.push_back(NULL);
-	if (execvp(m_args[0], &m_args[0]))
-		err(1, "execvp");
-}
-
-//
-// fork(2) then execute the compiler and wait for it to finish. Returns exit
-// code of native compiler.
-//
-int
-InstFrontend::fork_compiler()
-{
-	pid_t child_pid;
-	int status;
-	int exit = -1;
-
-	if ((child_pid = fork()) < 0)
-		err(1, "fork");
-
-	// If in child execute compiler.
-	if (child_pid == 0)
-		exec_compiler();
-
-	m_log << "Forked compiler '" << m_args[0] << "' "
-	       << "pid is '" << child_pid << "'" << std::endl;
-
-	// Wait for the child to finish so we can get its exit code.
-	if (waitpid(child_pid, &status, 0) < 0)
-		err(1, "waitpid");
-
-	// Decode the exit code from status.
-	if (WIFEXITED(status))
-		exit = WEXITSTATUS(status);
-
-	// Return the exit code of the native compiler.
-	return exit;
-}
-#endif // _WIN32

@@ -13,17 +13,19 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
-#include "inst_frontend.h"	// InstFrontend
-
-#include <cstring>		// strcmp
-
 #ifdef _WIN32
 #include <windows.h>
 #include <Shlwapi.h>		// PathFindFileNameA
+
+#include "inst_win32.h"
 #else /* _WIN32 */
 #include <err.h>
 #include <libgen.h>		// basename
+
+#include "inst_feunix.h"	// InstFrontend
 #endif /* _WIN32 */
+
+#include <cstring>		// strcmp
 
 
 int
@@ -50,7 +52,15 @@ main(int argc, char *argv[])
 	if (std::strcmp(argv[0], base_name) != 0)
 		argv[0] = base_name;
 
-	InstFrontend main(argc, argv, is_citrun_inst);
+#ifdef _WIN32
+	InstFrontendWin32 main(argc, argv, is_citrun_inst);
+#else
+	InstFrontendUnix main(argc, argv, is_citrun_inst);
+#endif
+
+	main.log_identity();
+	main.get_paths();
+	main.clean_PATH();
 	main.process_cmdline();
 
 	main.instrument();
