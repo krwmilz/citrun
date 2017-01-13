@@ -13,14 +13,13 @@ if $(NT) {
 }
 
 #
-# citrun_wrap, citrun_check
+# citrun_check
 #
 if $(NT) {
 	File citrun_wrap.bat : wrap.bat ;
 	Clean clean : citrun_wrap.bat ;
 }
 else {
-	Shell citrun_wrap : wrap.sh ;
 	Shell citrun_check : check.sh ;
 }
 

@@ -54,7 +54,21 @@ CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
 
 LLVM_LIBS="bitreader mcparser transformutils option"
 
-# Write top of Jamrules. Any errors inside backticks get ignored.
+# Write prefix.h
+cat <<EOF > prefix.h
+static const char *prefix = R"(${PREFIX-`pwd`})";
+EOF
+
+# Write citrun_wrap
+cat <<EOF > citrun_wrap
+#!/bin/sh
+
+export PATH="${PREFIX-`pwd`}/compilers:\$PATH"
+exec \$@
+EOF
+chmod +x citrun_wrap
+
+# Write Jamrules. Any errors inside backticks get ignored.
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
 C++ = ${CXX-c++} ;

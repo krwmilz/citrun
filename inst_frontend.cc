@@ -16,6 +16,7 @@
 #include "inst_action.h"	// InstrumentActionFactory
 #include "inst_frontend.h"
 #include "lib.h"		// citrun_major, citrun_minor
+#include "prefix.h"		// prefix
 
 #include <sys/stat.h>		// stat
 
@@ -72,16 +73,15 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 {
 	log_identity();
 
-	const char *citrun_path = std::getenv("CITRUN_PATH");
+	m_compilers_path = prefix ;
+	m_lib_path = prefix ;
 
-	m_compilers_path = citrun_path ? citrun_path : "" ;
-	m_compilers_path.append("compilers");
-
-	m_lib_path = citrun_path ? citrun_path : "" ;
 #ifdef _WIN32
-	m_lib_path.append("libcitrun.lib");
+	m_compilers_path.append("\\compilers");
+	m_lib_path.append("\\libcitrun.lib");
 #else
-	m_lib_path.append("libcitrun.a");
+	m_compilers_path.append("/compilers");
+	m_lib_path.append("/libcitrun.a");
 #endif // _WIN32
 
 	m_log << "Compilers path = '" << m_compilers_path << "'" << std::endl;
