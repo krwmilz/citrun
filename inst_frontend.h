@@ -1,7 +1,7 @@
-#include "inst_action.h"	// InstrumentAction
 #include "inst_log.h"
 
 #include <chrono>		// std::chrono::high_resolution_clock
+#include <map>
 #include <string>
 
 class InstFrontend {
