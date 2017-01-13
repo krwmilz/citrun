@@ -42,6 +42,17 @@ IF %ERRORLEVEL% NEQ 0 (
 	EXIT /B 1
 )
 
+:: Write prefix.h
+> prefix.h ECHO static const char *prefix = R"(%CD%)";
+
+:: Write citrun_wrap
+>  citrun_wrap.bat ECHO @ECHO off
+>> citrun_wrap.bat ECHO SETLOCAL
+>> citrun_wrap.bat ECHO SET Path=%CD%\compilers;%%PATH%%
+>> citrun_wrap.bat ECHO CALL %%*
+>> citrun_wrap.bat ECHO EXIT /B %%ERRORLEVEL%%
+>> citrun_wrap.bat ECHO ENDLOCAL
+
 :: Silence warning about exceptions being disabled from xlocale.
 >  Jamrules ECHO C++FLAGS = /D_HAS_EXCEPTIONS=0 ;
 >> Jamrules ECHO.
