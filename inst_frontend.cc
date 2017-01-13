@@ -20,13 +20,14 @@
 
 #include <sys/stat.h>		// stat
 
-#include <clang/Frontend/TextDiagnosticBuffer.h>
+#include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <cstdio>		// tmpnam
 #include <cstring>		// strcmp
 #include <fstream>		// ifstream, ofstream
 #include <iostream>		// cerr
+#include <llvm/Support/raw_os_ostream.h>
 #include <sstream>		// ostringstream
 
 #ifdef _WIN32
@@ -358,11 +359,15 @@ InstFrontend::instrument()
 		Tool(op.getCompilations(), op.getSourcePathList());
 
 	//
-	// These diagnostics aren't too important because the input code could
-	// be terrible.
+	// Send tool diagnostics to the log with a prefix to tell it from the
+	// rest.
 	//
-	clang::TextDiagnosticBuffer diag_buffer;
-	Tool.setDiagnosticConsumer(&diag_buffer);
+	clang::DiagnosticOptions diag_opts;
+	llvm::raw_os_ostream raw_ostream(m_log);
+	clang::TextDiagnosticPrinter *printer =
+		new clang::TextDiagnosticPrinter(raw_ostream, &diag_opts);
+	printer->setPrefix("clang");
+	Tool.setDiagnosticConsumer(printer);
 
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
