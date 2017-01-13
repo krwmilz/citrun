@@ -114,8 +114,8 @@ InstFrontend::clean_PATH()
 }
 
 // Returns true if value ends with suffix, false otherwise.
-static bool
-ends_with(std::string const &value, std::string const &suffix)
+bool
+InstFrontend::ends_with(std::string const &value, std::string const &suffix)
 {
 	if (suffix.length() > value.length())
 		return false;

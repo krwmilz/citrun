@@ -14,10 +14,10 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #ifdef _WIN32
+#include "inst_fewin32.h"
+
 #include <windows.h>
 #include <Shlwapi.h>		// PathFindFileNameA
-
-#include "inst_win32.h"
 #else /* _WIN32 */
 #include <err.h>
 #include <libgen.h>		// basename

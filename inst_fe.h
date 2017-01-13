@@ -30,6 +30,8 @@ class InstFrontend
 	virtual int		fork_compiler() = 0;
 
 protected:
+	bool			ends_with(std::string const &, std::string const &);
+
 	std::vector<char *>	m_args;
 	bool			m_is_citruninst;
 	std::vector<std::string> m_source_files;

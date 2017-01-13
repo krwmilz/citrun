@@ -84,7 +84,7 @@ InstFrontendWin32::copy_file(std::string const &dst_fn, std::string const &src_f
 	dst.close();
 }
 
-int
+bool
 InstFrontendWin32::is_link(bool object_arg, bool compile_arg)
 {
 	if (std::strcmp(m_args[0], "link") == 0)
