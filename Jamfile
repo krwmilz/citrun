@@ -60,7 +60,7 @@ Main citrun_gltest : gl_testmain.cc ;
 #
 INST_SRCS =
 	inst_main.cc
-	inst_frontend.cc
+	inst_fe.cc
 	inst_action.cc
 	inst_visitor.cc ;
 
