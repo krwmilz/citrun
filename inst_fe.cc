@@ -105,8 +105,8 @@ InstFrontend::clean_PATH()
 	}
 
 	if (!found_citrun_path) {
-		std::cerr << "Error: " << m_compilers_path << " not in PATH." << std::endl;
-		m_log <<     "Error: " << m_compilers_path << " not in PATH." << std::endl;
+		std::cerr << "Error: '" << m_compilers_path << "' not in PATH." << std::endl;
+		m_log <<     "Error: '" << m_compilers_path << "' not in PATH." << std::endl;
 		exit(1);
 	}
 

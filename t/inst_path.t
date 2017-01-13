@@ -5,16 +5,28 @@
 #
 use strict;
 use warnings;
-use Test::Cmd;
-use Test::More tests => 3;
+
+use t::utils;
+plan tests => 4;
 
 
 my $cc = Test::Cmd->new( prog => 'compilers/cc', workdir => '' );
 
-my $error_good = "Error: compilers not in PATH.
-";
+my $error_good = "Error: '.*compilers' not in PATH.";
 
 $cc->run( args => '', chdir => $cc->curdir );
-is( $cc->stdout,	'',	'is cc stdout empty' );
-is( $cc->stderr,	$error_good,	'is cc stderr identical' );
-is( $? >> 8,		1,	'is cc exit code 1' );
+is( $cc->stdout,	'',			'is cc stdout empty' );
+like( $cc->stderr,	qr/$error_good/,	'is cc stderr identical' );
+is( $? >> 8,		1,			'is cc exit code 1' );
+
+my $log_out;
+$cc->read( \$log_out, 'citrun.log' );
+
+my $log_good = <<EOF;
+>> citrun_inst
+Compilers path = ''
+PATH = ''
+Error: '' not in PATH.
+EOF
+
+eq_or_diff( clean_citrun_log( $log_out ), $log_good,	'is citrun.log identical' );
