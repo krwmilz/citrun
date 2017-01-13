@@ -4,8 +4,9 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
-plan tests => 4;
+plan tests => 3;
 
 
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
@@ -68,18 +69,11 @@ EOF
 my $citrun_log;
 $wrap->read(\$citrun_log, 'citrun.log');
 
-# Check line endings.
 if ($^O eq 'MSWin32') {
 	# Windows gets an extra message because exec() is emulated by fork().
 	$citrun_log_good .= <<EOF ;
 Forked compiler ''
 EOF
-	my $rn_count = () = $citrun_log_good =~ /\r\n/g;
-	is( $rn_count,	25,	'is \r\n count correct' );
-}
-else {
-	my $n_count = () = $citrun_log_good =~ /\n/g;
-	is( $n_count,	25,	'is \n count correct' );
 }
 
 $citrun_log = clean_citrun_log($citrun_log);
