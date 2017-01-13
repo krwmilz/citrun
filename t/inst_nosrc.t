@@ -3,6 +3,7 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 2;
 
@@ -16,6 +17,7 @@ Compilers path = ''
 Found source file ''
 Modified command line is ''
 Added clangtool argument ''
+clang: error: error reading ''
 Rewriting failed.
 EOF
 
