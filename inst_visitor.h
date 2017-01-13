@@ -1,4 +1,5 @@
 #include <array>
+#include <clang/AST/ASTConsumer.h>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
@@ -65,4 +66,25 @@ private:
 	clang::Rewriter		&m_TheRewriter;
 	clang::SourceManager	&m_SM;
 	clang::LangOptions	 m_lopt;
+};
+
+class RewriteASTConsumer : public clang::ASTConsumer
+{
+public:
+	explicit RewriteASTConsumer(clang::Rewriter &R) : Visitor(R) {}
+
+	// Override the method that gets called for each parsed top-level
+	// declaration.
+	virtual bool HandleTopLevelDecl(clang::DeclGroupRef DR) {
+		for (auto &b : DR) {
+			// Traverse the declaration using our AST visitor.
+			Visitor.TraverseDecl(b);
+			// b->dump();
+		}
+		return true;
+	}
+
+	RewriteASTVisitor& get_visitor() { return Visitor; };
+private:
+	RewriteASTVisitor Visitor;
 };
