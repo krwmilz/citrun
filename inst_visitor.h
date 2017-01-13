@@ -18,9 +18,20 @@ enum counters {
 	NCOUNTERS
 };
 
-class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor> {
+class RewriteASTVisitor : public clang::RecursiveASTVisitor<RewriteASTVisitor>
+{
+	bool			 modify_stmt(clang::Stmt *, int &);
+	clang::SourceLocation	 real_loc_end(clang::Stmt *);
+
+	clang::Rewriter		&m_TheRewriter;
+	clang::SourceManager	&m_SM;
+	clang::LangOptions	 m_lopt;
+
 public:
 	explicit RewriteASTVisitor(clang::Rewriter &R) :
+		m_TheRewriter(R),
+		m_SM(R.getSourceMgr()),
+		m_lopt(R.getLangOpts()),
 		m_counters(),
 		m_counter_descr({
 				"Function definitions",
@@ -34,10 +45,7 @@ public:
 				"Total statements",
 				"Binary operators",
 				"Errors rewriting source code"
-				}),
-		m_TheRewriter(R),
-		m_SM(R.getSourceMgr()),
-		m_lopt(R.getLangOpts())
+		})
 	{}
 
 	virtual bool TraverseStmt(clang::Stmt *);
@@ -58,18 +66,12 @@ public:
 
 	std::array<int, NCOUNTERS> m_counters;
 	std::array<std::string, NCOUNTERS> m_counter_descr;
-
-private:
-	bool			 modify_stmt(clang::Stmt *, int &);
-	clang::SourceLocation	 real_loc_end(clang::Stmt *);
-
-	clang::Rewriter		&m_TheRewriter;
-	clang::SourceManager	&m_SM;
-	clang::LangOptions	 m_lopt;
 };
 
 class RewriteASTConsumer : public clang::ASTConsumer
 {
+	RewriteASTVisitor Visitor;
+
 public:
 	explicit RewriteASTConsumer(clang::Rewriter &R) : Visitor(R) {}
 
@@ -85,6 +87,4 @@ public:
 	}
 
 	RewriteASTVisitor& get_visitor() { return Visitor; };
-private:
-	RewriteASTVisitor Visitor;
 };
