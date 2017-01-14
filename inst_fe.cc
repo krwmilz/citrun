@@ -70,11 +70,10 @@ InstFrontend::get_paths()
 void
 InstFrontend::clean_PATH()
 {
-	char *path;
-
 	if (m_is_citruninst == true)
 		return;
 
+	char *path;
 	if ((path = std::getenv("PATH")) == NULL) {
 		std::cerr << "Error: PATH is not set." << std::endl;
 		m_log <<     "Error: PATH is not set." << std::endl;
@@ -85,26 +84,34 @@ InstFrontend::clean_PATH()
 
 	// Filter m_compilers_path out of PATH
 	std::stringstream path_ss(path);
-	std::ostringstream new_path;
 	std::string component;
-	bool first_component = 1;
-	bool found_citrun_path = 0;
+	bool first_component = true;
+	bool found_citrun_path = false;
+	std::ostringstream new_path;
 
 	while (std::getline(path_ss, component, path_sep())) {
 		if (component == m_compilers_path) {
-			found_citrun_path = 1;
+			found_citrun_path = true;
 			continue;
 		}
 
-		if (first_component == 0)
+		if (first_component == false)
 			new_path << path_sep();
 
 		// It wasn't m_compilers_path, keep it
 		new_path << component;
-		first_component = 0;
+		first_component = false;
 	}
 
 	if (!found_citrun_path) {
+		//
+		// This is a really bad situation to be in. We are currently
+		// executing and can't tell which PATH element we were called
+		// from. If we exec there's a chance we'll get stuck in an
+		// infinite exec loop.
+		//
+		// Error visibly so this can be fixed as soon as possible.
+		//
 		std::cerr << "Error: '" << m_compilers_path << "' not in PATH." << std::endl;
 		m_log <<     "Error: '" << m_compilers_path << "' not in PATH." << std::endl;
 		exit(1);
