@@ -1,18 +1,20 @@
+#!/usr/bin/perl
 #
-# A little frontend for t::shm that prints the list of translation units.
+# A little frontend for t::mem that prints the list of translation units.
+#
+# Usage: write_tus.pl output_file memory_file
 #
 use strict;
 use warnings;
-use t::utils;
 
-open(my $out, '>', 'tu_list.out') or die $!;
-my $shm = t::shm->new($ARGV[0]);
+use t::mem;
 
-select $out;
+open( my $out, '>', $ARGV[0] ) or die $!;
+my $shm = t::mem->new( $ARGV[1] );
 
-my $transl_units = $shm->{translation_units};
-for (@$transl_units) {
-	my %tu = %$_;
+my $tus = $shm->{trans_units};
+for (sort keys %$tus) {
+	my $tu = $tus->{$_};
 
-	print "$tu{comp_file_name} $tu{size}\n";
+	print $out "$tu->{comp_file_name} $tu->{size}\n";
 }
