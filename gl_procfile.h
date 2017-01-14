@@ -3,7 +3,11 @@
 
 #include "gl_buffer.h"		// GlBuffer
 #include "gl_transunit.h"	// GlTranslationUnit
+#ifdef _WIN32
+#include "mem_win32.h"
+#else
 #include "mem_unix.h"		// MemUnix
+#endif
 
 
 //
