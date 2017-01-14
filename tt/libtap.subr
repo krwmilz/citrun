@@ -87,10 +87,6 @@ finish () {
             echo "# $planned test successful or skipped"
         fi
     fi
-    # This is sometimes set by the `enter_tmpdir` function in utils.subr.
-    if [ ! -z ${tmpdir+x} ]; then
-        rm -rf $tmpdir
-    fi
 }
 
 # Skip the entire test suite.  Should be run instead of plan.
