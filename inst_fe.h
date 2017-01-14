@@ -5,8 +5,8 @@
 #include "inst_log.h"
 
 #include <chrono>		// std::chrono::high_resolution_clock
-#include <map>
-#include <string>
+#include <map>			// std::map
+#include <string>		// std::string
 
 class InstFrontend
 {
@@ -30,8 +30,6 @@ class InstFrontend
 	virtual int		fork_compiler() = 0;
 
 protected:
-	bool			ends_with(std::string const &, std::string const &);
-
 	std::vector<char *>	m_args;
 	bool			m_is_citruninst;
 	std::vector<std::string> m_source_files;
@@ -46,4 +44,24 @@ public:
 	void			process_cmdline();
 	void			instrument();
 	void			compile_instrumented();
+};
+
+//
+// Helper class that is a unary predicate suitable for use with std::find_if.
+//
+class ends_with
+{
+	std::string arg;
+public:
+	ends_with(char *argument) :
+		arg(argument)
+	{}
+
+	bool operator ()(std::string const &suffix) const
+	{
+		if (suffix.length() > arg.length())
+			return false;
+
+		return std::equal(suffix.rbegin(), suffix.rend(), arg.rbegin());
+	}
 };

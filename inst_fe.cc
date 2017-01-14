@@ -21,11 +21,13 @@
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
+#include <llvm/Support/raw_os_ostream.h>
+
+#include <algorithm>		// std::find_if
 #include <cstdio>		// tmpnam
 #include <cstring>		// strcmp
-#include <iostream>		// cerr
-#include <llvm/Support/raw_os_ostream.h>
-#include <sstream>		// ostringstream
+#include <iostream>		// std::cerr
+#include <sstream>		// std::ostringstream
 
 
 static llvm::cl::OptionCategory ToolingCategory("citrun_inst options");
@@ -120,16 +122,6 @@ InstFrontend::clean_PATH()
 	set_path(new_path.str());
 }
 
-// Returns true if value ends with suffix, false otherwise.
-bool
-InstFrontend::ends_with(std::string const &value, std::string const &suffix)
-{
-	if (suffix.length() > value.length())
-		return false;
-
-	return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
-}
-
 //
 // Guess if the argument is a sourcefile. If it is stash a backup of the file
 // and sync the timestamps.
@@ -137,8 +129,8 @@ InstFrontend::ends_with(std::string const &value, std::string const &suffix)
 void
 InstFrontend::save_if_srcfile(char *arg)
 {
-	if (!ends_with(arg, ".c") && !ends_with(arg, ".cc") &&
-	    !ends_with(arg, ".cpp") && !ends_with(arg, ".cxx"))
+	std::array<std::string, 4> exts = { ".c", ".cc", ".cxx", ".cpp" };
+	if (std::find_if(exts.begin(), exts.end(), ends_with(arg)) == exts.end())
 		return;
 
 	char *dst_fn;
