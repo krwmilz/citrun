@@ -1,7 +1,8 @@
-#include <string>
-#include <vector>
+#include <string>		// std::string
+#include <vector>		// std::vector
 
-#include "gl_buffer.h"
+#include "gl_buffer.h"		// GlBuffer
+#include "mem.h"		// Mem
 
 
 //
@@ -15,7 +16,7 @@ class GlTranslationUnit
 	GlBuffer		 m_glbuffer;
 
 public:
-	GlTranslationUnit(void* &, demo_font_t *, glyphy_point_t &);
+	GlTranslationUnit(Mem &, demo_font_t *, glyphy_point_t &);
 
 	std::string		 comp_file_path() const;
 	unsigned int		 num_lines() const;

@@ -1,8 +1,9 @@
-#include <string>
-#include <vector>
+#include <string>		// std::string
+#include <vector>		// std::vector
 
-#include "gl_buffer.h"
-#include "gl_transunit.h"
+#include "gl_buffer.h"		// GlBuffer
+#include "gl_transunit.h"	// GlTranslationUnit
+#include "mem_unix.h"		// MemUnix
 
 
 //
@@ -12,10 +13,12 @@
 class GlProcessFile
 {
 	struct citrun_header	*m_header;
-	std::string		 m_path;
-	int			 m_fd;
-	size_t			 m_size;
 	GlBuffer		 m_glbuffer;
+#ifdef _WIN32
+	MemWin32		 m_mem;
+#else
+	MemUnix			 m_mem;
+#endif
 
 public:
 	GlProcessFile(std::string const &, demo_font_t *);

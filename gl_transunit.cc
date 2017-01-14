@@ -13,11 +13,9 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
-#include <cstring>		// memcpy
-#include <err.h>
-#include <fstream>
-#include <iostream>
-#include <unistd.h>		// getpagesize
+#include <cstring>		// std::memcpy
+#include <fstream>		// std::ifstream
+#include <iostream>		// std::cerr
 
 #include "gl_transunit.h"
 #include "lib.h"		// struct citrun_node
@@ -27,21 +25,18 @@
 // Take a pointer to a shared memory region and map data structures on top.
 // Automatically increments the pointer once we know how big this region is.
 //
-GlTranslationUnit::GlTranslationUnit(void* &mem, demo_font_t *font,
+GlTranslationUnit::GlTranslationUnit(Mem &m_mem, demo_font_t *font,
 		glyphy_point_t &cur_pos) :
-	m_node(static_cast<struct citrun_node *>(mem)),
+	m_node(static_cast<struct citrun_node *>(m_mem.get_ptr())),
 	m_data((unsigned long long *)(m_node + 1)),
 	m_data_buffer(m_node->size)
 {
-	unsigned int	 size, page_mask;
+	unsigned int	 size;
 
 	// Total size is node size plus live execution data size.
 	size = sizeof(struct citrun_node);
 	size += m_node->size * sizeof(unsigned long long);
-
-	// Increment passed in pointer to next page.
-	page_mask = getpagesize() - 1;
-	mem = (char *)mem + ((size + page_mask) & ~page_mask);
+	m_mem.increment(size);
 
 	glyphy_point_t next_pos = cur_pos;
 	next_pos.x += 80;
@@ -51,7 +46,7 @@ GlTranslationUnit::GlTranslationUnit(void* &mem, demo_font_t *font,
 
 	std::ifstream file_stream(m_node->abs_file_path);
 	if (file_stream.is_open() == 0) {
-		warnx("ifstream.open(%s)", m_node->abs_file_path);
+		std::cerr << "ifstream.open: " << m_node->abs_file_path << std::endl;
 		return;
 	}
 
@@ -66,8 +61,8 @@ GlTranslationUnit::GlTranslationUnit(void* &mem, demo_font_t *font,
 	}
 
 	if (i != m_node->size)
-		warnx("%s size mismatch: %u vs %u", m_node->abs_file_path, i,
-			m_node->size);
+		std::cerr << m_node->abs_file_path << " size mismatch: "
+			<< i << " vs " << m_node->size << std::endl;
 }
 
 //
