@@ -45,7 +45,7 @@ Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
 Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
 
 ObjectDefines gl_font.cc : FONT_PATH=\\\"$(FONT_PATH)\\\" ;
-ObjectC++Flags gl_main.cc gl_testmain.cc $(GL_SRCS) : $(GL_CFLAGS) ;
+ObjectC++Flags gl_main.cc gltest.cc $(GL_SRCS) : $(GL_CFLAGS) ;
 
 LINKLIBS on citrun_gl citrun_gltest += -lm $(GL_LIBS) ;
 LinkLibraries citrun_gl citrun_gltest : gl_common libglyphy ;
@@ -53,7 +53,7 @@ LinkLibraries citrun_gl citrun_gltest : gl_common libglyphy ;
 Main citrun_gl : gl_main.cc ;
 
 LINKLIBS on citrun_gltest += $(GLTEST_LIBS) ;
-Main citrun_gltest : gl_testmain.cc ;
+Main citrun_gltest : gltest.cc ;
 
 #
 # citrun_inst
