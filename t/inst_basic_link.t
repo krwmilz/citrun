@@ -18,7 +18,7 @@ Compilers path = ''
 PATH = ''
 Found source file ''
 Link detected, adding '' to command line.
-Modified command line is ''
+Command line is ''
 Added clangtool argument ''
 Instrumentation of '' finished:
     1 Lines of source code

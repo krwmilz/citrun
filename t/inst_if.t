@@ -41,7 +41,7 @@ my $check_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
 Found source file ''
-Modified command line is ''
+Command line is ''
 Added clangtool argument ''
 Instrumentation of '' finished:
     12 Lines of source code

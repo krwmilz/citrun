@@ -23,7 +23,7 @@ my $out_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
 Found source file ''
-Modified command line is ''
+Command line is ''
 Added clangtool argument ''
 clang: error: error reading ''
 Rewriting failed.

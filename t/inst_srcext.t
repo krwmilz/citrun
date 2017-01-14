@@ -15,7 +15,7 @@ my $out_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
 Found source file ''
-Modified command line is ''
+Command line is ''
 Added clangtool argument ''
 Instrumentation of '' finished:
     1 Lines of source code
@@ -39,7 +39,7 @@ for (@supported_exts) {
 $out_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
-Modified command line is ''
+Command line is ''
 No source files found on command line.
 Running as citrun_inst, not calling exec()
 EOF

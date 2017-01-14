@@ -43,7 +43,7 @@ my $citrun_log_good =<<EOF ;
 Compilers path = ''
 PATH = ''
 Found source file ''
-Modified command line is ''
+Command line is ''
 Added clangtool argument ''
 Instrumentation of '' finished:
     22 Lines of source code
@@ -62,7 +62,7 @@ Restored ''
 Compilers path = ''
 PATH = ''
 Link detected, adding '' to command line.
-Modified command line is ''
+Command line is ''
 No source files found on command line.
 EOF
 

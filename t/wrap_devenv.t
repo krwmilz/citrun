@@ -53,13 +53,13 @@ my $log_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
 PATH = ''
-Modified command line is ''
+Command line is ''
 No source files found on command line.
 Forked compiler ''
 >> citrun_inst
 Compilers path = ''
 PATH = ''
-Modified command line is ''
+Command line is ''
 No source files found on command line.
 Forked compiler ''
 EOF

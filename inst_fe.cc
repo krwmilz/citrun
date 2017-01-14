@@ -189,9 +189,9 @@ InstFrontend::process_cmdline()
 		m_args.push_back(const_cast<char *>(m_lib_path.c_str()));
 	}
 
-	m_log << "Modified command line is '";
-	for (auto &arg : m_args)
-		m_log << arg << " ";
+	m_log << "Command line is '" << m_args[0];
+	for (unsigned int i = 1; i < m_args.size(); ++i)
+		m_log << " " << m_args[i];
 	m_log << "'" << std::endl;
 
 	if (m_source_files.size() != 0)
