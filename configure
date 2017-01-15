@@ -10,7 +10,6 @@ echo
 
 # These binaries are assumed throughout so make sure they are available.
 type pkg-config
-type llvm-config
 type jam
 echo
 
@@ -21,6 +20,11 @@ if [ $uname = OpenBSD ]; then
 	LDGROUP_END="-Wl,--end-group"
 	FONT_PATH="/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
 	CXX=${CXX-eg++}
+	LLVM_INCLUDES='-I/usr/local/include'
+	#LLVM_INCLUDES='-I/usr/src/gnu/llvm/tools/clang/include
+	#-I/usr/src/gnu/llvm/include
+	#-I/usr/src/gnu/usr.bin/clang/include
+	#-I/usr/obj/gnu/usr.bin/clang/include'
 elif [ $uname = Darwin ]; then
 	GL_EXTRALIB="-framework OpenGL"
 	FONT_PATH="/Library/Fonts/Andale Mono.ttf"
@@ -46,13 +50,38 @@ for pkg in $gl_pkgs; do
 done
 echo
 
-# citrun_inst needs clang and llvm libraries.
-CLANG_LIBS="-lclangAST -lclangAnalysis -lclangBasic -lclangDriver \
-	-lclangEdit -lclangFrontend -lclangFrontendTool -lclangLex \
-	-lclangParse -lclangRewrite -lclangRewriteFrontend -lclangSema \
-	-lclangSerialization -lclangTooling"
-
-LLVM_LIBS="bitreader mcparser transformutils option"
+# citrun_inst needs lots of Clang and LLVM libraries.
+# for LLVM libraries:
+#	llvm-config --libs bitreader mcparser transformutils option
+INST_LIBS="-lcurses
+	-lpthread
+	-lz
+	-lm
+	${LDGROUP_START-}
+	-lclangAST
+	-lclangAnalysis
+	-lclangBasic
+	-lclangDriver
+	-lclangEdit
+	-lclangFrontend
+	-lclangFrontendTool
+	-lclangLex
+	-lclangParse
+	-lclangRewrite
+	-lclangRewriteFrontend
+	-lclangSema
+	-lclangSerialization
+	-lclangTooling
+	${LDGROUP_END-}
+	-lLLVMOption
+	-lLLVMTransformUtils
+	-lLLVMAnalysis
+	-lLLVMProfileData
+	-lLLVMMCParser
+	-lLLVMMC
+	-lLLVMBitReader
+	-lLLVMCore
+	-lLLVMSupport"
 
 # Write prefix.h
 cat <<EOF > prefix.h
@@ -73,8 +102,16 @@ cat <<EOF > Jamrules
 CC = ${CC-cc} ;
 C++ = ${CXX-c++} ;
 
-CCFLAGS += ${CFLAGS-} ;
-C++FLAGS += -std=c++11 -fno-exceptions -fno-rtti ${CFLAGS-} ;
+CCFLAGS  += ${CFLAGS-} -Wall -W -Wcast-qual
+	-Wwrite-strings ;
+C++FLAGS += ${CFLAGS-} -Wall -W -Wcast-qual
+	-std=c++11
+	-fno-exceptions
+	-fno-rtti
+	-Wno-unused-parameter
+	-Werror=date-time
+	-fvisibility-inlines-hidden
+	-Wdelete-non-virtual-dtor ;
 LINKFLAGS += ${LDFLAGS-} ;
 
 FONT_PATH = "${FONT_PATH}" ;
@@ -83,10 +120,9 @@ GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
 GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;
 GLTEST_LIBS  = `pkg-config --libs osmesa` ;
 
-INST_CFLAGS = `llvm-config --cxxflags` ;
-INST_LDFLAGS = `llvm-config --ldflags` ;
-INST_LIBS = ${INST_EXTRALIB-}
-	${LDGROUP_START-} ${CLANG_LIBS} ${LDGROUP_END-}
-	`llvm-config --libs ${LLVM_LIBS}`
-	`llvm-config --system-libs` ;
+INST_CFLAGS = ${LLVM_INCLUDES-}
+	-Wno-comment
+	-D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS ;
+INST_LDFLAGS = -nopie ;
+INST_LIBS = ${INST_EXTRALIB-} ${INST_LIBS} ;
 EOF
