@@ -38,7 +38,7 @@ void *
 extend(size_t req_bytes)
 {
 	size_t	 aligned_bytes;
-	size_t	 len;
+	off_t	 len;
 	void	*mem;
 	size_t	 page_mask;
 
@@ -68,7 +68,7 @@ extend(size_t req_bytes)
 void
 open_fd()
 {
-	char			*procdir;
+	const char		*procdir;
 	char			 procfile[PATH_MAX];
 
 	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
