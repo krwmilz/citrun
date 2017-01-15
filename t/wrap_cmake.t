@@ -3,14 +3,13 @@
 #
 use strict;
 use warnings;
+
 use File::Which;
 use t::utils;
 
-if (which 'cmake') {
-	plan tests => 8;
-} else {
-	plan skip_all => 'cmake not found';
-}
+plan skip_all => 'cmake not found' unless (which 'cmake');
+plan tests => 8;
+
 
 my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
@@ -78,11 +77,13 @@ print $wrap->stdout;
 is( $wrap->stderr,	'',	'is citrun_wrap make stderr empty');
 is( $? >> 8,		0,	'is citrun_wrap make exit code 0');
 
+$ENV{CITRUN_PROCDIR} = $wrap->workdir;
+
 # Check the instrumented program runs.
 $wrap->run( prog => $wrap->workdir . "/program", chdir => $wrap->curdir );
 
-is( $wrap->stdout,	'',	'is program stdout empty');
-is( $wrap->stderr,	'',	'is program stderr empty');
-is( $? >> 8,		0,	'is program exit code 0');
+is( $wrap->stdout,	'',	'is instrumented program stdout empty');
+is( $wrap->stderr,	'',	'is instrumented program stderr empty');
+is( $? >> 8,		0,	'is instrumented program exit code 0');
 
 #ok "is runtime shared memory file created" test -f procdir/program_*

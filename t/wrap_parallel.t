@@ -4,8 +4,10 @@
 #
 use strict;
 use warnings;
+
 use File::Which;
 use t::utils;
+
 plan skip_all => 'make not found' unless (which 'make');
 plan tests => 15;
 
@@ -53,6 +55,7 @@ my $check_out = $wrap->stdout;
 $check_out =~ s/^.*Milliseconds spent rewriting.*\n//gm;
 eq_or_diff( $check_out, $check_good,	'is citrun_check stdout identical', { context => 3 } );
 
+$ENV{CITRUN_PROCDIR} = $wrap->workdir;
 for (1..4) {
 	$wrap->run( prog => $wrap->workdir . "/program$_", chdir => $wrap->curdir );
 	is( $wrap->stdout,	'',	"is instrumented program$_ stdout silent" );

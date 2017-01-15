@@ -3,12 +3,11 @@
 #
 use strict;
 use warnings;
+
 use File::Which;
 use t::utils;
 
-unless (which 'ninja') {
-	plan skip_all => 'ninja not found';
-}
+plan skip_all => 'ninja not found' unless (which 'ninja');
 plan tests => 6;
 
 
@@ -62,6 +61,7 @@ $citrun_log = clean_citrun_log( $citrun_log );
 
 eq_or_diff( $citrun_log, $log_good,	'is citrun_wrap log file identical', { context => 3 } );
 
+$ENV{CITRUN_PROCDIR} = $wrap->workdir;
 $wrap->run( prog => $wrap->workdir . '/program', chdir => $wrap->curdir );
 is( $wrap->stdout,	'',	'is instrumented program stdout silent' );
 is( $wrap->stderr,	'',	'is instrumented program stderr silent' );

@@ -4,8 +4,10 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 11;
+
 
 my $e2e = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
 
@@ -68,6 +70,8 @@ print $e2e->stdout;
 is( $e2e->stderr,	'',	'is citrun_wrap compile stderr silent' );
 is( $? >> 8,		0,	'is citrun_wrap compile exit code 0' );
 eq_or_diff( $log,	$log_good,	'is citrun_wrap log file identical' );
+
+$ENV{CITRUN_PROCDIR} = $e2e->workdir;
 
 $e2e->run( prog => $e2e->workdir . "/fib", chdir => $e2e->curdir );
 is( $e2e->stderr,	'',	'is fib stderr silent' );

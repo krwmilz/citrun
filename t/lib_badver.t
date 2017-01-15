@@ -33,6 +33,7 @@ my $err_good = 'libcitrun 0.0: incompatible version 0.255.
 Try cleaning and rebuilding your project.
 ';
 
+$ENV{CITRUN_PROCDIR} = $compiler->workdir;
 my $abs_prog_path = File::Spec->catfile( $compiler->workdir, "main" );
 $compiler->run( prog => $abs_prog_path, chdir => $compiler->curdir );
 is( $compiler->stdout,	'',		'is incompatible node program stdout silent' );
