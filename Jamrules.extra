@@ -52,4 +52,4 @@ actions TestCoverage
 }
 
 Analysis analysis ;
-TestCoverage test-coverage ;
+TestCoverage coverage ;
