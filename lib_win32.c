@@ -142,7 +142,7 @@ open_fd()
 void
 citrun_os_info(struct citrun_header *h)
 {
-	pids[0] = getpid();
+	h->pids[0] = getpid();
 
 	if (GetModuleFileName(NULL, h->progname, sizeof(h->progname)) == 0)
 		Err(1, "GetModuleFileName");
