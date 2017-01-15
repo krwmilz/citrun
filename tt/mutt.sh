@@ -2,12 +2,16 @@
 #
 # Test that building Mutt works.
 #
-. tt/package.subr "mail/mutt"
+. tt/package.subr 'mail' 'mutt'
 plan 11
 
 pkg_check_deps
 pkg_clean
 pkg_build
+
+pkg_clean
+pkg_build_instrumented
+exit 0
 pkg_test
 
 cat <<EOF > check.good

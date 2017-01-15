@@ -1,47 +1,84 @@
-. t/utils.subr
+. tt/libtap.subr
 
 if [ `uname` != "OpenBSD" ]; then
 	skip_all "test not supported on this platform."
 fi
 
-portdir="/usr/ports/$1"
-workdir=`make -C $portdir show=WRKDIST`
+# Script arguments give the path in the OpenBSD ports system.
+portdir="/usr/ports/$1/$2"
+workdist=`make -C $portdir show=WRKDIST`
+workdir=`make -C $portdir show=WRKDIR`
+
+# This is used by the OpenBSD /usr/ports/infratstucture/.
+# PWD is evaluated right now, WRKDIR is deferred.
+portpath="${PWD}/compilers:\${WRKDIR}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11R6/bin"
+
+diag "Current workdir is: $workdir"
+
+export CITRUN_PROCDIR="$workdir/procdir/"
+
+time_ok()
+{
+	start=`date +%s`
+	ok "$@"
+}
 
 pkg_check_deps()
 {
-	make -C $portdir full-build-depends > deps
-	make -C $portdir full-test-depends >> deps
-	sort deps | uniq > deps.uniq
-	pkg_info -q > installed
-	comm -2 -3 deps.uniq installed > deps_needed
+	mkdir -p $workdir
 
-	ok "are dependencies met" diff -u /dev/null deps_needed
+	make -C $portdir full-all-depends > $workdir/deps
+	make -C $portdir full-test-depends >> $workdir/deps
+	sort $workdir/deps | uniq > $workdir/deps.uniq
+
+	pkg_info -q > $workdir/installed
+	comm -2 -3 $workdir/deps.uniq $workdir/installed > $workdir/deps_needed
+
+	diff -u /dev/null $workdir/deps_needed || bail "dependencies not met"
 }
 
 pkg_build()
 {
-	ok "is built" make -C $portdir PORTPATH="$treedir/src:\${WRKDIR}/bin:$PATH" build
+	mkdir -p $workdir
+	start=`date +%s`
+	make -C $portdir build > $workdir/build.stdout 2> $workdir/build.stderr
+	ok 'is make build exit code 0' test $? -eq 0
+
+	diag Vanilla build took $((`date +%s` - start)) sec
+}
+
+pkg_build_instrumented()
+{
+	mkdir -p $workdir
+	start=`date +%s`
+	make -C $portdir PORTPATH="$portpath" build \
+		> $workdir/build_instrumented.stdout \
+		2> $workdir/build_instrumented.stderr
+	ok 'is instrumented make build exit code 0' test $? -eq 0
+
+	diag Instrumented build took $((`date +%s` - start)) sec
 }
 
 pkg_test()
 {
-	ok "port test" make -C $portdir PORTPATH="$treedir/src:\${WRKDIR}/bin:$PATH" test
+	time_ok 'is test successful' make -C $portdir test
+}
+
+pkg_test_instrumented()
+{
+	ok 'is test with instrumentation successful' \
+		make -C $portdir PORTPATH="${portpath}" test
 }
 
 pkg_check()
 {
-	ok "is citrun_check successful" citrun_check -o check.out $workdir
-	strip_millis check.out
-	ok "citrun_check output diff" diff -u check.good check.out
+	ok "is citrun_check successful" citrun_check $workdist
+	#ok "is 'Milliseconds' sanitized" sed -i -e "/Milliseconds spent/d" $1
+	#ok "citrun_check output diff" diff -u check.good check.out
 }
 
 pkg_clean()
 {
-	ok "port clean" make -C $portdir clean
-}
-
-pkg_check_manifest()
-{
-	ok "is manifest sort exit code 0" sort -o tu_list.out tu_list.out
-	ok "is tu manifest correct" diff -u tu_list.good tu_list.out
+	make -C $portdir clean=all > /dev/null
+	ok 'is make clean exit code 0' test $? -eq 0
 }

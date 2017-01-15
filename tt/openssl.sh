@@ -10,7 +10,7 @@ pkg_check_deps
 pkg_clean
 pkg_build
 
-cat <<EOF > check.good
+cat <<EOF > $tmpdir/check.good
 Summary:
        752 Source files used as input
         58 Application link commands
@@ -33,7 +33,7 @@ Totals:
 EOF
 pkg_check
 
-cat <<EOF > tu_list.good
+cat <<EOF > $tmpdir/tu_list.good
 a_bitstr.c 263
 a_bool.c 112
 a_bytes.c 307
@@ -721,8 +721,7 @@ EOF
 
 LD_LIBRARY_PATH="$workdir" $workdir/apps/openssl < /dev/null > /dev/null
 
-ok "is write_tus.pl exit code 0" \
-	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}openssl_*
-pkg_check_manifest
+ok "is write_tus.pl exit code 0" tt/write_tus.pl $tmpdir/tu_list.out ${CITRUN_PROCDIR}openssl_*
+ok "is tu manifest complete" diff -u $tmpdir/tu_list.good $tmpdir/tu_list.out
 
 pkg_clean

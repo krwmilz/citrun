@@ -3,16 +3,23 @@
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
-. tt/package.subr "devel/git"
-plan 9
+. tt/package.subr 'devel' 'git'
+plan 1
 
 pkg_check_deps
 pkg_clean
 pkg_build
+cp $workdist/config.log /tmp/config.log.good
+
+pkg_clean
+pkg_build_instrumented
+
+exit 0
+diag diff -u $workdist/config.log /tmp/config.log.good
 # Writes too many shared memory files and quickly fills /tmp.
 #pkg_test
 
-cat <<EOF > check.good
+cat <<EOF > $workdir/check.good
 Summary:
        383 Source files used as input
         84 Application link commands
@@ -36,8 +43,9 @@ Totals:
       1531 Errors rewriting source
 EOF
 pkg_check
+exit 0
 
-cat <<EOF > tu_list.good
+cat <<EOF > $workdir/tu_list.good
 abspath.c 181
 advice.c 120
 alias.c 78
@@ -309,12 +317,9 @@ xdiff/xutils.c 496
 zlib.c 274
 EOF
 
-$workdir/git < /dev/null > /dev/null
+$workdist/git < /dev/null > /dev/null
 
-ok "is write_tus.pl exit code 0" \
-	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}git_*
-
-sort -o tu_list.out tu_list.out
-ok "translation unit manifest" diff -u tu_list.good tu_list.out
+ok "is write_tus.pl exit code 0" tt/write_tus.pl $workdir/tu_list.out ${CITRUN_PROCDIR}git_*
+ok "translation unit manifest" diff -u $workdir/tu_list.good $workdir/tu_list.out
 
 pkg_clean
