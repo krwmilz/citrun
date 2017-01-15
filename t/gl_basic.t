@@ -4,9 +4,12 @@
 #
 use strict;
 use warnings;
+
 use File::Compare;
 use Imager;
 use t::utils;
+
+plan skip_all => 'glew + osmesa required';
 plan tests => 6;
 
 my $dir = setup_projdir();
