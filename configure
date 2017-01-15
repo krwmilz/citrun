@@ -20,7 +20,6 @@ if [ $uname = OpenBSD ]; then
 	LDGROUP_END="-Wl,--end-group"
 	FONT_PATH="/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
 	CXX=${CXX-eg++}
-	LLVM_INCLUDES='-I/usr/local/include'
 	#LLVM_INCLUDES='-I/usr/src/gnu/llvm/tools/clang/include
 	#-I/usr/src/gnu/llvm/include
 	#-I/usr/src/gnu/usr.bin/clang/include
