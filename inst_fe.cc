@@ -129,7 +129,7 @@ InstFrontend::clean_PATH()
 void
 InstFrontend::save_if_srcfile(char *arg)
 {
-	std::array<std::string, 4> exts = { ".c", ".cc", ".cxx", ".cpp" };
+	std::array<std::string, 4> exts = {{ ".c", ".cc", ".cxx", ".cpp" }};
 	if (std::find_if(exts.begin(), exts.end(), ends_with(arg)) == exts.end())
 		return;
 

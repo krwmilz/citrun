@@ -33,7 +33,7 @@ public:
 		m_SM(R.getSourceMgr()),
 		m_lopt(R.getLangOpts()),
 		m_counters(),
-		m_counter_descr({
+		m_counter_descr( {{
 				"Function definitions",
 				"If statements",
 				"For loops",
@@ -45,7 +45,7 @@ public:
 				"Total statements",
 				"Binary operators",
 				"Errors rewriting source code"
-		})
+		}} )
 	{}
 
 	virtual bool TraverseStmt(clang::Stmt *);
