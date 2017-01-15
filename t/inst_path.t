@@ -10,7 +10,10 @@ use t::utils;
 plan tests => 4;
 
 
-my $cc = Test::Cmd->new( prog => 'compilers/cc', workdir => '' );
+my $compiler = 'compilers/cc';
+$compiler = 'compilers\cl' if ($^O eq 'MSWin32');
+
+my $cc = Test::Cmd->new( prog => $compiler, workdir => '' );
 
 my $error_good = "Error: '.*compilers' not in PATH.";
 
