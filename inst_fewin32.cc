@@ -18,6 +18,7 @@
 #include <windows.h>		// CreateProcess
 #include <Shlwapi.h>		// PathFindOnPath
 
+#include <array>
 #include <cstdio>		// tmpnam
 #include <cstring>		// strcmp
 #include <fstream>		// ifstream, ofstream
@@ -132,7 +133,8 @@ InstFrontendWin32::fork_compiler()
 	char real_cc[MAX_PATH];
 	std::strcpy(real_cc, m_args[0]);
 
-	if (!ends_with(real_cc, ".exe") && !ends_with(real_cc, ".EXE"))
+	std::array<std::string, 2> exts = {{ ".exe", ".EXE" }};
+	if (std::find_if(exts.begin(), exts.end(), ends_with(real_cc)) == exts.end())
 		std::strcat(real_cc, ".exe");
 
 	if (PathFindOnPathA(real_cc, NULL) == FALSE)
