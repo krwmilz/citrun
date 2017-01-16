@@ -3,7 +3,7 @@
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
-. tt/package.subr 'devel' 'git'
+. tt/openbsd.subr 'devel' 'git'
 plan 1
 
 pkg_clean

@@ -2,7 +2,7 @@
 #
 # Test that building Mutt works.
 #
-. tt/package.subr 'mail' 'mutt'
+. tt/openbsd.subr 'mail' 'mutt'
 plan 11
 
 pkg_clean
