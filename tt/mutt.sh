@@ -5,16 +5,25 @@
 . tt/package.subr 'mail' 'mutt'
 plan 11
 
+pkg_clean
+
+pkg_extract
 pkg_check_deps
-pkg_clean
 pkg_build
+#pkg_test
 
-pkg_clean
+pkg_extract_instrumented
 pkg_build_instrumented
-exit 0
-pkg_test
 
-cat <<EOF > check.good
+# Diff various things between vanilla and instrumented build.
+ok 'is config.log identical' \
+	diff -u $workdist/config.log $workdir_inst/mutt-1.6.2/config.log
+ok 'is build stdout identical' \
+	diff -u $workdir/build.stdout $workdir_inst/build.stdout
+ok 'is build stderr identical' \
+	diff -u $workdir/build.stderr $workdir_inst/build.stderr
+
+cat <<EOF > $workdir_inst/check.good
 Summary:
        218 Source files used as input
         73 Application link commands
@@ -37,9 +46,10 @@ Totals:
      12082 Binary operators
        558 Errors rewriting source
 EOF
-pkg_check
+pkg_citrun_check
+exit 0
 
-cat <<EOF > tu_list.good
+cat <<EOF > $workdir_inst/tu_list.good
 account.c 241
 addrbook.c 246
 alias.c 658
@@ -143,9 +153,10 @@ utf7.c 292
 util.c 852
 EOF
 
+exit 0
+
 $workdir/mutt < /dev/null > /dev/null
-ok "is write_tus.pl exit code 0" \
-	perl -I$treedir $treedir/tt/write_tus.pl ${CITRUN_PROCDIR}mutt_*
+ok "is write_tus.pl exit code 0" perl tt/write_tus.pl ${CITRUN_PROCDIR}mutt_*
 pkg_check_manifest
 
 pkg_clean

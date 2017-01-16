@@ -6,16 +6,20 @@
 . tt/package.subr 'devel' 'git'
 plan 1
 
-pkg_check_deps
 pkg_clean
-pkg_build
-cp $workdist/config.log /tmp/config.log.good
 
-pkg_clean
+pkg_extract
+pkg_check_deps
+pkg_build
+
+pkg_extract_instrumented
 pkg_build_instrumented
 
+diff -u $workdist/config.log $workdir_inst/git-2.9.0/config.log
+diff -u $workdir/build.stdout $workdir_inst/build.stdout
+diff -u $workdir/build.stderr $workdir_inst/build.stderr
+
 exit 0
-diag diff -u $workdist/config.log /tmp/config.log.good
 # Writes too many shared memory files and quickly fills /tmp.
 #pkg_test
 
