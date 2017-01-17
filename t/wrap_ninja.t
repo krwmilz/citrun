@@ -44,7 +44,6 @@ Instrumentation of '' finished:
     1 Return statement values
     3 Total statements
 Modified source written successfully.
-Rewriting successful.
 Forked compiler ''
 Rewritten source compile successful
 Restored ''

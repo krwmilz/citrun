@@ -54,7 +54,6 @@ Instrumentation of '' finished:
     1 Return statement values
     14 Total statements
 Modified source written successfully.
-Rewriting successful.
 EOF
 
 # Run the command.

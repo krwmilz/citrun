@@ -31,10 +31,8 @@ fi
 find $@ -name citrun.log -print0 | xargs -0 awk '
 $0~/Found source file/		{ summary[0] += 1 }
 $0~/Link detected/		{ summary[1] += 1 }
-$0~/Rewriting successful/	{ summary[2] += 1 }
-$0~/Rewriting failed/		{ summary[3] += 1 }
-$0~/Rewritten source compile successful/ { summary[4] += 1 }
-$0~/Rewritten source compile failed/ { summary[5] += 1 }
+$0~/Rewritten source compile successful/ { summary[2] += 1 }
+$0~/Rewritten source compile failed/ { summary[3] += 1 }
 
 $0~/Lines of source code/	{ totals[0] += $2 }
 $0~/Milliseconds spent rewriting source/ { totals[1] += $2 }
@@ -53,13 +51,11 @@ $0~/Errors rewriting source/	{ totals[12] += $2 }
 END {
 	summary_desc[0] = "Source files used as input"
 	summary_desc[1] = "Application link commands"
-	summary_desc[2] = "Rewrite successes"
-	summary_desc[3] = "Rewrite failures"
-	summary_desc[4] = "Rewritten source compile successes"
-	summary_desc[5] = "Rewritten source compile failures"
+	summary_desc[2] = "Rewritten source compile successes"
+	summary_desc[3] = "Rewritten source compile failures"
 
 	print "Summary:"
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < 4; i++) {
 		if (i != 0 && summary[i] == 0) continue
 		printf "%10i %s\n", summary[i],	summary_desc[i]
 	}

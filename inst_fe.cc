@@ -18,7 +18,7 @@
 #include "lib.h"		// citrun_major, citrun_minor
 #include "prefix.h"		// prefix
 
-#include <clang/Frontend/TextDiagnosticPrinter.h>
+#include <clang/Basic/Diagnostic.h>	// IgnoringDiagConsumer
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/Support/raw_os_ostream.h>
@@ -236,23 +236,18 @@ InstFrontend::instrument()
 		Tool(op.getCompilations(), op.getSourcePathList());
 
 	//
-	// Send tool diagnostics to the log with a prefix to tell it from the
-	// rest.
+	// Ignore all errors/warnings by default.
+	// This makes Tool.run() always return 0 too.
 	//
-	clang::DiagnosticOptions diag_opts;
-	llvm::raw_os_ostream raw_ostream(m_log);
-	clang::TextDiagnosticPrinter *printer =
-		new clang::TextDiagnosticPrinter(raw_ostream, &diag_opts);
-	printer->setPrefix("clang");
-	Tool.setDiagnosticConsumer(printer);
+	Tool.setDiagnosticConsumer(new clang::IgnoringDiagConsumer());
 
 	std::unique_ptr<InstrumentActionFactory> f =
 		llvm::make_unique<InstrumentActionFactory>(m_log, m_is_citruninst, m_source_files);
 
-	// Run the ClangTool over an InstrumentActionFactory, instrumenting and
-	// writing modified source code in place.
-	int ret = Tool.run(f.get());
-	m_log << "Rewriting " << (ret ? "failed." : "successful.") << std::endl;
+	//
+	// Run instrumentation. All source files are processed here.
+	//
+	Tool.run(f.get());
 
 	// All of the time until now is the overhead citrun_inst adds.
 	std::chrono::high_resolution_clock::time_point now =
@@ -262,14 +257,7 @@ InstFrontend::instrument()
 
 	// This is as far as we go in citrun_inst mode.
 	if (m_is_citruninst)
-		exit(ret);
-
-	// If rewriting failed original source files may be in an
-	// inconsistent state.
-	if (ret) {
-		restore_original_src();
-		exec_compiler();
-	}
+		exit(0);
 }
 
 //

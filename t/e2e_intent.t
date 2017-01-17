@@ -60,7 +60,6 @@ Instrumentation of '' finished:
     64 Total statements
     7 Binary operators
 Modified source written successfully.
-Rewriting successful.
 Forked compiler ''
 Rewritten source compile successful
 Restored ''

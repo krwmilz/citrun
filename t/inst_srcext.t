@@ -23,7 +23,6 @@ Instrumentation of '' finished:
     1 Return statement values
     3 Total statements
 Modified source written successfully.
-Rewriting successful.
 EOF
 
 for (@supported_exts) {

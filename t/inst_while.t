@@ -43,7 +43,6 @@ Instrumentation of '' finished:
     18 Total statements
     2 Binary operators
 Modified source written successfully.
-Rewriting successful.
 EOF
 
 # Run the command.

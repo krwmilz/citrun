@@ -42,7 +42,6 @@ Instrumentation of '' finished:
     1 Function definitions
     1 Total statements
 Modified source written successfully.
-Rewriting successful.
 EOF
 
 # Run the command.

@@ -54,7 +54,6 @@ Instrumentation of '' finished:
     58 Total statements
     6 Binary operators
 Modified source written successfully.
-Rewriting successful.
 Forked compiler ''
 Rewritten source compile successful
 Restored ''
