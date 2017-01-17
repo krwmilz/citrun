@@ -95,9 +95,10 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 
 	/* Copy these fields from incoming node verbatim. */
 	new->size = n->size;
-	strncpy(new->comp_file_path, n->comp_file_path, 1024);
-	strncpy(new->abs_file_path,  n->abs_file_path, 1024);
-	new->comp_file_path[1023] = new->abs_file_path[1023] = '\0';
+	strncpy(new->comp_file_path, n->comp_file_path, CITRUN_PATH_MAX);
+	strncpy(new->abs_file_path,  n->abs_file_path, CITRUN_PATH_MAX);
+	new->comp_file_path[CITRUN_PATH_MAX - 1] = '\0';
+	new->abs_file_path[CITRUN_PATH_MAX - 1] = '\0';
 
 	/* Set incoming nodes data pointer to allocated space after struct. */
 	n->data = (unsigned long long *)(new + 1);

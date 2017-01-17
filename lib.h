@@ -1,5 +1,6 @@
-static const unsigned int citrun_major = 0;
-static const unsigned int citrun_minor = 0;
+#define CITRUN_PATH_MAX		 256
+static const unsigned int	 citrun_major = 0;
+static const unsigned int	 citrun_minor = 0;
 
 struct citrun_header {
 	char			 magic[4];
@@ -15,8 +16,8 @@ struct citrun_header {
 
 struct citrun_node {
 	unsigned int		 size;
-	char			 comp_file_path[1024];
-	char			 abs_file_path[1024];
+	char			 comp_file_path[CITRUN_PATH_MAX];
+	char			 abs_file_path[CITRUN_PATH_MAX];
 	unsigned long long	*data;
 };
 

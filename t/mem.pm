@@ -37,7 +37,7 @@ sub new {
 	while ($node_start < $self->{size}) {
 		# Struct field ordering controlled by lib.h.
 		my $data = substr($self->{mem}, $node_start, $node_fixed_size);
-		my @struct_fields = unpack("IZ1024Z1024", $data);
+		my @struct_fields = unpack("IZ256Z256", $data);
 
 		# Store a hash of information we just found.
 		my $buf_size = $struct_fields[0];
