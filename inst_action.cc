@@ -116,6 +116,7 @@ citrun_constructor()
 #ifdef __cplusplus
 }
 #endif
+#line 1
 )";
 
 	clang::SourceLocation start = sm.getLocForStartOfFile(main_fid);
