@@ -10,10 +10,10 @@ if [ $uname = "OpenBSD" ]; then
 	fi
 
 	rm -rf /usr/ports/devel/citrun
-	cp -R distrib/openbsd/citrun /usr/ports/devel/
+	cp -R distrib/openbsd /usr/ports/devel/citrun
 
 	export NO_CHECKSUM=1
-	rm -f /usr/ports/distfiles/citrun-*.tar.gz
+	rm -f /usr/ports/distfiles/citrun*.tar.gz
 
 	make -C /usr/ports/devel/citrun clean=all
 	make -C /usr/ports/devel/citrun package
