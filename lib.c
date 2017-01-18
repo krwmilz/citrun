@@ -42,9 +42,7 @@ add_header()
 {
 	header = extend(sizeof(struct citrun_header));
 
-	/* Must be exactly 4 bytes. */
 	strncpy(header->magic, "ctrn", sizeof(header->magic));
-
 	header->major = citrun_major;
 	header->minor = citrun_minor;
 
@@ -52,7 +50,7 @@ add_header()
 	get_prog_name(header->progname, sizeof(header->progname));
 
 	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
-		strncpy(header->cwd, "", 3);
+		strncpy(header->cwd, "", sizeof(header->cwd));
 
 	atexit(set_exited);
 }
