@@ -7,8 +7,8 @@
 set -eu
 . tt/libtap.subr
 
-# Script dependencies.
-type comm cut diff make nm sed sort > /dev/null
+type comm cut diff make nm sed sort > /dev/null || \
+	bail "OpenBSD end to end script dependencies not met"
 
 # Script arguments give the path in the OpenBSD ports system.
 portdir="/usr/ports/$1/$2"
@@ -26,17 +26,13 @@ export CITRUN_PROCDIR="$workdir/procdir/"
 pkg_extract()
 {
 	make -C $portdir extract > /dev/null
-	ok 'is make extract exit code 0' test $? -eq 0
-
-	diag "Building vanilla port in '$workdir'"
+	ok "is vanilla src extracted in '$workdir'" test $? -eq 0
 }
 
 pkg_extract_instrumented()
 {
 	make -C $portdir WRKDIR="$workdir_inst" extract > /dev/null
-	ok 'is make extract (citrun) exit code 0' test $? -eq 0
-
-	diag "Building instrumented port in '$workdir_inst'"
+	ok "is instrumented src extracted in '$workdir_inst'" test $? -eq 0
 }
 
 pkg_check_deps()
@@ -49,7 +45,7 @@ pkg_check_deps()
 	comm -2 -3 $workdir/deps.uniq $workdir/installed > $workdir/deps_needed
 
 	diff -u /dev/null $workdir/deps_needed || bail "dependencies not met"
-	diag "Port has `wc -l < $workdir/deps.uniq` dependencies, all are met"
+	ok "is all `wc -l < $workdir/deps.uniq` port dependencies met"
 }
 
 pkg_build()
