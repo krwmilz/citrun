@@ -25,9 +25,9 @@ if ($^O eq 'MSWin32') {
 	# Windows has extra lines because exec() is emulated by fork().
 
 	my $rn_count = () = $citrun_log =~ /\r\n/g;
-	is( $rn_count,	16,	'is \r\n count correct' );
+	is( $rn_count,	15,	'is \r\n count correct' );
 }
 else {
 	my $n_count = () = $citrun_log =~ /\n/g;
-	is( $n_count,	15,	'is \n count correct' );
+	is( $n_count,	14,	'is \n count correct' );
 }
