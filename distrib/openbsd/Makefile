@@ -20,8 +20,7 @@ MODULES =		gcc4
 MODGCC4_ARCHS =		*
 MODGCC4_LANGS =		c++
 
-LIB_DEPENDS =		graphics/freeglut \
-			graphics/glew \
+LIB_DEPENDS =		graphics/glew \
 			graphics/glfw
 
 BUILD_DEPENDS =		devel/jam \
