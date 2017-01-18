@@ -38,10 +38,6 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 	m_is_citruninst(is_citrun_inst),
 	m_log(is_citrun_inst)
 {
-#ifndef _WIN32
-	// Sometimes we're not called as citrun_inst so force that here.
-	setprogname("citrun_inst");
-#endif // _WIN32
 }
 
 void

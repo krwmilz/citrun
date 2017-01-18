@@ -53,6 +53,9 @@ InstFrontendUnix::log_os_str()
 	else
 		m_log << " (" << utsname.sysname << "-" << utsname.release
 			<< " " << utsname.machine << ")";
+
+	// Sometimes we're not called as citrun_inst so force that here.
+	setprogname("citrun_inst");
 }
 
 void
