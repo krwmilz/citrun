@@ -1,9 +1,9 @@
-#!/bin/sh -u
+#!/bin/sh -eu
 #
 # Test that building Mutt works.
 #
 . tt/openbsd.subr 'mail' 'mutt'
-plan 11
+plan 16
 
 pkg_clean
 
@@ -15,22 +15,22 @@ pkg_build
 pkg_extract_instrumented
 pkg_build_instrumented
 
-# Diff various things between vanilla and instrumented build.
+pkg_scrub_logs $workdist/config.log $workdist_inst/config.log
+pkg_diff_build_logs
+
 ok 'is config.log identical' \
-	diff -u $workdist/config.log $workdir_inst/mutt-1.6.2/config.log
-ok 'is build stdout identical' \
-	diff -u $workdir/build.stdout $workdir_inst/build.stdout
-ok 'is build stderr identical' \
-	diff -u $workdir/build.stderr $workdir_inst/build.stderr
+	diff -u $workdist/config.log $workdist_inst/config.log
+
+ok 'is size exit code 0' size $workdist/mutt $workdist_inst/mutt
+
+pkg_diff_symbols mutt
 
 cat <<EOF > $workdir_inst/check.good
 Summary:
        218 Source files used as input
         73 Application link commands
-       209 Rewrite successes
-         9 Rewrite failures
-       194 Rewritten source compile successes
-        15 Rewritten source compile failures
+       194 Modified source compiles successful
+        24 Modified source compiles failed
 
 Totals:
      94664 Lines of source code
