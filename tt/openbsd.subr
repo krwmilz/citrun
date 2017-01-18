@@ -1,10 +1,14 @@
 #
 # OpenBSD ports infrastructure compatibility layer for end to end testing.
+# Exports CITRUN_PROCDIR.
 #
 [ `uname` != "OpenBSD" ] && return 0
 
 set -eu
 . tt/libtap.subr
+
+# Script dependencies.
+type comm cut diff make nm sed sort > /dev/null
 
 # Script arguments give the path in the OpenBSD ports system.
 portdir="/usr/ports/$1/$2"
