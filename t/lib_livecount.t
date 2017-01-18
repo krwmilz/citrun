@@ -26,7 +26,7 @@ my %trans_units = %{ $shm->{trans_units} };
 
 my $last_total = 0;
 for (0..20) {
-	usleep 1 * 1000;
+	usleep 5 * 1000;
 	my $total = 0;
 
 	for (keys %trans_units) {
