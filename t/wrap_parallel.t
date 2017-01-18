@@ -40,7 +40,7 @@ my $check_good = <<EOF;
 Summary:
          4 Source files used as input
          4 Application link commands
-         4 Rewritten source compile successes
+         4 Successful modified source compiles
 
 Totals:
          4 Lines of source code

@@ -51,8 +51,8 @@ $0~/Errors rewriting source/	{ totals[12] += $2 }
 END {
 	summary_desc[0] = "Source files used as input"
 	summary_desc[1] = "Application link commands"
-	summary_desc[2] = "Rewritten source compile successes"
-	summary_desc[3] = "Rewritten source compile failures"
+	summary_desc[2] = "Successful modified source compiles"
+	summary_desc[3] = "Failed modified source compiles"
 
 	print "Summary:"
 	for (i = 0; i < 4; i++) {
