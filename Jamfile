@@ -113,7 +113,7 @@ actions SymLink
 #
 # install
 #
-InstallLib	$(PREFIX)/share/citrun	: libcitrun.a ;
+InstallLib	$(PREFIX)/lib		: libcitrun.a ;
 InstallShell	$(PREFIX)/bin		: citrun_check ;
 InstallBin	$(PREFIX)/bin		: citrun_wrap citrun_gl citrun_inst ;
 InstallSyms	$(PREFIX)/share/citrun	: cc gcc clang clang++ g++ c++ egcc eg++ ;
