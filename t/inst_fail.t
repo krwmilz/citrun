@@ -17,20 +17,18 @@ main(void)
 	return 0;
 EOF
 
-$inst->run( args => '-c bad.c', workdir => $inst->curdir );
-
 my $out_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
 Found source file ''
 Command line is ''
 Added clangtool argument ''
-clang: error: error reading ''
-Rewriting failed.
 EOF
 
-my $out = clean_citrun_log(scalar $inst->stdout);
+$inst->run( args => '-c bad.c', workdir => $inst->curdir );
 
+my $out = clean_citrun_log(scalar $inst->stdout);
 eq_or_diff( $out,	$out_good,	'is citrun_inst output identical', { context => 3} );
+
 print $inst->stderr;
-is( $? >> 8,		1,		'is citrun_inst exit code 1' );
+is( $? >> 8,		0,		'is citrun_inst exit code 0' );
