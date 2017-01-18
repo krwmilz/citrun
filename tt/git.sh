@@ -1,10 +1,10 @@
-#!/bin/sh -u
+#!/bin/sh -eu
 #
 # Instruments git, checks logs, and makes sure the resulting program still
 # works.
 #
 . tt/openbsd.subr 'devel' 'git'
-plan 1
+plan 16
 
 pkg_clean
 
@@ -15,22 +15,19 @@ pkg_build
 pkg_extract_instrumented
 pkg_build_instrumented
 
-diff -u $workdist/config.log $workdir_inst/git-2.9.0/config.log
-diff -u $workdir/build.stdout $workdir_inst/build.stdout
-diff -u $workdir/build.stderr $workdir_inst/build.stderr
+pkg_scrub_logs $workdist/config.log $workdist_inst/config.log
+pkg_diff_build_logs
 
-exit 0
 # Writes too many shared memory files and quickly fills /tmp.
 #pkg_test
 
-cat <<EOF > $workdir/check.good
+# Last known good instrumentation report.
+cat <<EOF > $workdir_inst/check.good
 Summary:
        383 Source files used as input
         84 Application link commands
-       377 Rewrite successes
-         6 Rewrite failures
-       374 Rewritten source compile successes
-         3 Rewritten source compile failures
+       374 Modified source compiles successful
+         9 Modified source compiles failed
 
 Totals:
     185771 Lines of source code
@@ -46,10 +43,9 @@ Totals:
      34627 Binary operators
       1531 Errors rewriting source
 EOF
-pkg_check
-exit 0
+pkg_citrun_check
 
-cat <<EOF > $workdir/tu_list.good
+cat <<EOF > $workdir_inst/tu_list.good
 abspath.c 181
 advice.c 120
 alias.c 78
@@ -321,9 +317,12 @@ xdiff/xutils.c 496
 zlib.c 274
 EOF
 
-$workdist/git < /dev/null > /dev/null
+$workdist_inst/git --help > /dev/null
+ok 'is instrumented git exit code 0' test $? -eq 0
 
-ok "is write_tus.pl exit code 0" tt/write_tus.pl $workdir/tu_list.out ${CITRUN_PROCDIR}git_*
-ok "translation unit manifest" diff -u $workdir/tu_list.good $workdir/tu_list.out
+ok "is write_tus.pl exit code 0" \
+	tt/write_tus.pl $workdir_inst/tu_list.out ${CITRUN_PROCDIR}git_*
+ok "translation unit manifest" \
+	diff -u $workdir_inst/tu_list.good $workdir_inst/tu_list.out
 
 pkg_clean
