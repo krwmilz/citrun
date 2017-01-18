@@ -1,13 +1,18 @@
+#
+# OpenBSD ports infrastructure compatibility layer for end to end testing.
+#
 [ `uname` != "OpenBSD" ] && return 0
 
-set -u
+set -eu
 . tt/libtap.subr
 
 # Script arguments give the path in the OpenBSD ports system.
 portdir="/usr/ports/$1/$2"
 workdist=`make -C $portdir show=WRKDIST`
 workdir=`make -C $portdir show=WRKDIR`
+
 workdir_inst="${workdir}-citrun"
+workdist_inst=`make -C $portdir WRKDIR=$workdir_inst show=WRKDIST`
 
 # This is used by the OpenBSD /usr/ports/infratstucture/.
 portpath="${PWD}/compilers:$workdir_inst/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11R6/bin"
@@ -83,7 +88,7 @@ pkg_test_instrumented()
 
 pkg_citrun_check()
 {
-	citrun_check $workdir_inst > $workdir_inst/check.out
+	citrun_check $workdist_inst > $workdir_inst/check.out
 	ok 'is citrun_check successful' test $? -eq 0
 
 	ok 'is Milliseconds sanitized' \
@@ -97,4 +102,41 @@ pkg_clean()
 	make -C $portdir clean=all > /dev/null
 	ok 'is make clean exit code 0' test $? -eq 0
 	ok 'is rm -rf instrumented workdir exit code 0' rm -rf $workdir_inst
+}
+
+#
+# By default operates on build.std{out,err} but optionally takes extra files as
+# parameters.
+#
+pkg_scrub_logs()
+{
+	#
+	# Replace port specific paths like /usr/ports/pobj/.* and .text section
+	# hex offsets with constants.
+	#
+	sed -i.bak \
+		-e 's;/usr/ports/pobj/.*/;<port_path>;' \
+		-e 's/\.text+0x[0-9a-f]*/\.text+OFF/' \
+		$workdir/build.stdout $workdir_inst/build.stdout \
+		$workdir/build.stderr $workdir_inst/build.stderr \
+		$@
+}
+
+pkg_diff_build_logs()
+{
+	ok 'is build stdout identical' \
+		diff -u $workdir/build.stdout $workdir_inst/build.stdout
+	ok 'is build stderr identical' \
+		diff -u $workdir/build.stderr $workdir_inst/build.stderr
+}
+
+pkg_diff_symbols()
+{
+	nm -P $workdist/$1 | cut -f 1-2 -d ' ' | cut -f 1 -d '.' > $workdir/nm.out
+	ok "is nm on vanilla binary '$1' exit code 0" test $? -eq 0
+
+	nm -P $workdist_inst/$1 | cut -f 1-2 -d ' ' | cut -f 1 -d '.' > $workdir_inst/nm.out
+	ok "is nm on instrumented binary '$1' exit code 0'" test $? -eq 0
+
+	ok 'is symbol diff empty' diff -u $workdir/nm.out $workdir_inst/nm.out
 }
