@@ -32,7 +32,7 @@ do-configure:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ./configure
 
 do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q
+	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q -j4
 
 do-install:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${ALL_FAKE_FLAGS} jam install
