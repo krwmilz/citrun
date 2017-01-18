@@ -9,8 +9,7 @@ echo Configuring...
 echo
 
 # These binaries are assumed throughout so make sure they are available.
-type pkg-config
-type jam
+type pkg-config jam
 echo
 
 # Operating system specific variables.
@@ -83,16 +82,26 @@ INST_LIBS="-lcurses
 	-lLLVMCore
 	-lLLVMSupport"
 
+PREFIX=${PREFIX-`pwd`}
+if [ ${PREFIX} == `pwd`  ]; then
+	SHAREDIR=compilers
+	LIBDIR=
+else
+	SHAREDIR=share/citrun
+	LIBDIR=lib
+fi
+
 # Write prefix.h
 cat <<EOF > prefix.h
-static const char *prefix = R"(${PREFIX-`pwd`})";
+static const char *share_dir = R"(${PREFIX}/${SHAREDIR})";
+static const char *lib_dir = R"(${PREFIX}/${LIBDIR})";
 EOF
 
 # Write citrun_wrap
 cat <<EOF > citrun_wrap
 #!/bin/sh
 
-export PATH="${PREFIX-`pwd`}/compilers:\$PATH"
+export PATH="${PREFIX}/${SHAREDIR}:\$PATH"
 exec \$@
 EOF
 chmod +x citrun_wrap

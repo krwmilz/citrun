@@ -55,11 +55,9 @@ InstFrontend::log_identity()
 void
 InstFrontend::get_paths()
 {
-	m_compilers_path = prefix ;
-	m_compilers_path += dir_sep();
-	m_compilers_path.append("compilers");
+	m_compilers_path = share_dir ;
 
-	m_lib_path = prefix ;
+	m_lib_path = lib_dir ;
 	m_lib_path += dir_sep();
 	m_lib_path += lib_name();
 
