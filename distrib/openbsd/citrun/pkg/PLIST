@@ -1,12 +1,13 @@
 @comment $OpenBSD$
-bin/citrun-check
-@bin bin/citrun-inst
-@bin bin/citrun-gl
-bin/citrun-wrap
-@man man/man1/citrun-check.1
-@man man/man1/citrun-gl.1
-@man man/man1/citrun-term.1
-@man man/man1/citrun-wrap.1
+bin/citrun_check
+@bin bin/citrun_inst
+@bin bin/citrun_gl
+bin/citrun_wrap
+lib/libcitrun.a
+@man man/man1/citrun_check.1
+@man man/man1/citrun_gl.1
+@man man/man1/citrun_inst.1
+@man man/man1/citrun_wrap.1
 share/citrun/
 share/citrun/c++
 share/citrun/cc
@@ -16,4 +17,3 @@ share/citrun/eg++
 share/citrun/egcc
 share/citrun/g++
 share/citrun/gcc
-share/citrun/libcitrun.a
