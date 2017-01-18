@@ -17,6 +17,7 @@ if [ $uname = "OpenBSD" ]; then
 
 	make -C /usr/ports/devel/citrun clean=all
 	make -C /usr/ports/devel/citrun package
+	make -C /usr/ports/devel/citrun clean
 	exit 0
 
 elif [ $uname = "Darwin" ]; then
