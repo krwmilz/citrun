@@ -7,7 +7,7 @@ use Test::TrailingSpace;
 my $finder = Test::TrailingSpace->new(
 	{
 		root => '.',
-		filename_regex => qr/\.(?:t|pm|pl|cc|h|sh)\z/,
+		filename_regex => qr/\.(?:t|pm|pl|cc|h|sh|1)\z/,
 	},
 );
 
