@@ -29,14 +29,14 @@ if $(NT) {
 actions Analysis
 {
 	scan-build --use-c++=eg++ ./configure
-	scan-build -o html --use-c++=eg++ jam -j4
+	scan-build -o html --use-c++=eg++ jam
 }
 
 actions TestCoverage
 {
 	set -e
 	CFLAGS="-coverage" LDFLAGS="-coverage" ./configure
-	jam -j4
+	jam
 
 	# Roll libgcov.a into libcitrun.a.
 	ar -M < t/libcitrun_gcov.mri
