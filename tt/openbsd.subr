@@ -18,8 +18,8 @@ workdir=`make -C $portdir show=WRKDIR`
 workdir_inst="${workdir}-citrun"
 workdist_inst=`make -C $portdir WRKDIR=$workdir_inst show=WRKDIST`
 
-# This is used by the OpenBSD /usr/ports/infratstucture/.
-portpath="${PWD}/compilers:$workdir_inst/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11R6/bin"
+# This is used by the OpenBSD /usr/ports/infrastructure/.
+portpath="/usr/local/share/citrun:$workdir_inst/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11R6/bin"
 
 export CITRUN_PROCDIR="$workdir/procdir/"
 
@@ -38,7 +38,7 @@ pkg_extract_instrumented()
 pkg_check_deps()
 {
 	make -C $portdir full-all-depends > $workdir/deps
-	make -C $portdir full-test-depends >> $workdir/deps
+	#make -C $portdir full-test-depends >> $workdir/deps
 	sort $workdir/deps | uniq > $workdir/deps.uniq
 
 	pkg_info -q > $workdir/installed
