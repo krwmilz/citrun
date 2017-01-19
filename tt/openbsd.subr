@@ -18,6 +18,12 @@ workdir=`make -C $portdir show=WRKDIR`
 workdir_inst="${workdir}-citrun"
 workdist_inst=`make -C $portdir WRKDIR=$workdir_inst show=WRKDIST`
 
+# Release testing must be done on installed package.
+if ! pkg_info -e citrun-9999; then
+	echo "C It Run not found."
+	exit 1
+fi
+
 # This is used by the OpenBSD /usr/ports/infrastructure/.
 portpath="/usr/local/share/citrun:$workdir_inst/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11R6/bin"
 
