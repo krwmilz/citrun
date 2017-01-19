@@ -9,8 +9,7 @@ if [ $uname = "OpenBSD" ]; then
 		exit 1
 	fi
 
-	rm -rf /usr/ports/devel/citrun
-	cp -R distrib/openbsd /usr/ports/devel/citrun
+	cp -R distrib/openbsd/* /usr/ports/devel/citrun/
 
 	export NO_CHECKSUM=1
 	rm -f /usr/ports/distfiles/citrun*.tar.gz
