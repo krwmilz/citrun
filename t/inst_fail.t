@@ -23,9 +23,15 @@ Compilers path = ''
 Found source file ''
 Command line is ''
 Added clangtool argument ''
+Instrumentation of '' finished:
+    5 Lines of source code
+    1 Function definitions
+    1 Return statement values
+    3 Total statements
+Modified source written successfully.
 EOF
 
-$inst->run( args => '-c bad.c', workdir => $inst->curdir );
+$inst->run( args => '-c bad.c', chdir => $inst->curdir );
 
 my $out = clean_citrun_log(scalar $inst->stdout);
 eq_or_diff( $out,	$out_good,	'is citrun_inst output identical', { context => 3} );
