@@ -1,4 +1,0 @@
-C It Run is a suite of tools that lets you watch your source code execute.
-
-This package contains citrun binaries that have been instrumented with citrun,
-in case you wanted to watch citrun itself running.
