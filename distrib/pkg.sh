@@ -12,11 +12,13 @@ if [ $uname = "OpenBSD" ]; then
 	cp -R distrib/openbsd/* /usr/ports/devel/citrun/
 
 	export NO_CHECKSUM=1
-	rm -f /usr/ports/distfiles/citrun*.tar.gz
-
+	rm -f /usr/ports/distfiles/citrun-*.tar.gz
 	make -C /usr/ports/devel/citrun clean=all
+
 	make -C /usr/ports/devel/citrun package
+
 	make -C /usr/ports/devel/citrun clean
+	rm -f /usr/ports/distfiles/citrun-*.tar.gz
 	exit 0
 
 elif [ $uname = "Darwin" ]; then
