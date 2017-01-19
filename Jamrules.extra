@@ -51,5 +51,36 @@ actions TestCoverage
 	mv *.gcov gcov/
 }
 
-Analysis analysis ;
-TestCoverage coverage ;
+#
+# Use C It Run on itself.
+#
+actions CCItRunRun
+{
+	set -e
+
+	#
+	# Namespace global instrumentation variables such that they don't
+	# collide with the actual instrumentation.
+	#
+	sed -i \
+		-e "s,struct citrun_node,struct ccitrunrun_node," \
+		-e "s,citrun_node_add,ccitrunrun_node_add," \
+		-e "s,citrun_major,ccitrunrun_major,g" \
+		-e "s,citrun_minor,ccitrunrun_minor,g" \
+		lib.h lib.c inst_action.cc inst_fe.cc gl_procfile.cc
+
+	#
+	# Change binary names so we can do a side by side installation.
+	#
+	sed -i \
+		-e "s,citrun_inst,ccitrunrun_inst," \
+		-e "s,citrun_term,ccitrunrun_term," \
+		-e "s,citrun_gl,ccitrunrun_gl," \
+		-e "s,libcitrun,libccitrunrun," \
+		Jamfile lib.c inst_main.cc
+	jam
+}
+
+Analysis	analysis ;
+TestCoverage	coverage ;
+CCItRunRun	ccitrunrun ;
