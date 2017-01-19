@@ -25,38 +25,48 @@
 .Sh DESCRIPTION
 The
 .Nm
-utility recursively searches for activity logs created by
+utility searches for activity logs created by
 .Xr citrun_wrap 1 .
-.Pp
-When
+If
 .Ar dir
-is given it is searched instead of the current working
+is given it will be searched instead of the current working
 directory.
 .Pp
-The first section output by
+The
 .Nm
-is a summary of all rewrite activity. It can contain any of the following
-events:
+utility will usually output two sections titled
+.Qq Summary
+and
+.Qq Totals
+each containing counts of certain events that occurred during
+rewriting.
+.Pp
+The
+.Qq Summary
+section contains at least one of the following events:
 .Pp
 .Bl -tag -width Ds
 .It Source files used as input
-The total number of C/C++ source files that had rewriting attempted on them.
+The total number of C/C++ source files input for rewriting.
 .It Application link commands
-Number of link commands detected and modified to include the runtime.
-.It Rewrite successes
-The number of times the rewriter successfully transformed the entire source
-file.
-.It Rewrite failures
-Rewriting a source file failed. There are two failure cases, either native
-parsing the original source file also fails, or, only citrun_inst failed parsing
-the source file.
-.It Rewritten source compile successes
-The number of times the rewritten source file is processed successfully by the
-native compiler.
-.It Rewritten source compile failures
-Compiling the rewritten source file failed. There are two failure cases, either
-compiling the original source file also fails or only compiling the
-rewritten source fails.
+The number of application link commands detected during rewriting.
+.It Successful modified source compiles
+The number of rewritten source files successfully compiled with the native
+compiler.
+.It Failed modified source compiles
+The number of rewritten source files that failed compilation with the native
+compiler.
+.Pp
+This can happen for either two reasons:
+.Bl -bullet -compact
+.It
+Compiling the original source file would have failed too
+.It
+Only compiling the rewritten source file failed
+.El
+.Pp
+The current software design does not admit an efficient, automatic method to
+tell the above two cases apart.
 .El
 .Sh EXIT STATUS
 .Ex -std
