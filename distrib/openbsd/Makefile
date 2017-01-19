@@ -2,8 +2,7 @@
 
 COMMENT =		see your source code run
 
-DISTNAME =		citrun
-PKGNAME =		citrun-0.0
+DISTNAME =		citrun-9999
 CATEGORIES =		devel
 
 HOMEPAGE =		http://cit.run
@@ -13,7 +12,7 @@ PERMIT_PACKAGE_CDROM =	Yes
 
 MASTER_SITES =		${HOMEPAGE}/
 
-WANTLIB +=		curses GL GLU GLEW glfw c freetype m pthread z
+WANTLIB +=		GL GLU GLEW glfw c freetype m pthread z
 
 # -std=c++11
 MODULES =		gcc4
