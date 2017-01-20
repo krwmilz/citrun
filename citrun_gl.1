@@ -18,26 +18,42 @@
 .Os
 .Sh NAME
 .Nm citrun_gl
-.Nd OpenGL viewer
+.Nd see your source code run
 .Sh DESCRIPTION
-Multiplexes execution data from any running instrumented programs into an
-OpenGL window.
-.Pp
-Started instrumented programs will try connecting to
+The
 .Nm
-when it is running. When that succeeds execution data will appear in the viewer
-window.
+utility shows any executing (or executed) programs built with
+.Xr citrun_wrap 1 .
 .Pp
+Every time a program built with
+.Xr citrun_wrap 1
+is executed a new unique file is created that
 .Nm
-uses process group information from connected programs to aggregate similar
-processes together.
-.Sh FILES
+reads and displays.
+.Pp
+Any currently running programs are shown as such with animations indicating
+which lines are executing.
+Programs that have exited already show the hottest code paths taken during
+application lifetime.
+.Pp
+The viewer is keyboard driven with the following keys being recognized:
 .Bl -tag -width Ds
-.It Pa /tmp/citrun.socket
-Listen socket.
+.It q
+Quit application.
+.It -
+Zoom out.
+.It =
+Zoom in.
+.It h
+Move left.
+.It j
+Move down.
+.It k
+Move up
+.It l
+Move right.
 .El
 .Sh EXIT STATUS
 .Ex -std
 .Sh SEE ALSO
-.Xr citrun_wrap 1 ,
-.Xr citrun_term 1
+.Xr citrun_wrap 1
