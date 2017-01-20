@@ -2,11 +2,7 @@ p  { line-height: 1.5em; }
 li { line-height: 1.5em; }
 
 body {
-	max-width: 50em;
+	max-width: 40em;
 	padding: 10px;
 	margin: auto;
-}
-
-.inline_logo {
-	height: 1em;
 }
