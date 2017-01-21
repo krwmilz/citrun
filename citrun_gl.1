@@ -18,21 +18,21 @@
 .Os
 .Sh NAME
 .Nm citrun_gl
-.Nd see your source code run
+.Nd see code run
 .Sh DESCRIPTION
 The
 .Nm
-utility shows any executing (or executed) programs built with
+utility shows any programs built with
 .Xr citrun_wrap 1 .
 .Pp
 Every time a program built with
 .Xr citrun_wrap 1
-is executed a new unique file is created that
+is executed
 .Nm
-reads and displays.
+detects and displays it.
 .Pp
-Any currently running programs are shown as such with animations indicating
-which lines are executing.
+Any running programs are shown as such with animations indicating
+executing lines.
 Programs that have exited already show the hottest code paths taken during
 application lifetime.
 .Pp
