@@ -93,9 +93,12 @@ InstFrontendUnix::copy_file(std::string const &dst_fn, std::string const &src_fn
 	src.close();
 	dst.close();
 
-	// Restore the original access and modification time
+	//
+	// Restore the original access and modification time, it's not critical
+	// if it fails.
+	//
 	if (utimes(dst_fn.c_str(), st_tim) < 0)
-		err(1, "utimes");
+		warn("utimes");
 }
 
 bool
