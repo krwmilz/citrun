@@ -73,7 +73,7 @@ mkstemp(char *template)
  * Returns a pointer to the extended region on success, exits on failure.
  */
 void *
-extend(size_t req_bytes)
+citrun_extend(size_t req_bytes)
 {
 	size_t	 aligned_bytes;
 	size_t	 len;
@@ -86,7 +86,6 @@ extend(size_t req_bytes)
 
 	page_mask = system_info.dwAllocationGranularity - 1;
 	aligned_bytes = (req_bytes + page_mask) & ~page_mask;
-
 
 	/* Get current file length. */
 	if ((len = GetFileSize(h, NULL)) == INVALID_FILE_SIZE)
@@ -110,7 +109,6 @@ extend(size_t req_bytes)
 		Err(1, "MapViewOfFile");
 
 	CloseHandle(fm);
-
 	return mem;
 }
 
@@ -118,7 +116,7 @@ extend(size_t req_bytes)
  * Opens a file with a random suffix. Exits on error.
  */
 void
-open_fd()
+citrun_open_fd()
 {
 	char			*procdir;
 	char			 procfile[PATH_MAX];
