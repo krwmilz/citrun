@@ -140,14 +140,13 @@ open_fd()
 }
 
 void
-get_prog_name(char *buf, size_t buf_size)
-{
-	if (GetModuleFileName(NULL, buf, buf_size) == 0)
-		Err(1, "GetModuleFileName");
-}
-
-void
-get_pids(unsigned int pids[3])
+citrun_os_info(struct citrun_header *h)
 {
 	pids[0] = getpid();
+
+	if (GetModuleFileName(NULL, h->progname, sizeof(h->progname)) == 0)
+		Err(1, "GetModuleFileName");
+
+	if (getcwd(h->cwd, sizeof(h->cwd)) == NULL)
+		strncpy(h->cwd, "", sizeof(h->cwd));
 }
