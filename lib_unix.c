@@ -25,7 +25,7 @@
 #include <string.h>		/* strl{cpy,cat} */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
 
-#include "lib_os.h"
+#include "libP.h"
 
 static int			 fd;
 

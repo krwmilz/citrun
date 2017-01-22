@@ -17,7 +17,7 @@
 #include <stdio.h>		/* fprintf, stderr */
 #include <string.h>		/* strncpy */
 
-#include "lib_os.h"		/* lib.h, extend, open_fd */
+#include "libP.h"		/* lib.h, extend, open_fd */
 
 
 static int			 init;

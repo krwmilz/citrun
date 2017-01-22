@@ -19,7 +19,7 @@
 #include <io.h>
 #define PATH_MAX 32000
 
-#include "lib_os.h"
+#include "libP.h"
 
 
 static HANDLE			 h = INVALID_HANDLE_VALUE;
