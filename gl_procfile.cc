@@ -40,7 +40,6 @@ GlProcessFile::GlProcessFile(std::string const &path, demo_font_t *font) :
 	ss << "Program: " << m_header->progname << std::endl;
 	ss << "Translation Units: " << m_header->units << std::endl;
 	ss << "Lines of Code: " << m_header->loc << std::endl;
-	ss << "Done: " << m_header->exited << std::endl;
 
 	m_glbuffer.add_text(ss.str().c_str(), font, 2);
 	glyphy_point_t cur_pos;
