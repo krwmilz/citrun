@@ -41,10 +41,13 @@ citrun_add_header()
 }
 
 /*
- * Public Interface.
+ * Public Interface citrun_node_add.
  *
- * Copies n into the shared memory file and then points n->data to a region of
- * memory located right after n that's at least 8 * n->size large.
+ * Create or enlarge memory block backed by file. The first call to this
+ * function creates a new memory block with a header.
+ * Any call after the first enlarges the memory block with enough storage for:
+ * - copying incoming struct citrun_node verbatim
+ * - live execution buffers (8 bytes per line of instrumented translation unit)
  * Exits on failure.
  */
 void
