@@ -26,10 +26,9 @@ sub new {
 		$self->{pids}[0], $self->{pids}[1], $self->{pids}[2],
 		$self->{units},
 		$self->{loc},
-		$self->{done},
 		$self->{progname},
 		$self->{cwd}
-	) = unpack("Z4I8Z1024Z1024", $self->{mem});
+	) = unpack("Z4I7Z1024Z1024", $self->{mem});
 
 	my %trans_units;
 	my $node_start = get_aligned_size($header_size);

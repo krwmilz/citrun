@@ -6,7 +6,7 @@ use warnings;
 
 use t::mem;
 use t::utils;
-plan tests => 19;
+plan tests => 18;
 
 
 my $dir = setup_projdir();
@@ -24,7 +24,6 @@ is( $shm->{major},	0,	'is major 0' );
 is( $shm->{minor},	0,	'is minor 0' );
 is( $shm->{units},	3,	'is 3 translation units' );
 is( $shm->{loc},	42,	'is 42 lines of code' );
-is( $shm->{done},	1,	'is done signalled' );
 
 my ($pid, $ppid, $pgrp) = @{ $shm->{pids} };
 cmp_ok( $pid,	'<',	100 * 1000,	'is pid < max pid' );
