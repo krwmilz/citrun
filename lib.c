@@ -20,34 +20,33 @@
 #include "libP.h"		/* lib.h, extend, open_fd */
 
 
-static int			 init;
-static struct citrun_header	*header;
+static struct citrun_header	*citrun_header;
 
 /*
  * Try and set a flag if the atexit() trigger actually fires.
  */
 static void
-set_exited(void)
+citrun_set_exited(void)
 {
-	header->exited = 1;
+	citrun_header->exited = 1;
 }
 
 /*
  * Extends the memory mapping and puts a struct citrun_header on top of it.
  */
 static void
-add_header()
+citrun_add_header()
 {
-	header = extend(sizeof(struct citrun_header));
+	citrun_header = citrun_extend(sizeof(struct citrun_header));
 
-	strncpy(header->magic, "ctrn", sizeof(header->magic));
-	header->major = citrun_major;
-	header->minor = citrun_minor;
+	strncpy(citrun_header->magic, "ctrn", sizeof(citrun_header->magic));
+	citrun_header->major = citrun_major;
+	citrun_header->minor = citrun_minor;
 
 	/* Fill in os specific information in header. */
-	citrun_os_info(header);
+	citrun_os_info(citrun_header);
 
-	atexit(set_exited);
+	atexit(citrun_set_exited);
 }
 
 /*
@@ -62,6 +61,7 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 {
 	size_t			 sz;
 	struct citrun_node	*new;
+	static int		 citrun_init;
 
 	/* Binary compatibility between versions not guaranteed. */
 	if (major != citrun_major || minor != citrun_minor) {
@@ -71,20 +71,20 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 		exit(1);
 	}
 
-	if (init == 0) {
-		open_fd();
-		add_header();
-		init = 1;
+	if (citrun_init == 0) {
+		citrun_open_fd();
+		citrun_add_header();
+		citrun_init = 1;
 	}
 
 	/* Allocate enough room for node and live execution buffers. */
 	sz = sizeof(struct citrun_node);
 	sz += n->size * sizeof(unsigned long long);
-	new = extend(sz);
+	new = citrun_extend(sz);
 
 	/* Increment accumulation fields in header. */
-	header->units++;
-	header->loc += n->size;
+	citrun_header->units++;
+	citrun_header->loc += n->size;
 
 	/* Copy these fields from incoming node verbatim. */
 	new->size = n->size;

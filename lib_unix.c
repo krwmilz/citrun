@@ -35,7 +35,7 @@ static int			 fd;
  * Returns a pointer to the extended region on success, exits on failure.
  */
 void *
-extend(size_t req_bytes)
+citrun_extend(size_t req_bytes)
 {
 	size_t	 aligned_bytes;
 	off_t	 len;
@@ -66,7 +66,7 @@ extend(size_t req_bytes)
  * Opens a file with a random suffix. Exits on error.
  */
 void
-open_fd()
+citrun_open_fd()
 {
 	const char		*procdir;
 	char			 procfile[PATH_MAX];
