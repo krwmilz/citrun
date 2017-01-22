@@ -1,7 +1,7 @@
+#include "lib.h"
 /*
  * Operating system specific functions.
  */
 void	*extend(size_t);
-void	 get_prog_name(char *, size_t);
-void	 get_pids(unsigned int [3]);
+void	 citrun_os_info(struct citrun_header *);
 void	 open_fd();

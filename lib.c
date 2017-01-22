@@ -16,10 +16,8 @@
 #include <stdlib.h>		/* exit */
 #include <stdio.h>		/* fprintf, stderr */
 #include <string.h>		/* strncpy */
-#include <unistd.h>		/* getcwd */
 
-#include "lib.h"		/* citrun_*, struct citrun_{header,node} */
-#include "lib_os.h"		/* extend, open_fd */
+#include "lib_os.h"		/* lib.h, extend, open_fd */
 
 
 static int			 init;
@@ -46,11 +44,8 @@ add_header()
 	header->major = citrun_major;
 	header->minor = citrun_minor;
 
-	get_pids(header->pids);
-	get_prog_name(header->progname, sizeof(header->progname));
-
-	if (getcwd(header->cwd, sizeof(header->cwd)) == NULL)
-		strncpy(header->cwd, "", sizeof(header->cwd));
+	/* Fill in os specific information in header. */
+	citrun_os_info(header);
 
 	atexit(set_exited);
 }

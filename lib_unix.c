@@ -86,16 +86,18 @@ open_fd()
 		err(1, "mkstemp");
 }
 
+/*
+ * Fills in a few operating system specific fields in struct citrun_header.
+ */
 void
-get_pids(unsigned int pids[3])
+citrun_os_info(struct citrun_header *h)
 {
-	pids[0] = getpid();
-	pids[1] = getppid();
-	pids[2] = getpgrp();
-}
+	h->pids[0] = getpid();
+	h->pids[1] = getppid();
+	h->pids[2] = getpgrp();
 
-void
-get_prog_name(char *buf, size_t buf_size)
-{
-	strlcpy(buf, getprogname(), buf_size);
+	strlcpy(h->progname, getprogname(), sizeof(h->progname));
+
+	if (getcwd(h->cwd, sizeof(h->cwd)) == NULL)
+		strncpy(h->cwd, "", sizeof(h->cwd));
 }
