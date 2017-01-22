@@ -17,36 +17,27 @@
 #include <stdio.h>		/* fprintf, stderr */
 #include <string.h>		/* strncpy */
 
-#include "libP.h"		/* lib.h, extend, open_fd */
+#include "libP.h"		/* lib.h, citrun_extend, citrun_open_fd */
 
-
-static struct citrun_header	*citrun_header;
-
-/*
- * Try and set a flag if the atexit() trigger actually fires.
- */
-static void
-citrun_set_exited(void)
-{
-	citrun_header->exited = 1;
-}
 
 /*
  * Extends the memory mapping and puts a struct citrun_header on top of it.
  */
-static void
+static struct citrun_header *
 citrun_add_header()
 {
-	citrun_header = citrun_extend(sizeof(struct citrun_header));
+	struct citrun_header	*new_header;
 
-	strncpy(citrun_header->magic, "ctrn", sizeof(citrun_header->magic));
-	citrun_header->major = citrun_major;
-	citrun_header->minor = citrun_minor;
+	new_header = citrun_extend(sizeof(struct citrun_header));
+
+	strncpy(new_header->magic, "ctrn", sizeof(new_header->magic));
+	new_header->major = citrun_major;
+	new_header->minor = citrun_minor;
 
 	/* Fill in os specific information in header. */
-	citrun_os_info(citrun_header);
+	citrun_os_info(new_header);
 
-	atexit(citrun_set_exited);
+	return new_header;
 }
 
 /*
@@ -59,9 +50,9 @@ citrun_add_header()
 void
 citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 {
-	size_t			 sz;
-	struct citrun_node	*new;
-	static int		 citrun_init;
+	size_t				 sz;
+	struct citrun_node		*new;
+	static struct citrun_header	*header = NULL;
 
 	/* Binary compatibility between versions not guaranteed. */
 	if (major != citrun_major || minor != citrun_minor) {
@@ -71,10 +62,9 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 		exit(1);
 	}
 
-	if (citrun_init == 0) {
+	if (header == NULL) {
 		citrun_open_fd();
-		citrun_add_header();
-		citrun_init = 1;
+		header = citrun_add_header();
 	}
 
 	/* Allocate enough room for node and live execution buffers. */
@@ -83,8 +73,8 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 	new = citrun_extend(sz);
 
 	/* Increment accumulation fields in header. */
-	citrun_header->units++;
-	citrun_header->loc += n->size;
+	header->units++;
+	header->loc += n->size;
 
 	/* Copy these fields from incoming node verbatim. */
 	new->size = n->size;
