@@ -15,8 +15,6 @@ echo
 # Operating system specific variables.
 uname=`uname`
 if [ $uname = OpenBSD ]; then
-	LDGROUP_START="-Wl,--start-group"
-	LDGROUP_END="-Wl,--end-group"
 	FONT_PATH="/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
 	CXX=${CXX-eg++}
 	LLVM_INCLUDES='-I/usr/local/include'
@@ -30,8 +28,6 @@ elif [ $uname = Darwin ]; then
 elif [ $uname = Linux ]; then
 	GL_EXTRALIB="-lbsd"
 	INST_EXTRALIB="-lbsd"
-	LDGROUP_START="-Wl,--start-group"
-	LDGROUP_END="-Wl,--end-group"
 	FONT_PATH="/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 else
 	echo WARNING: Platform $uname not tested. Compilation may fail.
@@ -56,22 +52,20 @@ INST_LIBS="-lcurses
 	-lpthread
 	-lz
 	-lm
-	${LDGROUP_START-}
-	-lclangAST
-	-lclangAnalysis
-	-lclangBasic
-	-lclangDriver
-	-lclangEdit
-	-lclangFrontend
 	-lclangFrontendTool
-	-lclangLex
-	-lclangParse
-	-lclangRewrite
-	-lclangRewriteFrontend
-	-lclangSema
+	-lclangFrontend
 	-lclangSerialization
+	-lclangDriver
 	-lclangTooling
-	${LDGROUP_END-}
+	-lclangParse
+	-lclangSema
+	-lclangAnalysis
+	-lclangRewriteFrontend
+	-lclangRewrite
+	-lclangEdit
+	-lclangAST
+	-lclangLex
+	-lclangBasic
 	-lLLVMOption
 	-lLLVMTransformUtils
 	-lLLVMAnalysis
