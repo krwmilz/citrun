@@ -15,7 +15,6 @@ echo
 # Operating system specific variables.
 uname=`uname`
 if [ $uname = OpenBSD ]; then
-	FONT_PATH="/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
 	CXX=${CXX-eg++}
 	LLVM_INCLUDES='-I/usr/local/include'
 	#LLVM_INCLUDES='-I/usr/src/gnu/llvm/tools/clang/include
@@ -24,11 +23,9 @@ if [ $uname = OpenBSD ]; then
 	#-I/usr/obj/gnu/usr.bin/clang/include'
 elif [ $uname = Darwin ]; then
 	GL_EXTRALIB="-framework OpenGL"
-	FONT_PATH="/Library/Fonts/Andale Mono.ttf"
 elif [ $uname = Linux ]; then
 	GL_EXTRALIB="-lbsd"
 	INST_EXTRALIB="-lbsd"
-	FONT_PATH="/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
 else
 	echo WARNING: Platform $uname not tested. Compilation may fail.
 	echo
@@ -116,8 +113,6 @@ C++FLAGS += ${CFLAGS-} -Wall -W -Wcast-qual
 	-fvisibility-inlines-hidden
 	-Wdelete-non-virtual-dtor ;
 LINKFLAGS += ${LDFLAGS-} ;
-
-FONT_PATH = "${FONT_PATH}" ;
 
 GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
 GL_LIBS = ${GL_EXTRALIB-} `pkg-config --libs glfw3 glew freetype2` ;

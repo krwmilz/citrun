@@ -44,7 +44,6 @@ Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
 Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
 Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
 
-ObjectDefines gl_font.cc : FONT_PATH=\\\"$(FONT_PATH)\\\" ;
 ObjectC++Flags gl_main.cc gltest.cc $(GL_SRCS) : $(GL_CFLAGS) ;
 
 LINKLIBS on citrun_gl citrun_gltest += -lm $(GL_LIBS) ;

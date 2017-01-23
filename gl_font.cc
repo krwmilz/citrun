@@ -24,6 +24,18 @@
 #include "gl_font.h"
 #include "glyphy/glyphy-freetype.h"
 
+#if defined(__OpenBSD__)
+#define FONT_PATH "/usr/X11R6/lib/X11/fonts/TTF/DejaVuSansMono.ttf"
+#elif defined(__APPLE__)
+#define FONT_PATH "/Library/Fonts/Andale Mono.ttf"
+#elif defined(__gnu_linux__)
+#define FONT_PATH "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+#elif defined(_WIN32)
+#define FONT_PATH ""
+#else
+#error "Font string not configured."
+#endif
+
 
 typedef std::unordered_map<unsigned int, glyph_info_t> glyph_cache_t;
 FT_Library ft_library;
