@@ -1,4 +1,4 @@
-SubDir TOP glyphy ;
+SubDir TOP bin glyphy ;
 
 SubDirHdrs . ;
 SubDirC++Flags -DPKGDATADIR="" ;
