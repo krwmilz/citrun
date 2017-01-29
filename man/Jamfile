@@ -1,0 +1,8 @@
+SubDir TOP man ;
+
+InstallMan $(PREFIX)/man :
+	citrun_gl.1
+	citrun_inst.1
+	citrun_wrap.1
+	citrun_check.1
+	;

@@ -1,0 +1,20 @@
+SubDir TOP share citrun ;
+
+rule InstallSym
+{
+	Depends install : $(PREFIX)/share/citrun/$(>) ;
+	MakeLocate $(PREFIX)/share/citrun/$(>) : $(<) ;
+
+	#for i in $(>)
+	#{
+	#	SymLink $(PREFIX)/share/citrun/$(i) ;
+	#}
+}
+
+actions InstallSym
+{
+	cp -RP share/citrun/$(>) $(PREFIX)/share/citrun ;
+	# 	$(RM) $(<) && $(LN) -s ../../bin/citrun_inst $(<) ;
+}
+
+InstallSym $(PREFIX)/share/citrun : cc gcc clang clang++ g++ c++ egcc eg++ ;

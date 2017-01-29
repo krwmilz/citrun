@@ -1,0 +1,104 @@
+SubDir TOP bin ;
+SubDirHdrs $(TOP) lib ;
+
+if ! $(PREFIX) {
+	PREFIX = `pwd` ;
+}
+
+actions ShellReplace {
+	sed -e "s, PREFIX ,$(PREFIX)," < $(>) > $(<)
+	chmod +x $(<)
+}
+
+#
+# citrun_check
+# citrun_wrap
+#
+if $(NT) {
+	File citrun_wrap.bat : wrap.bat ;
+	Clean clean : citrun_wrap.bat ;
+}
+else {
+	MakeLocate citrun_check : bin ;
+	Shell citrun_check : check.sh ;
+
+	MakeLocate citrun_wrap : bin ;
+	Depends all : citrun_wrap ;
+	Clean clean : citrun_wrap ;
+	ShellReplace citrun_wrap : wrap.sh ;
+}
+
+#
+# citrun_inst
+#
+INST_SRCS =
+	inst_main.cc
+	inst_fe.cc
+	inst_action.cc
+	inst_visitor.cc ;
+
+if $(NT) {
+	INST_SRCS += inst_fewin32.cc ;
+} else {
+	INST_SRCS += inst_feunix.cc ;
+}
+
+Stringize lib_h.h : lib.h ;
+
+ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) -DPREFIX=\\\"$(PREFIX)\\\" ;
+
+LINKFLAGS on citrun_inst$(SUFEXE) = $(LINKFLAGS) $(INST_LDFLAGS) ;
+LINKLIBS on citrun_inst$(SUFEXE) += $(INST_LIBS) ;
+
+Main citrun_inst : $(INST_SRCS) ;
+
+if $(NT) {
+	for i in cl.exe link.exe {
+		MakeLocate $(i) : compilers ;
+		File $(i) : citrun_inst.exe ;
+		Clean clean : $(i) ;
+	}
+}
+
+#
+# citrun_gl,  citrun_gltest
+#
+GL_SRCS =
+	gl_procfile.cc
+	gl_transunit.cc
+	process_dir.cc
+	gl_view.cc
+	demo-atlas.cc
+	gl_buffer.cc
+	gl_font.cc
+	demo-glstate.cc
+	demo-shader.cc
+	matrix4x4.c ;
+
+Library gl_common : $(GL_SRCS) ;
+
+Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
+Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
+Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
+
+ObjectC++Flags gl_main.cc gltest.cc $(GL_SRCS) : $(GL_CFLAGS) ;
+
+LINKLIBS on citrun_gl citrun_gltest += -lm $(GL_LIBS) ;
+LinkLibraries citrun_gl citrun_gltest : gl_common libglyphy ;
+
+Main citrun_gl : gl_main.cc ;
+
+LINKLIBS on citrun_gltest += $(GLTEST_LIBS) ;
+Main citrun_gltest : gltest.cc ;
+
+# Link with the c++ compiler so that the matching c++ runtime library gets added
+# automatically.
+LINK on citrun_inst citrun_gl citrun_gltest = $(C++) ;
+
+#
+# install
+#
+InstallShell	$(PREFIX)/bin		: citrun_check citrun_wrap ;
+InstallBin	$(PREFIX)/bin		: citrun_gl citrun_inst ;
+
+SubInclude TOP bin glyphy ;
