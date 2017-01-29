@@ -24,7 +24,7 @@ if $(NT) {
 }
 
 #
-# Different build modifiers for static analysis and test coverage.
+# Run clang static analysis on the build.
 #
 actions Analysis
 {
@@ -32,6 +32,9 @@ actions Analysis
 	scan-build -o html --use-c++=eg++ jam
 }
 
+#
+# Get test coverage of integration test suite.
+#
 actions TestCoverage
 {
 	set -e
