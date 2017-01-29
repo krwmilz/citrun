@@ -100,3 +100,5 @@ INST_CFLAGS = ${LLVM_INCLUDES-}
 INST_LDFLAGS = -nopie ;
 INST_LIBS = ${INST_EXTRALIB-} ${INST_LIBS} ;
 EOF
+
+cat Jamrules.extra >> Jamrules
