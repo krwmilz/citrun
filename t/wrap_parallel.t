@@ -12,7 +12,7 @@ plan skip_all => 'make not found' unless (which 'make');
 plan tests => 15;
 
 
-my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $wrap->write( 'main1.c', 'int main(void) { return 0; }' );
 $wrap->write( 'main2.c', 'int main(void) { return 0; }' );
@@ -49,7 +49,7 @@ Totals:
         12 Total statements
 EOF
 
-$wrap->run( prog => 'citrun_check', chdir => $wrap->curdir );
+$wrap->run( prog => 'bin/citrun_check', chdir => $wrap->curdir );
 my $check_out = $wrap->stdout;
 $check_out =~ s/^.*Milliseconds spent rewriting.*\n//gm;
 eq_or_diff( $check_out, $check_good,	'is citrun_check stdout identical', { context => 3 } );

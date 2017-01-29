@@ -3,11 +3,12 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 4;
 
 
-my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'bin/citrun_inst', workdir => '' );
 $inst->write( 'if.c', <<EOF );
 int main(int argc, char *argv[]) {
 	if (argc == 1)

@@ -3,10 +3,12 @@
 #
 use strict;
 use warnings;
+
 use Test::Cmd;
 use Test::More tests => 3;
 
-my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+
+my $wrap = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 $wrap->run( args => '-ASD', chdir => $wrap->curdir );
 
 my $err_good;

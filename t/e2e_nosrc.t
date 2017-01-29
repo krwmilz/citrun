@@ -9,7 +9,7 @@ use t::utils;
 plan tests => 4;
 
 
-my $inst = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 my $out_good = <<EOF;
 >> citrun_inst

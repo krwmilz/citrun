@@ -3,11 +3,12 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 4;
 
 
-my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'bin/citrun_inst', workdir => '' );
 $inst->write( 'while.c', <<EOF );
 int main(int argc, char *argv[]) {
 	while (argc < 17)

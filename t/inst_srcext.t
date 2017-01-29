@@ -3,13 +3,14 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 15;
 
 
 my @supported_exts = ("c", "cc", "cxx", "cpp");
 
-my $inst = Test::Cmd->new( prog => 'citrun_inst', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'bin/citrun_inst', workdir => '' );
 
 my $out_good = <<EOF;
 >> citrun_inst

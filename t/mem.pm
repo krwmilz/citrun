@@ -75,7 +75,7 @@ sub get_buffers {
 1;
 __DATA__
 __C__
-#include "../lib.h"
+#include "../lib/lib.h"
 
 size_t citrun_header_size() {
 	return sizeof(struct citrun_header);

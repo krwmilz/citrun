@@ -39,7 +39,7 @@ sub get_one_shmfile {
 
 sub setup_projdir {
 
-	my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+	my $wrap = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 	$ENV{CITRUN_PROCDIR} =  $wrap->workdir;
 
 	$wrap->write( 'main.c', <<EOF);

@@ -11,7 +11,7 @@ plan skip_all => 'cmake not found' unless (which 'cmake');
 plan tests => 8;
 
 
-my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $wrap->write( 'CMakeLists.txt', <<'EOF' );
 cmake_minimum_required (VERSION 2.6)

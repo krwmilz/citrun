@@ -9,7 +9,7 @@ use t::utils;		# os_compiler()
 plan tests => 4;
 
 
-my $compiler = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $compiler = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $compiler->write( 'main.c', <<EOF );
 #include <stddef.h>

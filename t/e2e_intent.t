@@ -9,7 +9,7 @@ use t::utils;
 plan tests => 11;
 
 
-my $e2e = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $e2e = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $e2e->write( 'fib.c', <<EOF );
 #include <stdio.h>

@@ -3,11 +3,12 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 3;
 
 
-my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $wrap->write( 'main.c', 'int main(void) { return 0; }' );
 $wrap->run( args => os_compiler() . 'main main.c', chdir => $wrap->curdir );

@@ -11,7 +11,7 @@ plan skip_all => 'jam not found' unless (which 'jam');
 plan tests => 6;
 
 
-my $wrap = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $wrap = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $wrap->write( 'main.c', 'int main(void) { return 0; }' );
 $wrap->write( 'Jamfile', <<EOF );

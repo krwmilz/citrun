@@ -8,7 +8,7 @@ use t::utils;
 plan tests => 3;
 
 
-my $inst = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $inst = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 
 $inst->write( 'bad.c', <<EOF );
 int

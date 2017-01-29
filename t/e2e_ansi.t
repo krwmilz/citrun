@@ -4,11 +4,12 @@
 #
 use strict;
 use warnings;
+
 use t::utils;
 plan tests => 3;
 
 
-my $cc = Test::Cmd->new( prog => 'citrun_wrap', workdir => '' );
+my $cc = Test::Cmd->new( prog => 'bin/citrun_wrap', workdir => '' );
 $cc->write( 'main.c', 'int main(void) { return 0; }' );
 
 if ($^O eq 'MSWin32') {
