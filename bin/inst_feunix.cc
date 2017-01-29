@@ -40,7 +40,7 @@ InstFrontendUnix::path_sep()
 std::string
 InstFrontendUnix::lib_name()
 {
-	return "libcitrun.a";
+	return "lib/libcitrun.a";
 }
 
 void

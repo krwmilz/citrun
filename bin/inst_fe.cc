@@ -16,7 +16,6 @@
 #include "inst_action.h"	// InstrumentActionFactory
 #include "inst_fe.h"
 #include "lib.h"		// citrun_major, citrun_minor
-#include "prefix.h"		// prefix
 
 #include <clang/Basic/Diagnostic.h>	// IgnoringDiagConsumer
 #include <clang/Tooling/CommonOptionsParser.h>
@@ -51,9 +50,11 @@ InstFrontend::log_identity()
 void
 InstFrontend::get_paths()
 {
-	m_compilers_path = share_dir ;
+	m_compilers_path = PREFIX ;
+	m_compilers_path += dir_sep() ;
+	m_compilers_path += "share/citrun" ;
 
-	m_lib_path = lib_dir ;
+	m_lib_path = PREFIX ;
 	m_lib_path += dir_sep();
 	m_lib_path += lib_name();
 

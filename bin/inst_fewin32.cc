@@ -25,8 +25,6 @@
 #include <iostream>		// cerr
 #include <sstream>		// ostringstream
 
-#define PATH_SEP ';'
-
 
 static void
 Err(int code, const char *fmt)
