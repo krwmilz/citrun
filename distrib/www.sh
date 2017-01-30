@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh -eu
 
 mkdir -p www/man
 for man in *.1; do
