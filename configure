@@ -42,37 +42,6 @@ for pkg in $gl_pkgs; do
 done
 echo
 
-# citrun_inst needs lots of Clang and LLVM libraries.
-# for LLVM libraries:
-#	llvm-config --libs bitreader mcparser transformutils option
-INST_LIBS="-lcurses
-	-lpthread
-	-lz
-	-lm
-	-lclangFrontendTool
-	-lclangFrontend
-	-lclangSerialization
-	-lclangDriver
-	-lclangTooling
-	-lclangParse
-	-lclangSema
-	-lclangAnalysis
-	-lclangRewriteFrontend
-	-lclangRewrite
-	-lclangEdit
-	-lclangAST
-	-lclangLex
-	-lclangBasic
-	-lLLVMOption
-	-lLLVMTransformUtils
-	-lLLVMAnalysis
-	-lLLVMProfileData
-	-lLLVMMCParser
-	-lLLVMMC
-	-lLLVMBitReader
-	-lLLVMCore
-	-lLLVMSupport"
-
 # Write Jamrules. Any errors inside backticks get ignored.
 cat <<EOF > Jamrules
 CC = ${CC-cc} ;
@@ -98,7 +67,35 @@ INST_CFLAGS = ${LLVM_INCLUDES-}
 	-Wno-comment
 	-D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS ;
 INST_LDFLAGS = -nopie ;
-INST_LIBS = ${INST_EXTRALIB-} ${INST_LIBS} ;
+INST_LIBS = ${INST_EXTRALIB-}
+	-lcurses
+	-lpthread
+	-lz
+	-lm
+	-lclangFrontendTool
+	-lclangFrontend
+	-lclangSerialization
+	-lclangDriver
+	-lclangTooling
+	-lclangParse
+	-lclangSema
+	-lclangAnalysis
+	-lclangRewriteFrontend
+	-lclangRewrite
+	-lclangEdit
+	-lclangAST
+	-lclangLex
+	-lclangBasic
+	-lLLVMOption
+	-lLLVMTransformUtils
+	-lLLVMAnalysis
+	-lLLVMProfileData
+	-lLLVMMCParser
+	-lLLVMMC
+	-lLLVMBitReader
+	-lLLVMCore
+	-lLLVMSupport
+	;
 EOF
 
 cat Jamrules.extra >> Jamrules
