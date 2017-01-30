@@ -6,7 +6,7 @@ if [ $uname = "OpenBSD" ]; then
 
 	export NO_CHECKSUM=1
 	rm -f /usr/ports/distfiles/citrun-*.tar.gz
-	make -C /usr/ports/devel/citrun clean=all
+	make -C /usr/ports/devel/citrun clean
 
 	make -C /usr/ports/devel/citrun package
 
