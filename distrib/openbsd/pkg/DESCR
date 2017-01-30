@@ -1,4 +1,6 @@
-Adds instrumentation to your source code at compile time.
+C It Run lets you watch source code execute.
 
-When your instrumented binaries run their execution information can be
-visualized with the included OpenGL viewer.
+It supports the C/C++ programming languages and all types of executing code
+like static/shared libraries or executable programs.
+
+Instrumentation and viewer utilities with manuals are included.
