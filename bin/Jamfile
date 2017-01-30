@@ -1,10 +1,6 @@
 SubDir TOP bin ;
 SubDirHdrs $(TOP) lib ;
 
-if ! $(PREFIX) {
-	PREFIX = `pwd` ;
-}
-
 actions ShellReplace {
 	sed -e "s, PREFIX ,$(PREFIX)," < $(>) > $(<)
 	chmod +x $(<)
