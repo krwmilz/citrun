@@ -1,6 +1,6 @@
 # $OpenBSD$
 
-COMMENT =		see your source code run
+COMMENT =		see your code run
 
 DISTNAME =		citrun-9999
 CATEGORIES =		devel
@@ -25,10 +25,16 @@ LIB_DEPENDS =		graphics/glew \
 BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
-TEST_DEPENDS =		devel/p5-Expect
+TEST_DEPENDS =		devel/p5-Inline \
+			devel/p5-Sys-Mmap \
+			devel/p5-Test-Cmd \
+			devel/p5-Test-Differences \
+			devel/p5-Test-TrailingSpace \
+			devel/p5-Test-WWW-Mechanize \
+			graphics/p5-Imager \
+			sysutils/p5-File-Which
 
-do-configure:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ./configure
+CONFIGURE_STYLE =	simple
 
 do-build:
 	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} jam -q -j4
