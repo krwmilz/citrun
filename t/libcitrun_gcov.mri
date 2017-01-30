@@ -1,5 +1,5 @@
-create libcitrun.a
-addlib libcitrun.a
+create lib/libcitrun.a
+addlib lib/libcitrun.a
 addlib /usr/lib/gcc-lib/amd64-unknown-openbsd6.0/4.2.1/libgcov.a
 save
 end
