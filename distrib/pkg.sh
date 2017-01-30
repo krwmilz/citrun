@@ -2,13 +2,6 @@
 
 uname=`uname`
 if [ $uname = "OpenBSD" ]; then
-	# Packaging might have bad interactions with an already installed
-	# citrun. For now prevent that from happening.
-	if pkg_info citrun > /dev/null 2>&1; then
-		echo Please uninstall citrun before packaging.
-		exit 1
-	fi
-
 	cp -R distrib/openbsd/* /usr/ports/devel/citrun/
 
 	export NO_CHECKSUM=1
@@ -19,7 +12,6 @@ if [ $uname = "OpenBSD" ]; then
 
 	make -C /usr/ports/devel/citrun clean
 	rm -f /usr/ports/distfiles/citrun-*.tar.gz
-	exit 0
 
 elif [ $uname = "Darwin" ]; then
 	sudo port uninstall citrun
@@ -29,7 +21,6 @@ elif [ $uname = "Darwin" ]; then
 	sudo port -v -D darwin/devel/citrun install
 
 	cp /opt/local/var/macports/software/citrun/citrun-0.0_0.darwin_15.x86_64.tbz2 bin/
-	exit 0
 
 elif [ $uname = "Linux" ]; then
 	sudo dpkg -r citrun || true
@@ -44,8 +35,7 @@ elif [ $uname = "Linux" ]; then
 
 	sudo dpkg -i $tmpdir/citrun_0-1_amd64.deb
 	cp $tmpdir/citrun_0-1_amd64.deb .
-	exit 0
+else
+	echo "Error: Can't package for unknown system '$uname'"
+	exit 1;
 fi
-
-echo "Error: Can't package for unknown system '$uname'"
-exit 1;
