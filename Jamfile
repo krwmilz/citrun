@@ -32,7 +32,7 @@ actions TestCoverage
 	mkdir gcov
 	# The output from gcov is valuable to save too.
 	gcov -o lib lib/lib*.c | tee gcov/SUMMARY
-	egcov -r bin/*.cc | tee gcov/SUMMARY
+	egcov -r bin/*.cc | tee -a gcov/SUMMARY
 	mv *.gcov gcov/
 }
 
