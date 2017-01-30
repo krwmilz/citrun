@@ -29,8 +29,8 @@ actions TestCoverage
 	prove
 	# prove tt
 
-	gcov -o . lib*.c
-	egcov -r *.cc
+	gcov -o lib lib/lib*.c
+	egcov -r bin/*.cc
 
 	mkdir gcov
 	mv *.gcov gcov/
