@@ -29,10 +29,10 @@ actions TestCoverage
 	prove
 	# prove tt
 
-	gcov -o lib lib/lib*.c
-	egcov -r bin/*.cc
-
 	mkdir gcov
+	# The output from gcov is valuable to save too.
+	gcov -o lib lib/lib*.c | tee gcov/SUMMARY
+	egcov -r bin/*.cc | tee gcov/SUMMARY
 	mv *.gcov gcov/
 }
 
