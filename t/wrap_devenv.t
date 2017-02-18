@@ -2,8 +2,7 @@
 # Try and wrap devenv with citrun_wrap.
 # TODO: devenv uses response files (not supported right now).
 #
-use strict;
-use warnings;
+use Modern::Perl;
 use t::utils;
 
 if ($^O eq "MSWin32") {

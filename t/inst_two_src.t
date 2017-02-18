@@ -2,9 +2,7 @@
 # Check that two source files given on the same command line both get
 # instrumented fully.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

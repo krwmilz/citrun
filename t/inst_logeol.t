@@ -1,9 +1,7 @@
 #
 # Check that proper platform specific line endings exist in citrun.log.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 1;
 

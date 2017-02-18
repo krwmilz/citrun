@@ -1,8 +1,6 @@
 package t::mem;
 
-use strict;
-use warnings;
-
+use Modern::Perl;
 use POSIX;
 use Sys::Mmap;
 use autodie;

@@ -1,9 +1,7 @@
 #
 # Make sure preprocessor flags -E, -MM cause no instrumentation to be done.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 8;
 

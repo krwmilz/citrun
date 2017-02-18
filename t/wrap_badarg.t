@@ -1,9 +1,7 @@
 #
 # Make sure calling citrun_wrap with arguments fails.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::Cmd;
 use Test::More tests => 3;
 

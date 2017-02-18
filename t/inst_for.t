@@ -1,9 +1,7 @@
 #
 # Test that for loop condition instrumenting works.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

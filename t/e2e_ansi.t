@@ -2,9 +2,7 @@
 # Check that instrumentation works when the -ansi flag is passed during
 # compilation.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

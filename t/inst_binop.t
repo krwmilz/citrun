@@ -1,9 +1,7 @@
 #
 # Test that binary operators in strange cases work. Includes enums and globals.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

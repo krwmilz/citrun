@@ -1,10 +1,8 @@
 #
 # Test that wrapping the 'ninja' build system produces instrumented binaries.
 #
-use strict;
-use warnings;
-
 use File::Which;
+use Modern::Perl;
 use t::utils;
 
 plan skip_all => 'ninja not found' unless (which 'ninja');

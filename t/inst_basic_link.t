@@ -1,9 +1,7 @@
 #
 # Check that the most basic of compile command lines works.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

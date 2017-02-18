@@ -1,9 +1,7 @@
 package t::mem;
 
-use strict;
-use warnings;
-
 use Inline 'C';
+use Modern::Perl;
 use POSIX;
 use if $^O eq 'MSWin32', 't::mem_win32';
 use if $^O ne 'MSWin32', 't::mem_unix';

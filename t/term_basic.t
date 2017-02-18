@@ -1,4 +1,4 @@
-use strict;
+use Modern::Perl;
 use Test::More skip_all => "citrun_term not compiled";
 use Expect;
 use test::project;

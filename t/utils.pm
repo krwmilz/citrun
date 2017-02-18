@@ -1,7 +1,5 @@
-use strict;
-use warnings;
-
 use if $^O eq "MSWin32", 'File::DosGlob' => 'glob';
+use Modern::Perl;
 use Test::Cmd;
 use Test::Differences;
 use Test::More;

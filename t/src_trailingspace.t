@@ -1,9 +1,7 @@
 #
 # Test that source files have no trailing whitespace.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::More tests => 1;
 use Test::TrailingSpace;
 

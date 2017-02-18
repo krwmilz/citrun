@@ -1,9 +1,7 @@
 #
 # Check that return statement values (if any) are instrumented correctly.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

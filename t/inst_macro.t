@@ -2,9 +2,7 @@
 # Test for some tricky macro situations. In particular macro expansions at the
 # end of binary operators.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

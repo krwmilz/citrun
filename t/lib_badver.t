@@ -2,9 +2,7 @@
 # Check that linking object files of one citrun version with libcitrun of
 # another errors.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;		# os_compiler()
 plan tests => 4;
 

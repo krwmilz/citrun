@@ -1,9 +1,7 @@
 #
 # Check that if statement conditions are instrumented properly.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

@@ -2,9 +2,7 @@
 # Test that a ran program outputs a memory file with correct line execution
 # counts.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::mem;
 use t::utils;
 plan tests => 8;

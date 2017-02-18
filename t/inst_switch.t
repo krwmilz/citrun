@@ -1,9 +1,7 @@
 #
 # Make sure that switch statement condition instrumentation works.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

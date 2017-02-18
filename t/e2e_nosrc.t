@@ -2,9 +2,7 @@
 # Check that giving citrun_wrap a compile command with a non existent file is
 # handled.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

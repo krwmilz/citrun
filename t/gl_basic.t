@@ -2,14 +2,11 @@
 # Check that opening the viewer after an instrumented program has exited gives
 # an identical output to known good.
 #
-use strict;
-use warnings;
-
 use File::Compare;
 use Imager;
+use Modern::Perl;
 use t::utils;
 
-plan skip_all => 'glew + osmesa required';
 plan tests => 6;
 
 my $dir = setup_projdir();
@@ -22,7 +19,7 @@ is( $dir->stderr,	'',	'is instrumented program stderr silent' );
 my $render_file = File::Spec->catdir( $dir->workdir, 'test.tga' );
 my $render_good_file = File::Spec->catfile( 't', 'gl_basic.tga' );
 
-$dir->run( prog => 'citrun_gltest', args => "$render_file 800 600", workdir => '' );
+$dir->run( prog => 'bin/citrun_gltest', args => "$render_file 800 600", workdir => '' );
 print $dir->stdout;
 is( $dir->stderr,	'',	'is citrun_gltest stderr silent' );
 

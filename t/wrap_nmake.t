@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 
 plan skip_all => 'win32 only' if ($^O ne "MSWin32");

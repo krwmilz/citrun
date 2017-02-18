@@ -1,10 +1,8 @@
 #
 # Test that wrapping the 'jam' build system produces instrumented binaries.
 #
-use strict;
-use warnings;
-
 use File::Which;
+use Modern::Perl;
 use t::utils;
 
 plan skip_all => 'jam not found' unless (which 'jam');

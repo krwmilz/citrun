@@ -1,9 +1,7 @@
 #
 # Check that a program that won't compile natively is handled properly.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

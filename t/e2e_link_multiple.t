@@ -1,9 +1,7 @@
 #
 # Check that linking more than one instrumented object file together works.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

@@ -1,9 +1,7 @@
 #
 # Verify that passing a bad directory to citrun_check errors out.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::Cmd;
 use Test::More;
 

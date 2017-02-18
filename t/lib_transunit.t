@@ -1,9 +1,7 @@
 #
 # Test that the shared memory translation units are what we expect.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::mem;
 use t::utils;
 plan tests => 14;

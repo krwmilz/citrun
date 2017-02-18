@@ -1,9 +1,7 @@
 #
 # Verify the output when 0 citrun.log files are found.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::Cmd;
 use Test::More;
 

@@ -2,9 +2,7 @@
 # The milliseconds spent processing line is always regex'ed out in other tests.
 # Do the opposite here and make sure it's there.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

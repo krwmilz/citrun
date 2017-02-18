@@ -1,9 +1,7 @@
 #
 # Test live website has correct html and no broken links.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::More skip_all => 'utf8 index false positive';
 use Test::WWW::Mechanize;
 

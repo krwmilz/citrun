@@ -1,9 +1,7 @@
 #
 # Verify citrun_check can handle paths with spaces when counting log files.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::Cmd;
 use Test::More;
 

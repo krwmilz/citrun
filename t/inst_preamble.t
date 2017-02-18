@@ -1,9 +1,7 @@
 #
 # Test that the instrumentation preamble is what we think it is.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 3;
 

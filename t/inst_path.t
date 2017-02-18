@@ -3,9 +3,7 @@
 # - TODO: not having PATH set errors
 # - not having CITRUN_PATH set when using transparent compile mode errors
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 

@@ -2,9 +2,7 @@
 # Make sure the intention of a program isn't altered by instrumentation.
 # Show this by getting correct results from an instrumented program.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 11;
 

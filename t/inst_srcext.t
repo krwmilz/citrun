@@ -1,9 +1,7 @@
 #
 # Check that the advertised source file extensions work.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 15;
 

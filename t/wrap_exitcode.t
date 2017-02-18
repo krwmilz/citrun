@@ -1,9 +1,7 @@
 #
 # Make sure that citrun_wrap exits with the same code as the native build.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Test::Cmd;
 use Test::More tests => 3;
 

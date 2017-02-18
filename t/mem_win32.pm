@@ -1,8 +1,6 @@
 package t::mem;
 
-use strict;
-use warnings;
-
+use Modern::Perl;
 use POSIX;		# NULL
 use Win32::API;
 use autodie;

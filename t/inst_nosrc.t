@@ -1,9 +1,7 @@
 #
 # Check that giving citrun_inst a non existent file is handled.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 2;
 

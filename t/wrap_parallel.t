@@ -2,10 +2,8 @@
 # Check that calling citrun_inst in parallel doesn't cause any obviously bad
 # things to happen.
 #
-use strict;
-use warnings;
-
 use File::Which;
+use Modern::Perl;
 use t::utils;
 
 plan skip_all => 'make not found' unless (which 'make');

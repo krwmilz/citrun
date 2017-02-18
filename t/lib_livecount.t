@@ -1,9 +1,7 @@
 #
 # Test that we can count an executing program as its running.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Time::HiRes qw( time usleep );
 use t::mem;
 use t::utils;

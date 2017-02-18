@@ -1,9 +1,7 @@
 #
 # Make sure that while loop condition instrumentation works.
 #
-use strict;
-use warnings;
-
+use Modern::Perl;
 use t::utils;
 plan tests => 4;
 
