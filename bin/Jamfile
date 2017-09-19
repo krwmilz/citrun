@@ -27,31 +27,18 @@ ShellReplace citrun_wrap : wrap.sh ;
 INST_SRCS =
 	inst_main.cc
 	inst_fe.cc
+	inst_feunix.cc
 	inst_action.cc
 	inst_visitor.cc ;
-
-if $(NT) {
-	INST_SRCS += inst_fewin32.cc ;
-} else {
-	INST_SRCS += inst_feunix.cc ;
-}
 
 Stringize lib_h.h : lib.h ;
 
 ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) -DPREFIX=\\\"$(PREFIX)\\\" ;
 
-LINKFLAGS on citrun_inst$(SUFEXE) = $(LINKFLAGS) $(INST_LDFLAGS) ;
-LINKLIBS on citrun_inst$(SUFEXE) += $(INST_LIBS) ;
+LINKFLAGS on citrun_inst = $(LINKFLAGS) $(INST_LDFLAGS) ;
+LINKLIBS on citrun_inst += $(INST_LIBS) ;
 
 Main citrun_inst : $(INST_SRCS) ;
-
-if $(NT) {
-	for i in cl.exe link.exe {
-		MakeLocate $(i) : compilers ;
-		File $(i) : citrun_inst.exe ;
-		Clean clean : $(i) ;
-	}
-}
 
 #
 # citrun_gl,  citrun_gltest

@@ -1,10 +1,6 @@
 SubDir TOP lib ;
 
-if $(NT) {
-	Library libcitrun : lib.c lib_win32.c ;
-} else {
-	ObjectCcFlags lib.c lib_unix.c : -fPIC -ansi ;
-	Library libcitrun : lib.c lib_unix.c ;
+ObjectCcFlags lib.c lib_unix.c : -fPIC -ansi ;
+Library libcitrun : lib.c lib_unix.c ;
 
-	InstallLib $(PREFIX)/lib : libcitrun.a ;
-}
+InstallLib $(PREFIX)/lib : libcitrun.a ;
