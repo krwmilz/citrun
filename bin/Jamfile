@@ -8,21 +8,18 @@ actions ShellReplace {
 
 #
 # citrun_check
+#
+SHELLHEADER = "#!/usr/bin/awk -f" ;
+MakeLocate citrun_check : bin ;
+Shell citrun_check : check.awk ;
+
+#
 # citrun_wrap
 #
-if $(NT) {
-	File citrun_wrap.bat : wrap.bat ;
-	Clean clean : citrun_wrap.bat ;
-}
-else {
-	MakeLocate citrun_check : bin ;
-	Shell citrun_check : check.sh ;
-
-	MakeLocate citrun_wrap : bin ;
-	Depends all : citrun_wrap ;
-	Clean clean : citrun_wrap ;
-	ShellReplace citrun_wrap : wrap.sh ;
-}
+MakeLocate citrun_wrap : bin ;
+Depends all : citrun_wrap ;
+Clean clean : citrun_wrap ;
+ShellReplace citrun_wrap : wrap.sh ;
 
 #
 # citrun_inst

@@ -36,6 +36,7 @@ is( $? >> 8,		0,	'is citrun_wrap make exit code 0' );
 
 my $check_good = <<EOF;
 Summary:
+         8 Rewrite tool runs
          4 Source files used as input
          4 Application link commands
          4 Successful modified source compiles
@@ -47,7 +48,7 @@ Totals:
         12 Total statements
 EOF
 
-$wrap->run( prog => 'bin/citrun_check', chdir => $wrap->curdir );
+$wrap->run( prog => 'bin/citrun_check', args => 'citrun.log', chdir => $wrap->curdir );
 my $check_out = $wrap->stdout;
 $check_out =~ s/^.*Milliseconds spent rewriting.*\n//gm;
 eq_or_diff( $check_out, $check_good,	'is citrun_check stdout identical', { context => 3 } );
