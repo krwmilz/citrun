@@ -1,0 +1,88 @@
+echo ░█▀▀░░░▀█▀░▀█▀░░░█▀▄░█░█░█▀█ ;
+echo ░█░░░░░░█░░░█░░░░█▀▄░█░█░█░█ ;
+echo ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░▀░▀ ;
+echo ;
+
+PREFIX ?= `pwd` ;
+CC = clang ;
+C++ = clang++ ;
+
+echo PREFIX \= $(PREFIX) ;
+echo CC \= $(CC) ;
+echo C++ \= $(C++) ;
+echo CFLAGS \= $(CFLAGS) ;
+echo ;
+
+if $(OS) = "OPENBSD" {
+	echo "Good to go soldier." ;
+}
+else if $(OS) = "Darwin" {
+	GL_EXTRALIB = "-framework OpenGL" ;
+}
+else if $(OS) = "Linux" {
+	INST_EXTRALIB = "-lbsd" ;
+	GL_EXTRALIB = "-lbsd" ;
+}
+else {
+	echo "WARNING: Platform '$(OS)' untested, compilation may fail." ;
+	echo "WARNING: Run `jam check_dependencies` first." ;
+	echo ;
+}
+
+CCFLAGS  += $(CFLAGS) -Wall -W -Wcast-qual
+	-Wwrite-strings ;
+
+C++FLAGS += $(CFLAGS) -Wall -W -Wcast-qual
+	-std=c++11
+	-fno-exceptions
+	-fno-rtti
+	-Wno-unused-parameter
+	-Werror=date-time
+	-fvisibility-inlines-hidden
+	-Wdelete-non-virtual-dtor ;
+
+LINKFLAGS += $(LDFLAGS) ;
+
+GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
+GL_LIBS = $(GL_EXTRALIB) `pkg-config --libs glfw3 glew freetype2` ;
+GLTEST_LIBS  = `pkg-config --libs osmesa` ;
+
+INST_CFLAGS = `llvm-config --cxxflags` ;
+INST_LDFLAGS = -nopie ;
+
+INST_LIBS =
+	`llvm-config --ldflags`
+	$(INST_EXTRALIB)
+	-lclangTooling
+	-lclangFrontendTool
+	-lclangFrontend
+	-lclangDriver
+	-lclangSerialization
+	-lclangCodeGen
+	-lclangParse
+	-lclangSema
+	-lclangAnalysis
+	-lclangRewrite
+	-lclangRewriteFrontend
+	-lclangEdit
+	-lclangAST
+	-lclangLex
+	-lclangBasic
+	`llvm-config --system-libs --libs bitreader mcparser transformutils option`
+	;
+
+# Quote an entire file and add a variable declaration prefixing the string.
+rule Stringize
+{
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	Depends $(1) : $(2) ;
+	Clean clean : $(1) ;
+}
+
+actions Stringize
+{
+	> $(<) echo "static const char *$(1:B) = R\"("
+	>> $(<) cat $(>)
+	>> $(<) echo ")\";"
+}

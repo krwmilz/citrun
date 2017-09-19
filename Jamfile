@@ -5,6 +5,27 @@ SubInclude TOP lib ;
 SubInclude TOP man ;
 SubInclude TOP share citrun ;
 
+actions PkgConfig
+{
+	set -e
+	type pkg-config
+	echo
+
+	gl_pkgs="osmesa glfw3 glew freetype2"
+	for pkg in $gl_pkgs; do
+		echo -n "$pkg = "
+		pkg-config --modversion $pkg || echo "NOT FOUND"
+	done
+}
+
+actions C++11
+{
+	$(C++) -x c++ -std=c++11 -E - < /dev/null > /dev/null
+}
+
+C++11 check_dependencies ;
+PkgConfig check_dependencies ;
+
 #
 # Run clang static analysis on the build.
 #
