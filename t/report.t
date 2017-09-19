@@ -5,31 +5,31 @@ use Modern::Perl;
 use Test::Cmd;
 use Test::More;
 
-plan skip_all => 'citrun_check missing on win32' if ($^O eq "MSWin32");
+plan skip_all => 'citrun_report missing on win32' if ($^O eq "MSWin32");
 plan tests => 12;
 
 
-my $check = Test::Cmd->new( prog => 'bin/citrun_check', workdir => '' );
+my $report = Test::Cmd->new( prog => 'bin/citrun_report', workdir => '' );
 
 #
 # Test when a nonexistent file argument is given.
 #
 my $error_good = "awk: can't open file _nonexistent_";
-$check->run( args => '_nonexistent_', chdir => $check->curdir );
+$report->run( args => '_nonexistent_', chdir => $report->curdir );
 
-is( $check->stdout,	'',		'is nonexistent file stdout silent' );
-like( $check->stderr,	qr/$error_good/, 'is nonexistent file stderr identical' );
+is( $report->stdout,	'',		'is nonexistent file stdout silent' );
+like( $report->stderr,	qr/$error_good/, 'is nonexistent file stderr identical' );
 is( $? >> 8,		2,		'is nonexistent file exit code nonzero' );
 
 #
 # Verify output when an empty file is processed.
 #
 my $output_good = "No signs of rewrite activity.";
-$check->write( 'empty_file.log', '' );
-$check->run( args => 'empty_file.log', chdir => $check->curdir );
+$report->write( 'empty_file.log', '' );
+$report->run( args => 'empty_file.log', chdir => $report->curdir );
 
-like( $check->stdout,	qr/$output_good/, 'is empty file stdout expected' );
-is( $check->stderr,	'',		'is empty file stderr silent' );
+like( $report->stdout,	qr/$output_good/, 'is empty file stdout expected' );
+is( $report->stderr,	'',		'is empty file stderr silent' );
 is( $? >> 8,		1,		'is empty file exit code nonzero' );
 
 #
@@ -37,11 +37,11 @@ is( $? >> 8,		1,		'is empty file exit code nonzero' );
 #
 $output_good = 'Summary:
          1 Rewrite tool runs';
-$check->write( 'header_only.log', '>> citrun_inst');
-$check->run( args => 'header_only.log', chdir => $check->curdir );
+$report->write( 'header_only.log', '>> citrun_inst');
+$report->run( args => 'header_only.log', chdir => $report->curdir );
 
-like( $check->stdout,	qr/$output_good/, 'is header only stdout expected' );
-is( $check->stderr,	'',		'is header only stderr silent' );
+like( $report->stdout,	qr/$output_good/, 'is header only stdout expected' );
+is( $report->stderr,	'',		'is header only stderr silent' );
 is( $? >> 8,		0,		'is header only exit code zero' );
 
 #
@@ -49,10 +49,10 @@ is( $? >> 8,		0,		'is header only exit code zero' );
 #
 $output_good = "No signs of rewrite activity.";
 
-mkdir File::Spec->catdir( $check->workdir, 'dir a' );
-$check->write( [ 'dir a', 'citrun.log' ], '' );
+mkdir File::Spec->catdir( $report->workdir, 'dir a' );
+$report->write( [ 'dir a', 'citrun.log' ], '' );
 
-$check->run( args => 'dir\ a/citrun.log', chdir => $check->curdir );
-like( $check->stdout,	qr/$output_good/, 'is path with spaces stdout identical' );
-is( $check->stderr,	'',		'is path with spaces stderr silent' );
+$report->run( args => 'dir\ a/citrun.log', chdir => $report->curdir );
+like( $report->stdout,	qr/$output_good/, 'is path with spaces stdout identical' );
+is( $report->stderr,	'',		'is path with spaces stderr silent' );
 is( $? >> 8,		1,		'is path with spaces exit code nonzero' );

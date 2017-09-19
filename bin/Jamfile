@@ -7,11 +7,11 @@ actions ShellReplace {
 }
 
 #
-# citrun_check
+# citrun_report
 #
 SHELLHEADER = "#!/usr/bin/awk -f" ;
-MakeLocate citrun_check : bin ;
-Shell citrun_check : check.awk ;
+MakeLocate citrun_report : bin ;
+Shell citrun_report : report.awk ;
 
 #
 # citrun_wrap
@@ -77,7 +77,7 @@ LINK on citrun_inst citrun_gl citrun_gltest = $(C++) ;
 #
 # install
 #
-InstallShell	$(PREFIX)/bin		: citrun_check citrun_wrap ;
+InstallShell	$(PREFIX)/bin		: citrun_report citrun_wrap ;
 InstallBin	$(PREFIX)/bin		: citrun_gl citrun_inst ;
 
 SubInclude TOP bin glyphy ;

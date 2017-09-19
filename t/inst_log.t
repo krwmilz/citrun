@@ -1,6 +1,6 @@
 #
 # Check that a raw citrun.log file is in good shape.
-# citrun_check relies on this output, and citrun_check is used quite a bit.
+# citrun_report relies on this output, and citrun_report is used quite a bit.
 #
 use Modern::Perl;
 use t::utils;

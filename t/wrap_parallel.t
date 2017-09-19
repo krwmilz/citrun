@@ -34,7 +34,7 @@ print $wrap->stdout;
 is( $wrap->stderr,	'',	'is citrun_wrap make stderr silent' );
 is( $? >> 8,		0,	'is citrun_wrap make exit code 0' );
 
-my $check_good = <<EOF;
+my $report_good = <<EOF;
 Summary:
          8 Rewrite tool runs
          4 Source files used as input
@@ -48,10 +48,11 @@ Totals:
         12 Total statements
 EOF
 
-$wrap->run( prog => 'bin/citrun_check', args => 'citrun.log', chdir => $wrap->curdir );
-my $check_out = $wrap->stdout;
-$check_out =~ s/^.*Milliseconds spent rewriting.*\n//gm;
-eq_or_diff( $check_out, $check_good,	'is citrun_check stdout identical', { context => 3 } );
+$wrap->run( prog => 'bin/citrun_report', args => 'citrun.log',
+	chdir => $wrap->curdir );
+my $report_out = $wrap->stdout;
+$report_out =~ s/^.*Milliseconds spent rewriting.*\n//gm;
+eq_or_diff( $report_out, $report_good,	'is citrun_report stdout identical', { context => 3 } );
 
 $ENV{CITRUN_PROCDIR} = $wrap->workdir;
 for (1..4) {
