@@ -1,4 +1,4 @@
-#include "inst_visitor.h"
+#include "inst_consumer.h"
 #include "inst_log.h"
 
 #include <clang/Frontend/FrontendActions.h>

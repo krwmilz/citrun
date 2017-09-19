@@ -21,6 +21,27 @@
 #include <string>
 
 
+RewriteASTVisitor::RewriteASTVisitor(clang::Rewriter &R) :
+	m_TheRewriter(R),
+	m_SM(R.getSourceMgr()),
+	m_lopt(R.getLangOpts()),
+	m_counters(),
+	m_counter_descr( {{
+		"Function definitions",
+		"If statements",
+		"For loops",
+		"While loops",
+		"Do while loops",
+		"Switch statements",
+		"Return statement values",
+		"Call expressions",
+		"Total statements",
+		"Binary operators",
+		"Errors rewriting source code"
+	}} )
+{
+}
+
 bool
 RewriteASTVisitor::TraverseStmt(clang::Stmt *s)
 {
