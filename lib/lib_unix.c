@@ -27,15 +27,17 @@
 
 #include "libP.h"
 
-static int			 fd;
 
 /*
- * Extends the file and memory mapping length of fd by a requested amount of
- * bytes (rounded up to the next page size).
- * Returns a pointer to the extended region on success, exits on failure.
+ * Extend the length of the file descriptor passed as the first argument, by a
+ * number of bytes (rounded up to a convenient size) given by the second
+ * argument.
+ *
+ * Returns a pointer to the beginning of the extended region on success.
+ * Instrumented program exits nonzero on failure.
  */
 void *
-citrun_extend(size_t req_bytes)
+citrun_extend(int fd, size_t req_bytes)
 {
 	size_t	 aligned_bytes;
 	off_t	 len;
@@ -63,13 +65,19 @@ citrun_extend(size_t req_bytes)
 }
 
 /*
- * Opens a file with a random suffix. Exits on error.
+ * Opens a new file semi randomly named like "my_program_name_3IcD7HyvoZ".
+ * If the CITRUN_PROCDIR environment variable is set its value is prefixed to
+ * the file name else "/tmp/citrun/" is prefixed.
+ *
+ * Returns a new file descriptor with a unique file system path on success.
+ * Instrumented program exits nonzero on failure.
  */
-void
+int
 citrun_open_fd()
 {
 	const char		*procdir;
 	char			 procfile[PATH_MAX];
+	int			 fd;
 
 	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
 		procdir = "/tmp/citrun";
@@ -84,10 +92,15 @@ citrun_open_fd()
 
 	if ((fd = mkstemp(procfile)) < 0)
 		err(1, "mkstemp");
+
+	return fd;
 }
 
 /*
- * Fills in a few operating system specific fields in struct citrun_header.
+ * Takes a pointer to a struct citrun_header and fills in fields related to
+ * process id, program name, and working directory.
+ *
+ * Returns nothing and never fails.
  */
 void
 citrun_os_info(struct citrun_header *h)
