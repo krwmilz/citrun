@@ -1,5 +1,7 @@
 SubDir TOP lib ;
 
+Stringize lib_h.h : lib.h ;
+
 ObjectCcFlags lib.c lib_unix.c : -fPIC -ansi ;
 Library libcitrun : lib.c lib_unix.c ;
 

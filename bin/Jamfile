@@ -1,25 +1,20 @@
 SubDir TOP bin ;
 SubDirHdrs $(TOP) lib ;
 
-actions ShellReplace {
-	sed -e "s, PREFIX ,$(PREFIX)," < $(>) > $(<)
-	chmod +x $(<)
-}
-
 #
 # citrun_report
 #
-SHELLHEADER = "#!/usr/bin/awk -f" ;
+SHELLHEADER on citrun_report = "#!/usr/bin/awk -f" ;
 MakeLocate citrun_report : bin ;
 Shell citrun_report : report.awk ;
 
 #
 # citrun_wrap
 #
+SHELLHEADER on citrun_wrap = "#!/bin/sh" ;
 MakeLocate citrun_wrap : bin ;
-Depends all : citrun_wrap ;
-Clean clean : citrun_wrap ;
-ShellReplace citrun_wrap : wrap.sh ;
+Shell citrun_wrap : wrap.sh ;
+ReplacePrefix citrun_wrap ;
 
 #
 # citrun_inst
@@ -31,12 +26,29 @@ INST_SRCS =
 	inst_action.cc
 	inst_visitor.cc ;
 
-Stringize lib_h.h : lib.h ;
+ObjectC++Flags $(INST_SRCS) : `llvm-config --cppflags` -DPREFIX=\\\"$(PREFIX)\\\" ;
 
-ObjectC++Flags $(INST_SRCS) : $(INST_CFLAGS) -DPREFIX=\\\"$(PREFIX)\\\" ;
-
-LINKFLAGS on citrun_inst = $(LINKFLAGS) $(INST_LDFLAGS) ;
-LINKLIBS on citrun_inst += $(INST_LIBS) ;
+LINKFLAGS on citrun_inst = $(LINKFLAGS) ;
+LINKLIBS on citrun_inst +=
+	`llvm-config --ldflags`
+	$(INST_EXTRALIB)
+	-lclangTooling
+	-lclangFrontendTool
+	-lclangFrontend
+	-lclangDriver
+	-lclangSerialization
+	-lclangCodeGen
+	-lclangParse
+	-lclangSema
+	-lclangAnalysis
+	-lclangRewrite
+	-lclangRewriteFrontend
+	-lclangEdit
+	-lclangAST
+	-lclangLex
+	-lclangBasic
+	`llvm-config --system-libs --libs bitreader mcparser transformutils option`
+	;
 
 Main citrun_inst : $(INST_SRCS) ;
 
@@ -61,10 +73,12 @@ Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
 Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
 Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
 
-ObjectC++Flags gl_main.cc gltest.cc $(GL_SRCS) : $(GL_CFLAGS) ;
+ObjectC++Flags gl_main.cc gltest.cc $(GL_SRCS) : `pkg-config --cflags glfw3 glew freetype2` ;
 
-LINKLIBS on citrun_gl citrun_gltest += -lm $(GL_LIBS) ;
-LINKLIBS on citrun_gltest += $(GLTEST_LIBS) ;
+LINKLIBS on citrun_gl += -lm $(GL_EXTRALIB) `pkg-config --libs glfw3 glew freetype2` ;
+LINKLIBS on citrun_gltest += -lm `pkg-config --libs glfw3 osmesa freetype2` ;
+LINKLIBS on citrun_gltest += bin/glew-2.1.0/lib/libGLEW.a ;
+
 LinkLibraries citrun_gl citrun_gltest : gl_common libglyphy ;
 
 Main citrun_gl : gl_main.cc ;

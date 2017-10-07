@@ -4,13 +4,14 @@ echo ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░
 echo ;
 
 PREFIX ?= `pwd` ;
-CC = clang ;
-C++ = clang++ ;
+CC = $(CC:E=clang) ;
+C++ = $(CXX:E=clang++) ;
 
 echo PREFIX \= $(PREFIX) ;
 echo CC \= $(CC) ;
 echo C++ \= $(C++) ;
 echo CFLAGS \= $(CFLAGS) ;
+echo LDFLAGS \= $(LDFLAGS) ;
 echo ;
 
 if $(OS) = "OPENBSD" {
@@ -43,34 +44,6 @@ C++FLAGS += $(CFLAGS) -Wall -W -Wcast-qual
 
 LINKFLAGS += $(LDFLAGS) ;
 
-GL_CFLAGS = `pkg-config --cflags glfw3 glew freetype2` ;
-GL_LIBS = $(GL_EXTRALIB) `pkg-config --libs glfw3 glew freetype2` ;
-GLTEST_LIBS  = `pkg-config --libs osmesa` ;
-
-INST_CFLAGS = `llvm-config --cxxflags` ;
-INST_LDFLAGS = -nopie ;
-
-INST_LIBS =
-	`llvm-config --ldflags`
-	$(INST_EXTRALIB)
-	-lclangTooling
-	-lclangFrontendTool
-	-lclangFrontend
-	-lclangDriver
-	-lclangSerialization
-	-lclangCodeGen
-	-lclangParse
-	-lclangSema
-	-lclangAnalysis
-	-lclangRewrite
-	-lclangRewriteFrontend
-	-lclangEdit
-	-lclangAST
-	-lclangLex
-	-lclangBasic
-	`llvm-config --system-libs --libs bitreader mcparser transformutils option`
-	;
-
 # Quote an entire file and add a variable declaration prefixing the string.
 rule Stringize
 {
@@ -86,3 +59,101 @@ actions Stringize
 	>> $(<) cat $(>)
 	>> $(<) echo ")\";"
 }
+
+actions ReplacePrefix {
+	sed -i -e "s, PREFIX ,$(PREFIX)," $(<)
+}
+
+actions PkgConfig
+{
+	set -e
+	type pkg-config
+	echo
+
+	gl_pkgs="osmesa glfw3 glew freetype2"
+	for pkg in $gl_pkgs; do
+		echo -n "$pkg = "
+		pkg-config --modversion $pkg || echo "NOT FOUND"
+	done
+}
+
+actions C++11
+{
+	$(C++) -x c++ -std=c++11 -E - < /dev/null > /dev/null
+}
+
+C++11 check_dependencies ;
+PkgConfig check_dependencies ;
+
+#
+# Run clang static analysis on the build.
+#
+actions Analysis
+{
+	scan-build --use-c++=clang++ -o html jam -j4
+}
+
+#
+# Get test coverage from black box suite.
+#
+actions TestCoverage
+{
+	set -e
+	#CFLAGS="-coverage" LDFLAGS="-coverage" ./configure
+	#CFLAGS="--coverage" LDFLAGS="--coverage" jam -j4
+	CXX=/usr/local/bin/clang++ CFLAGS="-fprofile-instr-generate -fcoverage-mapping" LDFLAGS=${CFLAGS} jam -dx
+
+exit 1
+	# Roll libgcov.a into libcitrun.a.
+	ar -M < t/libcitrun_gcov.mri
+
+	prove
+	# prove tt
+
+	mkdir gcov
+	# The output from gcov is valuable to save too.
+	gcov -o lib lib/lib*.c | tee gcov/SUMMARY
+	egcov -r bin/*.cc | tee -a gcov/SUMMARY
+	mv *.gcov gcov/
+}
+
+#
+# Use C It Run on itself.
+#
+actions CCItRunRun
+{
+	set -e
+	echo
+	read go?"Target destructively changes source code. Proceed? (y/n) "
+
+	if [ $go != y ]; then
+		echo Aborting
+		exit 0
+	fi
+
+	#
+	# Namespace global instrumentation variables such that they don't
+	# collide with the actual instrumentation.
+	#
+	sed -i \
+		-e "s,struct citrun_node,struct ccitrunrun_node," \
+		-e "s,citrun_node_add,ccitrunrun_node_add," \
+		-e "s,citrun_major,ccitrunrun_major,g" \
+		-e "s,citrun_minor,ccitrunrun_minor,g" \
+		lib.h lib.c inst_action.cc inst_fe.cc gl_procfile.cc
+
+	#
+	# Change binary names so we can do a side by side installation.
+	#
+	sed -i \
+		-e "s,citrun_inst,ccitrunrun_inst," \
+		-e "s,citrun_term,ccitrunrun_term," \
+		-e "s,citrun_gl,ccitrunrun_gl," \
+		-e "s,libcitrun,libccitrunrun," \
+		Jamfile lib.c inst_main.cc
+	jam
+}
+
+Analysis	analysis ;
+TestCoverage	coverage ;
+CCItRunRun	ccitrunrun ;
