@@ -19,7 +19,8 @@
 #include <io.h>
 #define PATH_MAX 32000
 
-#include "libP.h"
+#include "lib.h"		/* struct citrun_header */
+#include "lib_os.h"
 
 
 static HANDLE			 h = INVALID_HANDLE_VALUE;

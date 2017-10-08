@@ -25,7 +25,8 @@
 #include <string.h>		/* strl{cpy,cat} */
 #include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
 
-#include "libP.h"
+#include "lib.h"		/* struct citrun_header */
+#include "lib_os.h"
 
 
 /*
