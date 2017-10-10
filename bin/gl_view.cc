@@ -25,7 +25,7 @@ extern "C" {
 }
 
 
-View::View(demo_glstate_t *st) :
+View::View(citrun::gl_state &st) :
 	refcount(1),
 	st(st),
 	fullscreen(false)
@@ -56,13 +56,13 @@ View::reset()
 void
 View::scale_gamma_adjust(double factor)
 {
-	demo_glstate_scale_gamma_adjust(st, factor);
+	st.scale_gamma_adjust(factor);
 }
 
 void
 View::scale_contrast(double factor)
 {
-	demo_glstate_scale_contrast(st, factor);
+	st.scale_contrast(factor);
 }
 
 void
@@ -74,19 +74,19 @@ View::scale_perspective(double factor)
 void
 View::toggle_outline()
 {
-	demo_glstate_toggle_outline(st);
+	st.toggle_outline();
 }
 
 void
 View::scale_outline_thickness(double factor)
 {
-	demo_glstate_scale_outline_thickness(st, factor);
+	st.scale_outline_thickness(factor);
 }
 
 void
 View::adjust_boldness(double factor)
 {
-	demo_glstate_adjust_boldness(st, factor);
+	st.adjust_boldness(factor);
 }
 
 void
@@ -162,7 +162,7 @@ View::toggle_fullscreen()
 void
 View::toggle_debug()
 {
-	demo_glstate_toggle_debug(st);
+	st.toggle_debug();
 }
 
 
@@ -431,7 +431,7 @@ View::display(glyphy_extents_t const &extents)
 			-(extents.max_x + extents.min_x) / 2.,
 			-(extents.max_y + extents.min_y) / 2., 0);
 
-	demo_glstate_set_matrix(st, mat);
+	st.set_matrix(mat);
 
 	glClearColor (1, 1, 1, 1);
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -440,5 +440,5 @@ View::display(glyphy_extents_t const &extents)
 void
 View::setup()
 {
-	demo_glstate_setup(st);
+	st.setup();
 }

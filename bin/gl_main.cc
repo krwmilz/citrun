@@ -17,9 +17,8 @@
 
 citrun::gl_main::gl_main()
 {
-	st = demo_glstate_create();
 	static_vu = new View(st);
-	font = new citrun::gl_font(FONT_PATH, demo_glstate_get_atlas(st));
+	font = new citrun::gl_font(FONT_PATH, st.get_atlas());
 	static_vu->setup();
 
 	glyphy_point_t top_left = { 0, 0 };

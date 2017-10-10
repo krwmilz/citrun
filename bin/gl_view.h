@@ -2,12 +2,12 @@
 #define VIEW_H
 
 #include "demo-common.h"
-#include "demo-glstate.h"
+#include "gl_state.h"		// citrun::gl_state
 #include <GLFW/glfw3.h>
 
 class View {
 public:
-	View(demo_glstate_t *);
+	View(citrun::gl_state &);
 	~View();
 
 	void reset();
@@ -43,7 +43,7 @@ private:
 
 	unsigned int   refcount;
 
-	demo_glstate_t *st;
+	citrun::gl_state &st;
 
 	/* Output */
 	glyphy_bool_t fullscreen;
