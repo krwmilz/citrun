@@ -1,63 +1,16 @@
 //
 // osdemo.c originally from Brian Paul, public domain.
 //
-#include <err.h>
-#include <GL/glew.h>
+#include <GL/glew.h>		// glewInit, glewIsSupported
 #define GLAPI extern
-#include <GL/osmesa.h>
-#include <stdio.h>
+#include <GL/osmesa.h>		// OSMesa{Context,CreateContext,MakeCurrent}
+#include <err.h>
+#include <stdio.h>		// fclose, fopen, fputc
 #include <stdlib.h>
 #include <string.h>
 
-#include "gl_buffer.h"
-#include "gl_font.h"
-#include "gl_procfile.h"
-#include "gl_view.h"
-#include "process_dir.h"
+#include "gl_main.h"		// citrun::gl_main
 
-
-static int Width = 400;
-static int Height = 400;
-
-static void
-render_image(void)
-{
-	ProcessDir m_pdir;
-	std::vector<GlProcessFile> drawables;
-
-	demo_glstate_t *st = demo_glstate_create();
-	GlBuffer text_buffer;
-
-	View *static_vu = new View(st);
-
-	demo_font_t *font = demo_font_create(demo_glstate_get_atlas(st));
-
-	static_vu->setup();
-
-	glyphy_point_t top_left = { 0, 0 };
-	text_buffer.move_to(&top_left);
-	text_buffer.add_text("waiting...", font, 1);
-
-	for (std::string &file_name : m_pdir.scan())
-		drawables.emplace_back(file_name, font);
-
-	glyphy_extents_t extents;
-	for (auto &i : drawables) {
-		glyphy_extents_t t = i.get_extents();
-		extents.max_x = std::max(extents.max_x, t.max_x);
-		extents.max_y = std::max(extents.max_y, t.max_y);
-		extents.min_x = std::min(extents.min_x, t.min_x);
-		extents.min_y = std::min(extents.min_y, t.min_y);
-	}
-
-	// Set up view transforms
-	static_vu->display(extents);
-
-	text_buffer.draw();
-
-	for (auto &i : drawables)
-		i.display();
-}
 
 static void
 write_targa(const char *filename, const GLubyte *buffer, int width, int height)
@@ -79,10 +32,10 @@ write_targa(const char *filename, const GLubyte *buffer, int width, int height)
       fputc (0x00, f);
       fputc (0x00, f);	/* Y-origin of Image	*/
       fputc (0x00, f);
-      fputc (Width & 0xff, f);      /* Image Width	*/
-      fputc ((Width>>8) & 0xff, f);
-      fputc (Height & 0xff, f);     /* Image Height	*/
-      fputc ((Height>>8) & 0xff, f);
+      fputc (width & 0xff, f);      /* Image Width	*/
+      fputc ((width>>8) & 0xff, f);
+      fputc (height & 0xff, f);     /* Image Height	*/
+      fputc ((height>>8) & 0xff, f);
       fputc (0x18, f);		/* Pixel Depth, 0x18 => 24 Bits	*/
       fputc (0x20, f);		/* Image Descriptor	*/
       fclose(f);
@@ -104,6 +57,8 @@ main(int argc, char *argv[])
 	OSMesaContext	 ctx;
 	void		*buffer;
 	char		*filename = NULL;
+	int		 width = 400;
+	int		 height = 400;
 
 	if (argc < 2) {
 		fprintf(stderr, "Usage:\n");
@@ -112,9 +67,12 @@ main(int argc, char *argv[])
 	}
 
 	filename = argv[1];
+	if (filename == NULL)
+		errx(0,"Specify a filename if you want to make an image file");
+
 	if (argc == 4) {
-		Width = atoi(argv[2]);
-		Height = atoi(argv[3]);
+		width = atoi(argv[2]);
+		height = atoi(argv[3]);
 	}
 
 	// Create an RGBA-mode context
@@ -128,11 +86,11 @@ main(int argc, char *argv[])
 		errx(1, "OSMesaCreateContext failed!");
 
 	// Allocate the image buffer
-	if ((buffer = malloc(Width * Height * 4 * sizeof(GLubyte))) == NULL)
+	if ((buffer = malloc(width * height * 4 * sizeof(GLubyte))) == NULL)
 		errx(1, "Alloc image buffer failed!");
 
 	// Bind the buffer to the context and make it current
-	if (!OSMesaMakeCurrent(ctx, buffer, GL_UNSIGNED_BYTE, Width, Height))
+	if (!OSMesaMakeCurrent(ctx, buffer, GL_UNSIGNED_BYTE, width, height))
 		errx(1, "OSMesaMakeCurrent failed!");
 
 	int z, s, a;
@@ -143,17 +101,14 @@ main(int argc, char *argv[])
 
 	GLenum glew_status = glewInit();
 	if (GLEW_OK != glew_status)
-		errx(1, "%s", glewGetErrorString(glew_status));
+		errx(1, "glewInit %s", glewGetErrorString(glew_status));
 	if (!glewIsSupported("GL_VERSION_2_0"))
 		errx(1, "No support for OpenGL 2.0 found");
 
-	render_image();
+	citrun::gl_main main;
+	main.tick();
 
-	if (filename != NULL)
-		write_targa(filename, static_cast<const GLubyte *>(buffer), Width, Height);
-	else
-		printf("Specify a filename if you want to make an image file\n");
-
+	write_targa(filename, static_cast<const GLubyte *>(buffer), width, height);
 	printf("all done\n");
 
 	free(buffer);
