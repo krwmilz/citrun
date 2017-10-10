@@ -3,10 +3,12 @@
 #
 use Modern::Perl;
 use t::utils;
+
 plan tests => 4;
 
 
 my $inst = Test::Cmd->new( prog => 'bin/citrun_inst', workdir => '' );
+
 $inst->write( 'binop.c', <<EOF );
 enum ASDF {
 	ONE = (1 << 0),
@@ -48,7 +50,7 @@ int main(void) {++_citrun.data[13];
 }
 EOF
 
-my $check_good = <<EOF;
+my $log_good = <<EOF;
 >> citrun_inst
 Compilers path = ''
 Found source file ''
@@ -72,9 +74,9 @@ my $inst_out;
 $inst->read(\$inst_out, 'binop.c');
 
 # Sanitize paths from stdout.
-my $check_out = clean_citrun_log(scalar $inst->stdout);
+my $log_out = clean_citrun_log(scalar $inst->stdout);
 
 eq_or_diff( $inst_out,	$inst_good, 'is instrumented file identical', { context => 3 } );
-eq_or_diff $check_out,	$check_good, 'is citrun_inst output identical', { context => 3 };
+eq_or_diff $log_out,	$log_good, 'is citrun_inst output identical', { context => 3 };
 is( $inst->stderr,	'',	'is citrun_inst stderr silent' );
 is( $? >> 8,		0,	'is citrun_inst exit code 0' );

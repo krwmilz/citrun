@@ -5,6 +5,7 @@
 #
 use Modern::Perl;
 use t::utils;
+
 plan tests => 4;
 
 
@@ -17,7 +18,7 @@ my $error_good = "Error: '.*share/citrun' not in PATH.";
 
 $cc->run( args => '', chdir => $cc->curdir );
 is( $cc->stdout,	'',			'is cc stdout empty' );
-like( $cc->stderr,	qr/$error_good/,	'is cc stderr identical' );
+like( $cc->stderr,	qr/$error_good/,	'is cc stderr about right' );
 is( $? >> 8,		1,			'is cc exit code 1' );
 
 my $log_out;
