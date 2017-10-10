@@ -19,7 +19,7 @@
 
 
 citrun::gl_state::gl_state() :
-	program(demo_shader_create_program()),
+	program(shader.create_program()),
 	atlas(2048, 1024, 64, 8),
 	u_debug(false),
 	u_contrast(1.0),

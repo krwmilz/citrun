@@ -18,13 +18,16 @@
 #include <assert.h>
 #include <GL/glew.h>
 
-#include "demo-shader.h"
+#include "gl_shader.h"
 
 #include "demo_atlas_glsl.h"
 #include "demo_vshader_glsl.h"
 #include "demo_fshader_glsl.h"
 
 
+citrun::gl_shader::gl_shader()
+{
+}
 
 static unsigned int
 glyph_encode (unsigned int atlas_x ,  /* 7 bits */
@@ -51,7 +54,7 @@ static void
 glyph_vertex_encode (double x, double y,
 		     unsigned int corner_x, unsigned int corner_y,
 		     const citrun::glyph_info_t *gi,
-		     glyph_vertex_t *v)
+		     citrun::glyph_vertex_t *v)
 {
   unsigned int encoded = glyph_encode (gi->atlas_x, gi->atlas_y,
 				       corner_x, corner_y,
@@ -63,11 +66,9 @@ glyph_vertex_encode (double x, double y,
 }
 
 void
-demo_shader_add_glyph_vertices (const glyphy_point_t        &p,
-				double                       font_size,
-				citrun::glyph_info_t        *gi,
-				std::vector<glyph_vertex_t> *vertices,
-				glyphy_extents_t            *extents)
+citrun::gl_shader::add_glyph_vertices(const glyphy_point_t &p, double font_size,
+	citrun::glyph_info_t *gi, std::vector<glyph_vertex_t> *vertices,
+	glyphy_extents_t *extents)
 {
   if (gi->is_empty)
     return;
@@ -190,7 +191,7 @@ link_program (GLuint vshader,
 #endif
 
 GLuint
-demo_shader_create_program (void)
+citrun::gl_shader::create_program()
 {
   TRACE();
 

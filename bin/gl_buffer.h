@@ -23,7 +23,7 @@
 
 #include "demo-common.h"
 #include "gl_font.h"		// citrun::gl_font
-#include "demo-shader.h"
+#include "gl_shader.h"		// citrun::glyph_vertex_t
 
 
 namespace citrun {
@@ -32,11 +32,13 @@ class gl_buffer
 {
 	unsigned int			 m_refcount;
 	glyphy_point_t			 m_cursor;
-	std::vector<glyph_vertex_t>	 m_vertices;
+	std::vector<citrun::glyph_vertex_t> m_vertices;
 	glyphy_extents_t		 m_ink_extents;
 	glyphy_extents_t		 m_logical_extents;
 	bool				 m_dirty;
 	GLuint				 m_buf_name;
+
+	citrun::gl_shader		 shader;
 
 public:
 	gl_buffer();

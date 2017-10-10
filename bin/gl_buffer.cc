@@ -123,7 +123,7 @@ citrun::gl_buffer::add_text(const char *utf8, citrun::gl_font &font, double font
 
 		/* Update ink extents */
 		glyphy_extents_t m_ink_extents;
-		demo_shader_add_glyph_vertices(m_cursor, font_size, &gi, &m_vertices, &m_ink_extents);
+		shader.add_glyph_vertices(m_cursor, font_size, &gi, &m_vertices, &m_ink_extents);
 		glyphy_extents_extend(&m_ink_extents, &m_ink_extents);
 
 		/* Update logical extents */

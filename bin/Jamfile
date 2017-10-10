@@ -56,12 +56,12 @@ Main citrun_inst : $(INST_SRCS) ;
 # citrun_gl,  citrun_gltest
 #
 GL_SRCS =
-	demo-shader.cc
 	gl_atlas.cc
 	gl_buffer.cc
 	gl_font.cc
 	gl_main.cc
 	gl_runtime.cc
+	gl_shader.cc
 	gl_state.cc
 	gl_view.cc
 	matrix4x4.c ;

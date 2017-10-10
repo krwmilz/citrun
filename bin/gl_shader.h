@@ -15,7 +15,6 @@
  *
  * Google Author(s): Behdad Esfahbod
  */
-
 #ifndef DEMO_SHADERS_H
 #define DEMO_SHADERS_H
 
@@ -25,25 +24,29 @@
 #include "gl_font.h"		// citrun::glyph_info_t
 
 
+namespace citrun {
+
 struct glyph_vertex_t {
-  /* Position */
-  GLfloat x;
-  GLfloat y;
-  /* Glyph info */
-  GLfloat g16hi;
-  GLfloat g16lo;
+	/* Position */
+	GLfloat x;
+	GLfloat y;
+	/* Glyph info */
+	GLfloat g16hi;
+	GLfloat g16lo;
 };
 
-void
-demo_shader_add_glyph_vertices (const glyphy_point_t        &p,
-				double                       font_size,
-				citrun::glyph_info_t        *gi,
-				std::vector<glyph_vertex_t> *vertices,
-				glyphy_extents_t            *extents);
+class gl_shader {
+public:
+		 gl_shader();
 
+	void	 add_glyph_vertices (const glyphy_point_t &,
+			double,
+			citrun::glyph_info_t *,
+			std::vector<glyph_vertex_t> *,
+			glyphy_extents_t *);
+	GLuint	 create_program();
+};
 
-GLuint
-demo_shader_create_program (void);
-
+} // namespace citrun
 
 #endif /* DEMO_SHADERS_H */

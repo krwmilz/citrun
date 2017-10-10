@@ -20,12 +20,13 @@
 
 #include "demo-common.h"
 #include "gl_atlas.h"		// citrun::gl_atlas
-#include "demo-shader.h"
+#include "gl_shader.h"
 
 
 namespace citrun {
 
 class gl_state {
+	citrun::gl_shader shader;
 	GLuint		 program;
 	citrun::gl_atlas atlas;
 
