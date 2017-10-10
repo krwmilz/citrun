@@ -39,6 +39,10 @@ InstFrontend::InstFrontend(int argc, char *argv[], bool is_citrun_inst) :
 {
 }
 
+InstFrontend::~InstFrontend()
+{
+}
+
 void
 InstFrontend::log_identity()
 {
@@ -52,7 +56,9 @@ InstFrontend::get_paths()
 {
 	m_compilers_path = PREFIX ;
 	m_compilers_path += dir_sep() ;
-	m_compilers_path += "share/citrun" ;
+	m_compilers_path += "share" ;
+	m_compilers_path += dir_sep() ;
+	m_compilers_path += "citrun" ;
 
 	m_lib_path = PREFIX ;
 	m_lib_path += dir_sep();
@@ -109,8 +115,11 @@ InstFrontend::clean_PATH()
 		//
 		// Error visibly so this can be fixed as soon as possible.
 		//
-		std::cerr << "Error: '" << m_compilers_path << "' not in PATH." << std::endl;
-		m_log <<     "Error: '" << m_compilers_path << "' not in PATH." << std::endl;
+		std::stringstream err;
+		err << "Error: '" << m_compilers_path << "' not in PATH.";
+
+		std::cerr << err.str() << std::endl;
+		m_log << err.str() << std::endl;
 		exit(1);
 	}
 
@@ -118,7 +127,7 @@ InstFrontend::clean_PATH()
 }
 
 //
-// Guess if the argument is a sourcefile. If it is stash a backup of the file
+// Guess if the argument is a source file. If it is stash a backup of the file
 // and sync the timestamps.
 //
 void

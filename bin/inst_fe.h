@@ -36,7 +36,8 @@ protected:
 	InstrumentLogger	m_log;
 
 public:
-	InstFrontend(int, char *argv[], bool);
+				InstFrontend(int, char *argv[], bool);
+	virtual			~InstFrontend() = 0;
 
 	void			log_identity();
 	void			get_paths();
