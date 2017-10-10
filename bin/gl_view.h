@@ -2,7 +2,6 @@
 #define VIEW_H
 
 #include "demo-common.h"
-#include "gl_buffer.h"
 #include "demo-glstate.h"
 #include <GLFW/glfw3.h>
 
