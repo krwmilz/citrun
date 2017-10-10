@@ -19,6 +19,8 @@
 #ifndef GL_FONT_H
 #define GL_FONT_H
 
+#include <unordered_map>
+
 #include "demo-common.h"
 #include "demo-atlas.h"
 
@@ -26,43 +28,53 @@
 #include FT_FREETYPE_H
 
 
+namespace citrun {
+
 typedef struct {
-  glyphy_extents_t extents;
-  double           advance;
-  glyphy_bool_t    is_empty; /* has no outline; eg. space; don't draw it */
-  unsigned int     nominal_w;
-  unsigned int     nominal_h;
-  unsigned int     atlas_x;
-  unsigned int     atlas_y;
+	glyphy_extents_t extents;
+	double		advance;
+	glyphy_bool_t	is_empty; /* has no outline; eg. space; don't draw it */
+	unsigned int	nominal_w;
+	unsigned int	nominal_h;
+	unsigned int	atlas_x;
+	unsigned int	atlas_y;
 } glyph_info_t;
 
+class gl_font {
+	FT_Library	 ft_library;
+	FT_Face		 face;
 
-typedef struct demo_font_t demo_font_t;
+	std::unordered_map<unsigned int, glyph_info_t> glyph_cache;
 
-demo_font_t *
-demo_font_create (demo_atlas_t *atlas);
+	/* stats */
+	unsigned int	 num_glyphs;
+	double		 sum_error;
+	unsigned int	 sum_endpoints;
+	double		 sum_fetch;
+	unsigned int	 sum_bytes;
 
-demo_font_t *
-demo_font_reference (demo_font_t *font);
+	demo_atlas_t	*atlas;
+	glyphy_arc_accumulator_t *acc;
 
-void
-demo_font_destroy (demo_font_t *font);
+	void		 _upload_glyph(unsigned int, glyph_info_t *);
+	void		 encode_ft_glyph(unsigned int,
+				double,
+				glyphy_rgba_t *,
+				unsigned int,
+				unsigned int *,
+				unsigned int *,
+				unsigned int *,
+				glyphy_extents_t *,
+				double *);
+public:
+			 gl_font(std::string const&, demo_atlas_t *atlas);
+			~gl_font();
 
+	FT_Face		 get_face() const;
+	demo_atlas_t	*get_atlas();
+	void		 lookup_glyph(unsigned int, glyph_info_t *);
+	void		 print_stats();
+};
 
-FT_Face
-demo_font_get_face (demo_font_t *font);
-
-demo_atlas_t *
-demo_font_get_atlas (demo_font_t *font);
-
-
-void
-demo_font_lookup_glyph (demo_font_t  *font,
-			unsigned int  glyph_index,
-			glyph_info_t *glyph_info);
-
-void
-demo_font_print_stats (demo_font_t *font);
-
-
+} // namespace citrun
 #endif /* GL_FONT_H */
