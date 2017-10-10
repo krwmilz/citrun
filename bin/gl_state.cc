@@ -20,7 +20,7 @@
 
 citrun::gl_state::gl_state() :
 	program(demo_shader_create_program()),
-	atlas(demo_atlas_create(2048, 1024, 64, 8)),
+	atlas(2048, 1024, 64, 8),
 	u_debug(false),
 	u_contrast(1.0),
 	u_gamma_adjust(1.0),
@@ -33,7 +33,6 @@ citrun::gl_state::gl_state() :
 
 citrun::gl_state::~gl_state()
 {
-	demo_atlas_destroy(atlas);
 	glDeleteProgram(program);
 }
 
@@ -52,7 +51,7 @@ citrun::gl_state::setup()
 {
 	glUseProgram(program);
 
-	demo_atlas_set_uniforms(atlas);
+	atlas.set_uniforms();
 
 	SET_UNIFORM(u_debug, u_debug);
 	SET_UNIFORM(u_contrast, u_contrast);
@@ -65,7 +64,7 @@ citrun::gl_state::setup()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-demo_atlas_t *
+citrun::gl_atlas &
 citrun::gl_state::get_atlas()
 {
 	return atlas;

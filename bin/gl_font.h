@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 #include "demo-common.h"
-#include "demo-atlas.h"
+#include "gl_atlas.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -53,7 +53,7 @@ class gl_font {
 	double		 sum_fetch;
 	unsigned int	 sum_bytes;
 
-	demo_atlas_t	*atlas;
+	citrun::gl_atlas &atlas;
 	glyphy_arc_accumulator_t *acc;
 
 	void		 _upload_glyph(unsigned int, glyph_info_t *);
@@ -67,11 +67,11 @@ class gl_font {
 				glyphy_extents_t *,
 				double *);
 public:
-			 gl_font(std::string const&, demo_atlas_t *atlas);
+			 gl_font(std::string const&, citrun::gl_atlas &);
 			~gl_font();
 
 	FT_Face		 get_face() const;
-	demo_atlas_t	*get_atlas();
+	citrun::gl_atlas &get_atlas();
 	void		 lookup_glyph(unsigned int, glyph_info_t *);
 	void		 print_stats();
 };

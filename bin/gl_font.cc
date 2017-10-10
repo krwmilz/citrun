@@ -25,14 +25,14 @@
 #include "glyphy/glyphy-freetype.h"
 
 
-citrun::gl_font::gl_font(std::string const &font_path, demo_atlas_t *at) :
+citrun::gl_font::gl_font(std::string const &font_path, citrun::gl_atlas &at) :
 	face(NULL),
 	num_glyphs(0),
 	sum_error(0),
 	sum_endpoints(0),
 	sum_fetch(0),
 	sum_bytes(0),
-	atlas(demo_atlas_reference(at)),
+	atlas(at),
 	acc(glyphy_arc_accumulator_create())
 {
 	FT_Init_FreeType(&ft_library);
@@ -42,7 +42,6 @@ citrun::gl_font::gl_font(std::string const &font_path, demo_atlas_t *at) :
 citrun::gl_font::~gl_font()
 {
 	glyphy_arc_accumulator_destroy(acc);
-	demo_atlas_destroy(atlas);
 }
 
 FT_Face
@@ -51,7 +50,7 @@ citrun::gl_font::get_face() const
 	return face;
 }
 
-demo_atlas_t *
+citrun::gl_atlas &
 citrun::gl_font::get_atlas()
 {
 	return atlas;
@@ -182,7 +181,7 @@ citrun::gl_font::_upload_glyph(unsigned int glyph_index,
 
 	glyph_info->is_empty = glyphy_extents_is_empty (&glyph_info->extents);
 	if (!glyph_info->is_empty)
-		demo_atlas_alloc (atlas, buffer, output_len,
+		atlas.alloc(buffer, output_len,
 				&glyph_info->atlas_x, &glyph_info->atlas_y);
 }
 

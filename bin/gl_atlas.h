@@ -15,40 +15,33 @@
  *
  * Google Author(s): Behdad Esfahbod, Maysum Panju
  */
-
 #ifndef DEMO_ATLAS_H
 #define DEMO_ATLAS_H
 
 #include "demo-common.h"
 
 
-typedef struct demo_atlas_t demo_atlas_t;
+namespace citrun {
 
-demo_atlas_t *
-demo_atlas_create (unsigned int w,
-		   unsigned int h,
-		   unsigned int item_w,
-		   unsigned int item_h_quantum);
+class gl_atlas {
+	GLuint		 tex_unit;
+	GLuint		 tex_name;
+	GLuint		 tex_w;
+	GLuint		 tex_h;
+	GLuint		 item_w;
+	GLuint		 item_h_q; /* height quantum */
+	GLuint		 cursor_x;
+	GLuint		 cursor_y;
 
-demo_atlas_t *
-demo_atlas_reference (demo_atlas_t *at);
+public:
+			 gl_atlas(unsigned int, unsigned int, unsigned int, unsigned int);
+			~gl_atlas();
 
-void
-demo_atlas_destroy (demo_atlas_t *at);
+	void		 alloc(glyphy_rgba_t *, unsigned int, unsigned int *, unsigned int *);
+	void		 bind_texture();
+	void		 set_uniforms();
+};
 
-
-void
-demo_atlas_alloc (demo_atlas_t  *at,
-		  glyphy_rgba_t *data,
-		  unsigned int   len,
-		  unsigned int  *px,
-		  unsigned int  *py);
-
-void
-demo_atlas_bind_texture (demo_atlas_t *at);
-
-void
-demo_atlas_set_uniforms (demo_atlas_t *at);
-
+} // namespace citrun
 
 #endif /* DEMO_ATLAS_H */

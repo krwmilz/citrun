@@ -19,7 +19,7 @@
 #define DEMO_GLSTATE_H
 
 #include "demo-common.h"
-#include "demo-atlas.h"
+#include "gl_atlas.h"		// citrun::gl_atlas
 #include "demo-shader.h"
 
 
@@ -27,7 +27,7 @@ namespace citrun {
 
 class gl_state {
 	GLuint		 program;
-	demo_atlas_t	*atlas;
+	citrun::gl_atlas atlas;
 
 	/* Uniforms */
 	double		 u_debug;
@@ -41,7 +41,7 @@ public:
 			~gl_state();
 
 	void		 setup();
-	demo_atlas_t	*get_atlas();
+	citrun::gl_atlas &get_atlas();
 	void		 scale_gamma_adjust(double);
 	void		 scale_contrast(double);
 	void		 toggle_debug();

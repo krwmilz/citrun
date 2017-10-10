@@ -56,8 +56,8 @@ Main citrun_inst : $(INST_SRCS) ;
 # citrun_gl,  citrun_gltest
 #
 GL_SRCS =
-	demo-atlas.cc
 	demo-shader.cc
+	gl_atlas.cc
 	gl_buffer.cc
 	gl_font.cc
 	gl_main.cc
