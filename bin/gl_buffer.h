@@ -22,11 +22,13 @@
 #include <vector>
 
 #include "demo-common.h"
-#include "gl_font.h"
+#include "gl_font.h"		// citrun::gl_font
 #include "demo-shader.h"
 
 
-class GlBuffer
+namespace citrun {
+
+class gl_buffer
 {
 	unsigned int			 m_refcount;
 	glyphy_point_t			 m_cursor;
@@ -37,15 +39,16 @@ class GlBuffer
 	GLuint				 m_buf_name;
 
 public:
-	GlBuffer();
+	gl_buffer();
 
 	void		reference();
 	void		clear();
 	void		extents(glyphy_extents_t *, glyphy_extents_t *);
 	void		move_to(const glyphy_point_t *);
 	void		current_point(glyphy_point_t *);
-	void		add_text(const char *, demo_font_t *, double);
+	void		add_text(const char *, citrun::gl_font &, double);
 	void		draw();
 };
 
+} // namespace citrun
 #endif // GL_BUFFER_H

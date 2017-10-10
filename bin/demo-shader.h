@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "demo-common.h"
-#include "gl_font.h"
+#include "gl_font.h"		// citrun::glyph_info_t
 
 
 struct glyph_vertex_t {
@@ -37,7 +37,7 @@ struct glyph_vertex_t {
 void
 demo_shader_add_glyph_vertices (const glyphy_point_t        &p,
 				double                       font_size,
-				glyph_info_t                *gi,
+				citrun::glyph_info_t        *gi,
 				std::vector<glyph_vertex_t> *vertices,
 				glyphy_extents_t            *extents);
 

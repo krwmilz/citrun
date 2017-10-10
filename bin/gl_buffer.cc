@@ -19,16 +19,14 @@
 #include "gl_buffer.h"
 
 
-GlBuffer::GlBuffer() :
-	m_refcount(1),
-	m_cursor({0, 0})
+citrun::gl_buffer::gl_buffer() : m_refcount(1), m_cursor({0, 0})
 {
 	glGenBuffers(1, &m_buf_name);
 	clear();
 }
 
 #if 0
-GlBuffer::~GlBuffer()
+gl_buffer::~gl_buffer()
 {
 	//if (!buffer || --buffer->refcount)
 	//	return;
@@ -38,13 +36,13 @@ GlBuffer::~GlBuffer()
 #endif
 
 void
-GlBuffer::reference()
+citrun::gl_buffer::reference()
 {
 	m_refcount++;
 }
 
 void
-GlBuffer::clear()
+citrun::gl_buffer::clear()
 {
 	m_vertices.clear();
 	glyphy_extents_clear(&m_ink_extents);
@@ -53,7 +51,7 @@ GlBuffer::clear()
 }
 
 void
-GlBuffer::extents(glyphy_extents_t *ink, glyphy_extents_t *logical)
+citrun::gl_buffer::extents(glyphy_extents_t *ink, glyphy_extents_t *logical)
 {
 	if (ink)
 		*ink = m_ink_extents;
@@ -62,21 +60,21 @@ GlBuffer::extents(glyphy_extents_t *ink, glyphy_extents_t *logical)
 }
 
 void
-GlBuffer::move_to(const glyphy_point_t *p)
+citrun::gl_buffer::move_to(const glyphy_point_t *p)
 {
 	m_cursor = *p;
 }
 
 void
-GlBuffer::current_point(glyphy_point_t *p)
+citrun::gl_buffer::current_point(glyphy_point_t *p)
 {
 	*p = m_cursor;
 }
 
 void
-GlBuffer::add_text(const char *utf8, demo_font_t *font, double font_size)
+citrun::gl_buffer::add_text(const char *utf8, citrun::gl_font &font, double font_size)
 {
-	FT_Face face = demo_font_get_face(font);
+	FT_Face face = font.get_face();
 	glyphy_point_t top_left = m_cursor;
 	m_cursor.y += font_size /* * font->ascent */;
 	unsigned int unicode;
@@ -113,7 +111,7 @@ GlBuffer::add_text(const char *utf8, demo_font_t *font, double font_size)
 
 		unsigned int glyph_index = FT_Get_Char_Index(face, unicode);
 		glyph_info_t gi;
-		demo_font_lookup_glyph(font, glyph_index, &gi);
+		font.lookup_glyph(glyph_index, &gi);
 
 		/* Let tab operate like it does in editors, 8 spaces. */
 		if (unicode == '\t') {
@@ -147,7 +145,7 @@ GlBuffer::add_text(const char *utf8, demo_font_t *font, double font_size)
 }
 
 void
-GlBuffer::draw()
+citrun::gl_buffer::draw()
 {
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);

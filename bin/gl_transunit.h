@@ -1,22 +1,25 @@
 #include <string>		// std::string
 #include <vector>		// std::vector
 
-#include "gl_buffer.h"		// GlBuffer
-#include "mem.h"		// Mem
+#include "gl_buffer.h"		// citrun::gl_buffer
+#include "gl_font.h"		// citrun::gl_font
+#include "mem.h"		// citrun::mem
 
+
+namespace citrun {
 
 //
 // Owns a few pages of shared memory and a gl buffer.
 //
-class GlTranslationUnit
+class gl_transunit
 {
 	struct citrun_node	*m_node;
 	uint64_t		*m_data;
 	std::vector<uint64_t>	 m_data_buffer;
-	GlBuffer		 m_glbuffer;
+	citrun::gl_buffer	 m_glbuffer;
 
 public:
-	GlTranslationUnit(Mem &, demo_font_t *, glyphy_point_t &);
+	gl_transunit(citrun::mem &, citrun::gl_font &, glyphy_point_t &);
 
 	std::string		 comp_file_path() const;
 	unsigned int		 num_lines() const;
@@ -24,3 +27,5 @@ public:
 	void			 display();
 	glyphy_extents_t	 get_extents();
 };
+
+} // namespace citrun

@@ -50,7 +50,7 @@ glyph_encode (unsigned int atlas_x ,  /* 7 bits */
 static void
 glyph_vertex_encode (double x, double y,
 		     unsigned int corner_x, unsigned int corner_y,
-		     const glyph_info_t *gi,
+		     const citrun::glyph_info_t *gi,
 		     glyph_vertex_t *v)
 {
   unsigned int encoded = glyph_encode (gi->atlas_x, gi->atlas_y,
@@ -65,7 +65,7 @@ glyph_vertex_encode (double x, double y,
 void
 demo_shader_add_glyph_vertices (const glyphy_point_t        &p,
 				double                       font_size,
-				glyph_info_t                *gi,
+				citrun::glyph_info_t        *gi,
 				std::vector<glyph_vertex_t> *vertices,
 				glyphy_extents_t            *extents)
 {

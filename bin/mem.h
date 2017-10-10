@@ -3,11 +3,14 @@
 
 #include <string>		// std::string
 
+
+namespace citrun {
+
 //
 // Class that handles operating system independent access to blocks of memory
 // that are efficiently sized for the underlying system.
 //
-class Mem
+class mem
 {
 	size_t		 m_off;
 
@@ -19,12 +22,9 @@ protected:
 	size_t		 m_size;
 
 public:
-	Mem() :
-		m_off(0)
-	{};
+			 mem() : m_off(0) {};
 
-	void
-	increment(size_t size)
+	void		 increment(size_t size)
 	{
 		size_t page_mask;
 		size_t rounded_size;
@@ -36,23 +36,11 @@ public:
 		m_off += rounded_size;
 	}
 
-	void *
-	get_ptr()
-	{
-		return (char *)m_base + m_off;
-	}
-
-	bool
-	at_end()
-	{
-		return m_off >= m_size;
-	}
-
-	bool
-	at_end_exactly()
-	{
-		return m_off == m_size;
-	}
+	void		*get_ptr() { return (char *)m_base + m_off; }
+	bool		 at_end() { return m_off >= m_size; }
+	bool		 at_end_exactly() { return m_off == m_size; }
 
 };
+
+} // namespace citrun
 #endif // MEM_H

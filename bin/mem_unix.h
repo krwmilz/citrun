@@ -20,10 +20,12 @@
 #include <fcntl.h>		// O_RDONLY
 #include <unistd.h>		// getpagesize
 
-#include "mem.h"		// Mem
+#include "mem.h"		// citrun::mem
 
 
-class MemUnix : public Mem
+namespace citrun {
+
+class mem_unix : public citrun::mem
 {
 	std::string	 m_path;
 	int		 m_fd;
@@ -36,7 +38,7 @@ class MemUnix : public Mem
 	}
 
 public:
-	MemUnix(std::string const &path) :
+	mem_unix(std::string const &path) :
 		m_path(path),
 		m_fd(0)
 	{
@@ -59,3 +61,5 @@ public:
 			err(1, "mmap");
 	}
 };
+
+} // namespace citrun

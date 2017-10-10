@@ -18,15 +18,15 @@
 #include <cstring>		// std::strncmp
 #include <sstream>		// std::stringstream
 
-#include "gl_procfile.h"
 #include "lib.h"		// citrun_major, struct citrun_{node,header}
+#include "gl_procfile.h"	// citrun::gl_procfile
 
 
 //
 // Take a filesystem path and memory map its contents. Map at least a header
 // structure on top of it.
 //
-GlProcessFile::GlProcessFile(std::string const &path, demo_font_t *font) :
+citrun::gl_procfile::gl_procfile(std::string const &path, citrun::gl_font &font, double const &x_off) :
 	m_mem(path)
 {
 	// Header is always at offset 0.
@@ -36,17 +36,27 @@ GlProcessFile::GlProcessFile(std::string const &path, demo_font_t *font) :
 	assert(std::strncmp(m_header->magic, "ctrn", 4) == 0);
 	assert(m_header->major == citrun_major);
 
-	std::stringstream ss;
-	ss << "Program: " << m_header->progname << std::endl;
-	ss << "Translation Units: " << m_header->units << std::endl;
-	ss << "Lines of Code: " << m_header->loc << std::endl;
+	glyphy_point_t orig_pos = { x_off, 0 };
+	m_glbuffer.move_to(&orig_pos);
 
-	m_glbuffer.add_text(ss.str().c_str(), font, 2);
-	glyphy_point_t cur_pos;
-	m_glbuffer.current_point(&cur_pos);
+	std::stringstream maj;
+	maj << "Name:              '" << m_header->progname << "'" << std::endl;
+	maj << "Translation Units: " << m_header->units << std::endl;
+	maj << "Lines of code:     " << m_header->loc << std::endl;
+	m_glbuffer.add_text(maj.str().c_str(), font, 3);
 
-	while (!m_mem.at_end())
-		m_tus.emplace_back(m_mem, font, cur_pos);
+	std::stringstream min;
+	min << "Working directory: " << m_header->cwd << std::endl;
+	min << "Instrumented with: v" << m_header->major << "." << m_header->minor << std::endl;
+	m_glbuffer.add_text(min.str().c_str(), font, 2);
+
+	glyphy_point_t draw_pos;
+	m_glbuffer.current_point(&draw_pos);
+
+	while (!m_mem.at_end()) {
+		m_tus.emplace_back(m_mem, font, draw_pos);
+		draw_pos.x += 80;
+	}
 
 	// Make sure internal increment in TranslationUnit works as intended.
 	assert(m_mem.at_end_exactly());
@@ -56,15 +66,13 @@ GlProcessFile::GlProcessFile(std::string const &path, demo_font_t *font) :
 // Checks if the pid given by the runtime is alive. Prone to race conditions.
 //
 bool
-GlProcessFile::is_alive() const
+citrun::gl_procfile::is_alive() const
 {
-	if (kill(m_header->pids[0], 0) == 0)
-		return 1;
-	return 0;
+	return kill(m_header->pids[0], 0) == 0;
 }
 
-const GlTranslationUnit *
-GlProcessFile::find_tu(std::string const &srcname) const
+const citrun::gl_transunit *
+citrun::gl_procfile::find_tu(std::string const &srcname) const
 {
 	for (auto &i : m_tus)
 		if (srcname == i.comp_file_path())
@@ -73,7 +81,7 @@ GlProcessFile::find_tu(std::string const &srcname) const
 }
 
 void
-GlProcessFile::display()
+citrun::gl_procfile::display()
 {
 	m_glbuffer.draw();
 
@@ -82,7 +90,7 @@ GlProcessFile::display()
 }
 
 glyphy_extents_t
-GlProcessFile::get_extents()
+citrun::gl_procfile::get_extents()
 {
 	glyphy_extents_t extents;
 	m_glbuffer.extents(NULL, &extents);
