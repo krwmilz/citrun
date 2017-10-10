@@ -19,10 +19,9 @@
 #include <GL/glew.h>
 
 #include "gl_shader.h"
-
-#include "demo_atlas_glsl.h"
-#include "demo_vshader_glsl.h"
-#include "demo_fshader_glsl.h"
+#include "gl_atlas_glsl.h"
+#include "gl_vshader_glsl.h"
+#include "gl_fshader_glsl.h"
 
 
 citrun::gl_shader::gl_shader()
@@ -197,14 +196,14 @@ citrun::gl_shader::create_program()
 
   GLuint vshader, fshader, program;
   const GLchar *vshader_sources[] = {GLSL_HEADER_STRING,
-				     demo_vshader_glsl};
+				     gl_vshader_glsl};
   vshader = compile_shader (GL_VERTEX_SHADER, ARRAY_LEN (vshader_sources), vshader_sources);
   const GLchar *fshader_sources[] = {GLSL_HEADER_STRING,
-				     demo_atlas_glsl,
+				     gl_atlas_glsl,
 				     glyphy_common_shader_source (),
 				     "#define GLYPHY_SDF_PSEUDO_DISTANCE 1\n",
 				     glyphy_sdf_shader_source (),
-				     demo_fshader_glsl};
+				     gl_fshader_glsl};
   fshader = compile_shader (GL_FRAGMENT_SHADER, ARRAY_LEN (fshader_sources), fshader_sources);
 
   program = link_program (vshader, fshader);

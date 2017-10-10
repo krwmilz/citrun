@@ -68,9 +68,9 @@ GL_SRCS =
 
 Library gl_common : $(GL_SRCS) ;
 
-Stringize demo_atlas_glsl.h :   demo_atlas.glsl ;
-Stringize demo_vshader_glsl.h : demo_vshader.glsl ;
-Stringize demo_fshader_glsl.h : demo_fshader.glsl ;
+Stringize gl_atlas_glsl.h :	gl_atlas.glsl ;
+Stringize gl_vshader_glsl.h :	gl_vshader.glsl ;
+Stringize gl_fshader_glsl.h :	gl_fshader.glsl ;
 
 ObjectC++Flags gl.cc gltest.cc $(GL_SRCS) : `pkg-config --cflags glfw3 glew freetype2` ;
 
