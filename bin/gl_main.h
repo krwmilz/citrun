@@ -2,9 +2,8 @@
 
 #include "gl_buffer.h"		// citrun::gl_buffer
 #include "gl_font.h"		// citrun::gl_font
-#include "gl_procfile.h"	// citrun::gl_procfile
+#include "gl_runtime.h"		// citrun::gl_procfile, citrun::process_dir
 #include "gl_view.h"
-#include "process_dir.h"	// citrun::process_dir
 
 
 namespace citrun {

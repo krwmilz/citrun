@@ -62,11 +62,9 @@ GL_SRCS =
 	gl_buffer.cc
 	gl_font.cc
 	gl_main.cc
-	gl_procfile.cc
-	gl_transunit.cc
+	gl_runtime.cc
 	gl_view.cc
-	matrix4x4.c
-	process_dir.cc ;
+	matrix4x4.c ;
 
 Library gl_common : $(GL_SRCS) ;
 
