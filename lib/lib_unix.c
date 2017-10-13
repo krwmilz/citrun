@@ -30,13 +30,22 @@
 
 #define UNIX_PROCDIR	"/tmp/citrun"
 
+
 /*
- * Extend the length of the file descriptor passed as the first argument, by a
- * number of bytes (rounded up to a convenient size) given by the second
- * argument.
+ * Implementation of lib_os.h interface for at least:
+ * - OpenBSD
+ * - Darwin
+ * - Linux
+ */
+
+/*
+ * Rounds up the second argument to a multiple of the system page size, which
+ * makes working with mmap nicer.
  *
- * Returns a pointer to the beginning of the extended region on success.
- * Instrumented program exits nonzero on failure.
+ * Get the current mapping length, extend it by truncation and then extend the
+ * memory mapping.
+ *
+ * If this function fails the instrumented program will exit nonzero.
  */
 void *
 citrun_extend(int fd, size_t req_bytes)
@@ -67,12 +76,13 @@ citrun_extend(int fd, size_t req_bytes)
 }
 
 /*
- * Opens a new file semi randomly named like "my_program_name_3IcD7HyvoZ".
- * If the CITRUN_PROCDIR environment variable is set its value is prefixed to
- * the file name else "/tmp/citrun/" is prefixed.
+ * If CITRUN_PROCDIR is not set UNIX_PROCDIR is used as a prefix. Attempt to
+ * create the prefix but don't error if it already exists.
  *
- * Returns a new file descriptor with a unique file system path on success.
- * Instrumented program exits nonzero on failure.
+ * Create a file name by concatenating the program name with a 10 character (man
+ * page suggests this amount) random template and pass that to mkstemp(3).
+ *
+ * If this program fails the instrumented program will exit nonzero.
  */
 int
 citrun_open_fd()
@@ -82,7 +92,7 @@ citrun_open_fd()
 	int			 fd;
 
 	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
-		procdir = "/tmp/citrun";
+		procdir = UNIX_PROCDIR;
 
 	if (mkdir(procdir, S_IRWXU) && errno != EEXIST)
 		err(1, "mkdir '%s'", procdir);
@@ -99,10 +109,14 @@ citrun_open_fd()
 }
 
 /*
- * Takes a pointer to a struct citrun_header and fills in fields related to
- * process id, program name, and working directory.
+ * Fills in the following fields:
+ * - process id
+ * - parent process id
+ * - process group
+ * - program name
+ * - current working directory
  *
- * Returns nothing and never fails.
+ * This function doesn't fail.
  */
 void
 citrun_os_info(struct citrun_header *h)
