@@ -23,11 +23,12 @@
 #include <limits.h>		/* PATH_MAX */
 #include <stdlib.h>		/* get{env,progname} */
 #include <string.h>		/* strl{cpy,cat} */
-#include <unistd.h>		/* lseek get{cwd,pid,ppid,pgrp} */
+#include <unistd.h>		/* access, execlp, fork, lseek, get* */
 
 #include "lib.h"		/* struct citrun_header */
 #include "lib_os.h"
 
+#define UNIX_PROCDIR	"/tmp/citrun"
 
 /*
  * Extend the length of the file descriptor passed as the first argument, by a
@@ -114,4 +115,48 @@ citrun_os_info(struct citrun_header *h)
 
 	if (getcwd(h->cwd, sizeof(h->cwd)) == NULL)
 		strncpy(h->cwd, "", sizeof(h->cwd));
+}
+
+/*
+ * Checks for the global citrun_gl lock file in the directory either given by the
+ * CITRUN_PROCDIR environment variable value or UNIX_PROCDIR if CITRUN_PROCDIR
+ * doesn't exist.
+ *
+ * If no lock file exists a new process is forked that tries to exec 'citrun_gl'
+ * which must be on the path.
+ *
+ * The instrumented program exits on failure and returns nothing on success.
+ */
+void
+citrun_start_viewer()
+{
+	pid_t		 pid;
+	const char	*procdir;
+	char		 viewer_file[PATH_MAX];
+
+	if ((procdir = getenv("CITRUN_PROCDIR")) == NULL)
+		procdir = UNIX_PROCDIR;
+
+	strlcpy(viewer_file, procdir, PATH_MAX);
+	strlcat(viewer_file, "/", PATH_MAX);
+	strlcat(viewer_file, "citrun_gl.lock", PATH_MAX);
+
+	if (access(viewer_file, F_OK)) {
+		/* If errno was ENOENT then fall through otherwise error. */
+		if (errno != ENOENT)
+			err(1, "access");
+	} else
+		/* File already exists, don't create a new viewer. */
+		return;
+
+	pid = fork();
+	if (pid < 0)
+		err(1, "fork");
+	else if (pid > 0)
+		/* In parent process. */
+		return;
+
+	/* In child process, exec the viewer. */
+	if (execlp("citrun_gl", "citrun_gl", NULL))
+		err(1, "exec citrun_gl");
 }

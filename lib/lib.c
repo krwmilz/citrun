@@ -113,6 +113,7 @@ citrun_node_add(unsigned int major, unsigned int minor, struct citrun_node *n)
 	if (header == NULL) {
 		fd = citrun_open_fd();
 		header = citrun_add_header(fd);
+		citrun_start_viewer();
 	}
 
 	/* Allocate enough room for node and live execution buffers. */
