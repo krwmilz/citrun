@@ -26,6 +26,7 @@ BUILD_DEPENDS =		devel/jam \
 			devel/llvm
 
 TEST_DEPENDS =		devel/p5-Inline \
+			devel/p5-Modern-Perl \
 			devel/p5-Sys-Mmap \
 			devel/p5-Test-Cmd \
 			devel/p5-Test-Differences \
