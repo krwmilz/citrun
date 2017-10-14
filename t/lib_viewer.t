@@ -26,7 +26,7 @@ is(	$? >> 8,	0,	'is wrapped compile exit code 0' );
 my $inst_prog = Test::Cmd->new( prog => $wrap->workdir . "/main", workdir => '' );
 
 $ENV{CITRUN_PROCDIR} = $inst_prog->workdir;
-my $err_good = 'main: exec citrun_gl: No such file or directory';
+my $err_good = 'libcitrun: exec citrun_gl: No such file or directory';
 
 $inst_prog->run( chdir => $inst_prog->curdir );
 is(	$inst_prog->stdout,	'',		'is case 1 stdout silent' );

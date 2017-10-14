@@ -170,6 +170,12 @@ citrun_start_viewer()
 		/* In parent process. */
 		return;
 
+	/*
+	 * Use a different name than the instrumented program this library is
+	 * linked to for better diagnostics in error messages.
+	 */
+	setprogname("libcitrun");
+
 	/* In child process, exec the viewer. */
 	if (execlp("citrun_gl", "citrun_gl", NULL))
 		err(1, "exec citrun_gl");
