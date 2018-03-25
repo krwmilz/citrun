@@ -25,14 +25,14 @@
 #include <string.h>		/* strl{cpy,cat} */
 #include <unistd.h>		/* access, execlp, fork, lseek, get* */
 
-#include "lib.h"		/* struct citrun_header */
-#include "lib_os.h"
+#include "citrun.h"		/* struct citrun_header */
+#include "os.h"
 
 #define UNIX_PROCDIR	"/tmp/citrun"
 
 
 /*
- * Implementation of lib_os.h interface for at least:
+ * Implementation of os.h interface for at least:
  * - OpenBSD
  * - Darwin
  * - Linux

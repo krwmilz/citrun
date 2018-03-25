@@ -14,7 +14,7 @@
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 //
 #include "inst_action.h"
-#include "lib_h.h"
+#include "citrun_h.h"		// citrun_h
 
 #include <clang/Frontend/CompilerInstance.h>
 #include <fstream>
@@ -73,7 +73,7 @@ R"(#ifdef __cplusplus
 extern "C" {
 #endif
 )";
-	preamble << lib_h;
+	preamble << citrun_h;
 	preamble << "static struct citrun_node _citrun = {\n"
 		<< "	" << num_lines << ",\n"
 		<< "	\"" << m_compiler_file_name << "\",\n"

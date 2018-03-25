@@ -15,7 +15,7 @@
 //
 #include "inst_action.h"	// InstrumentActionFactory
 #include "inst_fe.h"
-#include "lib.h"		// citrun_major, citrun_minor
+#include "citrun.h"		// citrun_major, citrun_minor
 
 #include <clang/Basic/Diagnostic.h>	// IgnoringDiagConsumer
 #include <clang/Tooling/CommonOptionsParser.h>

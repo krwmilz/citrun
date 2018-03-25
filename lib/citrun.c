@@ -17,8 +17,8 @@
 #include <stdio.h>		/* fprintf, stderr */
 #include <string.h>		/* strncpy */
 
-#include "lib.h"		/* struct citrun_header, struct citrun_node */
-#include "lib_os.h"		/* citrun_{extend,os_info,open_fd} */
+#include "citrun.h"		/* struct citrun_header, struct citrun_node */
+#include "os.h"			/* citrun_{extend,os_info,open_fd} */
 
 
 /*

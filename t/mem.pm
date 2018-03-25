@@ -32,7 +32,7 @@ sub new {
 	my $node_start = get_aligned_size($header_size);
 
 	while ($node_start < $self->{size}) {
-		# Struct field ordering controlled by lib.h.
+		# Struct field ordering controlled by citrun.h.
 		my $data = substr($self->{mem}, $node_start, $node_fixed_size);
 		my @struct_fields = unpack("IZ256Z256", $data);
 
@@ -73,7 +73,7 @@ sub get_buffers {
 1;
 __DATA__
 __C__
-#include "../lib/lib.h"
+#include "../lib/citrun.h"
 
 size_t citrun_header_size() {
 	return sizeof(struct citrun_header);

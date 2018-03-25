@@ -24,7 +24,7 @@
 #include <iostream>		// std::cerr
 #include <sstream>		// std::stringstream
 
-#include "lib.h"		// struct citrun_node
+#include "citrun.h"		// struct citrun_node
 #include "gl_runtime.h"		// citrun::gl_transunit, citrun::gl_procfile
 
 

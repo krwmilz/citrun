@@ -137,7 +137,7 @@ actions CCItRunRun
 		-e "s,citrun_node_add,ccitrunrun_node_add," \
 		-e "s,citrun_major,ccitrunrun_major,g" \
 		-e "s,citrun_minor,ccitrunrun_minor,g" \
-		lib.h lib.c inst_action.cc inst_fe.cc gl_procfile.cc
+		citrun.h citrun.c inst_action.cc inst_fe.cc gl_procfile.cc
 
 	#
 	# Change binary names so we can do a side by side installation.
@@ -147,7 +147,7 @@ actions CCItRunRun
 		-e "s,citrun_term,ccitrunrun_term," \
 		-e "s,citrun_gl,ccitrunrun_gl," \
 		-e "s,libcitrun,libccitrunrun," \
-		Jamfile lib.c inst_main.cc
+		Jamfile citrun.c inst_main.cc
 	jam
 }
 

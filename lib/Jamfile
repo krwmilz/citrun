@@ -1,8 +1,8 @@
 SubDir TOP lib ;
 
-Stringize lib_h.h : lib.h ;
+Stringize citrun_h.h : citrun.h ;
 
-ObjectCcFlags lib.c lib_unix.c : -fPIC -ansi ;
-Library libcitrun : lib.c lib_unix.c ;
+ObjectCcFlags citrun.c unix.c : -fPIC -ansi ;
+Library libcitrun : citrun.c unix.c ;
 
 InstallLib $(PREFIX)/lib : libcitrun.a ;
