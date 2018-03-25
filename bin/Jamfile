@@ -11,7 +11,6 @@ Shell citrun_report : report.awk ;
 #
 # citrun_wrap
 #
-SHELLHEADER on citrun_wrap = "#!/bin/sh" ;
 MakeLocate citrun_wrap : bin ;
 Shell citrun_wrap : wrap.sh ;
 ReplacePrefix citrun_wrap ;
@@ -82,10 +81,6 @@ LinkLibraries citrun_gl citrun_gltest : gl_common libglyphy ;
 
 Main citrun_gl : gl.cc ;
 Main citrun_gltest : gltest.cc ;
-
-# Link with the c++ compiler so that the matching c++ runtime library gets added
-# automatically.
-LINK on citrun_inst citrun_gl citrun_gltest = $(C++) ;
 
 #
 # install

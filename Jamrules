@@ -4,17 +4,14 @@ echo ░▀▀▀░░░▀▀▀░░▀░░░░▀░▀░▀▀▀░
 echo ;
 
 PREFIX ?= `pwd` ;
-CC = $(CC:E=clang) ;
-C++ = $(CXX:E=clang++) ;
 
 echo PREFIX \= $(PREFIX) ;
-echo CC \= $(CC) ;
-echo C++ \= $(C++) ;
 echo CFLAGS \= $(CFLAGS) ;
 echo LDFLAGS \= $(LDFLAGS) ;
 echo ;
 
 if $(OS) = "OPENBSD" {
+	INST_EXTRALIB = "-lstdc++" ;
 	echo "Good to go soldier." ;
 }
 else if $(OS) = "Darwin" {
@@ -79,7 +76,7 @@ actions PkgConfig
 
 actions C++11
 {
-	$(C++) -x c++ -std=c++11 -E - < /dev/null > /dev/null
+	$(CC) -x c++ -std=c++11 -E - < /dev/null > /dev/null
 }
 
 C++11 check_dependencies ;
@@ -90,7 +87,7 @@ PkgConfig check_dependencies ;
 #
 actions Analysis
 {
-	scan-build --use-c++=clang++ -o html jam -j4
+	scan-build -o html jam -j4
 }
 
 #
