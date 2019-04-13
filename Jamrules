@@ -66,7 +66,7 @@ actions PkgConfig
 	type pkg-config
 	echo
 
-	gl_pkgs="osmesa glfw3 glew freetype2"
+	gl_pkgs="osmesa glfw3 glew glyphy freetype2"
 	for pkg in $gl_pkgs; do
 		echo -n "$pkg = "
 		pkg-config --modversion $pkg || echo "NOT FOUND"
