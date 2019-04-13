@@ -46,7 +46,7 @@ LINKLIBS on citrun_inst +=
 	-lclangAST
 	-lclangLex
 	-lclangBasic
-	`llvm-config --system-libs --libs bitreader mcparser transformutils option`
+	-lLLVM
 	;
 
 Main citrun_inst : $(INST_SRCS) ;
