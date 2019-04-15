@@ -52,9 +52,10 @@ LINKLIBS on citrun_inst +=
 Main citrun_inst : $(INST_SRCS) ;
 
 #
-# citrun_gl,  citrun_gltest
+# citrun_gl
 #
 GL_SRCS =
+	gl.cc
 	gl_atlas.cc
 	gl_buffer.cc
 	gl_font.cc
@@ -65,21 +66,16 @@ GL_SRCS =
 	gl_view.cc
 	matrix4x4.c ;
 
-Library gl_common : $(GL_SRCS) ;
-
 Stringize gl_atlas_glsl.h :	gl_atlas.glsl ;
 Stringize gl_vshader_glsl.h :	gl_vshader.glsl ;
 Stringize gl_fshader_glsl.h :	gl_fshader.glsl ;
 
-ObjectC++Flags gl.cc gltest.cc $(GL_SRCS) : `pkg-config --cflags $(gl_pkgs)` ;
+ObjectC++Flags $(GL_SRCS) : `pkg-config --cflags $(gl_pkgs)` ;
 
+LINKFLAGS on citrun_gl = $(LINKFLAGS) ;
 LINKLIBS on citrun_gl += -lm $(GL_EXTRALIB) `pkg-config --libs $(gl_pkgs)` ;
-LINKLIBS on citrun_gltest += -lm `pkg-config --libs $(gl_pkgs)` ;
 
-LinkLibraries citrun_gl citrun_gltest : gl_common ;
-
-Main citrun_gl : gl.cc ;
-Main citrun_gltest : gltest.cc ;
+Main citrun_gl : $(GL_SRCS) ;
 
 #
 # install
