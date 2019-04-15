@@ -40,6 +40,8 @@ C++FLAGS += $(CFLAGS) -Wall -W -Wcast-qual
 
 LINKFLAGS += $(LDFLAGS) ;
 
+gl_pkgs = "glfw3 glew glyphy freetype2" ; # osmesa
+
 # Quote an entire file and add a variable declaration prefixing the string.
 rule Stringize
 {
@@ -66,8 +68,7 @@ actions PkgConfig
 	type pkg-config
 	echo
 
-	gl_pkgs="osmesa glfw3 glew glyphy freetype2"
-	for pkg in $gl_pkgs; do
+	for pkg in $(gl_pkgs); do
 		echo -n "$pkg = "
 		pkg-config --modversion $pkg || echo "NOT FOUND"
 	done
