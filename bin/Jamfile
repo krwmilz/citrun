@@ -74,8 +74,7 @@ Stringize gl_fshader_glsl.h :	gl_fshader.glsl ;
 ObjectC++Flags gl.cc gltest.cc $(GL_SRCS) : `pkg-config --cflags glyphy glfw3 glew freetype2` ;
 
 LINKLIBS on citrun_gl += -lm $(GL_EXTRALIB) `pkg-config --libs glyphy glfw3 glew freetype2` ;
-LINKLIBS on citrun_gltest += -lm `pkg-config --libs glyphy glfw3 osmesa freetype2` ;
-LINKLIBS on citrun_gltest += bin/glew-2.1.0/lib/libGLEW.a ;
+LINKLIBS on citrun_gltest += -lm `pkg-config --libs glyphy glfw3 glew freetype2` ;
 
 LinkLibraries citrun_gl citrun_gltest : gl_common ;
 
